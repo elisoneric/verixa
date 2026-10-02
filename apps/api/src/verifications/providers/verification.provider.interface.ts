@@ -2,21 +2,25 @@ export interface BvnVerificationData {
   bvn: string;
   firstName?: string;
   lastName?: string;
+  consent?: boolean;
 }
 
 export interface NinVerificationData {
   nin: string;
   firstName?: string;
   lastName?: string;
+  consent?: boolean;
 }
 
 export interface BankAccountVerificationData {
   accountNumber: string;
   bankCode: string;
+  consent?: boolean;
 }
 
 export interface NinAdvanceVerificationData {
   nin: string;
+  consent?: boolean;
 }
 
 export interface NinAdvanceResult {

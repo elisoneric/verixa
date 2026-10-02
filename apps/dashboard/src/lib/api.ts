@@ -213,7 +213,7 @@ export class ApiClient {
   }
 
   // NIN Slip Generator
-  static async generateNinSlip(nin: string, format: "pdf" | "docx" | "both" = "both") {
+  static async generateNinSlip(nin: string, format: "pdf" | "docx" | "both" = "both", consent = true) {
     return this.request<{
       status: string
       data: {
@@ -231,7 +231,7 @@ export class ApiClient {
       }
     }>("/v1/dashboard/slips/nin", {
       method: "POST",
-      body: JSON.stringify({ nin, format }),
+      body: JSON.stringify({ nin, format, consent }),
     })
   }
 

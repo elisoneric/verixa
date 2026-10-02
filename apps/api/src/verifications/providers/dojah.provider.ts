@@ -39,13 +39,16 @@ export class DojahProvider implements IVerificationProvider {
   async verifyBvn(data: BvnVerificationData): Promise<VerificationResponse<any>> {
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!secretKey) {
-      this.logger.log('Dojah credentials not configured, falling back to mock provider for BVN');
+      if (process.env.NODE_ENV === 'production' && !baseUrl.includes('sandbox')) {
+        throw new Error('Live Dojah credentials (DOJAH_SECRET_KEY) are not configured.');
+      }
+      this.logger.log('Dojah sandbox fallback to mock provider for BVN');
       return this.mockProvider.verifyBvn(data);
     }
 
     try {
       const response = await axios.get(`${baseUrl}/api/v1/kyc/bvn`, {
-        params: { bvn: data.bvn },
+        params: { bvn: data.bvn, consent: true },
         headers: {
           Authorization: secretKey,
           AppId: appId || '',
@@ -77,13 +80,16 @@ export class DojahProvider implements IVerificationProvider {
   async verifyNin(data: NinVerificationData): Promise<VerificationResponse<any>> {
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!secretKey) {
-      this.logger.log('Dojah credentials not configured, falling back to mock provider for NIN Basic');
+      if (process.env.NODE_ENV === 'production' && !baseUrl.includes('sandbox')) {
+        throw new Error('Live Dojah credentials (DOJAH_SECRET_KEY) are not configured.');
+      }
+      this.logger.log('Dojah sandbox fallback to mock provider for NIN Basic');
       return this.mockProvider.verifyNin(data);
     }
 
     try {
       const response = await axios.get(`${baseUrl}/api/v1/kyc/nin`, {
-        params: { nin: data.nin },
+        params: { nin: data.nin, consent: true },
         headers: {
           Authorization: secretKey,
           AppId: appId || '',
@@ -115,13 +121,16 @@ export class DojahProvider implements IVerificationProvider {
   async verifyNinAdvance(data: NinAdvanceVerificationData): Promise<VerificationResponse<NinAdvanceResult>> {
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!secretKey) {
-      this.logger.log('Dojah credentials not configured, falling back to mock provider for NIN Advance');
+      if (process.env.NODE_ENV === 'production' && !baseUrl.includes('sandbox')) {
+        throw new Error('Live Dojah credentials (DOJAH_SECRET_KEY) are not configured.');
+      }
+      this.logger.log('Dojah sandbox fallback to mock provider for NIN Advance');
       return this.mockProvider.verifyNinAdvance(data);
     }
 
     try {
       const response = await axios.get(`${baseUrl}/api/v1/kyc/nin/advance`, {
-        params: { nin: data.nin },
+        params: { nin: data.nin, consent: true },
         headers: {
           Authorization: secretKey,
           AppId: appId || '',
@@ -130,7 +139,7 @@ export class DojahProvider implements IVerificationProvider {
       });
 
       const entity = response.data?.entity || {};
-      const trackingId = entity.tracking_id || entity.trackingId || `VNX-${uuidv4().slice(0, 12).toUpperCase()}`;
+      const trackingId = entity.tracking_id || entity.trackingId || '';
 
       // Clean photo string (strip data:image... prefix if present for raw base64 or keep format)
       let photoStr = entity.photo || '';
@@ -169,6 +178,9 @@ export class DojahProvider implements IVerificationProvider {
   async verifyBankAccount(data: BankAccountVerificationData): Promise<VerificationResponse<any>> {
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!secretKey) {
+      if (process.env.NODE_ENV === 'production' && !baseUrl.includes('sandbox')) {
+        throw new Error('Live Dojah credentials (DOJAH_SECRET_KEY) are not configured.');
+      }
       return this.mockProvider.verifyBankAccount(data);
     }
 
@@ -177,6 +189,7 @@ export class DojahProvider implements IVerificationProvider {
         params: {
           account_number: data.accountNumber,
           bank_code: data.bankCode,
+          consent: true,
         },
         headers: {
           Authorization: secretKey,
@@ -204,3 +217,4 @@ export class DojahProvider implements IVerificationProvider {
     }
   }
 }
+

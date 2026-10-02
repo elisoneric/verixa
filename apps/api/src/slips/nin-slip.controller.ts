@@ -37,6 +37,9 @@ export class NinSlipController {
   @UseGuards(ApiKeyGuard)
   @Post('slips/nin')
   async generateSlipApiKey(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
     const nin = String(body.nin || '').trim();
     const format = body.format || 'pdf';
     return this.ninSlipService.generateSlipForOrganization(
@@ -52,6 +55,9 @@ export class NinSlipController {
   @UseGuards(JwtAuthGuard)
   @Post('dashboard/slips/nin')
   async generateSlipDashboard(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
     const nin = String(body.nin || '').trim();
     const format = body.format || 'both';
     return this.ninSlipService.generateSlipForOrganization(
@@ -100,6 +106,9 @@ export class NinSlipController {
   @UseGuards(ApiKeyGuard)
   @Post('verify/nin/advance')
   async verifyNinAdvance(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
     const nin = String(body.nin || '').trim();
     if (nin.length !== 11) {
       throw new BadRequestException('A valid 11-digit NIN is required');

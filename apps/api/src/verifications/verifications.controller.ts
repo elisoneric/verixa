@@ -10,10 +10,12 @@ import {
   InternalServerErrorException,
   UseInterceptors,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiKeyGuard } from '../auth/guards/api-key.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { MockProvider } from './providers/mock.provider';
+import { DojahProvider } from './providers/dojah.provider';
 import { BillingService } from '../billing/billing.service';
 import { IdentityCacheService } from './identity-cache.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -27,6 +29,7 @@ import { Environment } from '../organizations/entities/environment-config.entity
 export class VerificationsController {
   constructor(
     private mockProvider: MockProvider,
+    private dojahProvider: DojahProvider,
     private billingService: BillingService,
     private identityCacheService: IdentityCacheService,
     @InjectRepository(VerificationLog)
@@ -39,24 +42,54 @@ export class VerificationsController {
   @UseInterceptors(IdempotencyInterceptor)
   @Post('bvn')
   async verifyBvn(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
     const identifier = String(body.bvn || '').trim();
-    return this.processVerification(req, 'bvn', identifier, body, () => this.mockProvider.verifyBvn(body));
+    const isLive = req.environment === Environment.LIVE;
+    return this.processVerification(
+      req,
+      'bvn',
+      identifier,
+      body,
+      () => (isLive ? this.dojahProvider.verifyBvn(body) : this.mockProvider.verifyBvn(body))
+    );
   }
 
   @UseGuards(ApiKeyGuard)
   @UseInterceptors(IdempotencyInterceptor)
   @Post('nin')
   async verifyNin(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
     const identifier = String(body.nin || '').trim();
-    return this.processVerification(req, 'nin', identifier, body, () => this.mockProvider.verifyNin(body));
+    const isLive = req.environment === Environment.LIVE;
+    return this.processVerification(
+      req,
+      'nin',
+      identifier,
+      body,
+      () => (isLive ? this.dojahProvider.verifyNin(body) : this.mockProvider.verifyNin(body))
+    );
   }
 
   @UseGuards(ApiKeyGuard)
   @UseInterceptors(IdempotencyInterceptor)
   @Post('bank-account')
   async verifyBankAccount(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
     const identifier = `${body.bankCode || ''}_${body.accountNumber || ''}`.trim();
-    return this.processVerification(req, 'nuban', identifier, body, () => this.mockProvider.verifyBankAccount(body));
+    const isLive = req.environment === Environment.LIVE;
+    return this.processVerification(
+      req,
+      'nuban',
+      identifier,
+      body,
+      () => (isLive ? this.dojahProvider.verifyBankAccount(body) : this.mockProvider.verifyBankAccount(body))
+    );
   }
 
   // --- JWT Authenticated Endpoints (For Customer Dashboard) ---
@@ -209,6 +242,10 @@ export class VerificationsController {
     @Req() req: any,
     @Body() body: { service: 'bvn' | 'nin' | 'nuban'; environment: Environment; payload: any }
   ) {
+    if (body.payload?.consent !== true && body.payload?.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+
     const targetEnv = String(body.environment).toLowerCase() === 'live' ? Environment.LIVE : Environment.SANDBOX;
     let identifier = '';
     if (body.service === 'bvn') identifier = String(body.payload?.bvn || '').trim();
@@ -222,15 +259,21 @@ export class VerificationsController {
       headers: {},
     };
 
+    const isLive = targetEnv === Environment.LIVE;
+
     return this.processVerification(
       mockReq,
       body.service,
       identifier,
       body.payload,
       async () => {
-        if (body.service === 'bvn') return this.mockProvider.verifyBvn(body.payload);
-        if (body.service === 'nin') return this.mockProvider.verifyNin(body.payload);
-        return this.mockProvider.verifyBankAccount(body.payload);
+        if (body.service === 'bvn') {
+          return isLive ? this.dojahProvider.verifyBvn(body.payload) : this.mockProvider.verifyBvn(body.payload);
+        }
+        if (body.service === 'nin') {
+          return isLive ? this.dojahProvider.verifyNin(body.payload) : this.mockProvider.verifyNin(body.payload);
+        }
+        return isLive ? this.dojahProvider.verifyBankAccount(body.payload) : this.mockProvider.verifyBankAccount(body.payload);
       }
     );
   }
