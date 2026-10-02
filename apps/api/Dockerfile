@@ -27,10 +27,10 @@ ENV PORT=4000
 # Install curl for healthcheck
 RUN apk add --no-cache curl
 
-# Copy runtime packages
+# Copy runtime packages and built assets
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/src/slips/assets ./apps/api/src/slips/assets
 COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 
 EXPOSE 4000
