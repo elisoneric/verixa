@@ -72,6 +72,17 @@ services:
     depends_on:
       - api
 
+  docs:
+    build:
+      context: .
+      dockerfile: apps/docs/Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+    expose:
+      - "3002"
+
 volumes:
   pgdata:
   redisdata:

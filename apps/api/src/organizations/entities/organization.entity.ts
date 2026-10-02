@@ -37,6 +37,9 @@ export class Organization {
 
   @Column({ type: 'jsonb', nullable: true })
   complianceData: {
+    accountType?: string;
+    fullName?: string;
+    nin?: string;
     rcNumber?: string;
     businessType?: string;
     directorName?: string;
@@ -48,6 +51,7 @@ export class Organization {
     termsAgreed?: boolean;
     registeredIp?: string;
     verifiedAt?: string;
+    upgradedAt?: string;
   };
 
   @OneToMany(() => User, user => user.organization)

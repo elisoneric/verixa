@@ -46,8 +46,14 @@ export class BillingService {
     let defaultCache = 20;
 
     if (serviceType === 'nuban') {
-      defaultLive = 10;
-      defaultCache = 5;
+      return {
+        effectiveRate: 0,
+        baseRate: 0,
+        discountPercent: 100,
+        tier: org?.tier || OrganizationTier.STARTER,
+        isCustom: false,
+        isCacheHit,
+      };
     } else if (serviceType === 'nin_advance') {
       defaultLive = 140;
       defaultCache = 30;
@@ -61,13 +67,11 @@ export class BillingService {
     if (isCacheHit) {
       if (serviceType === 'bvn' && configMap['BASE_BVN_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_BVN_CACHE_PRICE'], 10);
       if (serviceType === 'nin' && configMap['BASE_NIN_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_CACHE_PRICE'], 10);
-      if (serviceType === 'nuban' && configMap['BASE_NUBAN_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NUBAN_CACHE_PRICE'], 10);
       if (serviceType === 'nin_advance' && configMap['BASE_NIN_ADVANCE_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_ADVANCE_CACHE_PRICE'], 10);
       if (serviceType === 'nin_slip' && configMap['BASE_NIN_SLIP_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_SLIP_CACHE_PRICE'], 10);
     } else {
       if (serviceType === 'bvn' && configMap['BASE_BVN_PRICE']) baseRate = parseInt(configMap['BASE_BVN_PRICE'], 10);
       if (serviceType === 'nin' && configMap['BASE_NIN_PRICE']) baseRate = parseInt(configMap['BASE_NIN_PRICE'], 10);
-      if (serviceType === 'nuban' && configMap['BASE_NUBAN_PRICE']) baseRate = parseInt(configMap['BASE_NUBAN_PRICE'], 10);
       if (serviceType === 'nin_advance' && configMap['BASE_NIN_ADVANCE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_ADVANCE_PRICE'], 10);
       if (serviceType === 'nin_slip' && configMap['BASE_NIN_SLIP_PRICE']) baseRate = parseInt(configMap['BASE_NIN_SLIP_PRICE'], 10);
     }
@@ -83,19 +87,14 @@ export class BillingService {
       } else if (serviceType === 'nin' && org?.customNinRate != null) {
         price = org.customNinRate;
         isCustom = true;
-      } else if (serviceType === 'nuban' && org?.customNubanRate != null) {
-        price = org.customNubanRate;
-        isCustom = true;
       } else {
         // 3. Organization tier standard pricing
         if (org?.tier === OrganizationTier.ENTERPRISE) {
-          if (serviceType === 'nuban') price = 7;
-          else if (serviceType === 'nin_advance') price = 120;
+          if (serviceType === 'nin_advance') price = 120;
           else if (serviceType === 'nin_slip') price = 230;
           else price = 35;
         } else if (org?.tier === OrganizationTier.GROWTH) {
-          if (serviceType === 'nuban') price = 9;
-          else if (serviceType === 'nin_advance') price = 130;
+          if (serviceType === 'nin_advance') price = 130;
           else if (serviceType === 'nin_slip') price = 250;
           else price = 45;
         }
@@ -103,13 +102,11 @@ export class BillingService {
     } else {
       // Tier savings on cache hits
       if (org?.tier === OrganizationTier.ENTERPRISE) {
-        if (serviceType === 'nuban') price = 3;
-        else if (serviceType === 'nin_advance') price = 20;
+        if (serviceType === 'nin_advance') price = 20;
         else if (serviceType === 'nin_slip') price = 35;
         else price = 15;
       } else if (org?.tier === OrganizationTier.GROWTH) {
-        if (serviceType === 'nuban') price = 4;
-        else if (serviceType === 'nin_advance') price = 25;
+        if (serviceType === 'nin_advance') price = 25;
         else if (serviceType === 'nin_slip') price = 40;
         else price = 18;
       }

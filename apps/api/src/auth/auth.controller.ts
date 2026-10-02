@@ -25,6 +25,12 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('upgrade-developer')
+  upgradeToDeveloper(@Req() req: any) {
+    return this.authService.upgradeToDeveloper(req.organizationId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('api-keys')
   listApiKeys(@Req() req: any) {
     return this.authService.listApiKeys(req.organizationId);

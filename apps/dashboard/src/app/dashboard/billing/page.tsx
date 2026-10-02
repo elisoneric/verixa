@@ -237,46 +237,49 @@ export default function BillingPage() {
             <TableRow>
               <TableHead>Service Endpoint</TableHead>
               <TableHead>Live Upstream Rate</TableHead>
-              <TableHead>Smart Cache Hit Rate</TableHead>
+              <TableHead>Intelligent Cache</TableHead>
               <TableHead>Latency SLA</TableHead>
               <TableHead>Billing Policy</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
+            <TableRow className="bg-emerald-500/5">
+              <TableCell className="font-medium text-white flex items-center gap-2">
+                Bank Account Resolution (NUBAN)
+                <Badge variant="verified" size="sm">FREE FOR NOW</Badge>
+              </TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">₦0.00 (Free)</TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">
+                Cache Split Included
+              </TableCell>
+              <TableCell className="font-mono text-xs text-zinc-400">&lt;120ms</TableCell>
+              <TableCell className="text-xs text-emerald-400">Zero Charge</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium text-white">NIN Advance Verification</TableCell>
+              <TableCell className="font-mono text-zinc-200 font-bold">140 NGX (₦140)</TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">
+                Cache Split Enabled
+              </TableCell>
+              <TableCell className="font-mono text-xs text-zinc-400">&lt;180ms</TableCell>
+              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium text-white">Official NIN Slip (Standard & Premium)</TableCell>
+              <TableCell className="font-mono text-zinc-200 font-bold">270 NGX (₦270)</TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">
+                Cache Split Enabled
+              </TableCell>
+              <TableCell className="font-mono text-xs text-zinc-400">&lt;250ms</TableCell>
+              <TableCell className="text-xs text-zinc-400">Charged on 200 OK generation</TableCell>
+            </TableRow>
             <TableRow>
               <TableCell className="font-medium text-white">Bank Verification Number (BVN)</TableCell>
-              <TableCell className="font-mono text-zinc-200 font-bold">{liveRates.bvn} NGX (₦{liveRates.bvn})</TableCell>
+              <TableCell className="font-mono text-zinc-200 font-bold">50 NGX (₦50)</TableCell>
               <TableCell className="font-mono text-emerald-400 font-bold">
-                <div className="flex items-center gap-2">
-                  <span>{cacheRates.bvn} NGX (₦{cacheRates.bvn})</span>
-                  <Badge variant="verified" size="sm">SAVE {cacheSavings}%</Badge>
-                </div>
+                Cache Split Enabled
               </TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) / &lt;180ms (Live)</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium text-white">National Identification Number (NIN)</TableCell>
-              <TableCell className="font-mono text-zinc-200 font-bold">{liveRates.nin} NGX (₦{liveRates.nin})</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">
-                <div className="flex items-center gap-2">
-                  <span>{cacheRates.nin} NGX (₦{cacheRates.nin})</span>
-                  <Badge variant="verified" size="sm">SAVE {cacheSavings}%</Badge>
-                </div>
-              </TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) / &lt;180ms (Live)</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium text-white">Bank Account Resolution (NUBAN)</TableCell>
-              <TableCell className="font-mono text-zinc-200 font-bold">{liveRates.nuban} NGX (₦{liveRates.nuban})</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">
-                <div className="flex items-center gap-2">
-                  <span>{cacheRates.nuban} NGX (₦{cacheRates.nuban})</span>
-                  <Badge variant="verified" size="sm">SAVE 50%</Badge>
-                </div>
-              </TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) / &lt;120ms (Live)</TableCell>
+              <TableCell className="font-mono text-xs text-zinc-400">&lt;150ms</TableCell>
               <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
             </TableRow>
           </TableBody>
@@ -287,53 +290,83 @@ export default function BillingPage() {
       <Modal
         isOpen={topupModalOpen}
         onClose={() => setTopupModalOpen(false)}
-        title="Top Up Live NGX Credits"
-        description="Choose the amount of NGX credits to purchase via Paystack checkout."
+        title="Fund Live Wallet Balance"
+        description="Transfer to your dedicated virtual account or initialize online checkout."
       >
-        <form onSubmit={handleTopupCheckout} className="space-y-4 mt-4">
-          <Input
-            label="Deposit Amount (NGN / NGX)"
-            type="number"
-            min="1000"
-            step="1000"
-            value={topupAmount}
-            onChange={(e) => setTopupAmount(e.target.value)}
-            hint="1 NGX = ₦1.00 NGN. Minimum topup is ₦1,000."
-            required
-          />
+        <div className="space-y-4 mt-2">
+          {/* Primary Recommended Method: Dedicated Account */}
+          <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-bold text-emerald-400">RECOMMENDED: AUTOMATED BANK TRANSFER</span>
+              <Badge variant="verified" size="sm">INSTANT CREDIT</Badge>
+            </div>
+            <p className="text-xs text-zinc-300 leading-relaxed">
+              Transfer directly from your bank app or USSD to your Paystack Dedicated Account. Your live NGX balance is auto-credited immediately upon settlement:
+            </p>
+            <div className="p-3 rounded-lg bg-zinc-950/80 border border-zinc-800 space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-zinc-500 block uppercase font-mono">Bank Name</span>
+                  <span className="text-xs font-bold text-white">Titan Trust Bank</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-zinc-500 block uppercase font-mono">Beneficiary</span>
+                  <span className="text-xs font-semibold text-zinc-300">Verixa ID / Settlement</span>
+                </div>
+              </div>
+              <div className="pt-1 flex items-center justify-between border-t border-zinc-800">
+                <div>
+                  <span className="text-[10px] text-zinc-500 block uppercase font-mono">Dedicated Account</span>
+                  <span className="font-mono text-base font-extrabold text-emerald-400 tracking-wider">9940182741</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={() => {
+                    navigator.clipboard.writeText("9940182741")
+                    alert("Account number 9940182741 copied to clipboard!")
+                  }}
+                >
+                  Copy Number
+                </Button>
+              </div>
+            </div>
+          </div>
 
-          <div className="grid grid-cols-3 gap-2 pt-1">
-            {["5000", "20000", "50000"].map((preset) => (
-              <button
-                key={preset}
+          {/* Secondary Method: Online Paystack */}
+          <form onSubmit={handleTopupCheckout} className="space-y-3 pt-2 border-t border-zinc-800">
+            <span className="text-xs font-semibold text-zinc-300 block">Alternative: Online Card / Gateway Checkout</span>
+            <Input
+              label="Deposit Amount (NGN / NGX)"
+              type="number"
+              min="1000"
+              step="1000"
+              value={topupAmount}
+              onChange={(e) => setTopupAmount(e.target.value)}
+              hint="1 NGX = ₦1.00 NGN. Minimum topup is ₦1,000."
+              required
+            />
+
+            <div className="flex justify-end gap-3 pt-3 border-t border-zinc-800">
+              <Button
                 type="button"
-                onClick={() => setTopupAmount(preset)}
-                className="py-1.5 rounded-lg border border-zinc-800 bg-zinc-950 font-mono text-xs text-zinc-300 hover:border-zinc-700"
+                variant="ghost"
+                size="sm"
+                onClick={() => setTopupModalOpen(false)}
               >
-                ₦{parseInt(preset).toLocaleString()}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setTopupModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="emerald"
-              size="sm"
-              isLoading={isProcessing}
-            >
-              Proceed to Paystack
-            </Button>
-          </div>
-        </form>
+                Close
+              </Button>
+              <Button
+                type="submit"
+                variant="emerald"
+                size="sm"
+                isLoading={isProcessing}
+              >
+                Proceed Online
+              </Button>
+            </div>
+          </form>
+        </div>
       </Modal>
     </div>
   )

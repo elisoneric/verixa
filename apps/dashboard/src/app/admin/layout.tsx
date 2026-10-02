@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!isLoading) {
       if (!token) {
         router.push(`/login?redirect=${encodeURIComponent(pathname)}`)
-      } else if (user && user.role !== "super_admin" && user.role !== "admin") {
+      } else if (user && !user.is_super_admin && user.role !== "super_admin" && user.role !== "SuperAdmin") {
         router.push("/dashboard")
       }
     }

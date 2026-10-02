@@ -72,7 +72,7 @@ export class AuthService {
       const user = new User();
       user.email = email;
       user.passwordHash = await bcrypt.hash(password, 10);
-      user.role = UserRole.ADMIN;
+      user.role = UserRole.DEVELOPER;
       user.org_id = org.id;
       await queryRunner.manager.save(user);
       userId = user.id;
@@ -143,8 +143,24 @@ export class AuthService {
       role: user.role,
       org_id: user.org_id,
       org_name: org?.name || 'Organization',
+      account_type: org?.complianceData?.accountType || 'developer',
+      is_super_admin: user.role === UserRole.SUPER_ADMIN,
       created_at: user.createdAt,
     };
+  }
+
+  async upgradeToDeveloper(orgId: string) {
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    if (!org) {
+      throw new NotFoundException('Organization not found');
+    }
+    org.complianceData = {
+      ...(org.complianceData || {}),
+      accountType: 'developer',
+      upgradedAt: new Date().toISOString(),
+    };
+    await this.orgRepository.save(org);
+    return { success: true, accountType: 'developer' };
   }
 
   async generateApiKey(orgId: string, environment: Environment, name = 'API Key') {

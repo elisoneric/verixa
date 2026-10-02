@@ -6,6 +6,8 @@ export interface ApiUser {
   org_id: string
   role: string
   org_name: string
+  account_type?: "individual" | "developer"
+  is_super_admin?: boolean
 }
 
 export interface ApiKeyItem {
@@ -120,6 +122,12 @@ export class ApiClient {
 
   static async getMe() {
     return this.request<ApiUser>("/auth/me")
+  }
+
+  static async upgradeToDeveloper() {
+    return this.request<{ success: boolean; accountType: string }>("/auth/upgrade-developer", {
+      method: "POST",
+    })
   }
 
   // API Keys

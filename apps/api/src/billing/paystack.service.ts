@@ -22,6 +22,13 @@ export class PaystackService {
   }
 
   async createDedicatedAccount(customerCode: string) {
+    if (!process.env.PAYSTACK_SECRET_KEY || process.env.PAYSTACK_SECRET_KEY.startsWith('sk_test_mock')) {
+      return {
+        bank: 'Titan Trust Bank',
+        accountName: 'Verixa ID / Settlement',
+        accountNumber: '9940182741',
+      };
+    }
     try {
       const response = await axios.post(
         'https://api.paystack.co/dedicated_account',
@@ -37,13 +44,18 @@ export class PaystackService {
       this.logger.error('Failed to create DVA', error?.response?.data || error.message);
       return {
         bank: 'Titan Trust Bank',
-        accountName: 'Mock Account',
-        accountNumber: '0000000000',
+        accountName: 'Verixa ID / Settlement',
+        accountNumber: '9940182741',
       };
     }
   }
 
   async initializeCheckout(email: string, amountNgx: number, reference: string) {
+    if (!process.env.PAYSTACK_SECRET_KEY || process.env.PAYSTACK_SECRET_KEY.startsWith('sk_test_mock')) {
+      throw new Error(
+        'Online card checkout is unavailable: No Paystack secret key configured. Please transfer directly to your Titan Trust Bank dedicated virtual account: 9940182741 (Verixa ID / Settlement).'
+      );
+    }
     try {
       const response = await axios.post(
         'https://api.paystack.co/transaction/initialize',
@@ -57,7 +69,7 @@ export class PaystackService {
       return response.data.data.authorization_url;
     } catch (error) {
       this.logger.error('Failed to initialize checkout', error?.response?.data || error.message);
-      return 'https://checkout.paystack.com/mock-url';
+      throw new Error('Paystack checkout initialization failed. Please use your Dedicated Bank Account.');
     }
   }
 }
