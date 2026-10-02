@@ -50,12 +50,12 @@ export default function WebhooksPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-white">Webhooks</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Webhooks</h1>
             <Badge variant="verified" size="sm">
               HMAC SHA-512
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Receive real-time asynchronous HTTP notifications for KYC verification events and account top-ups.
           </p>
         </div>
@@ -67,7 +67,7 @@ export default function WebhooksPage() {
 
       {/* Endpoints List */}
       <div className="space-y-4">
-        <h3 className="text-base font-bold text-white tracking-tight">Configured Endpoints</h3>
+        <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Configured Endpoints</h3>
 
         {endpoints.length === 0 ? (
           <EmptyState
@@ -79,26 +79,29 @@ export default function WebhooksPage() {
         ) : (
           <div className="space-y-4">
             {endpoints.map((ep) => (
-              <Card key={ep.id} className="p-6 bg-zinc-900/50 border-zinc-800 space-y-4">
+              <Card key={ep.id} className="p-6 bg-white dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 space-y-4 shadow-xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm font-bold text-white">{ep.url}</span>
+                      <span className="font-mono text-sm font-bold text-slate-900 dark:text-white">{ep.url}</span>
                       <Badge variant="verified" size="sm">ACTIVE</Badge>
                     </div>
-                    <div className="text-xs font-mono text-zinc-500">
+                    <div className="text-xs font-mono text-slate-500 dark:text-zinc-500">
                       ID: {ep.id} • Created {new Date(ep.createdAt).toLocaleDateString()}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="xs" onClick={() => handleTestPing(ep.id)}>
-                      ⚡ Send Test Ping
+                    <Button variant="outline" size="xs" onClick={() => handleTestPing(ep.id)} className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Send Test Ping
                     </Button>
                     <Button
                       variant="outline"
                       size="xs"
-                      className="text-rose-400 border-rose-500/30"
+                      className="text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/30"
                       onClick={() => setEndpoints(endpoints.filter((e) => e.id !== ep.id))}
                     >
                       Delete
@@ -106,19 +109,19 @@ export default function WebhooksPage() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-4 text-xs">
+                <div className="pt-3 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-4 text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="text-zinc-400">Subscribed Events:</span>
+                    <span className="text-slate-500 dark:text-zinc-400">Subscribed Events:</span>
                     {ep.events.map((ev: string) => (
-                      <span key={ev} className="rounded bg-zinc-800 px-2 py-0.5 font-mono text-[11px] text-zinc-300">
+                      <span key={ev} className="rounded bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 font-mono text-[11px] text-slate-700 dark:text-zinc-300">
                         {ev}
                       </span>
                     ))}
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-zinc-500 font-mono">Signing Secret:</span>
-                    <span className="font-mono text-zinc-300 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
+                    <span className="text-slate-400 dark:text-zinc-500 font-mono">Signing Secret:</span>
+                    <span className="font-mono text-slate-700 dark:text-zinc-300 bg-slate-100 dark:bg-zinc-950 px-2 py-0.5 rounded border border-slate-200 dark:border-zinc-800">
                       {ep.secret.slice(0, 10)}••••••••••••
                     </span>
                   </div>
@@ -131,7 +134,7 @@ export default function WebhooksPage() {
 
       {/* Signature Verification Code Example */}
       <div className="space-y-3">
-        <h3 className="text-sm font-bold text-white tracking-tight">Verifying Webhook Signatures (Node.js)</h3>
+        <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Verifying Webhook Signatures (Node.js)</h3>
         <CodeBlock
           language="javascript"
           title="Signature Verification Handler"
@@ -163,24 +166,24 @@ function verifyVerixaWebhook(req, signingSecret) {
           />
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-medium text-zinc-300">Subscribed Events</label>
-            <div className="space-y-2 text-xs text-zinc-300">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" defaultChecked className="rounded border-zinc-700 bg-zinc-950" />
+            <label className="block text-xs font-medium text-slate-700 dark:text-zinc-300">Subscribed Events</label>
+            <div className="space-y-2 text-xs text-slate-700 dark:text-zinc-300">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" defaultChecked className="rounded border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-emerald-500 focus:ring-emerald-500" />
                 <span>verification.successful — Triggered when BVN/NIN/NUBAN is verified</span>
               </label>
-              <label className="flex items-center gap-2">
-                <input type="checkbox" defaultChecked className="rounded border-zinc-700 bg-zinc-950" />
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" defaultChecked className="rounded border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-emerald-500 focus:ring-emerald-500" />
                 <span>verification.failed — Triggered on identity mismatch or invalid registry data</span>
               </label>
-              <label className="flex items-center gap-2">
-                <input type="checkbox" defaultChecked className="rounded border-zinc-700 bg-zinc-950" />
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" defaultChecked className="rounded border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-emerald-500 focus:ring-emerald-500" />
                 <span>billing.deposit_credited — Triggered on successful Paystack DVA credit</span>
               </label>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-zinc-800">
             <Button type="button" variant="ghost" size="sm" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>

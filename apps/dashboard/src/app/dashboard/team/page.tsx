@@ -47,12 +47,12 @@ export default function TeamPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-white">Team Members</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Team Members</h1>
             <Badge variant="mono" size="sm">
               {members.length} USERS
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Manage organization team access, role-based permissions, and invitations.
           </p>
         </div>
@@ -64,17 +64,17 @@ export default function TeamPage() {
 
       {/* Role Explanation Card */}
       <div className="grid md:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 text-xs space-y-1">
-          <span className="font-bold text-white block">Administrator</span>
-          <p className="text-zinc-400">Full access to billing, team invitations, and API key generation.</p>
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 text-xs space-y-1 shadow-xs">
+          <span className="font-bold text-slate-900 dark:text-white block">Administrator</span>
+          <p className="text-slate-500 dark:text-zinc-400">Full access to billing, team invitations, and API key generation.</p>
         </div>
-        <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 text-xs space-y-1">
-          <span className="font-bold text-white block">Developer</span>
-          <p className="text-zinc-400">Access to API keys, Explorer, Webhooks, and Verification Logs.</p>
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 text-xs space-y-1 shadow-xs">
+          <span className="font-bold text-slate-900 dark:text-white block">Developer</span>
+          <p className="text-slate-500 dark:text-zinc-400">Access to API keys, Explorer, Webhooks, and Verification Logs.</p>
         </div>
-        <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 text-xs space-y-1">
-          <span className="font-bold text-white block">Viewer / Operations</span>
-          <p className="text-zinc-400">Read-only verification logs, manual workspace, and transaction reports.</p>
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 text-xs space-y-1 shadow-xs">
+          <span className="font-bold text-slate-900 dark:text-white block">Viewer / Operations</span>
+          <p className="text-slate-500 dark:text-zinc-400">Read-only verification logs, manual workspace, and transaction reports.</p>
         </div>
       </div>
 
@@ -92,22 +92,22 @@ export default function TeamPage() {
         <TableBody>
           {members.map((m) => (
             <TableRow key={m.id}>
-              <TableCell className="font-medium text-white">{m.email}</TableCell>
+              <TableCell className="font-medium text-slate-900 dark:text-white">{m.email}</TableCell>
               <TableCell>
                 <Badge variant={m.role === "ADMIN" ? "verified" : "neutral"} size="sm">
                   {m.role}
                 </Badge>
               </TableCell>
               <TableCell>
-                <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   {m.status}
                 </span>
               </TableCell>
-              <TableCell className="font-mono text-xs text-zinc-500">{m.joinedAt}</TableCell>
+              <TableCell className="font-mono text-xs text-slate-500 dark:text-zinc-400">{m.joinedAt}</TableCell>
               <TableCell className="text-right">
                 {m.joinedAt !== "Owner" && (
-                  <Button variant="ghost" size="xs" className="text-rose-400 hover:text-rose-300">
+                  <Button variant="ghost" size="xs" className="text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300">
                     Remove
                   </Button>
                 )}
@@ -135,11 +135,11 @@ export default function TeamPage() {
           />
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-medium text-zinc-300">Organization Role</label>
+            <label className="block text-xs font-medium text-slate-700 dark:text-zinc-300">Organization Role</label>
             <select
               value={inviteRole}
               onChange={(e) => setInviteRole(e.target.value)}
-              className="w-full h-9 rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-xs text-zinc-200 focus:border-emerald-500 focus:outline-none"
+              className="w-full h-10 rounded-lg border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-3 text-xs text-slate-900 dark:text-zinc-200 focus:border-emerald-500 focus:outline-none shadow-2xs"
             >
               <option value="DEVELOPER">Developer (API keys & logs)</option>
               <option value="ADMIN">Admin (Full billing & team control)</option>
@@ -147,7 +147,7 @@ export default function TeamPage() {
             </select>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-zinc-800">
             <Button type="button" variant="ghost" size="sm" onClick={() => setIsInviteOpen(false)}>
               Cancel
             </Button>

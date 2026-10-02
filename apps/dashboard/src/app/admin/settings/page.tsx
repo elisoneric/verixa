@@ -65,23 +65,26 @@ export default function AdminSettingsPage() {
     <div className="space-y-8 max-w-3xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">System Configuration & Secrets</h1>
-        <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">System Configuration & Secrets</h1>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
           Dynamic runtime provider keys. Values are encrypted at rest with AES-256 envelope encryption and never exposed to the frontend.
         </p>
       </div>
 
       {savedSuccess && (
-        <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-medium">
-          ✓ Provider secret keys encrypted and updated in runtime cache.
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+          <svg className="w-4 h-4 shrink-0 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Provider secret keys encrypted and updated in runtime cache.</span>
         </div>
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Paystack Secret */}
-        <Card className="p-6 bg-zinc-900/50 border-zinc-800 space-y-4">
+        <Card className="p-6 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 space-y-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white tracking-tight">Paystack Gateway Configuration</h3>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Paystack Gateway Configuration</h3>
             <Badge variant="verified" size="sm">ENCRYPTED (AES-256)</Badge>
           </div>
           <div className="space-y-3 max-w-xl">
@@ -97,14 +100,14 @@ export default function AdminSettingsPage() {
         </Card>
 
         {/* Upstream Identity Gateways */}
-        <Card className="p-6 bg-zinc-900/50 border-zinc-800 space-y-4">
+        <Card className="p-6 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 space-y-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white tracking-tight">Upstream Verification Gateways</h3>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Upstream Verification Gateways</h3>
             <Badge variant="verified" size="sm">ENCRYPTED (AES-256)</Badge>
           </div>
 
           <div className="space-y-4 max-w-xl">
-            <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-xs text-blue-400">
+            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 text-xs text-blue-700 dark:text-blue-400">
               <span className="font-semibold">Hybrid Provider Engine:</span> When keys are absent, Verixa runs in realistic Zero-Config Mock Mode (with authentic Nigerian photos and slip rendering). Once Dojah keys are configured, Verixa automatically routes live queries upstream.
             </div>
 

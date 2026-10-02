@@ -74,12 +74,12 @@ export default function AdminOrganizationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-white">Tenant Organizations</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Tenant Organizations</h1>
             <Badge variant="failed" size="sm">
               {orgs.length} TENANTS
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Manage customer subscription tiers, custom enterprise rates, KYC data, and balances.
           </p>
         </div>
@@ -105,10 +105,10 @@ export default function AdminOrganizationsPage() {
           </TableHeader>
           <TableBody>
             {orgs.map((org) => (
-              <TableRow key={org.id}>
-                <TableCell className="font-semibold text-white">
+              <TableRow key={org.id} className="hover:bg-slate-50 dark:hover:bg-zinc-900/60">
+                <TableCell className="font-semibold text-slate-900 dark:text-white">
                   <div>{org.name}</div>
-                  <div className="font-mono text-[10px] text-zinc-500">{org.id.slice(0, 13)}...</div>
+                  <div className="font-mono text-[10px] text-slate-400 dark:text-zinc-500">{org.id.slice(0, 13)}...</div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -138,10 +138,13 @@ export default function AdminOrganizationsPage() {
                         setSelectedOrg(org)
                         setComplianceModalOpen(true)
                       }}
-                      className="text-xs text-emerald-400 hover:underline flex items-center gap-1"
+                      className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1.5"
                     >
-                      <span>✓ Verified Rep</span>
-                      <span className="text-[10px] text-zinc-500 font-mono">({org.complianceData.directorNin ? `${org.complianceData.directorNin.slice(0, 4)}•••` : "KYC"})</span>
+                      <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Verified Rep</span>
+                      <span className="text-[10px] text-slate-400 dark:text-zinc-500 font-mono">({org.complianceData.directorNin ? `${org.complianceData.directorNin.slice(0, 4)}•••` : "KYC"})</span>
                     </button>
                   ) : (
                     <span className="text-xs text-zinc-500">Standard</span>
@@ -178,11 +181,11 @@ export default function AdminOrganizationsPage() {
           )}
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">Account Subscription Tier</label>
+            <label className="text-xs font-medium text-slate-700 dark:text-zinc-300">Account Subscription Tier</label>
             <select
               value={tier}
               onChange={(e) => setTier(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-700/80 rounded-lg px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none"
+              className="w-full bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700/80 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-emerald-500 focus:outline-none shadow-2xs"
             >
               <option value="STARTER">Starter Plan (Default standard rates: ₦50 BVN/NIN, ₦10 NUBAN)</option>
               <option value="GROWTH">Growth Plan (10% volume discount: ₦45 BVN/NIN, ₦9 NUBAN)</option>
@@ -191,8 +194,8 @@ export default function AdminOrganizationsPage() {
             </select>
           </div>
 
-          <div className="border-t border-zinc-800/80 pt-3">
-            <h4 className="text-xs font-bold text-white mb-2">Custom Override Rates (Leave blank to use Tier default)</h4>
+          <div className="border-t border-slate-200 dark:border-zinc-800/80 pt-3">
+            <h4 className="text-xs font-bold text-slate-900 dark:text-white mb-2">Custom Override Rates (Leave blank to use Tier default)</h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Input
                 label="BVN Rate (NGX / ₦)"
@@ -223,14 +226,14 @@ export default function AdminOrganizationsPage() {
               type="checkbox"
               checked={notifyEmail}
               onChange={(e) => setNotifyEmail(e.target.checked)}
-              className="h-4 w-4 rounded border-zinc-700 bg-zinc-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-zinc-950"
+              className="h-4 w-4 rounded border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-emerald-500 focus:ring-emerald-500"
             />
-            <span className="text-xs text-zinc-300">
+            <span className="text-xs text-slate-700 dark:text-zinc-300">
               Send automated transactional email notification with new rate schedule to customer
             </span>
           </label>
 
-          <div className="flex gap-3 justify-end pt-3 border-t border-zinc-800">
+          <div className="flex gap-3 justify-end pt-3 border-t border-slate-200 dark:border-zinc-800">
             <Button
               type="button"
               variant="outline"
@@ -260,35 +263,35 @@ export default function AdminOrganizationsPage() {
         size="md"
       >
         {selectedOrg?.complianceData && (
-          <div className="space-y-3 pt-2 text-xs text-zinc-300">
-            <div className="p-3 bg-zinc-900/80 rounded-lg border border-zinc-800 space-y-2">
+          <div className="space-y-3 pt-2 text-xs text-slate-700 dark:text-zinc-300">
+            <div className="p-3 bg-slate-50 dark:bg-zinc-900/80 rounded-lg border border-slate-200 dark:border-zinc-800 space-y-2 shadow-2xs">
               <div className="flex justify-between">
-                <span className="text-zinc-500">Business Entity:</span>
-                <span className="font-semibold text-white">{selectedOrg.complianceData.businessType || "N/A"}</span>
+                <span className="text-slate-500 dark:text-zinc-500">Business Entity:</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{selectedOrg.complianceData.businessType || "N/A"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500">CAC Registration:</span>
-                <span className="font-mono text-white">{selectedOrg.complianceData.rcNumber || "Unincorporated / Dev"}</span>
+                <span className="text-slate-500 dark:text-zinc-500">CAC Registration:</span>
+                <span className="font-mono text-slate-900 dark:text-white">{selectedOrg.complianceData.rcNumber || "Unincorporated / Dev"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500">Authorized Representative:</span>
-                <span className="font-semibold text-emerald-400">{selectedOrg.complianceData.directorName || "N/A"}</span>
+                <span className="text-slate-500 dark:text-zinc-500">Authorized Representative:</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">{selectedOrg.complianceData.directorName || "N/A"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500">Representative NIN:</span>
-                <span className="font-mono text-white">{selectedOrg.complianceData.directorNin || "N/A"}</span>
+                <span className="text-slate-500 dark:text-zinc-500">Representative NIN:</span>
+                <span className="font-mono text-slate-900 dark:text-white">{selectedOrg.complianceData.directorNin || "N/A"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500">Primary Use Case:</span>
-                <span className="text-zinc-200">{selectedOrg.complianceData.useCase || "N/A"}</span>
+                <span className="text-slate-500 dark:text-zinc-500">Primary Use Case:</span>
+                <span className="text-slate-800 dark:text-zinc-200">{selectedOrg.complianceData.useCase || "N/A"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500">Lawful Basis Acknowledged:</span>
-                <span className="text-emerald-400 font-bold">{selectedOrg.complianceData.lawfulBasisAgreed ? "YES (Section 25 NDPA)" : "NO"}</span>
+                <span className="text-slate-500 dark:text-zinc-500">Lawful Basis Acknowledged:</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">{selectedOrg.complianceData.lawfulBasisAgreed ? "YES (Section 25 NDPA)" : "NO"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-500">Registration Timestamp:</span>
-                <span className="font-mono text-zinc-400">{selectedOrg.complianceData.verifiedAt ? new Date(selectedOrg.complianceData.verifiedAt).toLocaleString() : "N/A"}</span>
+                <span className="text-slate-500 dark:text-zinc-500">Registration Timestamp:</span>
+                <span className="font-mono text-slate-500 dark:text-zinc-400">{selectedOrg.complianceData.verifiedAt ? new Date(selectedOrg.complianceData.verifiedAt).toLocaleString() : "N/A"}</span>
               </div>
             </div>
             <div className="flex justify-end pt-2">

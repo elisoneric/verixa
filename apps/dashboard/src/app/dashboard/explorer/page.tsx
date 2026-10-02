@@ -65,12 +65,12 @@ export default function ApiExplorerPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-white">API Explorer</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">API Explorer</h1>
             <Badge variant={environment === "live" ? "verified" : "warning"} size="sm">
               {environment.toUpperCase()}
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Interactive developer console to test verification payloads against live and sandbox endpoints.
           </p>
         </div>
@@ -91,60 +91,60 @@ export default function ApiExplorerPage() {
       {/* Explorer Workspace Grid */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Request Panel */}
-        <Card className="bg-zinc-900/60 border-zinc-800 p-6 flex flex-col justify-between space-y-6">
+        <Card className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-6 flex flex-col justify-between space-y-6 shadow-xs">
           <div className="space-y-4">
             {/* Service Tab Switcher */}
             <div className="space-y-2">
-              <label className="text-xs font-mono text-zinc-400 uppercase">Verification Service</label>
+              <label className="text-xs font-mono font-semibold text-slate-500 dark:text-zinc-400 uppercase">Verification Service</label>
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => handleServiceChange("bvn")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
                     service === "bvn"
-                      ? "bg-zinc-800 text-emerald-400 border border-zinc-700"
-                      : "bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white"
+                      ? "bg-slate-900 dark:bg-zinc-800 text-emerald-400 border border-slate-800 dark:border-zinc-700 shadow-2xs font-bold"
+                      : "bg-slate-100 dark:bg-zinc-950 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   BVN (50 NGX)
                 </button>
                 <button
                   onClick={() => handleServiceChange("nin")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
                     service === "nin"
-                      ? "bg-zinc-800 text-sky-400 border border-zinc-700"
-                      : "bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white"
+                      ? "bg-slate-900 dark:bg-zinc-800 text-sky-400 border border-slate-800 dark:border-zinc-700 shadow-2xs font-bold"
+                      : "bg-slate-100 dark:bg-zinc-950 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
-                  NIN (50 NGX)
+                  NIN Advance (140 NGX)
                 </button>
                 <button
                   onClick={() => handleServiceChange("nuban")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
                     service === "nuban"
-                      ? "bg-zinc-800 text-indigo-400 border border-zinc-700"
-                      : "bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white"
+                      ? "bg-slate-900 dark:bg-zinc-800 text-indigo-400 border border-slate-800 dark:border-zinc-700 shadow-2xs font-bold"
+                      : "bg-slate-100 dark:bg-zinc-950 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
-                  NUBAN Account (10 NGX)
+                  NUBAN Account (0 NGX Free)
                 </button>
               </div>
             </div>
 
             {/* HTTP Method & Endpoint */}
-            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-zinc-950 border border-zinc-800 font-mono text-xs">
-              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-100 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 font-mono text-xs">
+              <span className="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-bold">
                 POST
               </span>
-              <span className="text-zinc-200">{endpoints[service]}</span>
+              <span className="text-slate-800 dark:text-zinc-200">{endpoints[service]}</span>
             </div>
 
             {/* Request Body Editor */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-mono text-zinc-400 uppercase">JSON Request Body</label>
+                <label className="text-xs font-mono font-semibold text-slate-500 dark:text-zinc-400 uppercase">JSON Request Body</label>
                 <button
                   onClick={() => handleServiceChange(service)}
-                  className="text-[11px] text-zinc-500 hover:text-zinc-300 font-mono"
+                  className="text-[11px] text-slate-500 hover:text-slate-800 dark:text-zinc-500 dark:hover:text-zinc-300 font-mono cursor-pointer"
                 >
                   Reset Template
                 </button>
@@ -153,7 +153,7 @@ export default function ApiExplorerPage() {
                 value={requestBody}
                 onChange={(e) => setRequestBody(e.target.value)}
                 rows={7}
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-200 focus:border-emerald-500/80 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 p-3 font-mono text-xs text-slate-900 dark:text-zinc-200 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-2xs"
               />
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function ApiExplorerPage() {
           <Button
             variant="emerald"
             size="md"
-            className="w-full"
+            className="w-full font-bold h-11"
             onClick={handleExecute}
             isLoading={isLoading}
           >
@@ -170,32 +170,32 @@ export default function ApiExplorerPage() {
         </Card>
 
         {/* Response Panel */}
-        <Card className="bg-zinc-900/60 border-zinc-800 p-6 flex flex-col justify-between">
+        <Card className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-6 flex flex-col justify-between shadow-xs">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <span className="text-xs font-mono text-zinc-400 uppercase">Response Inspector</span>
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+              <span className="text-xs font-mono font-semibold text-slate-500 dark:text-zinc-400 uppercase">Response Inspector</span>
               {responseMeta && (
                 <div className="flex items-center gap-2 font-mono text-xs">
                   <Badge variant={responseMeta.status === 200 ? "verified" : "failed"} size="sm">
                     {responseMeta.status} {responseMeta.status === 200 ? "OK" : "ERROR"}
                   </Badge>
-                  <span className="text-zinc-500">{responseMeta.latencyMs}ms</span>
+                  <span className="text-slate-500 dark:text-zinc-500">{responseMeta.latencyMs}ms</span>
                 </div>
               )}
             </div>
 
             {responseResult ? (
-              <pre className="p-4 rounded-lg bg-zinc-950 font-mono text-xs text-emerald-300/90 overflow-x-auto leading-relaxed border border-zinc-800 max-h-[380px]">
+              <pre className="p-4 rounded-lg bg-slate-900 dark:bg-zinc-950 font-mono text-xs text-emerald-300/90 overflow-x-auto leading-relaxed border border-slate-800 dark:border-zinc-800 max-h-[380px] shadow-inner">
                 {JSON.stringify(responseResult, null, 2)}
               </pre>
             ) : (
-              <div className="py-20 text-center text-xs text-zinc-500 font-mono">
+              <div className="py-20 text-center text-xs text-slate-400 dark:text-zinc-500 font-mono">
                 Click &quot;Run Request&quot; to execute query and view live JSON response payload.
               </div>
             )}
           </div>
 
-          <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 font-mono">
+          <div className="pt-4 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-slate-400 dark:text-zinc-500 font-mono">
             <span>Auth: Bearer API_KEY</span>
             <span>Content-Type: application/json</span>
           </div>

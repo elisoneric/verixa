@@ -134,32 +134,34 @@ export default function AdminPricingPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-white">Global Pricing & Smart Cache Billing</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Global Pricing & Smart Cache Billing</h1>
             <Badge variant={bonusActive ? "verified" : "mono"} size="sm">
               {bonusActive ? "PROMO ACTIVE" : "STANDARD PRICING"}
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Configure live upstream rates, set discounted Smart Cache hit fees, and manage cluster caching policies.
           </p>
         </div>
       </div>
 
       {message && (
-        <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-medium flex items-center gap-2">
-          <span>✓</span>
+        <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs font-medium flex items-center gap-2">
+          <svg className="w-4 h-4 shrink-0 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
           <span>{message}</span>
         </div>
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* 1. Base Live Upstream Prices */}
-        <Card className="bg-zinc-900/60 border-zinc-800 p-6">
-          <CardHeader className="p-0 pb-4 border-b border-zinc-800">
+        <Card className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-6 shadow-xs">
+          <CardHeader className="p-0 pb-4 border-b border-slate-200 dark:border-zinc-800">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-base text-white">1. Live Upstream Verification Fees (₦ / NGX)</CardTitle>
-                <p className="text-xs text-zinc-400 mt-0.5">
+                <CardTitle className="text-base text-slate-900 dark:text-white">1. Live Upstream Verification Fees (₦ / NGX)</CardTitle>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
                   Standard fee charged when a verification query misses cache and queries upstream registries (Dojah / NIMC / NIBSS).
                 </p>
               </div>
@@ -206,25 +208,30 @@ export default function AdminPricingPage() {
         </Card>
 
         {/* 2. Smart Identity Cache Pricing & Settings */}
-        <Card className="bg-zinc-900/60 border-zinc-800 p-6">
-          <CardHeader className="p-0 pb-4 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <Card className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-6 shadow-xs">
+          <CardHeader className="p-0 pb-4 border-b border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <CardTitle className="text-base text-white">2. Smart Identity Cache Pricing & Rules</CardTitle>
-                <Badge variant="verified" size="sm">⚡ COST SAVER</Badge>
+                <CardTitle className="text-base text-slate-900 dark:text-white">2. Smart Identity Cache Pricing & Rules</CardTitle>
+                <Badge variant="verified" size="sm" className="gap-1">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  COST SAVER
+                </Badge>
               </div>
-              <p className="text-xs text-zinc-400 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
                 When a client verifies an identity previously queried within the TTL window, response is served instantly from memory without querying Dojah.
               </p>
             </div>
-            <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 px-3.5 py-1.5 rounded-lg border border-zinc-800">
+            <label className="flex items-center gap-2 cursor-pointer bg-slate-50 dark:bg-zinc-950 px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-2xs">
               <input
                 type="checkbox"
                 checked={cacheEnabled}
                 onChange={(e) => setCacheEnabled(e.target.checked)}
-                className="h-4 w-4 rounded border-zinc-700 bg-zinc-900 text-emerald-500 focus:ring-emerald-500"
+                className="h-4 w-4 rounded border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-emerald-500 focus:ring-emerald-500"
               />
-              <span className="text-xs font-bold text-white">
+              <span className="text-xs font-bold text-slate-900 dark:text-white">
                 {cacheEnabled ? "Smart Cache ENABLED" : "Smart Cache Disabled"}
               </span>
             </label>
@@ -279,50 +286,53 @@ export default function AdminPricingPage() {
             </div>
 
             {/* Live vs Cache Savings Preview */}
-            <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-950/40 via-zinc-950 to-zinc-950 border border-emerald-500/20 space-y-2">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-zinc-950/70 border border-slate-200 dark:border-zinc-800 space-y-2 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                  <span>⚡</span> Client Savings via Smart Identity Cache
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Client Savings via Smart Identity Cache
                 </span>
-                <span className="text-[11px] font-mono text-zinc-400">
+                <span className="text-[11px] font-mono text-slate-500 dark:text-zinc-400">
                   TTL: {cacheTtlDays} Days • Latency: &lt;15ms
                 </span>
               </div>
 
               <div className="grid grid-cols-3 gap-3 pt-2 text-xs">
-                <div className="p-3 rounded-lg bg-zinc-900/80 border border-zinc-800">
-                  <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                <div className="p-3 rounded-lg bg-white dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-zinc-400">
                     <span>BVN Lookup</span>
-                    <span className="text-emerald-400 font-bold">-{bvnSavings}%</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">-{bvnSavings}%</span>
                   </div>
                   <div className="flex items-baseline gap-2 mt-1.5">
-                    <span className="text-base font-bold text-white">₦{cacheBvn}</span>
-                    <span className="text-xs line-through text-zinc-500">₦{baseBvn}</span>
-                    <span className="text-[10px] text-emerald-400">cache</span>
+                    <span className="text-base font-bold text-slate-900 dark:text-white">₦{cacheBvn}</span>
+                    <span className="text-xs line-through text-slate-400 dark:text-zinc-500">₦{baseBvn}</span>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">cache</span>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-zinc-900/80 border border-zinc-800">
-                  <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                <div className="p-3 rounded-lg bg-white dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-zinc-400">
                     <span>NIN Verification</span>
-                    <span className="text-emerald-400 font-bold">-{ninSavings}%</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">-{ninSavings}%</span>
                   </div>
                   <div className="flex items-baseline gap-2 mt-1.5">
-                    <span className="text-base font-bold text-white">₦{cacheNin}</span>
-                    <span className="text-xs line-through text-zinc-500">₦{baseNin}</span>
-                    <span className="text-[10px] text-emerald-400">cache</span>
+                    <span className="text-base font-bold text-slate-900 dark:text-white">₦{cacheNin}</span>
+                    <span className="text-xs line-through text-slate-400 dark:text-zinc-500">₦{baseNin}</span>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">cache</span>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-zinc-900/80 border border-zinc-800">
-                  <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                <div className="p-3 rounded-lg bg-white dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-zinc-400">
                     <span>NUBAN Account</span>
-                    <span className="text-emerald-400 font-bold">-{nubanSavings}%</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">-{nubanSavings}%</span>
                   </div>
                   <div className="flex items-baseline gap-2 mt-1.5">
-                    <span className="text-base font-bold text-white">₦{cacheNuban}</span>
-                    <span className="text-xs line-through text-zinc-500">₦{baseNuban}</span>
-                    <span className="text-[10px] text-emerald-400">cache</span>
+                    <span className="text-base font-bold text-slate-900 dark:text-white">₦{cacheNuban}</span>
+                    <span className="text-xs line-through text-slate-400 dark:text-zinc-500">₦{baseNuban}</span>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">cache</span>
                   </div>
                 </div>
               </div>
@@ -331,22 +341,22 @@ export default function AdminPricingPage() {
         </Card>
 
         {/* 3. Bonus Days / Flash Sales */}
-        <Card className="bg-zinc-900/60 border-zinc-800 p-6">
-          <CardHeader className="p-0 pb-4 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <Card className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-6 shadow-xs">
+          <CardHeader className="p-0 pb-4 border-b border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
-              <CardTitle className="text-base text-white">3. Bonus Days Promotional Rate Slash</CardTitle>
-              <p className="text-xs text-zinc-400 mt-0.5">
+              <CardTitle className="text-base text-slate-900 dark:text-white">3. Bonus Days Promotional Rate Slash</CardTitle>
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
                 Automatically discount live API verification rates across all tenants and display dashboard banners.
               </p>
             </div>
-            <label className="flex items-center gap-2 cursor-pointer bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800">
+            <label className="flex items-center gap-2 cursor-pointer bg-slate-50 dark:bg-zinc-950 px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-2xs">
               <input
                 type="checkbox"
                 checked={bonusActive}
                 onChange={(e) => setBonusActive(e.target.checked)}
-                className="h-4 w-4 rounded border-zinc-700 bg-zinc-900 text-emerald-500 focus:ring-emerald-500"
+                className="h-4 w-4 rounded border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-emerald-500 focus:ring-emerald-500"
               />
-              <span className="text-xs font-bold text-white">
+              <span className="text-xs font-bold text-slate-900 dark:text-white">
                 {bonusActive ? "Promo ENABLED" : "Promo Disabled"}
               </span>
             </label>
@@ -380,9 +390,9 @@ export default function AdminPricingPage() {
             </div>
 
             {/* Live Slashed Rates Preview */}
-            <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-2">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-800 space-y-2 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white">Effective Rate Preview During Campaign</span>
+                <span className="text-xs font-bold text-slate-900 dark:text-white">Effective Rate Preview During Campaign</span>
                 {bonusActive && (
                   <Badge variant="verified" size="sm">
                     {bonusPercent}% OFF ACTIVE
@@ -390,25 +400,25 @@ export default function AdminPricingPage() {
                 )}
               </div>
               <div className="grid grid-cols-3 gap-4 pt-2 text-xs">
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
-                  <span className="text-zinc-500 block text-[10px]">BVN Verification</span>
+                <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+                  <span className="text-slate-500 dark:text-zinc-500 block text-[10px]">BVN Verification</span>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-base font-bold text-white">₦{slashedBvn}</span>
-                    {bonusActive && <span className="text-xs line-through text-zinc-500">₦{baseBvn}</span>}
+                    <span className="text-base font-bold text-slate-900 dark:text-white">₦{slashedBvn}</span>
+                    {bonusActive && <span className="text-xs line-through text-slate-400 dark:text-zinc-500">₦{baseBvn}</span>}
                   </div>
                 </div>
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
-                  <span className="text-zinc-500 block text-[10px]">NIN Verification</span>
+                <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+                  <span className="text-slate-500 dark:text-zinc-500 block text-[10px]">NIN Verification</span>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-base font-bold text-white">₦{slashedNin}</span>
-                    {bonusActive && <span className="text-xs line-through text-zinc-500">₦{baseNin}</span>}
+                    <span className="text-base font-bold text-slate-900 dark:text-white">₦{slashedNin}</span>
+                    {bonusActive && <span className="text-xs line-through text-slate-400 dark:text-zinc-500">₦{baseNin}</span>}
                   </div>
                 </div>
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
-                  <span className="text-zinc-500 block text-[10px]">NUBAN Resolution</span>
+                <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xs">
+                  <span className="text-slate-500 dark:text-zinc-500 block text-[10px]">NUBAN Resolution</span>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-base font-bold text-white">₦{slashedNuban}</span>
-                    {bonusActive && <span className="text-xs line-through text-zinc-500">₦{baseNuban}</span>}
+                    <span className="text-base font-bold text-slate-900 dark:text-white">₦{slashedNuban}</span>
+                    {bonusActive && <span className="text-xs line-through text-slate-400 dark:text-zinc-500">₦{baseNuban}</span>}
                   </div>
                 </div>
               </div>

@@ -288,8 +288,11 @@ export default function HomePage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      ⚡ SUB-15MS · 60% SAVINGS
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      SUB-15MS · 60% SAVINGS
                     </span>
                     <span className="font-mono text-xs text-zinc-500">Identity Cache</span>
                   </div>
@@ -539,7 +542,12 @@ export default function HomePage() {
                   </div>
 
                   <div className="mb-4 p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 flex items-center justify-between">
-                    <span>⚡ Smart Cache Discount:</span>
+                    <span className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      Smart Cache Discount:
+                    </span>
                     <strong className="font-mono text-emerald-400">Save 50% - 60%</strong>
                   </div>
 

@@ -59,14 +59,14 @@ export function Modal({
       {/* Modal Dialog */}
       <div
         className={cn(
-          "relative z-50 w-full rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-zinc-100 shadow-2xl transition-all duration-200",
+          "relative z-50 w-full rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 text-slate-900 dark:text-zinc-100 shadow-2xl transition-all duration-200",
           maxWidthClasses[effectiveSize],
           className
         )}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-md p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+          className="absolute right-4 top-4 rounded-md p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-800 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -75,9 +75,9 @@ export function Modal({
 
         {title && (
           <div className="mb-4 pr-6">
-            <h3 className="text-lg font-semibold tracking-tight text-white">{title}</h3>
+            <h3 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">{title}</h3>
             {description && (
-              <p className="mt-1 text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">
                 {description}
               </p>
             )}

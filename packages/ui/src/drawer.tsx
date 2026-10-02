@@ -55,24 +55,24 @@ export function Drawer({
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
         <div
           className={cn(
-            "w-screen bg-zinc-950 border-l border-zinc-800 text-zinc-100 shadow-2xl flex flex-col h-full",
+            "w-screen bg-white dark:bg-zinc-950 border-l border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-zinc-100 shadow-2xl flex flex-col h-full",
             widthClasses[width],
             className
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-zinc-800/80 px-6 py-4 bg-zinc-900/50">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-zinc-800/80 px-6 py-4 bg-slate-50 dark:bg-zinc-900/50">
             <div>
               {title && (
-                <h3 className="text-base font-semibold tracking-tight text-white">{title}</h3>
+                <h3 className="text-base font-semibold tracking-tight text-slate-900 dark:text-white">{title}</h3>
               )}
               {description && (
-                <p className="mt-0.5 text-xs text-zinc-400">{description}</p>
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-zinc-400">{description}</p>
               )}
             </div>
             <button
               onClick={onClose}
-              className="rounded-md p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+              className="rounded-md p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-800 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

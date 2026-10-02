@@ -385,43 +385,45 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-b border-zinc-800 bg-zinc-950 p-6 space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
+          <div className="lg:hidden border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 space-y-6 shadow-xl">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-zinc-800">
               <Logo size="sm" />
-              <button onClick={() => setMobileMenuOpen(false)} className="text-zinc-400">
-                ✕
+              <button onClick={() => setMobileMenuOpen(false)} className="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white p-1 rounded-md">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => { setEnvironment("sandbox"); setMobileMenuOpen(false); }}
-                className={`py-2 text-xs font-mono rounded ${environment === "sandbox" ? "bg-amber-500/20 text-amber-400" : "bg-zinc-900 text-zinc-400"}`}
+                className={`py-2 text-xs font-mono rounded-lg border transition-colors ${environment === "sandbox" ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-500/30 font-bold" : "bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800"}`}
               >
                 Sandbox
               </button>
               <button
                 onClick={() => { setEnvironment("live"); setMobileMenuOpen(false); }}
-                className={`py-2 text-xs font-mono rounded ${environment === "live" ? "bg-emerald-500/20 text-emerald-400" : "bg-zinc-900 text-zinc-400"}`}
+                className={`py-2 text-xs font-mono rounded-lg border transition-colors ${environment === "live" ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30 font-bold" : "bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800"}`}
               >
                 Live
               </button>
             </div>
 
-            <div className="space-y-2">
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 py-1">Overview</Link>
-              <Link href="/dashboard/api-keys" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 py-1">API Keys</Link>
-              <Link href="/dashboard/explorer" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 py-1">API Explorer</Link>
-              <Link href="/dashboard/verify" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 py-1">Manual Workspace</Link>
-              <Link href="/dashboard/logs" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 py-1">Verification Logs</Link>
-              <Link href="/dashboard/billing" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 py-1">Billing & Credits</Link>
-              <Link href="/dashboard/webhooks" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 py-1">Webhooks</Link>
-              <Link href="/dashboard/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 py-1">Settings</Link>
+            <div className="space-y-1">
+              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Overview</Link>
+              <Link href="/dashboard/api-keys" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">API Keys</Link>
+              <Link href="/dashboard/explorer" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">API Explorer</Link>
+              <Link href="/dashboard/verify" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Manual Workspace</Link>
+              <Link href="/dashboard/logs" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Verification Logs</Link>
+              <Link href="/dashboard/billing" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Billing & Credits</Link>
+              <Link href="/dashboard/webhooks" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Webhooks</Link>
+              <Link href="/dashboard/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Settings</Link>
             </div>
 
-            <div className="pt-4 border-t border-zinc-800 flex justify-between items-center">
-              <span className="text-xs text-zinc-400">{user?.email}</span>
-              <button onClick={logout} className="text-xs text-rose-400 font-semibold">Sign Out</button>
+            <div className="pt-4 border-t border-slate-200 dark:border-zinc-800 flex justify-between items-center">
+              <span className="text-xs text-slate-500 dark:text-zinc-400">{user?.email}</span>
+              <button onClick={logout} className="text-xs text-rose-500 hover:text-rose-600 dark:text-rose-400 font-semibold">Sign Out</button>
             </div>
           </div>
         )}

@@ -163,8 +163,11 @@ export default function NinSlipGeneratorPage() {
           </div>
 
           {errorMsg && (
-            <div className="p-3.5 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/25 text-rose-700 dark:text-rose-400 text-xs font-medium">
-              ✕ {errorMsg}
+            <div className="flex items-center gap-2 p-3.5 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/25 text-rose-700 dark:text-rose-400 text-xs font-medium">
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{errorMsg}</span>
             </div>
           )}
         </form>
@@ -176,7 +179,11 @@ export default function NinSlipGeneratorPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 dark:border-zinc-800 gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-emerald-600 dark:text-emerald-400 text-lg font-bold">✓</span>
+                <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
                   {currentSlip.fullName}
                 </h3>

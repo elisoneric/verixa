@@ -31,12 +31,12 @@ export default function TransactionsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-white">Transactions Ledger</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Transactions Ledger</h1>
             <Badge variant="mono" size="sm">
               {transactions.length} RECORDS
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Complete financial history of NGX deposits, top-ups, and verification usage.
           </p>
         </div>
@@ -76,14 +76,14 @@ export default function TransactionsPage() {
             {transactions.map((tx) => {
               const isCredit = tx.amount > 0
               return (
-                <TableRow key={tx.id}>
-                  <TableCell className="font-mono text-xs text-zinc-200">
+                <TableRow key={tx.id} className="hover:bg-slate-50 dark:hover:bg-zinc-900/60">
+                  <TableCell className="font-mono text-xs text-slate-800 dark:text-zinc-200 font-bold">
                     {tx.referenceId?.slice(0, 16) || tx.id.slice(0, 16)}...
                   </TableCell>
-                  <TableCell className="text-sm font-medium text-white">
+                  <TableCell className="text-sm font-medium text-slate-900 dark:text-white">
                     {tx.description}
                   </TableCell>
-                  <TableCell className={`font-mono text-sm font-bold ${isCredit ? "text-emerald-400" : "text-zinc-300"}`}>
+                  <TableCell className={`font-mono text-sm font-bold ${isCredit ? "text-emerald-600 dark:text-emerald-400" : "text-slate-700 dark:text-zinc-300"}`}>
                     {isCredit ? `+${tx.amount.toLocaleString()} NGX` : `${tx.amount.toLocaleString()} NGX`}
                   </TableCell>
                   <TableCell>
@@ -91,7 +91,7 @@ export default function TransactionsPage() {
                       {tx.status?.toUpperCase() || "COMPLETED"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-mono text-xs text-zinc-500">
+                  <TableCell className="font-mono text-xs text-slate-500 dark:text-zinc-400">
                     {new Date(tx.createdAt).toLocaleString()}
                   </TableCell>
                 </TableRow>

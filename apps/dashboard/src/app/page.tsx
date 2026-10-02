@@ -234,8 +234,10 @@ export default function PublicLandingPage() {
 
           {/* Cache Split Explanation Box */}
           <div className="mt-6 p-6 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 flex flex-col sm:flex-row items-start gap-4">
-            <div className="h-9 w-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 font-bold text-sm">
-              ⚡
+            <div className="h-9 w-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
             </div>
             <div className="space-y-1">
               <h4 className="text-sm font-bold text-slate-900 dark:text-white">How Cache Split Works</h4>
