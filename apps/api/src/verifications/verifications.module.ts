@@ -4,6 +4,7 @@ import { VerificationLog } from './entities/verification-log.entity';
 import { SystemConfig } from '../admin/entities/system-config.entity';
 import { VerificationsController } from './verifications.controller';
 import { MockProvider } from './providers/mock.provider';
+import { DojahProvider } from './providers/dojah.provider';
 import { IdentityCacheService } from './identity-cache.service';
 import { AuthModule } from '../auth/auth.module';
 
@@ -13,7 +14,7 @@ import { AuthModule } from '../auth/auth.module';
     AuthModule,
   ],
   controllers: [VerificationsController],
-  providers: [MockProvider, IdentityCacheService],
-  exports: [IdentityCacheService],
+  providers: [MockProvider, DojahProvider, IdentityCacheService],
+  exports: [IdentityCacheService, MockProvider, DojahProvider],
 })
 export class VerificationsModule {}
