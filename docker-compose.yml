@@ -3,23 +3,74 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
+    restart: always
     environment:
-      POSTGRES_USER: verixa
-      POSTGRES_PASSWORD: verixa_password
-      POSTGRES_DB: verixa_db
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-verixa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-verixa_secure_password_99}
+      POSTGRES_DB: ${POSTGRES_DB:-verixa_db}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U verixa -d verixa_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    restart: always
+    command: redis-server --appendonly yes
     volumes:
       - redisdata:/data
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-verixa}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-verixa_secure_password_99}
+      DB_NAME: ${POSTGRES_DB:-verixa_db}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-verixa_super_secret_jwt_key_2026}
+      SYSTEM_ENCRYPTION_KEY: ${SYSTEM_ENCRYPTION_KEY:-01234567890123456789012345678901}
+      DOJAH_APP_ID: ${DOJAH_APP_ID:-}
+      DOJAH_SECRET_KEY: ${DOJAH_SECRET_KEY:-}
+      DOJAH_ENVIRONMENT: ${DOJAH_ENVIRONMENT:-production}
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api-verixa.esam.com.ng}
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api-verixa.esam.com.ng}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
 
 volumes:
   pgdata:
