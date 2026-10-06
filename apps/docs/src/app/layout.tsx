@@ -45,6 +45,7 @@ export default function RootLayout({
     {
       title: "PLATFORM GUIDES",
       links: [
+        { label: "Billing & Payment API", href: "/billing-api" },
         { label: "Smart Identity Cache", href: "/smart-cache" },
         { label: "Redis Idempotency", href: "/idempotency" },
         { label: "Webhooks & Signatures", href: "/webhooks" },

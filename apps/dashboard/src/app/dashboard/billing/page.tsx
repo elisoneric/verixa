@@ -57,7 +57,7 @@ export default function BillingPage() {
 
     try {
       const ref = `topup_${Date.now()}`
-      const res = await ApiClient.createCheckout(amountNum * 100, ref)
+      const res = await ApiClient.createCheckout(amountNum, ref)
       if (res.url) {
         window.open(res.url, "_blank")
       }

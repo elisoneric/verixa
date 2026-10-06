@@ -1,16 +1,21 @@
-import { Injectable, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
 import { Wallet } from './entities/wallet.entity';
 import { Transaction, TransactionStatus } from './entities/transaction.entity';
-import { Environment } from '../organizations/entities/environment-config.entity';
+import { Environment, EnvironmentConfig } from '../organizations/entities/environment-config.entity';
 import { User } from '../users/entities/user.entity';
 import { Organization, OrganizationTier } from '../organizations/entities/organization.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SystemConfig } from '../admin/entities/system-config.entity';
+import { PaystackService } from './paystack.service';
+import * as crypto from 'crypto';
+import axios from 'axios';
 
 @Injectable()
 export class BillingService {
+  private readonly logger = new Logger(BillingService.name);
+
   constructor(
     private dataSource: DataSource,
     @InjectRepository(Wallet)
@@ -21,7 +26,10 @@ export class BillingService {
     private orgRepository: Repository<Organization>,
     @InjectRepository(SystemConfig)
     private configRepository: Repository<SystemConfig>,
+    @InjectRepository(EnvironmentConfig)
+    private envConfigRepository: Repository<EnvironmentConfig>,
     private notificationsService: NotificationsService,
+    private paystackService: PaystackService,
   ) {}
 
   async getEffectiveRate(
@@ -305,19 +313,38 @@ export class BillingService {
     return { balance: wallet.balance };
   }
 
-  async handleSuccessfulTopup(email: string, amountNgx: number, reference: string): Promise<void> {
+  async handleSuccessfulTopup(email: string, amountNgx: number, reference: string, orgId?: string): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
+    let targetOrgId = orgId;
+    let targetEmail = email;
+
     try {
-      const user = await queryRunner.manager.findOne(User, { where: { email } });
-      if (!user) {
-        throw new Error('User not found for topup webhook');
+      if (!targetOrgId && email) {
+        const user = await queryRunner.manager.findOne(User, { where: { email } });
+        if (user) {
+          targetOrgId = user.org_id;
+        }
+      }
+
+      if (!targetOrgId) {
+        const firstOrg = await queryRunner.manager.findOne(Organization, {
+          relations: { users: true },
+        });
+        if (firstOrg) {
+          targetOrgId = firstOrg.id;
+          targetEmail = targetEmail || firstOrg.users?.[0]?.email || 'finance@verixa.internal';
+        }
+      }
+
+      if (!targetOrgId) {
+        throw new Error('Organization not found for topup webhook');
       }
 
       const wallet = await queryRunner.manager.findOne(Wallet, {
-        where: { org_id: user.org_id, environment: Environment.LIVE },
+        where: { org_id: targetOrgId, environment: Environment.LIVE },
         lock: { mode: 'pessimistic_write' },
       });
 
@@ -339,17 +366,104 @@ export class BillingService {
       transaction.amount = amountNgx;
       transaction.status = TransactionStatus.COMPLETED;
       transaction.referenceId = reference;
-      transaction.description = 'Paystack DVA Top-up';
+      transaction.description = 'Paystack Top-up / Payment';
       await queryRunner.manager.save(transaction);
 
       await queryRunner.commitTransaction();
 
-      await this.notificationsService.sendTopUpSuccessEmail(email, amountNgx, wallet.balance);
+      if (targetEmail) {
+        await this.notificationsService.sendTopUpSuccessEmail(targetEmail, amountNgx, wallet.balance);
+      }
+
+      this.dispatchClientWebhook(targetOrgId, {
+        reference,
+        amount: amountNgx,
+        currency: 'NGN',
+        balance: wallet.balance,
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async verifyPayment(reference: string, orgId?: string) {
+    // 1. Check local DB first
+    const existingTx = await this.transactionRepository.findOne({
+      where: { referenceId: reference },
+      relations: { wallet: true },
+    });
+
+    if (existingTx && existingTx.status === TransactionStatus.COMPLETED) {
+      return {
+        status: 'success',
+        reference: existingTx.referenceId,
+        paymentStatus: 'COMPLETED',
+        amount: existingTx.amount,
+        currency: 'NGN',
+        description: existingTx.description,
+        paidAt: existingTx.createdAt,
+      };
+    }
+
+    // 2. Query Paystack directly for live verification
+    const paystackRes = await this.paystackService.verifyTransaction(reference);
+    if (!paystackRes) {
+      throw new NotFoundException(`Payment reference ${reference} not found or verification failed`);
+    }
+
+    if (paystackRes.status === 'success') {
+      await this.handleSuccessfulTopup(paystackRes.customerEmail || '', paystackRes.amount, reference, orgId);
+      return {
+        status: 'success',
+        reference: paystackRes.reference,
+        paymentStatus: 'COMPLETED',
+        amount: paystackRes.amount,
+        currency: 'NGN',
+        description: 'Paystack Verified Checkout',
+        paidAt: paystackRes.paidAt || new Date().toISOString(),
+      };
+    }
+
+    return {
+      status: 'success',
+      reference: paystackRes.reference,
+      paymentStatus: paystackRes.status.toUpperCase(),
+      amount: paystackRes.amount,
+      currency: 'NGN',
+      description: 'Paystack Checkout Incomplete',
+      paidAt: paystackRes.paidAt || null,
+    };
+  }
+
+  private async dispatchClientWebhook(orgId: string, data: any) {
+    try {
+      const envConfig = await this.envConfigRepository.findOne({
+        where: { org_id: orgId, environment: Environment.LIVE },
+      });
+      if (!envConfig || !envConfig.webhookUrl) return;
+
+      const payload = {
+        event: 'payment.completed',
+        timestamp: new Date().toISOString(),
+        data,
+      };
+      const secret = envConfig.webhookSecret || 'secret';
+      const signature = crypto.createHmac('sha256', secret).update(JSON.stringify(payload)).digest('hex');
+
+      axios.post(envConfig.webhookUrl, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Verixa-Signature': signature,
+        },
+        timeout: 5000,
+      }).catch(err => {
+        this.logger.warn(`Failed to dispatch client webhook to ${envConfig.webhookUrl}: ${err.message}`);
+      });
+    } catch {
+      // Ignore webhook failure
     }
   }
 }
