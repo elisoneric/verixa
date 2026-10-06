@@ -4,24 +4,18 @@ import * as React from "react"
 import Link from "next/link"
 import { GlassyHeader, AppLink } from "@verixa/ui"
 
-type CodeLang = "curl" | "typescript" | "python" | "go"
+type CodeTab = "bvn_ts" | "airtime_curl" | "data_py" | "nuban_go"
 
 export default function HomePage() {
-  const [activeLang, setActiveLang] = React.useState<CodeLang>("typescript")
+  const [activeTab, setActiveTab] = React.useState<CodeTab>("bvn_ts")
   const [copied, setCopied] = React.useState(false)
   const [activeFaq, setActiveFaq] = React.useState<number | null>(null)
 
-  const codeSnippets: Record<CodeLang, string> = {
-    curl: `curl -X POST https://api.verixaid.com/v1/verify/bvn \\
-  -H "Authorization: Bearer vx_live_9f83a8f1e29c41b8..." \\
-  -H "Idempotency-Key: 7b3e6d1a-4c2e-48a9-981f-1c4a92b02e11" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "bvn": "22123456789",
-    "firstName": "CHIDERA",
-    "lastName": "OLUTOLA"
-  }'`,
-    typescript: `import { VerixaClient } from "@verixa/sdk";
+  const codeSnippets: Record<CodeTab, { title: string; code: string; lang: string }> = {
+    bvn_ts: {
+      title: "BVN Verification (TypeScript SDK)",
+      lang: "TypeScript",
+      code: `import { VerixaClient } from "@verixa/sdk";
 
 const verixa = new VerixaClient({
   apiKey: process.env.VERIXA_API_KEY,
@@ -36,23 +30,42 @@ const verification = await verixa.verify.bvn({
 
 console.log(verification.status); // "verified"
 console.log(verification.data.matchScore); // 0.98`,
-    python: `from verixa import VerixaClient
+    },
+    airtime_curl: {
+      title: "Airtime Vending VTU (cURL)",
+      lang: "cURL",
+      code: `curl -X POST https://api.verixaid.com/v1/vas/airtime \\
+  -H "Authorization: Bearer vx_live_9f83a8f1e29c..." \\
+  -H "Idempotency-Key: a1b2c3d4-e5f6-7890..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "network": "MTN",
+    "phoneNumber": "08031234567",
+    "amount": 1000
+  }'`,
+    },
+    data_py: {
+      title: "Mobile Data Bundle (Python)",
+      lang: "Python",
+      code: `from verixa import VerixaClient
 import os
 
-client = VerixaClient(
-    api_key=os.getenv("VERIXA_API_KEY"),
-    environment="production"
+client = VerixaClient(api_key=os.getenv("VERIXA_API_KEY"))
+
+# Vend 5GB SME data plan to customer
+bundle = client.vas.purchase_data(
+    network="AIRTEL",
+    phone_number="08029876543",
+    plan_code="AIRTEL-5GB-SME"
 )
 
-response = client.verify.bvn(
-    bvn="22123456789",
-    first_name="CHIDERA",
-    last_name="OLUTOLA"
-)
-
-print(response.status) # "verified"
-print(response.data.match_score) # 0.98`,
-    go: `package main
+print(bundle.status) # "success"
+print(bundle.reference) # "vx_vas_89b21f"`,
+    },
+    nuban_go: {
+      title: "NUBAN Bank Account (Go)",
+      lang: "Go",
+      code: `package main
 
 import (
     "context"
@@ -62,19 +75,20 @@ import (
 
 func main() {
     client := verixa.NewClient("vx_live_9f83a8f1...")
-    res, err := client.VerifyBVN(context.Background(), &verixa.BVNRequest{
-        BVN:       "22123456789",
-        FirstName: "CHIDERA",
+    res, err := client.VerifyBankAccount(context.Background(), &verixa.BankLookup{
+        AccountNumber: "0123456789",
+        BankCode:      "058", // GTBank
     })
     if err != nil {
         panic(err)
     }
-    fmt.Println(res.Status) // "verified"
+    fmt.Println(res.AccountName) // "TOBILOBA OLUFEYIKEMI"
 }`,
+    },
   }
 
   const handleCopyCode = () => {
-    navigator.clipboard.writeText(codeSnippets[activeLang])
+    navigator.clipboard.writeText(codeSnippets[activeTab].code)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -105,6 +119,13 @@ func main() {
           path: "/nuban",
         },
         {
+          label: "Airtime & Mobile Data API",
+          description: "Automated VTU top-ups and SME mobile data gifting API",
+          badge: "Telecom VAS",
+          app: "docs" as const,
+          path: "/airtime-data",
+        },
+        {
           label: "Smart Identity Cache",
           description: "Sub-15ms cached lookups with 60% fee reduction",
           badge: "Sub-15ms",
@@ -114,12 +135,12 @@ func main() {
         {
           label: "Corporate CAC (KYB)",
           description: "Entity validation and beneficial ownership lookup",
-          badge: "New",
+          badge: "Corporate",
           app: "docs" as const,
           path: "/cac",
         },
         {
-          label: "Messaging (SMS & WhatsApp)",
+          label: "SMS & WhatsApp Messaging",
           description: "Reliable OTP routing across Nigerian mobile telcos",
           app: "docs" as const,
           path: "/messaging",
@@ -140,13 +161,14 @@ func main() {
           href: "#solutions",
         },
         {
-          label: "HR & Contractor Screening",
-          description: "Pre-employment NIN, background, and bank validations",
-          href: "#solutions",
+          label: "Telecom & VAS Resellers",
+          description: "Wholesale automated airtime vending and corporate data distribution",
+          app: "docs" as const,
+          path: "/airtime-data",
         },
         {
-          label: "Property & High Value Assets",
-          description: "Verified tenant and buyer identity screening",
+          label: "HR & Contractor Screening",
+          description: "Pre-employment NIN, background, and bank validations",
           href: "#solutions",
         },
       ],
@@ -161,10 +183,10 @@ func main() {
           path: "/",
         },
         {
-          label: "5-Minute Quickstart",
-          description: "Zero to first verified identity request in seconds",
+          label: "Airtime & Data API Guide",
+          description: "VTU vending, telco network codes, and webhook callbacks",
           app: "docs" as const,
-          path: "/authentication",
+          path: "/airtime-data",
         },
         {
           label: "Smart Identity Cache Guide",
@@ -173,14 +195,14 @@ func main() {
           path: "/smart-cache",
         },
         {
-          label: "Idempotency Architecture",
-          description: "Redis-backed 24h duplicate request prevention",
+          label: "Environments & Sandbox",
+          description: "Live test keys, mock response simulator, and failovers",
           app: "docs" as const,
-          path: "/idempotency",
+          path: "/environments",
         },
       ],
     },
-    { label: "Pricing", href: "#pricing" },
+    { label: "APIs & Pricing", href: "#pricing" },
     { label: "Roadmap", href: "#roadmap" },
     { label: "Docs", app: "docs" as const, path: "/" },
   ]
@@ -191,16 +213,16 @@ func main() {
       a: "Create an account on console.verixa.com, navigate to the API Keys section, and generate a new Sandbox or Production key. Sandbox keys are ready immediately for instant mock testing.",
     },
     {
+      q: "Does Verixa support automated Airtime & Mobile Data vending?",
+      a: "Yes. Verixa provides high-throughput REST APIs for instant VTU airtime vending (MTN, Airtel, Glo, 9mobile) and corporate SME data bundle gifting. All telecom requests are backed by multi-aggregator failovers and instant webhook callbacks.",
+    },
+    {
       q: "What is Smart Identity Cache and how does it save 60%?",
       a: "When your platform verifies a customer (e.g. BVN or NIN), Verixa securely caches the verified record for 30 days within your private tenant partition. If you re-query that identity within 30 days, Verixa returns the result in sub-15ms for only ₦20 (instead of ₦50), saving up to 60%.",
     },
     {
       q: "How does the multi-provider failover work?",
-      a: "Upstream government registries experience frequent downtime. Verixa continuously monitors latency and error rates across multiple verified upstream aggregators. If one provider fails or degrades, Verixa automatically re-routes your request within 150ms without dropping the API call.",
-    },
-    {
-      q: "Can I use the standard OpenAI or HTTP client libraries?",
-      a: "Yes. Verixa ID uses standardized RESTful JSON over HTTPS. You can integrate directly using native fetch, Axios, Python requests, or our official SDKs for TypeScript, Python, and Go.",
+      a: "Upstream government registries and telco gateways experience frequent downtime. Verixa continuously monitors latency and error rates across multiple verified upstream aggregators. If one provider fails or degrades, Verixa automatically re-routes your request within 150ms without dropping the API call.",
     },
     {
       q: "How does billing and NGX credit work?",
@@ -213,8 +235,14 @@ func main() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans selection:bg-emerald-500/25 selection:text-emerald-300 antialiased">
-      {/* 1. Sleek Glassy Header (xAI Parity) */}
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans selection:bg-emerald-500/25 selection:text-emerald-300 antialiased relative">
+      {/* Ambient Top Glow Orbs to give the Frosted Glass true translucent color diffusion */}
+      <div
+        aria-hidden="true"
+        className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-40 bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-sky-500/15 blur-3xl pointer-events-none -z-10"
+      />
+
+      {/* 1. Sleek Glassy Floating Header (Grok / xAI Parity) */}
       <GlassyHeader
         logoBadge="API"
         logoBadgeColor="emerald"
@@ -232,7 +260,14 @@ func main() {
       />
 
       {/* 2. Sticky Sub-Navigation Strip ("On this page") */}
-      <div className="sticky top-16 z-40 border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-md">
+      <div
+        className="sticky top-16 z-40 border-b border-white/[0.08]"
+        style={{
+          backgroundColor: "rgba(9, 9, 11, 0.72)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        }}
+      >
         <div className="mx-auto w-full px-4 lg:px-6 max-w-7xl">
           <nav
             aria-label="On this page navigation"
@@ -243,7 +278,7 @@ func main() {
               API keys
             </a>
             <a href="#pricing" className="text-zinc-400 hover:text-white transition-colors shrink-0">
-              Models & pricing
+              APIs & pricing
             </a>
             <a href="#playground" className="text-zinc-400 hover:text-white transition-colors shrink-0">
               Free Playground
@@ -273,7 +308,7 @@ func main() {
               {/* Left Column: Editorial Display Typography */}
               <div>
                 <span className="inline-block text-xs font-mono font-medium tracking-wider text-emerald-400/90 uppercase">
-                  VERIXA API // ZERO-FAILOVER IDENTITY
+                  VERIXA API // IDENTITY & TELECOM GATEWAY
                 </span>
 
                 <h1 className="mt-4 font-display text-4xl sm:text-5xl lg:text-6xl font-[450] leading-[1.08] tracking-tight text-white text-balance">
@@ -282,7 +317,7 @@ func main() {
                 </h1>
 
                 <p className="mt-6 text-base sm:text-lg text-zinc-400 max-w-xl leading-relaxed">
-                  Verify BVN, NIN, and Nigerian bank accounts in real time with sub-150ms multi-provider failover. One usage-based API built for African fintech and enterprise.
+                  Verify BVN, NIN, and bank accounts, and vend automated Airtime and Mobile Data with sub-150ms multi-provider failover. One usage-based API built for African fintech and enterprise.
                 </p>
 
                 {/* Pill Action CTAs */}
@@ -290,7 +325,7 @@ func main() {
                   <AppLink
                     app="dashboard"
                     path="/register"
-                    className="inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold bg-white hover:bg-zinc-200 text-zinc-950 transition-all shadow-sm active:scale-[0.99]"
+                    className="inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold bg-white hover:bg-zinc-200 text-zinc-950 transition-all shadow-md active:scale-[0.99]"
                   >
                     Get your API key &rarr;
                   </AppLink>
@@ -298,7 +333,7 @@ func main() {
                   <AppLink
                     app="docs"
                     path="/"
-                    className="inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium bg-white/[0.05] hover:bg-white/[0.1] text-zinc-200 border border-white/[0.08] transition-all backdrop-blur-md active:scale-[0.99]"
+                    className="inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium bg-white/[0.06] hover:bg-white/[0.12] text-zinc-200 border border-white/[0.1] transition-all backdrop-blur-md active:scale-[0.99]"
                   >
                     Read the docs
                   </AppLink>
@@ -310,13 +345,13 @@ func main() {
                     <svg className="size-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none">
                       <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span>Works with your existing SDK in Python, TypeScript, or plain cURL</span>
+                    <span>Works with your existing HTTP & SDK stack in Python, TypeScript, or plain cURL</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <svg className="size-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none">
                       <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span>Usage-based pricing from ₦10 per check (up to 60% Smart Cache discount)</span>
+                    <span>Identity verification from ₦10 per check & wholesale Mobile Data from ₦220/GB</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <svg className="size-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none">
@@ -332,7 +367,7 @@ func main() {
                 {/* Aurora Mesh Glow Backdrop */}
                 <div
                   aria-hidden="true"
-                  className="absolute inset-0 -m-6 sm:-m-10 pointer-events-none opacity-40 blur-3xl"
+                  className="absolute inset-0 -m-6 sm:-m-10 pointer-events-none opacity-45 blur-3xl"
                   style={{
                     background:
                       "radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.35) 0%, transparent 45%), radial-gradient(circle at 70% 60%, rgba(56, 189, 248, 0.25) 0%, transparent 40%), radial-gradient(circle at 20% 70%, rgba(99, 102, 241, 0.2) 0%, transparent 45%)",
@@ -353,7 +388,9 @@ func main() {
                       <span className="size-2.5 rounded-full bg-[#ff5f57] shadow-[0_0_8px_rgba(255,95,87,0.5)]" />
                       <span className="size-2.5 rounded-full bg-[#febc2e] shadow-[0_0_8px_rgba(254,188,46,0.5)]" />
                       <span className="size-2.5 rounded-full bg-[#28c840] shadow-[0_0_8px_rgba(40,200,64,0.5)]" />
-                      <span className="ml-3 font-mono text-xs text-zinc-500">verixa-api-v1</span>
+                      <span className="ml-3 font-mono text-xs text-zinc-400 font-medium">
+                        {codeSnippets[activeTab].title}
+                      </span>
                     </div>
 
                     <button
@@ -383,24 +420,31 @@ func main() {
                   {/* Code Editor Window */}
                   <div className="py-4 font-mono text-[13px] leading-relaxed overflow-x-auto min-h-[220px]">
                     <pre className="text-zinc-300">
-                      <code>{codeSnippets[activeLang]}</code>
+                      <code>{codeSnippets[activeTab].code}</code>
                     </pre>
                   </div>
 
-                  {/* Language Switcher Tab Pills */}
+                  {/* API & Language Switcher Tab Pills */}
                   <div className="pt-4 border-t border-white/[0.08] flex items-center gap-1.5 flex-wrap">
-                    {(["typescript", "python", "curl", "go"] as CodeLang[]).map((lang) => (
+                    {(
+                      [
+                        { id: "bvn_ts", label: "BVN (TypeScript)" },
+                        { id: "airtime_curl", label: "Airtime VTU (cURL)" },
+                        { id: "data_py", label: "Mobile Data (Python)" },
+                        { id: "nuban_go", label: "NUBAN Bank (Go)" },
+                      ] as const
+                    ).map((item) => (
                       <button
-                        key={lang}
+                        key={item.id}
                         type="button"
-                        onClick={() => setActiveLang(lang)}
+                        onClick={() => setActiveTab(item.id)}
                         className={`rounded-full px-3 py-1 text-xs font-medium transition-all cursor-pointer ${
-                          activeLang === lang
+                          activeTab === item.id
                             ? "bg-white text-zinc-950 font-semibold shadow-sm"
                             : "text-zinc-400 hover:text-white hover:bg-white/[0.06]"
                         }`}
                       >
-                        {lang === "curl" ? "cURL" : lang === "typescript" ? "TypeScript" : lang === "python" ? "Python" : "Go"}
+                        {item.label}
                       </button>
                     ))}
                   </div>
@@ -416,13 +460,13 @@ func main() {
             <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
               <div className="max-w-lg">
                 <span className="text-xs font-mono font-medium tracking-wider text-emerald-400/90 uppercase">
-                  ZERO TO FIRST VERIFICATION
+                  ZERO TO FIRST TRANSACTION
                 </span>
                 <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-white">
                   Start building with your API key
                 </h2>
                 <p className="mt-4 text-zinc-400 leading-relaxed text-sm sm:text-base">
-                  Create an account, generate an API key, and complete your first verified BVN or NIN check in under a minute.
+                  Create an account, generate an API key, and complete your first verified identity check or airtime top-up in under a minute.
                 </p>
 
                 {/* Vertical Stepper List */}
@@ -464,7 +508,7 @@ func main() {
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-white">Set your base URL and verify</h3>
+                      <h3 className="text-sm font-medium text-white">Set your base URL and request</h3>
                       <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
                         Send requests to <code className="font-mono text-emerald-400">https://api.verixaid.com/v1</code> with your bearer token.
                       </p>
@@ -548,7 +592,7 @@ func main() {
           </div>
         </section>
 
-        {/* 5. Models & Pricing Table (#pricing) */}
+        {/* 5. APIs & Usage Pricing Table (#pricing) */}
         <section id="pricing" className="border-t border-white/[0.08] py-20 sm:py-28">
           <div className="mx-auto w-full px-4 lg:px-6 max-w-7xl space-y-12">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
@@ -557,10 +601,10 @@ func main() {
                   TRANSPARENT USAGE PRICING
                 </span>
                 <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-white">
-                  Models & verification pricing
+                  APIs & usage pricing
                 </h2>
                 <p className="mt-4 text-zinc-400 max-w-xl text-sm sm:text-base leading-relaxed">
-                  No monthly seat fees or maintenance retainers. Prepaid credits billed per query with built-in Smart Cache repeat discounts up to 60%.
+                  No monthly seat fees or maintenance retainers. Prepaid credits billed per query with built-in Smart Cache repeat discounts up to 60% and wholesale telecom rates.
                 </p>
               </div>
 
@@ -574,10 +618,10 @@ func main() {
                 </AppLink>
                 <AppLink
                   app="docs"
-                  path="/smart-cache"
+                  path="/airtime-data"
                   className="rounded-full px-4 py-2 text-xs sm:text-sm font-medium bg-white/[0.05] hover:bg-white/[0.1] text-zinc-300 border border-white/[0.08] transition-all"
                 >
-                  Smart Cache docs
+                  Airtime & Data docs
                 </AppLink>
               </div>
             </div>
@@ -587,14 +631,57 @@ func main() {
               <table className="w-full divide-y divide-white/[0.08] text-left">
                 <thead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
                   <tr className="[&>th]:py-4 [&>th]:px-4">
-                    <th className="w-[30%]">Endpoint / Service</th>
-                    <th className="w-[25%]">Capabilities & Checks</th>
-                    <th className="w-[15%]">SLA & Latency</th>
-                    <th className="w-[15%]">Live Verification</th>
-                    <th className="w-[15%] text-right">Smart Cache Hit</th>
+                    <th className="w-[28%]">Endpoint / Service</th>
+                    <th className="w-[28%]">Capabilities & Checks</th>
+                    <th className="w-[14%]">SLA & Latency</th>
+                    <th className="w-[15%]">Live Rate / Pricing</th>
+                    <th className="w-[15%] text-right">Discount / Savings</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.06] text-xs sm:text-sm">
+                  {/* Airtime */}
+                  <tr className="hover:bg-white/[0.02] transition-colors bg-emerald-500/[0.02]">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        Airtime Top-up (VTU)
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                          Telecom VAS
+                        </span>
+                      </div>
+                      <div className="text-zinc-500 text-xs">POST /v1/vas/airtime</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      MTN, Airtel, Glo, 9mobile instant vending with auto-balance sync
+                    </td>
+                    <td className="py-4 px-4 font-mono text-zinc-300">sub-2.0s · 99.9%</td>
+                    <td className="py-4 px-4 font-mono text-white font-medium">₦0 fee (Face Value)</td>
+                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
+                      2.5% &ndash; 3.5% <span className="text-[10px] text-emerald-500/80">cashback</span>
+                    </td>
+                  </tr>
+
+                  {/* Mobile Data */}
+                  <tr className="hover:bg-white/[0.02] transition-colors bg-emerald-500/[0.02]">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        Mobile Data Bundles
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-sky-500/15 text-sky-400 border border-sky-500/20">
+                          Telecom VAS
+                        </span>
+                      </div>
+                      <div className="text-zinc-500 text-xs">POST /v1/vas/data</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      SME, Corporate & Direct data gifting (1GB to 50GB bundles)
+                    </td>
+                    <td className="py-4 px-4 font-mono text-zinc-300">sub-2.5s · 99.9%</td>
+                    <td className="py-4 px-4 font-mono text-white font-medium">from ₦220.00 / GB</td>
+                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
+                      Wholesale <span className="text-[10px] text-emerald-500/80">Tier 1</span>
+                    </td>
+                  </tr>
+
+                  {/* BVN */}
                   <tr className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium">BVN Verification</div>
@@ -606,10 +693,11 @@ func main() {
                     <td className="py-4 px-4 font-mono text-zinc-300">sub-200ms · 99.9%</td>
                     <td className="py-4 px-4 font-mono text-white font-medium">₦50.00</td>
                     <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦20.00 <span className="text-[10px] text-emerald-500/80">(-60%)</span>
+                      ₦20.00 cache <span className="text-[10px] text-emerald-500/80">(-60%)</span>
                     </td>
                   </tr>
 
+                  {/* NIN */}
                   <tr className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium">NIN National Identity</div>
@@ -621,10 +709,11 @@ func main() {
                     <td className="py-4 px-4 font-mono text-zinc-300">sub-220ms · 99.9%</td>
                     <td className="py-4 px-4 font-mono text-white font-medium">₦50.00</td>
                     <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦20.00 <span className="text-[10px] text-emerald-500/80">(-60%)</span>
+                      ₦20.00 cache <span className="text-[10px] text-emerald-500/80">(-60%)</span>
                     </td>
                   </tr>
 
+                  {/* NUBAN */}
                   <tr className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium">NUBAN Bank Account</div>
@@ -636,10 +725,27 @@ func main() {
                     <td className="py-4 px-4 font-mono text-zinc-300">sub-120ms · 99.95%</td>
                     <td className="py-4 px-4 font-mono text-white font-medium">₦10.00</td>
                     <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦5.00 <span className="text-[10px] text-emerald-500/80">(-50%)</span>
+                      ₦5.00 cache <span className="text-[10px] text-emerald-500/80">(-50%)</span>
                     </td>
                   </tr>
 
+                  {/* Messaging */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium">SMS & WhatsApp Messaging</div>
+                      <div className="text-zinc-500 text-xs">POST /v1/messaging/sms</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      DND bypass OTP, alphanumeric sender ID, WhatsApp delivery
+                    </td>
+                    <td className="py-4 px-4 font-mono text-zinc-300">sub-3.0s · 99.9%</td>
+                    <td className="py-4 px-4 font-mono text-white font-medium">₦3.50 / SMS</td>
+                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
+                      ₦12.00 / WhatsApp
+                    </td>
+                  </tr>
+
+                  {/* Phone KYC */}
                   <tr className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium">Phone Number KYC</div>
@@ -651,10 +757,11 @@ func main() {
                     <td className="py-4 px-4 font-mono text-zinc-300">sub-180ms · 99.9%</td>
                     <td className="py-4 px-4 font-mono text-white font-medium">₦25.00</td>
                     <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦12.50 <span className="text-[10px] text-emerald-500/80">(-50%)</span>
+                      ₦12.50 cache <span className="text-[10px] text-emerald-500/80">(-50%)</span>
                     </td>
                   </tr>
 
+                  {/* CAC */}
                   <tr className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium">CAC Corporate Entity (KYB)</div>
@@ -666,7 +773,7 @@ func main() {
                     <td className="py-4 px-4 font-mono text-zinc-300">sub-350ms · 99.8%</td>
                     <td className="py-4 px-4 font-mono text-white font-medium">₦150.00</td>
                     <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦75.00 <span className="text-[10px] text-emerald-500/80">(-50%)</span>
+                      ₦75.00 cache <span className="text-[10px] text-emerald-500/80">(-50%)</span>
                     </td>
                   </tr>
                 </tbody>
@@ -692,7 +799,7 @@ func main() {
                   Try Verixa in the Playground
                 </h2>
                 <p className="mt-4 text-zinc-400 text-sm sm:text-base leading-relaxed">
-                  The Playground comes with every Console account: simulate BVN, NIN, and bank account lookups with live mock responses before writing integration code. When ready to ship, API usage is seamlessly billed per request.
+                  The Playground comes with every Console account: simulate BVN, NIN, bank account lookups, and test Airtime & Data top-up calls with live mock responses before writing integration code. When ready to ship, API usage is seamlessly billed per request.
                 </p>
 
                 <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -730,7 +837,30 @@ func main() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {/* Card 1: BVN */}
+              {/* Card 1: Airtime & Data */}
+              <AppLink
+                app="docs"
+                path="/airtime-data"
+                className="group rounded-xl border border-emerald-500/25 bg-emerald-500/[0.03] hover:bg-emerald-500/[0.06] hover:border-emerald-500/40 p-5 transition-all block relative"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <svg className="size-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="5" y="2" width="14" height="20" rx="3" />
+                    <line x1="12" y1="18" x2="12.01" y2="18" />
+                  </svg>
+                  <h3 className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors flex items-center gap-2">
+                    Airtime & Mobile Data API
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300">
+                      Popular
+                    </span>
+                  </h3>
+                </div>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Automated VTU airtime vending and SME/Corporate data gifting across MTN, Airtel, Glo, and 9mobile with instant DLRs.
+                </p>
+              </AppLink>
+
+              {/* Card 2: BVN */}
               <AppLink
                 app="docs"
                 path="/bvn"
@@ -751,7 +881,7 @@ func main() {
                 </p>
               </AppLink>
 
-              {/* Card 2: NIN */}
+              {/* Card 3: NIN */}
               <AppLink
                 app="docs"
                 path="/nin"
@@ -773,7 +903,7 @@ func main() {
                 </p>
               </AppLink>
 
-              {/* Card 3: NUBAN */}
+              {/* Card 4: NUBAN */}
               <AppLink
                 app="docs"
                 path="/nuban"
@@ -790,25 +920,6 @@ func main() {
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
                   Instant account ownership check across all Nigerian commercial banks, neobanks, and microfinance institutions.
-                </p>
-              </AppLink>
-
-              {/* Card 4: CAC KYB */}
-              <AppLink
-                app="docs"
-                path="/cac"
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] p-5 transition-all block"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <svg className="size-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3 21h18M3 7v14M21 7v14M6 11h4M6 15h4M14 11h4M14 15h4M12 3l9 4H3l9-4z" />
-                  </svg>
-                  <h3 className="text-sm font-medium text-white group-hover:text-amber-400 transition-colors">
-                    Corporate CAC (KYB)
-                  </h3>
-                </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Validate RC and Business Name registrations against Corporate Affairs Commission records.
                 </p>
               </AppLink>
 
@@ -831,22 +942,22 @@ func main() {
                 </p>
               </AppLink>
 
-              {/* Card 6: Messaging */}
+              {/* Card 6: CAC KYB */}
               <AppLink
                 app="docs"
-                path="/messaging"
+                path="/cac"
                 className="group rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] p-5 transition-all block"
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <svg className="size-5 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                  <svg className="size-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 21h18M3 7v14M21 7v14M6 11h4M6 15h4M14 11h4M14 15h4M12 3l9 4H3l9-4z" />
                   </svg>
-                  <h3 className="text-sm font-medium text-white group-hover:text-rose-400 transition-colors">
-                    SMS & WhatsApp Messaging
+                  <h3 className="text-sm font-medium text-white group-hover:text-amber-400 transition-colors">
+                    Corporate CAC (KYB)
                   </h3>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
-                  Deliver authentication OTPs and notifications with sub-3s delivery across all Nigerian carriers.
+                  Validate RC and Business Name registrations against Corporate Affairs Commission records.
                 </p>
               </AppLink>
             </div>

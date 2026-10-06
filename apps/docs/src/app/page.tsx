@@ -80,7 +80,7 @@ export default function DocsIntroductionPage() {
       </div>
 
       {/* Next steps grid */}
-      <div className="pt-6 border-t border-white/[0.08] grid sm:grid-cols-3 gap-3">
+      <div className="pt-6 border-t border-white/[0.08] grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <Link
           href="/authentication"
           className="p-4 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.14] transition-all block group"
@@ -98,6 +98,15 @@ export default function DocsIntroductionPage() {
             BVN Verification &rarr;
           </span>
           <span className="text-[11px] text-zinc-500 mt-1 block">Parameters & fuzzy name scoring</span>
+        </Link>
+        <Link
+          href="/airtime-data"
+          className="p-4 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.14] transition-all block group"
+        >
+          <span className="text-xs font-medium text-white group-hover:text-emerald-400 transition-colors block">
+            Airtime & Data API &rarr;
+          </span>
+          <span className="text-[11px] text-zinc-500 mt-1 block">Automated telco VTU vending</span>
         </Link>
         <Link
           href="/smart-cache"

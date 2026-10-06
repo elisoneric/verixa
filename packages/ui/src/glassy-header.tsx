@@ -47,7 +47,7 @@ export interface GlassyHeaderProps {
 }
 
 export function GlassyHeader({
-  logoBadge = "ID",
+  logoBadge = "API",
   logoBadgeColor = "emerald",
   navItems,
   onSearchClick,
@@ -84,20 +84,25 @@ export function GlassyHeader({
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 duration-200 transition-colors",
+        "fixed inset-x-0 top-0 z-50 duration-200 transition-all border-b border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]",
         className
       )}
+      style={{
+        backgroundColor: "rgba(9, 9, 11, 0.65)",
+        backdropFilter: "blur(20px) saturate(190%)",
+        WebkitBackdropFilter: "blur(20px) saturate(190%)",
+      }}
     >
-      {/* Ambient Top Gradient Vignette */}
+      {/* Luminous Hairline Specular Highlight along Top */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 -top-px h-24 bg-gradient-to-b from-black/80 via-black/40 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
       />
 
-      {/* Glassmorphic Backdrop Blur Shell */}
+      {/* Luminous Hairline Glow along Bottom */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[#09090b]/80 backdrop-blur-xl border-b border-white/[0.08]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"
       />
 
       <div className="relative mx-auto w-full px-4 lg:px-6 max-w-7xl">
@@ -133,8 +138,8 @@ export function GlassyHeader({
                         app={item.app}
                         path={item.path}
                         className={cn(
-                          "flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium text-zinc-400 hover:text-white transition-colors rounded-full hover:bg-white/[0.04]",
-                          activeDropdown === item.label && "text-white bg-white/[0.04]"
+                          "flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium text-zinc-300 hover:text-white transition-colors rounded-full hover:bg-white/[0.08]",
+                          activeDropdown === item.label && "text-white bg-white/[0.08]"
                         )}
                       >
                         {item.label}
@@ -159,8 +164,8 @@ export function GlassyHeader({
                       <a
                         href={item.href}
                         className={cn(
-                          "flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium text-zinc-400 hover:text-white transition-colors rounded-full hover:bg-white/[0.04]",
-                          activeDropdown === item.label && "text-white bg-white/[0.04]"
+                          "flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium text-zinc-300 hover:text-white transition-colors rounded-full hover:bg-white/[0.08]",
+                          activeDropdown === item.label && "text-white bg-white/[0.08]"
                         )}
                       >
                         {item.label}
@@ -185,8 +190,8 @@ export function GlassyHeader({
                       <button
                         type="button"
                         className={cn(
-                          "flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium text-zinc-400 hover:text-white transition-colors rounded-full hover:bg-white/[0.04] cursor-pointer",
-                          activeDropdown === item.label && "text-white bg-white/[0.04]"
+                          "flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium text-zinc-300 hover:text-white transition-colors rounded-full hover:bg-white/[0.08] cursor-pointer",
+                          activeDropdown === item.label && "text-white bg-white/[0.08]"
                         )}
                       >
                         {item.label}
@@ -211,27 +216,34 @@ export function GlassyHeader({
 
                     {/* Glassy Popover Dropdown */}
                     {hasDropdown && activeDropdown === item.label && (
-                      <div className="absolute top-full left-0 pt-2 z-50 min-w-[240px] animate-in fade-in zoom-in-95 duration-100">
-                        <div className="rounded-xl border border-white/[0.08] bg-[#0c0c0e]/95 backdrop-blur-2xl shadow-[0_16px_48px_-8px_rgba(0,0,0,0.6)] p-2">
-                          <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 px-3 py-1.5 font-semibold">
+                      <div className="absolute top-full left-0 pt-2 z-50 min-w-[260px] animate-in fade-in zoom-in-95 duration-100">
+                        <div
+                          className="rounded-2xl border border-white/[0.12] p-2 shadow-[0_20px_50px_rgba(0,0,0,0.7)]"
+                          style={{
+                            backgroundColor: "rgba(12, 12, 15, 0.88)",
+                            backdropFilter: "blur(24px) saturate(190%)",
+                            WebkitBackdropFilter: "blur(24px) saturate(190%)",
+                          }}
+                        >
+                          <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 px-3 py-1.5 font-semibold">
                             {item.label}
                           </div>
                           <div className="space-y-0.5">
                             {item.dropdown?.map((sub) => {
                               const content = (
-                                <div className="group flex flex-col px-3 py-2 rounded-lg hover:bg-white/[0.06] transition-colors">
+                                <div className="group flex flex-col px-3 py-2 rounded-xl hover:bg-white/[0.08] transition-colors">
                                   <div className="flex items-center justify-between">
                                     <span className="text-[13px] font-medium text-zinc-200 group-hover:text-white">
                                       {sub.label}
                                     </span>
                                     {sub.badge && (
-                                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                                         {sub.badge}
                                       </span>
                                     )}
                                   </div>
                                   {sub.description && (
-                                    <span className="text-[11px] text-zinc-500 group-hover:text-zinc-400 transition-colors line-clamp-1 mt-0.5">
+                                    <span className="text-[11px] text-zinc-400 group-hover:text-zinc-300 transition-colors line-clamp-1 mt-0.5">
                                       {sub.description}
                                     </span>
                                   )}
@@ -279,7 +291,7 @@ export function GlassyHeader({
               <button
                 type="button"
                 onClick={onSearchClick}
-                className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] text-zinc-400 hover:text-zinc-200 text-xs transition-colors"
+                className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 hover:text-white text-xs transition-colors"
               >
                 <svg
                   className="size-3.5 shrink-0 stroke-[2]"
@@ -294,7 +306,7 @@ export function GlassyHeader({
                   />
                 </svg>
                 <span className="truncate max-w-[120px]">{searchPlaceholder}</span>
-                <kbd className="hidden sm:inline-block rounded border border-white/[0.1] bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-mono text-zinc-400">
+                <kbd className="hidden sm:inline-block rounded border border-white/[0.12] bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-mono text-zinc-300">
                   ⌘K
                 </kbd>
               </button>
@@ -307,14 +319,14 @@ export function GlassyHeader({
                   <AppLink
                     app={secondaryCta.app}
                     path={secondaryCta.path}
-                    className="inline-flex items-center justify-center rounded-full px-4 py-2 text-[13px] font-medium text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
+                    className="inline-flex items-center justify-center rounded-full px-4 py-2 text-[13px] font-medium text-zinc-200 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] transition-all backdrop-blur-md shadow-xs"
                   >
                     {secondaryCta.label}
                   </AppLink>
                 ) : (
                   <Link
                     href={secondaryCta.href || "#"}
-                    className="inline-flex items-center justify-center rounded-full px-4 py-2 text-[13px] font-medium text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all"
+                    className="inline-flex items-center justify-center rounded-full px-4 py-2 text-[13px] font-medium text-zinc-200 hover:text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] transition-all backdrop-blur-md shadow-xs"
                   >
                     {secondaryCta.label}
                   </Link>
@@ -329,14 +341,14 @@ export function GlassyHeader({
                   <AppLink
                     app={primaryCta.app}
                     path={primaryCta.path}
-                    className="inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-2 text-[13px] font-semibold bg-white hover:bg-zinc-200 text-zinc-950 transition-all shadow-sm active:scale-[0.99]"
+                    className="inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-2 text-[13px] font-semibold bg-white hover:bg-zinc-200 text-zinc-950 transition-all shadow-md active:scale-[0.99]"
                   >
                     {primaryCta.label}
                   </AppLink>
                 ) : (
                   <Link
                     href={primaryCta.href || "#"}
-                    className="inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-2 text-[13px] font-semibold bg-white hover:bg-zinc-200 text-zinc-950 transition-all shadow-sm active:scale-[0.99]"
+                    className="inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-2 text-[13px] font-semibold bg-white hover:bg-zinc-200 text-zinc-950 transition-all shadow-md active:scale-[0.99]"
                   >
                     {primaryCta.label}
                   </Link>
@@ -349,7 +361,7 @@ export function GlassyHeader({
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle Navigation Menu"
-              className="md:hidden p-2 rounded-full border border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+              className="md:hidden p-2 rounded-full border border-white/[0.1] bg-white/[0.05] text-zinc-300 hover:text-white hover:bg-white/[0.1] transition-colors"
             >
               <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileOpen ? (
@@ -365,7 +377,14 @@ export function GlassyHeader({
 
       {/* Mobile Drawer Glassy Dropdown */}
       {mobileOpen && (
-        <div className="md:hidden border-b border-white/[0.08] bg-[#09090b]/95 backdrop-blur-2xl px-6 py-6 space-y-4 animate-in slide-in-from-top-4 duration-150">
+        <div
+          className="md:hidden border-b border-white/[0.1] px-6 py-6 space-y-4 animate-in slide-in-from-top-4 duration-150"
+          style={{
+            backgroundColor: "rgba(9, 9, 11, 0.95)",
+            backdropFilter: "blur(24px) saturate(190%)",
+            WebkitBackdropFilter: "blur(24px) saturate(190%)",
+          }}
+        >
           {navItems && navItems.length > 0 && (
             <div className="space-y-2">
               {navItems.map((item) => (
