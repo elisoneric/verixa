@@ -7,12 +7,15 @@ import { ApiClient } from "../../../lib/api"
 
 export default function ManualVerifyPage() {
   const { environment, setEnvironment, refreshBalance } = useAuth()
-  const [service, setService] = React.useState<"bvn" | "nin" | "nuban">("bvn")
+  const [service, setService] = React.useState<"bvn" | "nin" | "nuban" | "phone" | "cac">("bvn")
   const [bvn, setBvn] = React.useState("22123456789")
   const [firstName, setFirstName] = React.useState("CHIDERA")
   const [nin, setNin] = React.useState("11234567890")
   const [accountNumber, setAccountNumber] = React.useState("0123456789")
   const [bankCode, setBankCode] = React.useState("058")
+  const [phone, setPhone] = React.useState("08012345678")
+  const [rcNumber, setRcNumber] = React.useState("1234567")
+  const [companyType, setCompanyType] = React.useState("COMPANY")
   const [consent, setConsent] = React.useState(true)
 
   const [isLoading, setIsLoading] = React.useState(false)
@@ -35,6 +38,10 @@ export default function ManualVerifyPage() {
       payload = { bvn, firstName, consent: true }
     } else if (service === "nin") {
       payload = { nin, consent: true }
+    } else if (service === "phone") {
+      payload = { phoneNumber: phone, consent: true }
+    } else if (service === "cac") {
+      payload = { rcNumber, companyType, consent: true }
     } else {
       payload = { accountNumber, bankCode, consent: true }
     }
@@ -87,7 +94,7 @@ export default function ManualVerifyPage() {
             <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300 uppercase tracking-wide">
               Verification Service
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setService("bvn")}
@@ -112,8 +119,30 @@ export default function ManualVerifyPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setService("nuban")}
+                onClick={() => setService("phone")}
                 className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
+                  service === "phone"
+                    ? "bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-700 dark:text-amber-400 font-bold shadow-2xs"
+                    : "bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-50"
+                }`}
+              >
+                Phone
+              </button>
+              <button
+                type="button"
+                onClick={() => setService("cac")}
+                className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
+                  service === "cac"
+                    ? "bg-purple-50 dark:bg-purple-950/40 border-purple-500 text-purple-700 dark:text-purple-400 font-bold shadow-2xs"
+                    : "bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-50"
+                }`}
+              >
+                CAC Company
+              </button>
+              <button
+                type="button"
+                onClick={() => setService("nuban")}
+                className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer sm:col-span-2 ${
                   service === "nuban"
                     ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-500 text-indigo-700 dark:text-indigo-400 font-bold shadow-2xs"
                     : "bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-50"
@@ -159,6 +188,45 @@ export default function ManualVerifyPage() {
                 maxLength={11}
                 required
               />
+            )}
+
+            {service === "phone" && (
+              <Input
+                label="Nigerian Phone Number"
+                placeholder="08012345678"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                maxLength={14}
+                required
+              />
+            )}
+
+            {service === "cac" && (
+              <>
+                <Input
+                  label="CAC Registration / RC Number"
+                  placeholder="1234567"
+                  value={rcNumber}
+                  onChange={(e) => setRcNumber(e.target.value)}
+                  required
+                />
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 uppercase tracking-wide">
+                    Company Type
+                  </label>
+                  <select
+                    value={companyType}
+                    onChange={(e) => setCompanyType(e.target.value)}
+                    className="w-full h-10 rounded-lg border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-3 text-xs text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none shadow-2xs"
+                  >
+                    <option value="COMPANY">Limited Liability Company (RC)</option>
+                    <option value="BUSINESS_NAME">Business Name (BN)</option>
+                    <option value="INCORPORATED_TRUSTEES">Incorporated Trustees (IT / NGO)</option>
+                    <option value="LIMITED_PARTNERSHIP">Limited Partnership (LP)</option>
+                    <option value="LIMITED_LIABILITY_PARTNERSHIP">Limited Liability Partnership (LLP)</option>
+                  </select>
+                </div>
+              </>
             )}
 
             {service === "nuban" && (

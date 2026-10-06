@@ -34,7 +34,7 @@ export class BillingService {
 
   async getEffectiveRate(
     orgId: string,
-    serviceType: 'bvn' | 'nin' | 'nuban' | 'nin_advance' | 'nin_slip',
+    serviceType: 'bvn' | 'nin' | 'nuban' | 'nin_advance' | 'nin_slip' | 'phone' | 'cac' | 'nuban_kyc' | 'sms' | 'airtime' | 'data',
     isCacheHit = false
   ): Promise<{
     effectiveRate: number;
@@ -68,6 +68,21 @@ export class BillingService {
     } else if (serviceType === 'nin_slip') {
       defaultLive = 270;
       defaultCache = 50;
+    } else if (serviceType === 'phone') {
+      defaultLive = 50;
+      defaultCache = 20;
+    } else if (serviceType === 'cac') {
+      defaultLive = 200;
+      defaultCache = 80;
+    } else if (serviceType === 'nuban_kyc') {
+      defaultLive = 80;
+      defaultCache = 30;
+    } else if (serviceType === 'sms') {
+      defaultLive = 5;
+      defaultCache = 5;
+    } else if (serviceType === 'airtime' || serviceType === 'data') {
+      defaultLive = 0;
+      defaultCache = 0;
     }
 
     let baseRate = isCacheHit ? defaultCache : defaultLive;

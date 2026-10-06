@@ -38,8 +38,18 @@ export default function RootLayout({
       links: [
         { label: "BVN Verification", href: "/bvn" },
         { label: "NIN Verification", href: "/nin" },
-        { label: "Bank Account (NUBAN)", href: "/nuban" },
+        { label: "Phone Number Lookup", href: "/phone" },
+        { label: "CAC Business Verification", href: "/cac" },
+        { label: "NUBAN Resolve", href: "/nuban" },
+        { label: "NUBAN KYC Status", href: "/nuban-kyc" },
         { label: "Upcoming APIs (Roadmap)", href: "/roadmap" },
+      ],
+    },
+    {
+      title: "VALUE-ADDED SERVICES",
+      links: [
+        { label: "SMS & WhatsApp Messaging", href: "/messaging" },
+        { label: "Airtime & Mobile Data", href: "/airtime-data" },
       ],
     },
     {

@@ -8,6 +8,12 @@ import {
   NinAdvanceVerificationData,
   NinAdvanceResult,
   BankAccountVerificationData, 
+  PhoneNumberVerificationData,
+  CacVerificationData,
+  NubanKycVerificationData,
+  SmsDispatchData,
+  AirtimePurchaseData,
+  DataPurchaseData,
   VerificationResponse 
 } from './verification.provider.interface';
 import { MockProvider } from './mock.provider';
@@ -32,40 +38,50 @@ export class DojahProvider implements IVerificationProvider {
   }
 
   isConfigured(): boolean {
-    const { appId, secretKey } = this.getCredentials();
-    return Boolean(secretKey && secretKey.length > 5);
+    const { secretKey } = this.getCredentials();
+    return Boolean(secretKey && secretKey.length > 5 && !secretKey.startsWith('sk_test_mock'));
   }
+
+  private getHeaders(secretKey: string, appId: string | null) {
+    return {
+      Authorization: secretKey, // Note: Dojah requires raw key, not Bearer
+      AppId: appId || '',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  // --- 1. BVN Lookups ---
 
   async verifyBvn(data: BvnVerificationData): Promise<VerificationResponse<any>> {
     const { appId, secretKey, baseUrl } = this.getCredentials();
-    if (!secretKey) {
-      if (process.env.NODE_ENV === 'production' && !baseUrl.includes('sandbox')) {
-        throw new Error('Live Dojah credentials (DOJAH_SECRET_KEY) are not configured.');
-      }
-      this.logger.log('Dojah sandbox fallback to mock provider for BVN');
+    if (!this.isConfigured()) {
+      this.logger.log('Dojah credentials not live, falling back to mock provider for BVN');
       return this.mockProvider.verifyBvn(data);
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/api/v1/kyc/bvn`, {
-        params: { bvn: data.bvn, consent: true },
-        headers: {
-          Authorization: secretKey,
-          AppId: appId || '',
-        },
-        timeout: 12000,
+      let endpoint = `${baseUrl}/api/v1/kyc/bvn/full`;
+      const params: any = { bvn: data.bvn };
+
+      if (data.variant === 'match') {
+        endpoint = `${baseUrl}/api/v1/kyc/bvn`;
+        if (data.firstName) params.first_name = data.firstName;
+        if (data.lastName) params.last_name = data.lastName;
+        if (data.dob) params.dob = data.dob;
+      } else if (data.variant === 'advance') {
+        endpoint = `${baseUrl}/api/v1/kyc/bvn/advance`;
+      }
+
+      const response = await axios.get(endpoint, {
+        params,
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 15000,
       });
 
       const entity = response.data?.entity || {};
       return {
         status: 'success',
-        data: {
-          bvn: data.bvn,
-          first_name: entity.first_name || entity.firstname,
-          last_name: entity.last_name || entity.surname,
-          date_of_birth: entity.date_of_birth || entity.dob,
-          phone_number: entity.phone_number || entity.phone,
-        },
+        data: entity,
         meta: {
           provider: 'dojah',
           reference: `dojah_${uuidv4().slice(0, 12)}`,
@@ -77,36 +93,35 @@ export class DojahProvider implements IVerificationProvider {
     }
   }
 
+  // --- 2. NIN Lookups ---
+
   async verifyNin(data: NinVerificationData): Promise<VerificationResponse<any>> {
     const { appId, secretKey, baseUrl } = this.getCredentials();
-    if (!secretKey) {
-      if (process.env.NODE_ENV === 'production' && !baseUrl.includes('sandbox')) {
-        throw new Error('Live Dojah credentials (DOJAH_SECRET_KEY) are not configured.');
-      }
-      this.logger.log('Dojah sandbox fallback to mock provider for NIN Basic');
+    if (!this.isConfigured()) {
+      this.logger.log('Dojah credentials not live, falling back to mock provider for NIN');
       return this.mockProvider.verifyNin(data);
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/api/v1/kyc/nin`, {
-        params: { nin: data.nin, consent: true },
-        headers: {
-          Authorization: secretKey,
-          AppId: appId || '',
-        },
-        timeout: 12000,
+      let endpoint = `${baseUrl}/api/v1/kyc/nin`;
+      if (data.tier === 'advance') {
+        return this.verifyNinAdvance({ nin: data.nin, consent: data.consent });
+      } else if (data.tier === 'premium') {
+        endpoint = `${baseUrl}/api/v1/kyc/nin/premium`;
+      } else if (data.tier === 'slip') {
+        endpoint = `${baseUrl}/api/v1/kyc/nin/nin_slip`;
+      }
+
+      const response = await axios.get(endpoint, {
+        params: { nin: data.nin },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 15000,
       });
 
       const entity = response.data?.entity || {};
       return {
         status: 'success',
-        data: {
-          nin: data.nin,
-          first_name: entity.firstname || entity.first_name,
-          last_name: entity.surname || entity.last_name,
-          gender: entity.gender,
-          birthdate: entity.birthdate,
-        },
+        data: entity,
         meta: {
           provider: 'dojah',
           reference: `dojah_${uuidv4().slice(0, 12)}`,
@@ -120,28 +135,21 @@ export class DojahProvider implements IVerificationProvider {
 
   async verifyNinAdvance(data: NinAdvanceVerificationData): Promise<VerificationResponse<NinAdvanceResult>> {
     const { appId, secretKey, baseUrl } = this.getCredentials();
-    if (!secretKey) {
-      if (process.env.NODE_ENV === 'production' && !baseUrl.includes('sandbox')) {
-        throw new Error('Live Dojah credentials (DOJAH_SECRET_KEY) are not configured.');
-      }
-      this.logger.log('Dojah sandbox fallback to mock provider for NIN Advance');
+    if (!this.isConfigured()) {
+      this.logger.log('Dojah credentials not live, falling back to mock provider for NIN Advance');
       return this.mockProvider.verifyNinAdvance(data);
     }
 
     try {
       const response = await axios.get(`${baseUrl}/api/v1/kyc/nin/advance`, {
-        params: { nin: data.nin, consent: true },
-        headers: {
-          Authorization: secretKey,
-          AppId: appId || '',
-        },
-        timeout: 15000,
+        params: { nin: data.nin },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 18000,
       });
 
       const entity = response.data?.entity || {};
       const trackingId = entity.tracking_id || entity.trackingId || '';
 
-      // Clean photo string (strip data:image... prefix if present for raw base64 or keep format)
       let photoStr = entity.photo || '';
       if (photoStr.includes('base64,')) {
         photoStr = photoStr.split('base64,')[1];
@@ -156,13 +164,22 @@ export class DojahProvider implements IVerificationProvider {
           surname: entity.surname || entity.last_name || '',
           middleName: entity.middlename || entity.middle_name || '',
           gender: (entity.gender || 'MALE').toUpperCase(),
-          birthdate: entity.birthdate || entity.dob || '',
-          address: entity.residence_address || entity.address || '',
-          addressLine1: entity.residence_lga ? `${entity.residence_lga}, ${entity.residence_state || ''}` : (entity.residence_state || ''),
-          state: entity.residence_state || entity.state || '',
-          lga: entity.residence_lga || entity.lga || '',
+          birthdate: entity.birthdate || entity.date_of_birth || entity.dob || '',
+          address: entity.residence_address_line_1 || entity.residence_address || entity.address || '',
+          addressLine1: entity.residence_address_line_1 || entity.residence_town || '',
+          state: entity.residence_state || entity.birth_state || entity.state || '',
+          lga: entity.residence_lga || entity.birth_lga || entity.lga || '',
           phoneNumber: entity.telephoneno || entity.phone_number || '',
           photo: photoStr,
+          signature: entity.signature || '',
+          nextOfKin: entity.nok_first_name ? {
+            firstName: entity.nok_first_name,
+            middleName: entity.nok_middle_name,
+            lastName: entity.nok_last_name,
+            town: entity.nok_town,
+            lga: entity.nok_lga,
+            address: entity.nok_address_line_1,
+          } : undefined,
         },
         meta: {
           provider: 'dojah',
@@ -175,12 +192,11 @@ export class DojahProvider implements IVerificationProvider {
     }
   }
 
+  // --- 3. Bank Account & NUBAN ---
+
   async verifyBankAccount(data: BankAccountVerificationData): Promise<VerificationResponse<any>> {
     const { appId, secretKey, baseUrl } = this.getCredentials();
-    if (!secretKey) {
-      if (process.env.NODE_ENV === 'production' && !baseUrl.includes('sandbox')) {
-        throw new Error('Live Dojah credentials (DOJAH_SECRET_KEY) are not configured.');
-      }
+    if (!this.isConfigured()) {
       return this.mockProvider.verifyBankAccount(data);
     }
 
@@ -189,12 +205,8 @@ export class DojahProvider implements IVerificationProvider {
         params: {
           account_number: data.accountNumber,
           bank_code: data.bankCode,
-          consent: true,
         },
-        headers: {
-          Authorization: secretKey,
-          AppId: appId || '',
-        },
+        headers: this.getHeaders(secretKey!, appId),
         timeout: 12000,
       });
 
@@ -216,5 +228,221 @@ export class DojahProvider implements IVerificationProvider {
       throw err;
     }
   }
-}
 
+  async verifyNubanKycStatus(data: NubanKycVerificationData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.verifyNubanKycStatus!(data);
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/kyc/nuban/status`, {
+        params: {
+          account_number: data.accountNumber,
+          bank_code: data.bankCode,
+        },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 15000,
+      });
+
+      const entity = response.data?.entity || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'dojah',
+          reference: `dojah_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Dojah NUBAN KYC status lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  // --- 4. Phone Number Lookup ---
+
+  async verifyPhoneNumber(data: PhoneNumberVerificationData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.verifyPhoneNumber!(data);
+    }
+
+    try {
+      const endpoint = data.variant === 'advance'
+        ? `${baseUrl}/api/v1/kyc/phone_number`
+        : `${baseUrl}/api/v1/kyc/phone_number/basic`;
+
+      const response = await axios.get(endpoint, {
+        params: { phone_number: data.phoneNumber },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 15000,
+      });
+
+      const entity = response.data?.entity || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'dojah',
+          reference: `dojah_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Dojah Phone lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  // --- 5. Business Verification (CAC & TIN) ---
+
+  async verifyCac(data: CacVerificationData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.verifyCac!(data);
+    }
+
+    try {
+      let endpoint = `${baseUrl}/api/v1/kyc/cac/basic`;
+      if (data.variant === 'advance') {
+        endpoint = `${baseUrl}/api/v1/kyc/cac/advance`;
+      } else if (data.variant === 'tin') {
+        endpoint = `${baseUrl}/api/v1/kyc/cac/tin`;
+      }
+
+      const response = await axios.get(endpoint, {
+        params: {
+          rc_number: data.rcNumber,
+          company_type: data.companyType || 'COMPANY',
+        },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 18000,
+      });
+
+      const entity = response.data?.entity || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'dojah',
+          reference: `dojah_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Dojah CAC lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  // --- 6. Messaging (SMS / WhatsApp) ---
+
+  async sendSms(data: SmsDispatchData): Promise<any> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.sendSms!(data);
+    }
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/api/v1/messaging/sms`,
+        {
+          destination: data.destination,
+          message: data.message,
+          channel: data.channel || 'sms',
+          sender_id: data.senderId || 'Verixa',
+          priority: data.priority || false,
+        },
+        { headers: this.getHeaders(secretKey!, appId), timeout: 12000 }
+      );
+      return response.data?.entity || response.data;
+    } catch (err: any) {
+      this.logger.error(`Dojah SMS send error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  // --- 7. Airtime & Data ---
+
+  async purchaseAirtime(data: AirtimePurchaseData): Promise<any> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.purchaseAirtime!(data);
+    }
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/api/v1/purchase/airtime`,
+        {
+          amount: data.amount,
+          destination: Array.isArray(data.destination) ? data.destination : [data.destination],
+        },
+        { headers: this.getHeaders(secretKey!, appId), timeout: 15000 }
+      );
+      return response.data?.entity || response.data;
+    } catch (err: any) {
+      this.logger.error(`Dojah Airtime purchase error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async purchaseData(data: DataPurchaseData): Promise<any> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.purchaseData!(data);
+    }
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/api/v1/purchase/data`,
+        {
+          plan: data.plan,
+          destination: data.destination,
+        },
+        { headers: this.getHeaders(secretKey!, appId), timeout: 15000 }
+      );
+      return response.data?.entity || response.data;
+    } catch (err: any) {
+      this.logger.error(`Dojah Data purchase error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async getDataPlans(): Promise<any[]> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.getDataPlans!();
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/purchase/data/plans`, {
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 10000,
+      });
+      return response.data?.entity || [];
+    } catch (err: any) {
+      this.logger.error(`Dojah Data Plans fetch error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  // --- 8. Upstream Dojah Balance Health Check ---
+
+  async getUpstreamBalance(): Promise<{ balance: string; currency: string }> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return { balance: '500,000.00', currency: 'NGN' };
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/balance`, {
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 10000,
+      });
+      const balance = response.data?.entity?.wallet_balance || '0.00';
+      return { balance, currency: 'NGN' };
+    } catch (err: any) {
+      this.logger.error(`Dojah balance error: ${err?.message}`, err?.response?.data);
+      return { balance: 'Unavailable', currency: 'NGN' };
+    }
+  }
+}

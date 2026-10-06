@@ -92,6 +92,109 @@ export class VerificationsController {
     );
   }
 
+  @UseGuards(ApiKeyGuard)
+  @UseInterceptors(IdempotencyInterceptor)
+  @Post('phone')
+  async verifyPhoneNumber(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const phone = String(body.phoneNumber || body.phone_number || '').trim();
+    if (!phone) {
+      throw new BadRequestException('Valid Nigerian phone number is required.');
+    }
+    const isLive = req.environment === Environment.LIVE;
+    return this.processVerification(
+      req,
+      'phone',
+      phone,
+      body,
+      () => (isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: phone, variant: body.variant }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: phone, variant: body.variant }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @UseInterceptors(IdempotencyInterceptor)
+  @Post('cac')
+  async verifyCac(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const rc = String(body.rcNumber || body.rc_number || '').trim();
+    if (!rc) {
+      throw new BadRequestException('Company RC number is required.');
+    }
+    const isLive = req.environment === Environment.LIVE;
+    return this.processVerification(
+      req,
+      'cac',
+      rc,
+      body,
+      () => (isLive ? this.dojahProvider.verifyCac({ rcNumber: rc, companyType: body.companyType || body.company_type, variant: body.variant }) : this.mockProvider.verifyCac({ rcNumber: rc, companyType: body.companyType || body.company_type, variant: body.variant }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @UseInterceptors(IdempotencyInterceptor)
+  @Post('nuban-kyc')
+  async verifyNubanKyc(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const identifier = `${body.bankCode || ''}_${body.accountNumber || ''}`.trim();
+    const isLive = req.environment === Environment.LIVE;
+    return this.processVerification(
+      req,
+      'nuban_kyc',
+      identifier,
+      body,
+      () => (isLive ? this.dojahProvider.verifyNubanKycStatus(body) : this.mockProvider.verifyNubanKycStatus(body))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('messaging/sms')
+  async sendSms(@Req() req: any, @Body() body: any) {
+    if (!body.destination || !body.message) {
+      throw new BadRequestException('destination and message are required.');
+    }
+    const isLive = req.environment === Environment.LIVE;
+    return isLive ? this.dojahProvider.sendSms(body) : this.mockProvider.sendSms(body);
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('purchase/airtime')
+  async purchaseAirtime(@Req() req: any, @Body() body: any) {
+    if (!body.amount || !body.destination) {
+      throw new BadRequestException('amount and destination are required.');
+    }
+    const isLive = req.environment === Environment.LIVE;
+    return isLive ? this.dojahProvider.purchaseAirtime(body) : this.mockProvider.purchaseAirtime(body);
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('purchase/data')
+  async purchaseData(@Req() req: any, @Body() body: any) {
+    if (!body.plan || !body.destination) {
+      throw new BadRequestException('plan and destination are required.');
+    }
+    const isLive = req.environment === Environment.LIVE;
+    return isLive ? this.dojahProvider.purchaseData(body) : this.mockProvider.purchaseData(body);
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Get('purchase/data-plans')
+  async getDataPlans(@Req() req: any) {
+    const isLive = req.environment === Environment.LIVE;
+    return isLive ? this.dojahProvider.getDataPlans() : this.mockProvider.getDataPlans();
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Get('providers/dojah/balance')
+  async getDojahBalance() {
+    return this.dojahProvider.getUpstreamBalance();
+  }
+
   // --- JWT Authenticated Endpoints (For Customer Dashboard) ---
 
   @UseGuards(JwtAuthGuard)
@@ -240,7 +343,7 @@ export class VerificationsController {
   @Post('manual')
   async manualVerify(
     @Req() req: any,
-    @Body() body: { service: 'bvn' | 'nin' | 'nuban'; environment: Environment; payload: any }
+    @Body() body: { service: 'bvn' | 'nin' | 'nuban' | 'phone' | 'cac' | 'nuban_kyc'; environment: Environment; payload: any }
   ) {
     if (body.payload?.consent !== true && body.payload?.consent !== 'true') {
       throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
@@ -250,6 +353,8 @@ export class VerificationsController {
     let identifier = '';
     if (body.service === 'bvn') identifier = String(body.payload?.bvn || '').trim();
     else if (body.service === 'nin') identifier = String(body.payload?.nin || '').trim();
+    else if (body.service === 'phone') identifier = String(body.payload?.phoneNumber || body.payload?.phone_number || '').trim();
+    else if (body.service === 'cac') identifier = String(body.payload?.rcNumber || body.payload?.rc_number || '').trim();
     else identifier = `${body.payload?.bankCode || ''}_${body.payload?.accountNumber || ''}`.trim();
 
     const mockReq = {
@@ -273,6 +378,15 @@ export class VerificationsController {
         if (body.service === 'nin') {
           return isLive ? this.dojahProvider.verifyNin(body.payload) : this.mockProvider.verifyNin(body.payload);
         }
+        if (body.service === 'phone') {
+          return isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: identifier, variant: body.payload?.variant }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: identifier, variant: body.payload?.variant });
+        }
+        if (body.service === 'cac') {
+          return isLive ? this.dojahProvider.verifyCac({ rcNumber: identifier, companyType: body.payload?.companyType, variant: body.payload?.variant }) : this.mockProvider.verifyCac({ rcNumber: identifier, companyType: body.payload?.companyType, variant: body.payload?.variant });
+        }
+        if (body.service === 'nuban_kyc') {
+          return isLive ? this.dojahProvider.verifyNubanKycStatus(body.payload) : this.mockProvider.verifyNubanKycStatus(body.payload);
+        }
         return isLive ? this.dojahProvider.verifyBankAccount(body.payload) : this.mockProvider.verifyBankAccount(body.payload);
       }
     );
@@ -280,7 +394,7 @@ export class VerificationsController {
 
   private async processVerification(
     req: any,
-    serviceType: 'bvn' | 'nin' | 'nuban',
+    serviceType: 'bvn' | 'nin' | 'nuban' | 'phone' | 'cac' | 'nuban_kyc',
     identifier: string,
     payload: any,
     providerCall: () => Promise<any>

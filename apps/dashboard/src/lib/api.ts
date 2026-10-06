@@ -190,7 +190,11 @@ export class ApiClient {
     }>("/v1/verify/metrics")
   }
 
-  static async manualVerify(service: "bvn" | "nin" | "nuban", environment: "sandbox" | "live", payload: any) {
+  static async manualVerify(
+    service: "bvn" | "nin" | "nuban" | "phone" | "cac" | "nuban_kyc", 
+    environment: "sandbox" | "live", 
+    payload: any
+  ) {
     return this.request<any>("/v1/verify/manual", {
       method: "POST",
       body: JSON.stringify({ service, environment, payload }),
