@@ -1,49 +1,32 @@
 import Link from "next/link";
-import { Logo, AppLink } from "@verixa/ui";
+import { Logo, AppLink, GlassyHeader } from "@verixa/ui";
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300">
-      {/* Background Gradient Effect */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-tr from-emerald-600/15 via-sky-600/10 to-transparent blur-3xl opacity-50 rounded-full" />
-      </div>
-
-      {/* Navigation Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="hover:opacity-90 transition-opacity">
-            <Logo size="md" />
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
-            <Link href="/" className="hover:text-slate-100 transition-colors">Overview</Link>
-            <AppLink app="docs" className="hover:text-slate-100 transition-colors">Documentation</AppLink>
-            <Link href="/terms" className="hover:text-slate-100 transition-colors">Terms of Service</Link>
-            <Link href="/contact" className="hover:text-slate-100 transition-colors">Contact</Link>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <AppLink
-              app="dashboard"
-              path="/login"
-              className="text-sm font-medium text-slate-300 hover:text-white px-3 py-1.5 transition-colors"
-            >
-              Sign In
-            </AppLink>
-            <AppLink
-              app="dashboard"
-              path="/dashboard/api-keys"
-              className="inline-flex items-center justify-center rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-sm px-4 py-2 transition-all shadow-lg shadow-emerald-500/20"
-            >
-              Get API Keys
-            </AppLink>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col selection:bg-emerald-500/25 selection:text-emerald-300">
+      {/* Sleek Glassy Floating Header */}
+      <GlassyHeader
+        logoBadge="LEGAL"
+        logoBadgeColor="emerald"
+        navItems={[
+          { label: "Overview", app: "www", path: "/" },
+          { label: "Documentation", app: "docs", path: "/" },
+          { label: "Terms of Service", href: "/terms" },
+          { label: "Contact", href: "/contact" },
+        ]}
+        secondaryCta={{
+          label: "Contact",
+          href: "/contact",
+        }}
+        primaryCta={{
+          label: "Get API Key",
+          app: "dashboard",
+          path: "/register",
+        }}
+      />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-5xl mx-auto px-6 py-16 lg:py-24">
+      <main className="flex-1 max-w-5xl mx-auto px-6 pt-28 pb-16 lg:pt-32 lg:pb-24">
         {/* Header Header Info */}
         <div className="border-b border-slate-800 pb-8 mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono mb-4">
