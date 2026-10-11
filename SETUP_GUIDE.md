@@ -51,11 +51,17 @@ DOJAH_APP_ID=your_dojah_app_id
 DOJAH_SECRET_KEY=your_dojah_secret_key
 DOJAH_ENVIRONMENT=production # or sandbox
 
+# Super Admin Access
+ADMIN_EMAILS=admin@verixaid.com,elisoneric@gmail.com
+
 # Notifications (SMTP)
 SMTP_HOST=mail.verixaid.com
 SMTP_PORT=465
+SMTP_SECURE=true
 SMTP_USER=no-reply@verixaid.com
 SMTP_PASS=your_smtp_password
+SMTP_FROM_NAME=Verixa ID
+SMTP_FROM_EMAIL=no-reply@verixaid.com
 ```
 
 ### Dashboard Frontend (`apps/dashboard/.env.local`)

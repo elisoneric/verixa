@@ -2,11 +2,12 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { GlassyHeader, AppLink } from "@verixa/ui"
+import { GlassyHeader, AppLink, useLivePricing, formatPriceString } from "@verixa/ui"
 
 type CodeTab = "bvn_ts" | "airtime_curl" | "data_py" | "nuban_go"
 
 export default function HomePage() {
+  const { pricing } = useLivePricing()
   const [activeTab, setActiveTab] = React.useState<CodeTab>("bvn_ts")
   const [copied, setCopied] = React.useState(false)
   const [activeFaq, setActiveFaq] = React.useState<number | null>(null)
@@ -626,16 +627,34 @@ func main() {
               </div>
             </div>
 
+            {/* Promotional Banner if Active */}
+            {pricing.bonusPromotion.active && (
+              <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-gradient-to-r from-emerald-500/15 via-emerald-500/10 to-transparent border border-emerald-500/30 text-emerald-300 text-xs sm:text-sm font-medium">
+                <div className="flex items-center gap-2.5">
+                  <span className="px-2.5 py-0.5 rounded-full font-mono font-bold bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 text-[11px]">
+                    FLASH PROMO
+                  </span>
+                  <span className="font-semibold text-white">{pricing.bonusPromotion.title}</span>
+                  <span className="text-emerald-400">({pricing.bonusPromotion.discountPercent}% Rate Slash Active)</span>
+                </div>
+                {pricing.bonusPromotion.expiry && (
+                  <span className="text-zinc-400 text-xs font-mono">
+                    Valid until: {pricing.bonusPromotion.expiry}
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Desktop Table */}
             <div className="overflow-x-auto">
               <table className="w-full divide-y divide-white/[0.08] text-left">
                 <thead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
                   <tr className="[&>th]:py-4 [&>th]:px-4">
                     <th className="w-[28%]">Endpoint / Service</th>
-                    <th className="w-[28%]">Capabilities & Checks</th>
+                    <th className="w-[30%]">Capabilities & Checks</th>
                     <th className="w-[14%]">SLA & Latency</th>
-                    <th className="w-[15%]">Live Rate / Pricing</th>
-                    <th className="w-[15%] text-right">Discount / Savings</th>
+                    <th className="w-[14%]">Live Rate</th>
+                    <th className="w-[14%] text-right">Cache Hit Split</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.06] text-xs sm:text-sm clean-nums">
@@ -655,13 +674,12 @@ func main() {
                     </td>
                     <td className="py-4 px-4 font-sans text-zinc-300">sub-180ms · 99.9%</td>
                     <td className="py-4 px-4 font-sans">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-white font-bold text-sm">₦135.00</span>
-                        <span className="line-through text-zinc-500 text-xs">₦150.00</span>
-                      </div>
+                      <span className="text-white font-bold text-sm">
+                        {formatPriceString(pricing.baseRates.nin)}
+                      </span>
                     </td>
                     <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
-                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
+                      {formatPriceString(pricing.cacheRates.nin)} <span className="text-[10px] text-zinc-400 font-normal">cache hit</span>
                     </td>
                   </tr>
 
@@ -681,17 +699,66 @@ func main() {
                     </td>
                     <td className="py-4 px-4 font-sans text-zinc-300">sub-150ms · 99.9%</td>
                     <td className="py-4 px-4 font-sans">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-white font-bold text-sm">₦85.00</span>
-                        <span className="line-through text-zinc-500 text-xs">₦100.00</span>
-                      </div>
+                      <span className="text-white font-bold text-sm">
+                        {formatPriceString(pricing.baseRates.bvn)}
+                      </span>
                     </td>
                     <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
-                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
+                      {formatPriceString(pricing.cacheRates.bvn)} <span className="text-[10px] text-zinc-400 font-normal">cache hit</span>
                     </td>
                   </tr>
 
-                  {/* 3. NIN Phone Search */}
+                  {/* 3. NIN Advance / Demography */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
+                        </span>
+                        <span>NIN Advance Verification</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/nin-advance</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      Comprehensive demographics, verified telephone, tracking ID, and portrait
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-240ms · 99.8%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <span className="text-white font-bold text-sm">
+                        {formatPriceString(pricing.baseRates.ninAdvance)}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      {formatPriceString(pricing.cacheRates.ninAdvance)} <span className="text-[10px] text-zinc-400 font-normal">cache hit</span>
+                    </td>
+                  </tr>
+
+                  {/* 4. NIN Slip Generation */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
+                        </span>
+                        <span>Standardized NIN Slip Engine</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/nin-slip</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      High-resolution A4 dual-slip PDF and editable Word (.docx) document generator
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-280ms · 99.9%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <span className="text-white font-bold text-sm">
+                        {formatPriceString(pricing.baseRates.ninSlip)}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      {formatPriceString(pricing.cacheRates.ninSlip)} <span className="text-[10px] text-zinc-400 font-normal">cache hit</span>
+                    </td>
+                  </tr>
+
+                  {/* 5. Phone Lookup */}
                   <tr className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium flex items-center gap-2">
@@ -703,100 +770,71 @@ func main() {
                       <div className="text-zinc-400 text-xs mt-0.5">/api/nin-phone</div>
                     </td>
                     <td className="py-4 px-4 text-zinc-400">
-                      Discover linked NIN record using MSISDN telephone lookup
+                      Discover linked identity record using MSISDN telephone lookup
                     </td>
                     <td className="py-4 px-4 font-sans text-zinc-300">sub-200ms · 99.9%</td>
                     <td className="py-4 px-4 font-sans">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-white font-bold text-sm">₦185.00</span>
-                        <span className="line-through text-zinc-500 text-xs">₦200.00</span>
-                      </div>
+                      <span className="text-white font-bold text-sm">
+                        {formatPriceString(pricing.baseRates.phone)}
+                      </span>
                     </td>
                     <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
-                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
+                      {formatPriceString(pricing.cacheRates.phone)} <span className="text-[10px] text-zinc-400 font-normal">cache hit</span>
                     </td>
                   </tr>
 
-                  {/* 4. BVN Phone Search */}
-                  <tr className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 font-mono">
-                      <div className="text-white font-medium flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-                          POST
-                        </span>
-                        <span>BVN Phone Search</span>
-                      </div>
-                      <div className="text-zinc-400 text-xs mt-0.5">/api/bvn-phone</div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-400">
-                      Query linked BVN identity details via subscriber phone number
-                    </td>
-                    <td className="py-4 px-4 font-sans text-zinc-300">sub-180ms · 99.9%</td>
-                    <td className="py-4 px-4 font-sans">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-white font-bold text-sm">₦135.00</span>
-                        <span className="line-through text-zinc-500 text-xs">₦150.00</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
-                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
-                    </td>
-                  </tr>
-
-                  {/* 5. NIN Demography */}
-                  <tr className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 font-mono">
-                      <div className="text-white font-medium flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-                          POST
-                        </span>
-                        <span>NIN Demography</span>
-                      </div>
-                      <div className="text-zinc-400 text-xs mt-0.5">/api/nin-demography</div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-400">
-                      Comprehensive full demographic profile, photo, and address verification
-                    </td>
-                    <td className="py-4 px-4 font-sans text-zinc-300">sub-240ms · 99.8%</td>
-                    <td className="py-4 px-4 font-sans">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-white font-bold text-sm">₦235.00</span>
-                        <span className="line-through text-zinc-500 text-xs">₦250.00</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
-                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
-                    </td>
-                  </tr>
-
-                  {/* 6. NIN Tracking */}
-                  <tr className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 font-mono">
-                      <div className="text-white font-medium flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-                          POST
-                        </span>
-                        <span>NIN Tracking</span>
-                      </div>
-                      <div className="text-zinc-400 text-xs mt-0.5">/api/nin-tracking</div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-400">
-                      Real-time enrollment tracking ID verification and status lookup
-                    </td>
-                    <td className="py-4 px-4 font-sans text-zinc-300">sub-190ms · 99.9%</td>
-                    <td className="py-4 px-4 font-sans">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-white font-bold text-sm">₦185.00</span>
-                        <span className="line-through text-zinc-500 text-xs">₦200.00</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
-                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
-                    </td>
-                  </tr>
-
-                  {/* 7. Account Balance */}
+                  {/* 6. Bank NUBAN Account Resolution */}
                   <tr className="hover:bg-white/[0.02] transition-colors bg-emerald-500/[0.03]">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-500/15 text-sky-400 border border-sky-500/25">
+                          POST
+                        </span>
+                        <span>NUBAN Account Resolution</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/nuban-resolution</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      Instant 10-digit NUBAN account name resolution across commercial banks & fintechs
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-80ms · 99.99%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <span className="text-emerald-400 font-bold text-sm">
+                        {formatPriceString(pricing.baseRates.nuban)}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      100% Free
+                    </td>
+                  </tr>
+
+                  {/* 7. CAC Business Search */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
+                        </span>
+                        <span>CAC Company Verification</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/cac-lookup</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      Corporate Affairs Commission registered business, RC number, and shareholder search
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-220ms · 99.8%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <span className="text-white font-bold text-sm">
+                        {formatPriceString(pricing.baseRates.cac)}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      {formatPriceString(pricing.cacheRates.cac)} <span className="text-[10px] text-zinc-400 font-normal">cache hit</span>
+                    </td>
+                  </tr>
+
+                  {/* 8. Account Balance */}
+                  <tr className="hover:bg-white/[0.02] transition-colors bg-white/[0.01]">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium flex items-center gap-2">
                         <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-500/15 text-sky-400 border border-sky-500/25">
@@ -818,7 +856,7 @@ func main() {
                     </td>
                   </tr>
 
-                  {/* Airtime VAS */}
+                  {/* 9. Airtime VAS */}
                   <tr className="hover:bg-white/[0.02] transition-colors bg-white/[0.01]">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium flex items-center gap-2">
@@ -839,7 +877,7 @@ func main() {
                     </td>
                   </tr>
 
-                  {/* Mobile Data VAS */}
+                  {/* 10. Mobile Data VAS */}
                   <tr className="hover:bg-white/[0.02] transition-colors bg-white/[0.01]">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium flex items-center gap-2">
@@ -854,7 +892,9 @@ func main() {
                       SME, Corporate & Direct data gifting (1GB to 50GB bundles)
                     </td>
                     <td className="py-4 px-4 font-sans text-zinc-300">sub-2.5s · 99.9%</td>
-                    <td className="py-4 px-4 font-sans text-white font-medium">from ₦220.00 / GB</td>
+                    <td className="py-4 px-4 font-sans text-white font-medium">
+                      from ₦{pricing.baseRates.data}.00 / GB
+                    </td>
                     <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
                       Wholesale Tier 1
                     </td>

@@ -317,6 +317,17 @@ export class BillingService {
 
       await queryRunner.manager.save(transaction);
       await queryRunner.commitTransaction();
+
+      // Dispatch low balance warning if live wallet dips below threshold
+      if (targetEnv === Environment.LIVE && Number(wallet.balance) < 1000) {
+        this.orgRepository.findOne({ where: { id: orgId }, relations: { users: true } }).then((org) => {
+          if (org?.users?.length) {
+            org.users.forEach((u) => {
+              this.notificationsService.sendLowBalanceEmail(u.email, org.name, Number(wallet.balance)).catch(() => {});
+            });
+          }
+        }).catch(() => {});
+      }
     } catch (error) {
       await queryRunner.rollbackTransaction();
       if (error instanceof BadRequestException) {

@@ -59,6 +59,8 @@ export class Organization {
       accountName?: string;
       provisionedAt?: string;
     };
+    status?: 'active' | 'suspended';
+    statusUpdatedAt?: string;
   };
 
   @OneToMany(() => User, user => user.organization)

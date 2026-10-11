@@ -118,14 +118,27 @@ export class AuthService {
 
     const org = await this.orgRepository.findOne({ where: { id: user.org_id } });
 
-    const payload = { sub: user.id, email: user.email, org_id: user.org_id, role: user.role };
+    const adminEmails = (process.env.ADMIN_EMAILS || 'admin@verixaid.com,elisoneric@gmail.com')
+      .split(',')
+      .map((e) => e.trim().toLowerCase());
+    const isSuperAdmin = user.role === UserRole.SUPER_ADMIN || adminEmails.includes(user.email.toLowerCase());
+    const effectiveRole = isSuperAdmin ? UserRole.SUPER_ADMIN : user.role;
+
+    // Dispatch login security notice
+    this.notificationsService.sendLoginAlertEmail(user.email, {
+      time: new Date().toUTCString(),
+      ip: 'Web Developer Console',
+    }).catch(() => {});
+
+    const payload = { sub: user.id, email: user.email, org_id: user.org_id, role: effectiveRole };
     return {
       access_token: await this.jwtService.signAsync(payload),
       user: {
         id: user.id,
         email: user.email,
         org_id: user.org_id,
-        role: user.role,
+        role: effectiveRole,
+        is_super_admin: isSuperAdmin,
         org_name: org?.name || 'Organization',
       }
     };
@@ -197,7 +210,20 @@ export class AuthService {
     }
 
     const org = await this.orgRepository.findOne({ where: { id: orgId } });
-    const payload = { sub: user.id, email: user.email, org_id: orgId, role: user.role };
+
+    const adminEmails = (process.env.ADMIN_EMAILS || 'admin@verixaid.com,elisoneric@gmail.com')
+      .split(',')
+      .map((e) => e.trim().toLowerCase());
+    const isSuperAdmin = user.role === UserRole.SUPER_ADMIN || adminEmails.includes(user.email.toLowerCase());
+    const effectiveRole = isSuperAdmin ? UserRole.SUPER_ADMIN : user.role;
+
+    // Dispatch login notice
+    this.notificationsService.sendLoginAlertEmail(user.email, {
+      time: new Date().toUTCString(),
+      ip: 'Google Identity Services (GIS)',
+    }).catch(() => {});
+
+    const payload = { sub: user.id, email: user.email, org_id: orgId, role: effectiveRole };
 
     return {
       message: 'Google authentication successful',
@@ -206,7 +232,8 @@ export class AuthService {
         id: user.id,
         email: user.email,
         org_id: orgId,
-        role: user.role,
+        role: effectiveRole,
+        is_super_admin: isSuperAdmin,
         org_name: org?.name || 'Organization',
       },
     };
@@ -218,14 +245,21 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
     const org = await this.orgRepository.findOne({ where: { id: user.org_id } });
+
+    const adminEmails = (process.env.ADMIN_EMAILS || 'admin@verixaid.com,elisoneric@gmail.com')
+      .split(',')
+      .map((e) => e.trim().toLowerCase());
+    const isSuperAdmin = user.role === UserRole.SUPER_ADMIN || adminEmails.includes(user.email.toLowerCase());
+    const effectiveRole = isSuperAdmin ? UserRole.SUPER_ADMIN : user.role;
+
     return {
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: effectiveRole,
       org_id: user.org_id,
       org_name: org?.name || 'Organization',
       account_type: org?.complianceData?.accountType || 'developer',
-      is_super_admin: user.role === UserRole.SUPER_ADMIN,
+      is_super_admin: isSuperAdmin,
       created_at: user.createdAt,
     };
   }
@@ -260,6 +294,19 @@ export class AuthService {
     apiKey.isActive = true;
 
     await this.apiKeyRepository.save(apiKey);
+
+    // Notify organization members
+    this.orgRepository.findOne({ where: { id: orgId }, relations: { users: true } }).then((org) => {
+      if (org?.users?.length) {
+        org.users.forEach((u) => {
+          this.notificationsService.sendApiKeyCreatedEmail(u.email, {
+            keyName: name,
+            environment: targetEnv.toLowerCase(),
+            keyPrefix: prefix,
+          }).catch(() => {});
+        });
+      }
+    }).catch(() => {});
 
     // The token includes the database ID for O(1) lookups
     const rawKey = `${prefix}${apiKey.id}_${secret}`;

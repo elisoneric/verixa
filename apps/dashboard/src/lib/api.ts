@@ -313,16 +313,35 @@ export class ApiClient {
 
   static async getAdminPricing() {
     return this.request<{
-      baseRates: { bvn: number; nin: number; ninAdvance: number; ninSlip: number; nuban: number }
-      cacheRates: { bvn: number; nin: number; ninAdvance: number; ninSlip: number; nuban: number }
+      baseRates: {
+        bvn: number
+        nin: number
+        ninAdvance: number
+        ninSlip: number
+        nuban: number
+        phone?: number
+        cac?: number
+        data?: number
+        airtime?: number
+        sms?: number
+      }
+      cacheRates: {
+        bvn: number
+        nin: number
+        ninAdvance: number
+        ninSlip: number
+        nuban: number
+        phone?: number
+        cac?: number
+      }
       cacheSettings: { enabled: boolean; ttlDays: number }
       bonusPromotion: { active: boolean; discountPercent: number; title: string; expiry?: string }
     }>("/v1/admin/pricing")
   }
 
   static async updateAdminPricing(body: {
-    baseRates?: { bvn?: number; nin?: number; ninAdvance?: number; ninSlip?: number; nuban?: number }
-    cacheRates?: { bvn?: number; nin?: number; ninAdvance?: number; ninSlip?: number; nuban?: number }
+    baseRates?: Record<string, number | undefined>
+    cacheRates?: Record<string, number | undefined>
     cacheSettings?: { enabled?: boolean; ttlDays?: number }
     bonusPromotion?: { active: boolean; discountPercent: number; title: string; expiry?: string }
   }) {
@@ -344,6 +363,105 @@ export class ApiClient {
     return this.request<any>("/v1/admin/config", {
       method: "POST",
       body: JSON.stringify({ key, value, isSecret, description }),
+    })
+  }
+
+  static async getAdminRevenue() {
+    return this.request<{
+      totalDepositedNgx: number
+      totalConsumedNgx: number
+      depositsToday: number
+      depositsThisWeek: number
+      depositsThisMonth: number
+      netReserveNgx: number
+      recentTransactions: Array<{
+        id: string
+        amount: number
+        status: string
+        description: string
+        referenceId?: string
+        orgName: string
+        orgId: string
+        environment: string
+        createdAt: string
+      }>
+    }>("/v1/admin/revenue")
+  }
+
+  static async getAdminLogs(params?: {
+    limit?: number
+    offset?: number
+    serviceType?: string
+    status?: string
+    orgId?: string
+  }) {
+    const q = new URLSearchParams()
+    if (params?.limit) q.set("limit", String(params.limit))
+    if (params?.offset) q.set("offset", String(params.offset))
+    if (params?.serviceType) q.set("serviceType", params.serviceType)
+    if (params?.status) q.set("status", params.status)
+    if (params?.orgId) q.set("orgId", params.orgId)
+    const qs = q.toString() ? `?${q.toString()}` : ""
+    return this.request<{
+      total: number
+      limit: number
+      offset: number
+      logs: Array<{
+        id: string
+        orgId: string
+        orgName: string
+        serviceType: string
+        status: string
+        isCached: boolean
+        source: string
+        upstreamProvider: string
+        costDeducted: number
+        latencyMs: number
+        createdAt: string
+      }>
+    }>(`/v1/admin/logs${qs}`)
+  }
+
+  static async getAdminOrgUsers(orgId: string) {
+    return this.request<Array<{
+      id: string
+      email: string
+      role: string
+      createdAt: string
+    }>>(`/v1/admin/organizations/${orgId}/users`)
+  }
+
+  static async adjustAdminOrgBalance(
+    orgId: string,
+    amount: number,
+    environment: "live" | "sandbox",
+    reason?: string,
+    notifyEmail = true
+  ) {
+    return this.request<any>(`/v1/admin/organizations/${orgId}/balance`, {
+      method: "POST",
+      body: JSON.stringify({ amount, environment, reason, notifyEmail }),
+    })
+  }
+
+  static async updateAdminOrgStatus(orgId: string, status: "active" | "suspended") {
+    return this.request<any>(`/v1/admin/organizations/${orgId}/status`, {
+      method: "POST",
+      body: JSON.stringify({ status }),
+    })
+  }
+
+  static async broadcastAdminPromo(discountPercent: number, title: string) {
+    return this.request<any>("/v1/admin/pricing/broadcast", {
+      method: "POST",
+      body: JSON.stringify({ discountPercent, title }),
+    })
+  }
+
+  static async testAdminSmtp(to: string, customConfig?: any) {
+    return this.request<{ success: boolean; message: string; messageId?: string }>("/v1/admin/notifications/test", {
+      method: "POST",
+      body: JSON.stringify({ to, customConfig }),
     })
   }
 }
