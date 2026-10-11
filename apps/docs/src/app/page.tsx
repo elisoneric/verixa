@@ -165,6 +165,230 @@ export default function DocsIntroductionPage() {
             </div>
             <span className="text-emerald-400 font-bold font-sans text-sm">Free (₦0.00)</span>
           </div>
+
+          {/* Corporate KYB Group Header */}
+          <div className="bg-white/[0.03] px-4 py-2 text-[11px] uppercase tracking-wider text-emerald-400 font-bold font-sans border-t border-b border-white/[0.08]">
+            Corporate Registry & Business Verification (KYB)
+          </div>
+
+          {/* 8. CAC Basic */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">CAC Basic Company Lookup</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/cac-basic</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦250</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦220</span>
+            </div>
+          </div>
+
+          {/* 9. CAC Advance */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">CAC Advance (Directors & Shares)</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/cac-advance</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦600</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦540</span>
+            </div>
+          </div>
+
+          {/* 10. TIN Verification */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">TIN Tax ID Verification</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/tin-verification</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦200</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦180</span>
+            </div>
+          </div>
+
+          {/* Secondary Government IDs Group Header */}
+          <div className="bg-white/[0.03] px-4 py-2 text-[11px] uppercase tracking-wider text-emerald-400 font-bold font-sans border-t border-b border-white/[0.08]">
+            Secondary Government IDs (FRSC / INEC / NIS)
+          </div>
+
+          {/* 11. Driver's License */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">Driver's License (FRSC)</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/drivers-license</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦180</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦160</span>
+            </div>
+          </div>
+
+          {/* 12. Voter's Card */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">Voter's Card (VIN / INEC)</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/voters-card</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦150</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦130</span>
+            </div>
+          </div>
+
+          {/* 13. Passport */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">International Passport (NIS)</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/passport-verification</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦300</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦270</span>
+            </div>
+          </div>
+
+          {/* Banking & Credit Group Header */}
+          <div className="bg-white/[0.03] px-4 py-2 text-[11px] uppercase tracking-wider text-emerald-400 font-bold font-sans border-t border-b border-white/[0.08]">
+            Banking Intelligence & Multi-Bureau Credit
+          </div>
+
+          {/* 14. Account Resolve */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">NUBAN Bank Account Resolve</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/account-resolve</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦10</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">Free (₦0.00)</span>
+            </div>
+          </div>
+
+          {/* 15. Credit Score */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">Credit Score & Bureau Summary</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/credit-score</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦450</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦390</span>
+            </div>
+          </div>
+
+          {/* Biometrics & Risk Screening Group Header */}
+          <div className="bg-white/[0.03] px-4 py-2 text-[11px] uppercase tracking-wider text-emerald-400 font-bold font-sans border-t border-b border-white/[0.08]">
+            Biometrics, Anti-Fraud & Compliance Screening
+          </div>
+
+          {/* 16. Face Match */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">Face Match & Liveness Check</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/face-match</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦250</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦220</span>
+            </div>
+          </div>
+
+          {/* 17. AML Screening */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">AML, PEP & Sanctions Screening</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/aml-screening</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦200</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦175</span>
+            </div>
+          </div>
+
+          {/* 18. Phone Intelligence */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">SIM Swap & Carrier Intelligence</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/phone-intelligence</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦150</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦130</span>
+            </div>
+          </div>
+
+          {/* 19. Email Risk */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                POST
+              </span>
+              <div>
+                <span className="text-white font-semibold font-sans">Email Risk & Deliverability Score</span>
+                <code className="block text-zinc-400 text-[11px] mt-0.5">/api/email-risk</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-zinc-500 line-through font-sans">₦80</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦65</span>
+            </div>
+          </div>
         </div>
       </div>
 

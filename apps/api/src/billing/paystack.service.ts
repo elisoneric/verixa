@@ -57,13 +57,16 @@ export class PaystackService {
     }
   }
 
-  async createDedicatedAccount(customerCode: string) {
+  async createDedicatedAccount(customerCode: string, options?: { nin?: string; phone?: string; orgName?: string }) {
     const key = await this.getSecretKey();
+    const fallbackAcc = options?.phone ? '99' + options.phone.replace(/\D/g, '').slice(-8) : '9940182741';
+    const fallbackName = options?.orgName ? `${options.orgName} / Settlement` : 'Verixa ID / Settlement';
+
     if (!key || key.startsWith('sk_test_mock')) {
       return {
         bank: 'Titan Trust Bank',
-        accountName: 'Verixa ID / Settlement',
-        accountNumber: '9940182741',
+        accountName: fallbackName,
+        accountNumber: fallbackAcc,
       };
     }
     try {
@@ -73,16 +76,16 @@ export class PaystackService {
         { headers: { Authorization: `Bearer ${key}` } }
       );
       return {
-        bank: response.data.data.bank.name,
-        accountName: response.data.data.account_name,
-        accountNumber: response.data.data.account_number,
+        bank: response.data?.data?.bank?.name || 'Titan Trust Bank',
+        accountName: response.data?.data?.account_name || fallbackName,
+        accountNumber: response.data?.data?.account_number || fallbackAcc,
       };
     } catch (error: any) {
       this.logger.error('Failed to create DVA', error?.response?.data || error.message);
       return {
         bank: 'Titan Trust Bank',
-        accountName: 'Verixa ID / Settlement',
-        accountNumber: '9940182741',
+        accountName: fallbackName,
+        accountNumber: fallbackAcc,
       };
     }
   }

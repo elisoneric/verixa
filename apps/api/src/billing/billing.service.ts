@@ -177,6 +177,8 @@ export class BillingService {
     const bonusTitle = configMap['BONUS_DISCOUNT_TITLE'] || 'Flash Sale Active';
     const bonusPercent = parseInt(configMap['BONUS_DISCOUNT_PERCENT'] || '0', 10);
 
+    const orgDva = (org?.complianceData as any)?.dva;
+
     return {
       live: {
         balance: liveWallet ? Number(liveWallet.balance) : 0,
@@ -187,11 +189,12 @@ export class BillingService {
         currency: 'NGX',
       },
       dedicatedVirtualAccount: {
-        bankName: 'Titan Trust Bank',
-        accountNumber: '9940182741',
-        accountName: 'Verixa ID / Settlement',
+        bankName: orgDva?.bankName || 'Titan Trust Bank',
+        accountNumber: orgDva?.accountNumber || '9940182741',
+        accountName: orgDva?.accountName || (org?.name ? `${org.name} / Settlement` : 'Verixa ID / Settlement'),
         status: 'active',
         note: 'Funds transferred to this account auto-credit your Live NGX balance instantly via Paystack.',
+        isCustom: Boolean(orgDva?.accountNumber),
       },
       tier: org?.tier || OrganizationTier.STARTER,
       rates: {
@@ -237,6 +240,49 @@ export class BillingService {
       description: t.description,
       createdAt: t.createdAt,
     }));
+  }
+
+  async provisionDedicatedAccount(orgId: string, nin: string, phone: string) {
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    if (!org) {
+      throw new BadRequestException('Organization not found');
+    }
+
+    const customerCode = await this.paystackService.createCustomer(
+      `org-${org.id.slice(0, 8)}@verixaid.com`,
+      org.name
+    );
+
+    const account = await this.paystackService.createDedicatedAccount(customerCode, {
+      nin,
+      phone,
+      orgName: org.name,
+    });
+
+    org.complianceData = {
+      ...(org.complianceData || {}),
+      nin,
+      phone,
+      dva: {
+        bankName: account.bank,
+        accountNumber: account.accountNumber,
+        accountName: account.accountName,
+        provisionedAt: new Date().toISOString(),
+      },
+    };
+    await this.orgRepository.save(org);
+
+    return {
+      message: 'Dedicated account provisioned successfully',
+      dedicatedVirtualAccount: {
+        bankName: account.bank,
+        accountNumber: account.accountNumber,
+        accountName: account.accountName,
+        status: 'active',
+        note: 'Funds transferred to this account auto-credit your Live NGX balance instantly via Paystack.',
+        isCustom: true,
+      },
+    };
   }
 
   async deductCredits(orgId: string, environment: Environment, amount: number, referenceId: string): Promise<void> {

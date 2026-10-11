@@ -13,11 +13,11 @@ interface ThemeContextType {
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = React.useState<Theme>("light")
+  const [theme, setThemeState] = React.useState<Theme>("dark")
 
   React.useEffect(() => {
-    // Default to light theme, unless user previously chose dark
-    const savedTheme = (localStorage.getItem("vrx_theme") as Theme) || "light"
+    // Default to dark theme, unless user previously chose light
+    const savedTheme = (localStorage.getItem("vrx_theme") as Theme) || "dark"
     setThemeState(savedTheme)
     if (savedTheme === "dark") {
       document.documentElement.classList.add("dark")

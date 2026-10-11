@@ -97,27 +97,25 @@ export default function NinSlipGeneratorPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-white">
             NIN Slip Generator
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-zinc-400 mt-0.5">
             Instant print-ready PDF and Word (.docx) NIN slip generation.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs shadow-2xs">
-          <span className="text-slate-400 dark:text-zinc-500 font-mono">RATE:</span>
-          <span className="font-semibold text-emerald-600 dark:text-emerald-400 font-mono">₦270 Live</span>
-          <span className="text-slate-300 dark:text-zinc-700">•</span>
-          <span className="text-amber-600 dark:text-amber-400 font-mono">₦50 Cache</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#121620] border border-white/[0.08] text-xs shadow-2xs">
+          <span className="text-zinc-400 font-mono">RATE:</span>
+          <span className="font-semibold text-emerald-400 font-mono">₦270 / slip</span>
         </div>
       </div>
 
       {/* Main Generator Form */}
-      <Card className="p-6 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
+      <Card className="p-6 glass-card bg-[#0e1118]/70 border border-white/[0.08] shadow-xl backdrop-blur-xl rounded-2xl">
         <form onSubmit={handleGenerate} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-zinc-300">
+            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
               National Identification Number (NIN)
             </label>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -128,10 +126,10 @@ export default function NinSlipGeneratorPage() {
                   placeholder="Enter 11-digit NIN"
                   value={ninInput}
                   onChange={(e) => setNinInput(e.target.value.replace(/\D/g, ""))}
-                  className="w-full h-11 px-4 rounded-lg bg-white dark:bg-zinc-950 border border-slate-300 dark:border-zinc-800 text-slate-900 dark:text-white font-mono text-sm tracking-wider placeholder:text-slate-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all shadow-2xs"
+                  className="w-full h-11 px-4 rounded-lg bg-[#121620] border border-white/[0.12] text-white font-mono text-sm tracking-wider placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-2xs"
                   required
                 />
-                <span className="absolute right-3.5 top-3 text-xs font-mono text-slate-400 dark:text-zinc-500">
+                <span className="absolute right-3.5 top-3 text-xs font-mono text-zinc-400">
                   {ninInput.length}/11
                 </span>
               </div>
@@ -155,15 +153,15 @@ export default function NinSlipGeneratorPage() {
               id="consentCheckbox"
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              className="h-4 w-4 rounded border-white/[0.2] bg-black/40 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
             />
-            <label htmlFor="consentCheckbox" className="text-xs text-slate-600 dark:text-zinc-400 select-none cursor-pointer">
+            <label htmlFor="consentCheckbox" className="text-xs text-zinc-400 select-none cursor-pointer">
               I confirm applicant consent has been obtained for official identity retrieval.
             </label>
           </div>
 
           {errorMsg && (
-            <div className="flex items-center gap-2 p-3.5 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/25 text-rose-700 dark:text-rose-400 text-xs font-medium">
+            <div className="flex items-center gap-2 p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs font-medium">
               <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -175,23 +173,23 @@ export default function NinSlipGeneratorPage() {
 
       {/* Generated Slip Result Preview & Downloads */}
       {currentSlip && (
-        <Card className="p-6 bg-white dark:bg-zinc-900/80 border-emerald-500/40 shadow-xs space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 dark:border-zinc-800 gap-3">
+        <Card className="p-6 glass-card bg-[#0e1118]/70 border border-emerald-500/40 shadow-xs space-y-5 text-white">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-white/[0.08] gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <div className="w-5 h-5 rounded-full bg-emerald-950/80 text-emerald-400 flex items-center justify-center shrink-0">
                   <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                <h3 className="text-base font-bold text-white">
                   {currentSlip.fullName}
                 </h3>
                 <Badge variant={currentSlip.cached ? "verified" : "mono"} size="sm">
-                  {currentSlip.cached ? "Smart Cache Hit" : "Live Registry"}
+                  {currentSlip.cached ? "Cached" : "Live Registry"}
                 </Badge>
               </div>
-              <p className="text-xs font-mono text-slate-500 dark:text-zinc-400 mt-1">
+              <p className="text-xs font-mono text-zinc-400 mt-1">
                 NIN: {currentSlip.nin} {currentSlip.trackingId ? `• TRACKING: ${currentSlip.trackingId}` : ""}
               </p>
             </div>
@@ -222,7 +220,7 @@ export default function NinSlipGeneratorPage() {
 
           {/* Quick PDF Preview */}
           {currentSlip.pdfBase64 && (
-            <div className="rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-800 bg-slate-100 dark:bg-zinc-950">
+            <div className="rounded-lg overflow-hidden border border-white/[0.08] bg-[#090b10]">
               <iframe
                 src={`data:application/pdf;base64,${currentSlip.pdfBase64}#toolbar=0&navpanes=0`}
                 className="w-full h-[480px] border-none"
@@ -235,22 +233,22 @@ export default function NinSlipGeneratorPage() {
 
       {/* History */}
       {history.length > 1 && (
-        <Card className="p-5 bg-white dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 shadow-xs">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-3">
+        <Card className="p-5 glass-card bg-[#0e1118]/70 border border-white/[0.08] text-white shadow-xs">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">
             Recent Session Slips
           </h4>
-          <div className="divide-y divide-slate-100 dark:divide-zinc-800">
+          <div className="divide-y divide-white/[0.06]">
             {history.slice(1).map((item) => (
               <div key={item.nin} className="py-2.5 flex items-center justify-between text-xs">
                 <div>
-                  <span className="font-semibold text-slate-800 dark:text-white mr-2">{item.fullName}</span>
-                  <span className="font-mono text-slate-500">{item.nin}</span>
+                  <span className="font-semibold text-white mr-2">{item.fullName}</span>
+                  <span className="font-mono text-zinc-400">{item.nin}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {item.pdfBase64 && (
                     <button
                       onClick={() => downloadFile(item.pdfBase64!, `NIN_Slip_${item.nin}.pdf`, "application/pdf")}
-                      className="text-emerald-600 hover:underline font-medium"
+                      className="text-emerald-400 hover:underline font-medium"
                     >
                       PDF
                     </button>
@@ -258,7 +256,7 @@ export default function NinSlipGeneratorPage() {
                   {item.docxBase64 && (
                     <button
                       onClick={() => downloadFile(item.docxBase64!, `NIN_Slip_${item.nin}.docx`, "application/vnd.openxmlformats-officedocument.wordprocessingml.document")}
-                      className="text-slate-600 dark:text-zinc-400 hover:underline font-medium"
+                      className="text-zinc-400 hover:underline font-medium"
                     >
                       Word
                     </button>

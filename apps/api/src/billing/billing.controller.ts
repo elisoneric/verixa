@@ -41,6 +41,29 @@ export class BillingController {
   }
 
   @UseGuards(DualAuthGuard)
+  @Post('dedicated-account')
+  async provisionDedicatedAccount(
+    @Req() req: any,
+    @Body() body: { nin: string; phone: string; consent: boolean },
+  ) {
+    if (!body.consent) {
+      throw new BadRequestException('Applicant consent is required under NDPA regulations.');
+    }
+    if (!body.nin || body.nin.trim().length !== 11) {
+      throw new BadRequestException('A valid 11-digit NIN is required.');
+    }
+    if (!body.phone || body.phone.trim().length < 10) {
+      throw new BadRequestException('A valid Nigerian phone number is required.');
+    }
+
+    return this.billingService.provisionDedicatedAccount(
+      req.organizationId,
+      body.nin.trim(),
+      body.phone.trim(),
+    );
+  }
+
+  @UseGuards(DualAuthGuard)
   @Post('checkout')
   async createCheckout(
     @Req() req: any, 

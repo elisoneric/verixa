@@ -5,18 +5,12 @@ import { Button, Badge, Card, Tabs } from "@verixa/ui"
 import { useAuth } from "../../../lib/auth-context"
 import { ApiClient } from "../../../lib/api"
 
-type ApiEndpointKey = 
-  | "nin-verification"
-  | "bvn-verification"
-  | "nin-phone"
-  | "bvn-phone"
-  | "nin-demography"
-  | "nin-tracking"
-  | "balance"
+type ApiCategory = "all" | "identity" | "kyb" | "secondary_id" | "financial" | "risk" | "telecom"
 
 interface ApiEndpointConfig {
-  key: ApiEndpointKey
+  key: string
   name: string
+  category: ApiCategory
   method: "POST" | "GET"
   path: string
   benchmark: string
@@ -26,9 +20,11 @@ interface ApiEndpointConfig {
 }
 
 const ENDPOINTS: ApiEndpointConfig[] = [
+  // Core Identity
   {
     key: "nin-verification",
     name: "NIN Verification",
+    category: "identity",
     method: "POST",
     path: "/api/nin-verification",
     benchmark: "₦150",
@@ -42,6 +38,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
   {
     key: "bvn-verification",
     name: "BVN Verification",
+    category: "identity",
     method: "POST",
     path: "/api/bvn-verification",
     benchmark: "₦100",
@@ -55,6 +52,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
   {
     key: "nin-phone",
     name: "NIN Phone Search",
+    category: "identity",
     method: "POST",
     path: "/api/nin-phone",
     benchmark: "₦200",
@@ -68,6 +66,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
   {
     key: "bvn-phone",
     name: "BVN Phone Search",
+    category: "identity",
     method: "POST",
     path: "/api/bvn-phone",
     benchmark: "₦150",
@@ -81,6 +80,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
   {
     key: "nin-demography",
     name: "NIN Demography",
+    category: "identity",
     method: "POST",
     path: "/api/nin-demography",
     benchmark: "₦250",
@@ -94,6 +94,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
   {
     key: "nin-tracking",
     name: "NIN Tracking",
+    category: "identity",
     method: "POST",
     path: "/api/nin-tracking",
     benchmark: "₦200",
@@ -107,6 +108,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
   {
     key: "balance",
     name: "Account Balance",
+    category: "identity",
     method: "GET",
     path: "/api/balance",
     benchmark: "Free",
@@ -114,12 +116,257 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     description: "Check live wallet credit balance and prepaid metered quota with zero deduction overhead.",
     defaultPayload: null,
   },
+
+  // Corporate & KYB
+  {
+    key: "cac-basic",
+    name: "CAC Basic Lookup",
+    category: "kyb",
+    method: "POST",
+    path: "/api/cac-basic",
+    benchmark: "₦250",
+    verixaRate: "₦220",
+    description: "Validate registered Nigerian company, business name, or incorporated trustee status with CAC.",
+    defaultPayload: {
+      rc_number: "RC-1928374",
+      company_type: "COMPANY",
+      consent: true,
+    },
+  },
+  {
+    key: "cac-advance",
+    name: "CAC Advance (Directors)",
+    category: "kyb",
+    method: "POST",
+    path: "/api/cac-advance",
+    benchmark: "₦600",
+    verixaRate: "₦540",
+    description: "Full corporate record including beneficial ownership, share distribution, and director/shareholder details.",
+    defaultPayload: {
+      rc_number: "RC-1928374",
+      company_type: "COMPANY",
+      consent: true,
+    },
+  },
+  {
+    key: "tin-verification",
+    name: "TIN Tax Verification",
+    category: "kyb",
+    method: "POST",
+    path: "/api/tin-verification",
+    benchmark: "₦200",
+    verixaRate: "₦180",
+    description: "Corroborate corporate or individual Tax Identification Number via JTB / FIRS national database.",
+    defaultPayload: {
+      tin: "23910294-0001",
+      consent: true,
+    },
+  },
+
+  // Secondary Government IDs
+  {
+    key: "drivers-license",
+    name: "Driver's License (FRSC)",
+    category: "secondary_id",
+    method: "POST",
+    path: "/api/drivers-license",
+    benchmark: "₦180",
+    verixaRate: "₦160",
+    description: "FRSC driver's license record verification, expiry status, and official license photo.",
+    defaultPayload: {
+      license_number: "AAA001928374",
+      date_of_birth: "1988-04-14",
+      consent: true,
+    },
+  },
+  {
+    key: "voters-card",
+    name: "Voter's Card (VIN)",
+    category: "secondary_id",
+    method: "POST",
+    path: "/api/voters-card",
+    benchmark: "₦150",
+    verixaRate: "₦130",
+    description: "INEC national voter register lookup by Voter Identification Number (VIN) and polling unit.",
+    defaultPayload: {
+      vin: "90F5B12938475620192",
+      state: "LAGOS",
+      last_name: "OLUTOLA",
+      consent: true,
+    },
+  },
+  {
+    key: "passport-verification",
+    name: "Passport (NIS)",
+    category: "secondary_id",
+    method: "POST",
+    path: "/api/passport-verification",
+    benchmark: "₦300",
+    verixaRate: "₦270",
+    description: "Nigerian Immigration Service (NIS) international passport validity and bio-data match.",
+    defaultPayload: {
+      passport_number: "A10293847",
+      last_name: "OLUTOLA",
+      date_of_birth: "1988-04-14",
+      consent: true,
+    },
+  },
+
+  // Financial & Banking
+  {
+    key: "account-resolve",
+    name: "NUBAN Account Resolve",
+    category: "financial",
+    method: "POST",
+    path: "/api/account-resolve",
+    benchmark: "₦10",
+    verixaRate: "Free",
+    description: "Resolve 10-digit Nigerian NUBAN account number across commercial banks and microfinance institutions.",
+    defaultPayload: {
+      account_number: "0123456789",
+      bank_code: "058",
+      consent: true,
+    },
+  },
+  {
+    key: "credit-score",
+    name: "Credit Score & Report",
+    category: "financial",
+    method: "POST",
+    path: "/api/credit-score",
+    benchmark: "₦450",
+    verixaRate: "₦390",
+    description: "Multi-bureau credit score, active debt burden, and loan repayment history via applicant BVN.",
+    defaultPayload: {
+      bvn: "22198765432",
+      phone_number: "08031234567",
+      consent: true,
+    },
+  },
+
+  // Biometrics & Risk
+  {
+    key: "face-match",
+    name: "Face Match & Liveness",
+    category: "risk",
+    method: "POST",
+    path: "/api/face-match",
+    benchmark: "₦250",
+    verixaRate: "₦220",
+    description: "Biometric facial comparison of user selfie against government registry photo with liveness checks.",
+    defaultPayload: {
+      id_type: "BVN",
+      id_number: "22198765432",
+      selfie_image_base64: "data:image/jpeg;base64,mockselfie...",
+      liveness_check: true,
+      consent: true,
+    },
+  },
+  {
+    key: "aml-screening",
+    name: "AML & PEP Screening",
+    category: "risk",
+    method: "POST",
+    path: "/api/aml-screening",
+    benchmark: "₦200",
+    verixaRate: "₦175",
+    description: "Global sanctions, PEP watchlists, Interpol, and adverse media real-time screening.",
+    defaultPayload: {
+      name: "CHIDERA EMEKA OLUTOLA",
+      date_of_birth: "1988-04-14",
+      country: "NG",
+      consent: true,
+    },
+  },
+  {
+    key: "phone-intelligence",
+    name: "SIM Swap & Carrier",
+    category: "risk",
+    method: "POST",
+    path: "/api/phone-intelligence",
+    benchmark: "₦150",
+    verixaRate: "₦130",
+    description: "Carrier lookup, active line status, porting history, and SIM swap detection for fraud prevention.",
+    defaultPayload: {
+      phone_number: "08031234567",
+      consent: true,
+    },
+  },
+  {
+    key: "email-risk",
+    name: "Email Risk Score",
+    category: "risk",
+    method: "POST",
+    path: "/api/email-risk",
+    benchmark: "₦80",
+    verixaRate: "₦65",
+    description: "Disposable burner email detection, deliverability validation, and domain reputation scoring.",
+    defaultPayload: {
+      email: "dev@apextech.ng",
+      consent: true,
+    },
+  },
+
+  // Telco & Messaging
+  {
+    key: "telecom-airtime",
+    name: "Airtime Vending",
+    category: "telecom",
+    method: "POST",
+    path: "/api/telecom/airtime",
+    benchmark: "Face Value",
+    verixaRate: "2.5% Off",
+    description: "Automated instant VTU airtime vending to MTN, Airtel, Glo, and 9mobile with developer margins.",
+    defaultPayload: {
+      phone_number: "08031234567",
+      amount: 1000,
+      network: "MTN",
+      consent: true,
+    },
+  },
+  {
+    key: "telecom-data",
+    name: "Data Vending",
+    category: "telecom",
+    method: "POST",
+    path: "/api/telecom/data",
+    benchmark: "Market Rate",
+    verixaRate: "₦220/GB",
+    description: "Automated data bundle subscription vending across all Nigerian mobile networks.",
+    defaultPayload: {
+      phone_number: "08031234567",
+      plan: "MTN_1GB",
+      consent: true,
+    },
+  },
+  {
+    key: "messaging-otp",
+    name: "Transactional OTP SMS",
+    category: "telecom",
+    method: "POST",
+    path: "/api/messaging/send-otp",
+    benchmark: "₦4.50",
+    verixaRate: "₦3.80",
+    description: "High-delivery transactional SMS and WhatsApp OTP message dispatch with routing failover.",
+    defaultPayload: {
+      destination: "08031234567",
+      channel: "sms",
+      message: "Your Verixa authentication code is 492019. Valid for 10 minutes.",
+      consent: true,
+    },
+  },
 ]
 
 export default function ApiExplorerPage() {
   const { environment, setEnvironment, refreshBalance } = useAuth()
-  const [selectedKey, setSelectedKey] = React.useState<ApiEndpointKey>("nin-verification")
+  const [selectedCategory, setSelectedCategory] = React.useState<ApiCategory>("all")
+  const [selectedKey, setSelectedKey] = React.useState<string>("nin-verification")
   
+  const filteredEndpoints = React.useMemo(() => {
+    if (selectedCategory === "all") return ENDPOINTS
+    return ENDPOINTS.filter((e) => e.category === selectedCategory)
+  }, [selectedCategory])
+
   const currentConfig = React.useMemo(() => {
     return ENDPOINTS.find((e) => e.key === selectedKey) || ENDPOINTS[0]
   }, [selectedKey])
@@ -131,7 +378,7 @@ export default function ApiExplorerPage() {
   const [responseResult, setResponseResult] = React.useState<any | null>(null)
   const [responseMeta, setResponseMeta] = React.useState<{ status: number; latencyMs: number } | null>(null)
 
-  const handleSelectEndpoint = (key: ApiEndpointKey) => {
+  const handleSelectEndpoint = (key: string) => {
     setSelectedKey(key)
     const cfg = ENDPOINTS.find((e) => e.key === key) || ENDPOINTS[0]
     setRequestBody(cfg.defaultPayload ? JSON.stringify(cfg.defaultPayload, null, 2) : "")
@@ -166,6 +413,16 @@ export default function ApiExplorerPage() {
     }
   }
 
+  const categories: { id: ApiCategory; label: string }[] = [
+    { id: "all", label: "All Services (22)" },
+    { id: "identity", label: "Core Identity (7)" },
+    { id: "kyb", label: "Corporate KYB (3)" },
+    { id: "secondary_id", label: "Secondary IDs (3)" },
+    { id: "financial", label: "Banking & Credit (2)" },
+    { id: "risk", label: "Biometrics & Risk (4)" },
+    { id: "telecom", label: "Telco & Messaging (3)" },
+  ]
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -178,7 +435,7 @@ export default function ApiExplorerPage() {
             </Badge>
           </div>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Interactive developer console to test Verixa core endpoints with active dropped rates (-₦15).
+            Interactive developer console to test Verixa identity, business KYB, biometric, and financial endpoints.
           </p>
         </div>
 
@@ -195,13 +452,26 @@ export default function ApiExplorerPage() {
         </div>
       </div>
 
-      {/* Endpoint Selector Tabs */}
-      <div className="glass-card p-3 rounded-2xl border border-white/[0.08] bg-[#0c0e14]/60 backdrop-blur-xl">
-        <label className="text-[11px] font-mono font-semibold text-zinc-400 uppercase tracking-wider block mb-2 px-1">
-          Select Core API Endpoint
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-          {ENDPOINTS.map((ep) => {
+      {/* Category Pills & Endpoint Selector Tabs */}
+      <div className="glass-card p-4 rounded-2xl border border-white/[0.08] bg-[#0c0e14]/60 backdrop-blur-xl space-y-3">
+        <div className="flex flex-wrap items-center gap-2 border-b border-white/[0.06] pb-3">
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setSelectedCategory(c.id)}
+              className={`px-3 py-1 rounded-full text-xs font-sans transition-all cursor-pointer ${
+                selectedCategory === c.id
+                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold"
+                  : "bg-white/[0.03] text-zinc-400 border border-white/[0.06] hover:text-white"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2 max-h-[220px] overflow-y-auto pr-1">
+          {filteredEndpoints.map((ep) => {
             const isSelected = ep.key === selectedKey
             return (
               <button

@@ -132,6 +132,7 @@ export default function RegisterPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className="!text-white !bg-[#121620] !border-white/[0.12] focus:!border-emerald-500"
               required
             />
 
@@ -140,6 +141,7 @@ export default function RegisterPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="!text-white !bg-[#121620] !border-white/[0.12] focus:!border-emerald-500"
               required
             />
 
@@ -148,6 +150,7 @@ export default function RegisterPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="!text-white !bg-[#121620] !border-white/[0.12] focus:!border-emerald-500"
               required
             />
 

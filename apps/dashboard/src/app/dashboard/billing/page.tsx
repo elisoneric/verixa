@@ -9,6 +9,12 @@ import { ApiClient } from "../../../lib/api"
 export default function BillingPage() {
   const { environment, balance, refreshBalance } = useAuth()
   const [topupModalOpen, setTopupModalOpen] = React.useState(false)
+  const [provisionModalOpen, setProvisionModalOpen] = React.useState(false)
+  const [ninInput, setNinInput] = React.useState("")
+  const [phoneInput, setPhoneInput] = React.useState("")
+  const [consentAgreed, setConsentAgreed] = React.useState(false)
+  const [isProvisioning, setIsProvisioning] = React.useState(false)
+  const [provisionError, setProvisionError] = React.useState<string | null>(null)
   const [topupAmount, setTopupAmount] = React.useState("5000")
   const [isProcessing, setIsProcessing] = React.useState(false)
   const [isFaucetLoading, setIsFaucetLoading] = React.useState(false)
@@ -26,10 +32,6 @@ export default function BillingPage() {
     note: "Transfers to this dedicated bank account automatically credit your live NGX balance.",
   }
 
-  const rates = balance?.rates || { bvn: 50, nin: 50, nuban: 10 }
-  const liveRates = balance?.rates?.live || { bvn: rates.bvn, nin: rates.nin, nuban: rates.nuban }
-  const cacheRates = balance?.rates?.cache || { bvn: Math.round(rates.bvn * 0.4), nin: Math.round(rates.nin * 0.4), nuban: Math.round(rates.nuban * 0.5) }
-  const cacheSavings = balance?.rates?.cacheSavingsPercent || 60
   const tier = balance?.tier || "STARTER"
 
   const handleSandboxFaucet = async () => {
@@ -69,31 +71,63 @@ export default function BillingPage() {
     }
   }
 
+  const handleProvisionDedicatedAccount = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setProvisionError(null)
+
+    if (!ninInput.trim() || ninInput.trim().length !== 11) {
+      setProvisionError("Please provide a valid 11-digit NIN.")
+      return
+    }
+
+    if (!phoneInput.trim() || phoneInput.trim().length < 10) {
+      setProvisionError("Please provide a valid Nigerian phone number.")
+      return
+    }
+
+    if (!consentAgreed) {
+      setProvisionError("Applicant consent is required under NDPA regulations.")
+      return
+    }
+
+    setIsProvisioning(true)
+    try {
+      await ApiClient.provisionDedicatedAccount(ninInput.trim(), phoneInput.trim(), true)
+      await refreshBalance()
+      setProvisionModalOpen(false)
+      alert("Dedicated Paystack Virtual Account provisioned successfully!")
+    } catch (err: any) {
+      setProvisionError(err.message || "Failed to provision dedicated account.")
+    } finally {
+      setIsProvisioning(false)
+    }
+  }
+
   return (
     <div className="space-y-8">
       {/* Promotional Flash Sale Banner if active */}
       {balance?.bonusPromotion?.active && (
-        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-gradient-to-r dark:from-emerald-950/80 dark:via-emerald-900/40 dark:to-zinc-950 border border-emerald-300 dark:border-emerald-500/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
+        <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">{balance.bonusPromotion.title}</span>
+                <span className="text-sm font-bold text-white tracking-tight">{balance.bonusPromotion.title}</span>
                 <Badge variant="verified" size="sm">
                   {balance.bonusPromotion.discountPercent}% OFF ACTIVE
                 </Badge>
               </div>
-              <p className="text-xs text-emerald-800 dark:text-emerald-300/80 mt-0.5">
-                Bonus day rate slash is currently applied automatically to all your API calls.
+              <p className="text-xs text-emerald-300/80 mt-0.5">
+                Limited promotional top-up discount automatically applied on instant checkout.
               </p>
             </div>
           </div>
           <Button size="sm" variant="emerald" onClick={() => setTopupModalOpen(true)} className="shrink-0 font-semibold">
-            Top Up at Slashed Rates &rarr;
+            Top Up &rarr;
           </Button>
         </div>
       )}
@@ -102,7 +136,7 @@ export default function BillingPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-2xl font-bold tracking-tight text-white">
               Billing & NGX Credits
             </h1>
             <Badge variant="verified" size="sm">
@@ -112,7 +146,7 @@ export default function BillingPage() {
               {tier} PLAN
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
             Prepaid credit balance, dedicated virtual account funding, and transaction ledgers.
           </p>
         </div>
@@ -148,10 +182,10 @@ export default function BillingPage() {
       {/* Financial Overview Grid */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Current Balance Card */}
-        <Card className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-6 flex flex-col justify-between shadow-xs">
+        <Card className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 flex flex-col justify-between shadow-xl backdrop-blur-xl rounded-2xl">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-medium text-slate-500 dark:text-zinc-400 uppercase">
+              <span className="text-xs font-mono font-medium text-zinc-400 uppercase tracking-wider">
                 {environment} Available Balance
               </span>
               <Badge variant={environment === "live" ? "verified" : "warning"} size="sm">
@@ -160,39 +194,41 @@ export default function BillingPage() {
             </div>
 
             <div className="mt-4 flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold font-mono text-slate-900 dark:text-white tracking-tight">
+              <span className="text-4xl font-extrabold font-mono text-white tracking-tight">
                 {currentBalance.toLocaleString()}
               </span>
-              <span className="text-sm font-mono text-emerald-600 dark:text-emerald-400 font-bold">NGX</span>
+              <span className="text-sm font-mono text-emerald-400 font-bold">NGX</span>
             </div>
 
-            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-2">
-              Equivalent to <strong>₦{currentBalance.toLocaleString()}.00 NGN</strong>
+            <p className="text-xs text-zinc-400 mt-2">
+              Equivalent to <strong className="text-white">₦{currentBalance.toLocaleString()}.00 NGN</strong>
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs text-slate-400 dark:text-zinc-500">
+          <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-zinc-400">
             <span>Prepaid metered deductions</span>
             <span>Zero charges on failed requests</span>
           </div>
         </Card>
 
         {/* Dedicated Virtual Account (DVA) Card */}
-        <Card className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-6 flex flex-col justify-between shadow-xs">
+        <Card className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 flex flex-col justify-between shadow-xl backdrop-blur-xl rounded-2xl">
           <div>
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3 mb-4">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-4">
               <div>
-                <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 uppercase">PAYSTACK DEDICATED ACCOUNT</span>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">{dva.bankName}</h4>
+                <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">PAYSTACK DEDICATED ACCOUNT</span>
+                <h4 className="text-sm font-bold text-white">{dva.bankName}</h4>
               </div>
-              <Badge variant="verified" size="sm">AUTO-CREDIT</Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="verified" size="sm">AUTO-CREDIT</Badge>
+              </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <span className="text-xs text-slate-500 dark:text-zinc-400">Dedicated Account Number</span>
+                <span className="text-xs text-zinc-400">Dedicated Account Number</span>
                 <div className="mt-1 flex items-center gap-3">
-                  <span className="font-mono text-2xl font-bold text-slate-900 dark:text-white tracking-widest">
+                  <span className="font-mono text-2xl font-bold text-white tracking-widest">
                     {dva.accountNumber}
                   </span>
                   <Button
@@ -209,15 +245,25 @@ export default function BillingPage() {
               </div>
 
               <div>
-                <span className="text-xs text-slate-500 dark:text-zinc-400">Account Beneficiary</span>
-                <p className="text-xs font-semibold text-slate-700 dark:text-zinc-200">{dva.accountName}</p>
+                <span className="text-xs text-zinc-400">Account Beneficiary</span>
+                <p className="text-xs font-semibold text-zinc-200">{dva.accountName}</p>
               </div>
             </div>
           </div>
 
-          <p className="mt-4 text-[11px] text-slate-400 dark:text-zinc-500">
-            {dva.note}
-          </p>
+          <div className="mt-4 pt-3 border-t border-white/[0.08] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p className="text-[11px] text-zinc-400">
+              {dva.note}
+            </p>
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => setProvisionModalOpen(true)}
+              className="shrink-0 text-[11px]"
+            >
+              Verify NIN / Phone &rarr;
+            </Button>
+          </div>
         </Card>
       </div>
 
@@ -226,135 +272,190 @@ export default function BillingPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Active Metered Rate Schedule ({tier} Plan)</h3>
-              <Badge variant="verified" size="sm">SMART CACHE ACTIVE</Badge>
+              <h3 className="text-base font-bold text-white tracking-tight">Active Metered Rate Schedule ({tier} Plan)</h3>
             </div>
-            <p className="text-xs text-slate-500 dark:text-zinc-400">Unit costs charged per successful verification. Repeat identity lookups within 30 days are automatically served from Smart Cache at up to {cacheSavings}% off.</p>
+            <p className="text-xs text-zinc-400">Unit costs charged per successful verification. Zero charges on failed lookups.</p>
           </div>
           <AppLink app="www" path="/contact" className="text-xs text-emerald-400 hover:text-emerald-300 underline font-medium">
             Contact Sales for Custom Volume Tier &rarr;
           </AppLink>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Method & Endpoint</TableHead>
-              <TableHead>Service</TableHead>
-              <TableHead>Benchmark</TableHead>
-              <TableHead>Active Verixa Rate</TableHead>
-              <TableHead>Cache Split</TableHead>
-              <TableHead>Billing Policy</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className="font-mono text-xs">
-                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                <span className="text-zinc-200">/api/nin-verification</span>
-              </TableCell>
-              <TableCell className="font-medium text-white">NIN Verification</TableCell>
-              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦150</TableCell>
-              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
-                <span className="text-sm">₦135</span>
-                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
-              </TableCell>
-              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
-            </TableRow>
+        <div className="rounded-xl border border-white/[0.08] overflow-hidden bg-[#0c0e14]/70 backdrop-blur-md">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-white/[0.08] bg-[#0e1118]/80 text-zinc-400">
+                <TableHead>Method & Endpoint</TableHead>
+                <TableHead>Service</TableHead>
+                <TableHead>Active Rate</TableHead>
+                <TableHead>Billing Policy</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-white/[0.06]">
+              <TableRow className="hover:bg-white/[0.02] transition-colors">
+                <TableCell className="font-mono text-xs">
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                  <span className="text-zinc-200">/api/nin-verification</span>
+                </TableCell>
+                <TableCell className="font-medium text-white">NIN Verification</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦140 / query</TableCell>
+                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+              </TableRow>
 
-            <TableRow>
-              <TableCell className="font-mono text-xs">
-                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                <span className="text-zinc-200">/api/bvn-verification</span>
-              </TableCell>
-              <TableCell className="font-medium text-white">BVN Verification</TableCell>
-              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦100</TableCell>
-              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
-                <span className="text-sm">₦85</span>
-                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
-              </TableCell>
-              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
-            </TableRow>
+              <TableRow className="hover:bg-white/[0.02] transition-colors">
+                <TableCell className="font-mono text-xs">
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                  <span className="text-zinc-200">/api/bvn-verification</span>
+                </TableCell>
+                <TableCell className="font-medium text-white">BVN Verification</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦50 / query</TableCell>
+                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+              </TableRow>
 
-            <TableRow>
-              <TableCell className="font-mono text-xs">
-                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                <span className="text-zinc-200">/api/nin-phone</span>
-              </TableCell>
-              <TableCell className="font-medium text-white">NIN Phone Search</TableCell>
-              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦200</TableCell>
-              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
-                <span className="text-sm">₦185</span>
-                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
-              </TableCell>
-              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
-            </TableRow>
+              <TableRow className="hover:bg-white/[0.02] transition-colors">
+                <TableCell className="font-mono text-xs">
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                  <span className="text-zinc-200">/api/nin-phone</span>
+                </TableCell>
+                <TableCell className="font-medium text-white">NIN Phone Search</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦180 / query</TableCell>
+                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+              </TableRow>
 
-            <TableRow>
-              <TableCell className="font-mono text-xs">
-                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                <span className="text-zinc-200">/api/bvn-phone</span>
-              </TableCell>
-              <TableCell className="font-medium text-white">BVN Phone Search</TableCell>
-              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦150</TableCell>
-              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
-                <span className="text-sm">₦135</span>
-                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
-              </TableCell>
-              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
-            </TableRow>
+              <TableRow className="hover:bg-white/[0.02] transition-colors">
+                <TableCell className="font-mono text-xs">
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                  <span className="text-zinc-200">/api/bvn-phone</span>
+                </TableCell>
+                <TableCell className="font-medium text-white">BVN Phone Search</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦135 / query</TableCell>
+                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+              </TableRow>
 
-            <TableRow>
-              <TableCell className="font-mono text-xs">
-                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                <span className="text-zinc-200">/api/nin-demography</span>
-              </TableCell>
-              <TableCell className="font-medium text-white">NIN Demography</TableCell>
-              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦250</TableCell>
-              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
-                <span className="text-sm">₦235</span>
-                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
-              </TableCell>
-              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
-            </TableRow>
+              <TableRow className="hover:bg-white/[0.02] transition-colors">
+                <TableCell className="font-mono text-xs">
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                  <span className="text-zinc-200">/api/nin-demography</span>
+                </TableCell>
+                <TableCell className="font-medium text-white">NIN Demography</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦235 / query</TableCell>
+                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+              </TableRow>
 
-            <TableRow>
-              <TableCell className="font-mono text-xs">
-                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                <span className="text-zinc-200">/api/nin-tracking</span>
-              </TableCell>
-              <TableCell className="font-medium text-white">NIN Tracking</TableCell>
-              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦200</TableCell>
-              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
-                <span className="text-sm">₦185</span>
-                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
-              </TableCell>
-              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
-            </TableRow>
+              <TableRow className="hover:bg-white/[0.02] transition-colors">
+                <TableCell className="font-mono text-xs">
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                  <span className="text-zinc-200">/api/nin-tracking</span>
+                </TableCell>
+                <TableCell className="font-medium text-white">NIN Tracking</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦185 / query</TableCell>
+                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+              </TableRow>
 
-            <TableRow className="bg-emerald-500/5">
-              <TableCell className="font-mono text-xs">
-                <span className="text-sky-400 font-bold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20 mr-2">GET</span>
-                <span className="text-zinc-200">/api/balance</span>
-              </TableCell>
-              <TableCell className="font-medium text-white flex items-center gap-2">
-                Account Balance
-                <Badge variant="verified" size="sm">FREE</Badge>
-              </TableCell>
-              <TableCell className="font-sans text-xs text-zinc-500">Free</TableCell>
-              <TableCell className="font-sans font-bold text-emerald-400">₦0 (Free)</TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">Instant</TableCell>
-              <TableCell className="text-xs text-emerald-400">Zero Charge Always</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+              <TableRow className="hover:bg-white/[0.02] transition-colors">
+                <TableCell className="font-mono text-xs">
+                  <span className="text-sky-400 font-bold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20 mr-2">POST</span>
+                  <span className="text-zinc-200">/api/nin-slip</span>
+                </TableCell>
+                <TableCell className="font-medium text-white">Automated NIN Slip</TableCell>
+                <TableCell className="font-sans font-bold text-sky-400">₦270 / slip</TableCell>
+                <TableCell className="text-xs text-zinc-400">A4 PDF & Word document output</TableCell>
+              </TableRow>
+
+              <TableRow className="hover:bg-white/[0.02] transition-colors">
+                <TableCell className="font-mono text-xs">
+                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                  <span className="text-zinc-200">/api/nuban-lookup</span>
+                </TableCell>
+                <TableCell className="font-medium text-white">NUBAN Resolution</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">Free</TableCell>
+                <TableCell className="text-xs text-zinc-400">100% Free across all banks</TableCell>
+              </TableRow>
+
+              <TableRow className="bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors">
+                <TableCell className="font-mono text-xs">
+                  <span className="text-sky-400 font-bold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20 mr-2">GET</span>
+                  <span className="text-zinc-200">/api/balance</span>
+                </TableCell>
+                <TableCell className="font-medium text-white flex items-center gap-2">
+                  Account Balance
+                  <Badge variant="verified" size="sm">FREE</Badge>
+                </TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">Free</TableCell>
+                <TableCell className="text-xs text-emerald-400">Zero Charge Always</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
       </div>
+
+      {/* Provision Dedicated Account Modal */}
+      <Modal
+        isOpen={provisionModalOpen}
+        onClose={() => setProvisionModalOpen(false)}
+        title="Provision Dedicated Paystack Account"
+        description="Link your verified NIN and phone number to create a dedicated NUBAN account in your name."
+      >
+        <form onSubmit={handleProvisionDedicatedAccount} className="space-y-4 mt-2">
+          {provisionError && (
+            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
+              {provisionError}
+            </div>
+          )}
+
+          <Input
+            label="National Identification Number (NIN)"
+            placeholder="11-digit NIN"
+            value={ninInput}
+            onChange={(e) => setNinInput(e.target.value.replace(/\D/g, "").slice(0, 11))}
+            className="!text-white !bg-[#121620] !border-white/[0.12]"
+            required
+          />
+
+          <Input
+            label="Phone Number"
+            placeholder="e.g. 08012345678"
+            type="tel"
+            value={phoneInput}
+            onChange={(e) => setPhoneInput(e.target.value)}
+            className="!text-white !bg-[#121620] !border-white/[0.12]"
+            required
+          />
+
+          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.08] space-y-2">
+            <label className="flex items-start gap-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={consentAgreed}
+                onChange={(e) => setConsentAgreed(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-white/[0.2] bg-black/40 text-emerald-500 focus:ring-emerald-500"
+              />
+              <span className="text-xs text-zinc-300 leading-relaxed">
+                I give consent to Verixa to verify my NIN and phone number with official registries to provision a Dedicated Virtual Account with Paystack in compliance with the Nigeria Data Protection Act (NDPA 2023).
+              </span>
+            </label>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-white/[0.08]">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setProvisionModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="emerald"
+              size="sm"
+              isLoading={isProvisioning}
+            >
+              Provision Dedicated NUBAN
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Topup Modal */}
       <Modal
@@ -365,36 +466,36 @@ export default function BillingPage() {
       >
         <div className="space-y-4 mt-2">
           {/* Primary Recommended Method: Dedicated Account */}
-          <div className="p-4 rounded-xl border border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/70 dark:bg-emerald-950/20 space-y-2">
+          <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400">RECOMMENDED: AUTOMATED BANK TRANSFER</span>
+              <span className="text-xs font-mono font-bold text-emerald-400">RECOMMENDED: AUTOMATED BANK TRANSFER</span>
               <Badge variant="verified" size="sm">INSTANT CREDIT</Badge>
             </div>
-            <p className="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed">
+            <p className="text-xs text-zinc-300 leading-relaxed">
               Transfer directly from your bank app or USSD to your Paystack Dedicated Account. Your live NGX balance is auto-credited immediately upon settlement:
             </p>
-            <div className="p-3 rounded-lg bg-white dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-800 space-y-2 shadow-2xs">
+            <div className="p-3 rounded-lg bg-[#0e1118] border border-white/[0.08] space-y-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] text-slate-400 dark:text-zinc-500 block uppercase font-mono">Bank Name</span>
-                  <span className="text-xs font-bold text-slate-900 dark:text-white">Titan Trust Bank</span>
+                  <span className="text-[10px] text-zinc-400 block uppercase font-mono">Bank Name</span>
+                  <span className="text-xs font-bold text-white">{dva.bankName}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 dark:text-zinc-500 block uppercase font-mono">Beneficiary</span>
-                  <span className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Verixa ID / Settlement</span>
+                  <span className="text-[10px] text-zinc-400 block uppercase font-mono">Beneficiary</span>
+                  <span className="text-xs font-semibold text-zinc-300">{dva.accountName}</span>
                 </div>
               </div>
-              <div className="pt-1 flex items-center justify-between border-t border-slate-100 dark:border-zinc-800">
+              <div className="pt-2 flex items-center justify-between border-t border-white/[0.08]">
                 <div>
-                  <span className="text-[10px] text-slate-400 dark:text-zinc-500 block uppercase font-mono">Dedicated Account</span>
-                  <span className="font-mono text-base font-extrabold text-emerald-600 dark:text-emerald-400 tracking-wider">9940182741</span>
+                  <span className="text-[10px] text-zinc-400 block uppercase font-mono">Dedicated Account</span>
+                  <span className="font-mono text-base font-extrabold text-emerald-400 tracking-wider">{dva.accountNumber}</span>
                 </div>
                 <Button
                   variant="outline"
                   size="xs"
                   onClick={() => {
-                    navigator.clipboard.writeText("9940182741")
-                    alert("Account number 9940182741 copied to clipboard!")
+                    navigator.clipboard.writeText(dva.accountNumber)
+                    alert(`Account number ${dva.accountNumber} copied to clipboard!`)
                   }}
                 >
                   Copy Number
@@ -404,8 +505,8 @@ export default function BillingPage() {
           </div>
 
           {/* Secondary Method: Online Paystack */}
-          <form onSubmit={handleTopupCheckout} className="space-y-3 pt-2 border-t border-slate-200 dark:border-zinc-800">
-            <span className="text-xs font-semibold text-slate-700 dark:text-zinc-300 block">Alternative: Online Card / Gateway Checkout</span>
+          <form onSubmit={handleTopupCheckout} className="space-y-3 pt-2 border-t border-white/[0.08]">
+            <span className="text-xs font-semibold text-zinc-300 block">Alternative: Online Card / Gateway Checkout</span>
             <Input
               label="Deposit Amount (NGN / NGX)"
               type="number"
@@ -413,11 +514,12 @@ export default function BillingPage() {
               step="1000"
               value={topupAmount}
               onChange={(e) => setTopupAmount(e.target.value)}
+              className="!text-white !bg-[#121620] !border-white/[0.12]"
               hint="1 NGX = ₦1.00 NGN. Minimum topup is ₦1,000."
               required
             />
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-slate-200 dark:border-zinc-800">
+            <div className="flex justify-end gap-3 pt-3 border-t border-white/[0.08]">
               <Button
                 type="button"
                 variant="ghost"

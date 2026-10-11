@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
-@source "../../../packages/ui/src";
+@source "../../../../packages/ui/src";
 
 :root {
   color-scheme: dark;
@@ -9,6 +9,12 @@
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: var(--font-outfit), 'Outfit', sans-serif;
   --font-mono: var(--font-inter), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+:root:not(.dark) {
+  color-scheme: light;
+  --background: #f8fafc;
+  --foreground: #09090b;
 }
 
 @theme inline {
@@ -20,8 +26,8 @@
 }
 
 body {
-  background-color: #06070a;
-  color: #f8fafc;
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: var(--font-sans);
   letter-spacing: -0.011em;
   -webkit-font-smoothing: antialiased;

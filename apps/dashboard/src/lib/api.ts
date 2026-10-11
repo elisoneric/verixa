@@ -239,6 +239,23 @@ export class ApiClient {
     })
   }
 
+  static async provisionDedicatedAccount(nin: string, phone: string, consent: boolean) {
+    return this.request<{
+      message: string
+      dedicatedVirtualAccount: {
+        bankName: string
+        accountNumber: string
+        accountName: string
+        status: string
+        note: string
+        isCustom?: boolean
+      }
+    }>("/v1/billing/dedicated-account", {
+      method: "POST",
+      body: JSON.stringify({ nin, phone, consent }),
+    })
+  }
+
   // NIN Slip Generator
   static async generateNinSlip(nin: string, format: "pdf" | "docx" | "both" = "both", consent = true) {
     return this.request<{

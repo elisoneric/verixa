@@ -6,6 +6,15 @@ import {
   BankAccountVerificationData, 
   PhoneNumberVerificationData,
   CacVerificationData,
+  TinVerificationData,
+  DriversLicenseVerificationData,
+  VotersCardVerificationData,
+  PassportVerificationData,
+  CreditScoreData,
+  FaceMatchData,
+  AmlScreeningData,
+  PhoneIntelligenceData,
+  EmailRiskData,
   NubanKycVerificationData,
   SmsDispatchData,
   AirtimePurchaseData,
@@ -318,6 +327,181 @@ export class MockProvider implements IVerificationProvider {
       { amount: 2000, description: 'GLO 5.5GB Monthly Plan', plan: 'GLO_5.5GB' },
       { amount: 1200, description: '9MOBILE 2GB Monthly Plan', plan: '9MOBILE_2GB' },
     ];
+  }
+
+  async verifyTin(data: TinVerificationData): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return {
+      status: 'success',
+      data: {
+        tin: data.tin,
+        taxpayer_name: 'APEX TECHNOLOGIES LIMITED',
+        tax_office: 'MSTO YABA',
+        phone_number: '08031234567',
+        email: 'tax@apextech.ng',
+        registration_number: '1928374',
+        jtb_tin: '10029384712',
+        active: true,
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
+  }
+
+  async verifyDriversLicense(data: DriversLicenseVerificationData): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 350));
+    return {
+      status: 'success',
+      data: {
+        license_number: data.licenseNumber,
+        first_name: 'CHIDERA',
+        last_name: 'OLUTOLA',
+        middle_name: 'EMEKA',
+        date_of_birth: data.dob || '1988-04-14',
+        gender: 'MALE',
+        state_of_issue: 'LAGOS',
+        issue_date: '2022-03-10',
+        expiry_date: '2027-03-09',
+        photo: 'data:image/jpeg;base64,mockphoto_frsc',
+        status: 'VALID',
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
+  }
+
+  async verifyVotersCard(data: VotersCardVerificationData): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 320));
+    return {
+      status: 'success',
+      data: {
+        vin: data.vin,
+        first_name: 'CHIDERA',
+        last_name: data.lastName || 'OLUTOLA',
+        middle_name: 'EMEKA',
+        date_of_birth: '1988-04-14',
+        gender: 'MALE',
+        occupation: 'SOFTWARE ARCHITECT',
+        state: data.state || 'LAGOS',
+        lga: 'ETI-OSA',
+        polling_unit: 'PU 024 LEKKI PHASE 1',
+        delimitation: '24-08-05-024',
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
+  }
+
+  async verifyPassport(data: PassportVerificationData): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 400));
+    return {
+      status: 'success',
+      data: {
+        passport_number: data.passportNumber,
+        first_name: 'CHIDERA',
+        last_name: data.lastName || 'OLUTOLA',
+        middle_name: 'EMEKA',
+        date_of_birth: data.dob || '1988-04-14',
+        gender: 'MALE',
+        issue_date: '2020-08-20',
+        expiry_date: '2030-08-19',
+        issue_place: 'IKOYI, LAGOS',
+        nationality: 'NIGERIAN',
+        photo: 'data:image/jpeg;base64,mockphoto_nis',
+        status: 'ACTIVE',
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
+  }
+
+  async getCreditScore(data: CreditScoreData): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 450));
+    return {
+      status: 'success',
+      data: {
+        bvn: data.bvn,
+        credit_score: 742,
+        credit_rating: 'EXCELLENT',
+        risk_level: 'LOW',
+        total_accounts: 5,
+        active_accounts: 2,
+        closed_accounts: 3,
+        total_loan_amount: 1500000,
+        outstanding_balance: 180000,
+        delinquent_accounts: 0,
+        bureau_coverage: ['CRC', 'FIRST_CENTRAL', 'CREDIT_REGISTRY'],
+        last_inquiry_date: '2026-09-28',
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
+  }
+
+  async verifyFaceMatch(data: FaceMatchData): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 400));
+    return {
+      status: 'success',
+      data: {
+        id_type: data.idType,
+        id_number: data.idNumber,
+        match_status: 'MATCHED',
+        confidence_score: 96.8,
+        liveness_passed: data.livenessCheck !== false,
+        threshold: 80.0,
+        registry_name: 'CHIDERA EMEKA OLUTOLA',
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
+  }
+
+  async screenAml(data: AmlScreeningData): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 350));
+    return {
+      status: 'success',
+      data: {
+        screened_name: data.name,
+        match_count: 0,
+        risk_level: 'CLEAN',
+        is_pep: false,
+        is_sanctioned: false,
+        sources_checked: ['OFAC', 'UN', 'INTERPOL', 'EU', 'UK_HMT'],
+        matches: [],
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
+  }
+
+  async screenPhoneIntelligence(data: PhoneIntelligenceData): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 280));
+    return {
+      status: 'success',
+      data: {
+        phone_number: data.phoneNumber,
+        carrier: 'MTN NIGERIA',
+        line_status: 'ACTIVE',
+        sim_swap_last_30_days: false,
+        sim_swap_date: null,
+        caller_id_name: 'CHIDERA EMEKA',
+        risk_score: 10,
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
+  }
+
+  async checkEmailRisk(data: EmailRiskData): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 250));
+    return {
+      status: 'success',
+      data: {
+        email: data.email,
+        is_valid_format: true,
+        is_deliverable: true,
+        is_disposable: false,
+        is_free_provider: false,
+        domain: data.email.split('@')[1] || 'apextech.ng',
+        domain_age_days: 1820,
+        breach_count: 0,
+        risk_score: 5,
+        recommendation: 'ALLOW',
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
   }
 
   async getUpstreamBalance(): Promise<{ balance: string; currency: string }> {

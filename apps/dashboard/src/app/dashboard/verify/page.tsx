@@ -63,14 +63,14 @@ export default function ManualVerifyPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-2xl font-bold tracking-tight text-white">
               Identity Verification
             </h1>
             <Badge variant={environment === "live" ? "verified" : "warning"} size="sm">
               {environment.toUpperCase()}
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
             Perform individual KYC identity and bank account checks.
           </p>
         </div>
@@ -88,10 +88,10 @@ export default function ManualVerifyPage() {
 
       {/* Main Form Grid */}
       <div className="grid md:grid-cols-2 gap-6 items-start">
-        <Card className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-6 space-y-5 shadow-xs">
+        <Card className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 space-y-5 shadow-xl backdrop-blur-xl rounded-2xl">
           {/* Service Selector */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300 uppercase tracking-wide">
+            <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wide">
               Verification Service
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -100,8 +100,8 @@ export default function ManualVerifyPage() {
                 onClick={() => setService("bvn")}
                 className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
                   service === "bvn"
-                    ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold shadow-2xs"
-                    : "bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-50"
+                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 font-bold shadow-2xs"
+                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
                 }`}
               >
                 BVN
@@ -111,8 +111,8 @@ export default function ManualVerifyPage() {
                 onClick={() => setService("nin")}
                 className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
                   service === "nin"
-                    ? "bg-sky-50 dark:bg-sky-950/40 border-sky-500 text-sky-700 dark:text-sky-400 font-bold shadow-2xs"
-                    : "bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-50"
+                    ? "bg-sky-500/20 border-sky-500 text-sky-400 font-bold shadow-2xs"
+                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
                 }`}
               >
                 NIN
@@ -122,8 +122,8 @@ export default function ManualVerifyPage() {
                 onClick={() => setService("phone")}
                 className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
                   service === "phone"
-                    ? "bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-700 dark:text-amber-400 font-bold shadow-2xs"
-                    : "bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-50"
+                    ? "bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-2xs"
+                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
                 }`}
               >
                 Phone
@@ -133,8 +133,8 @@ export default function ManualVerifyPage() {
                 onClick={() => setService("cac")}
                 className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
                   service === "cac"
-                    ? "bg-purple-50 dark:bg-purple-950/40 border-purple-500 text-purple-700 dark:text-purple-400 font-bold shadow-2xs"
-                    : "bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-50"
+                    ? "bg-purple-500/20 border-purple-500 text-purple-400 font-bold shadow-2xs"
+                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
                 }`}
               >
                 CAC Company
@@ -144,8 +144,8 @@ export default function ManualVerifyPage() {
                 onClick={() => setService("nuban")}
                 className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer sm:col-span-2 ${
                   service === "nuban"
-                    ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-500 text-indigo-700 dark:text-indigo-400 font-bold shadow-2xs"
-                    : "bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-50"
+                    ? "bg-indigo-500/20 border-indigo-500 text-indigo-400 font-bold shadow-2xs"
+                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
                 }`}
               >
                 Bank (NUBAN)
@@ -217,7 +217,7 @@ export default function ManualVerifyPage() {
                   <select
                     value={companyType}
                     onChange={(e) => setCompanyType(e.target.value)}
-                    className="w-full h-10 rounded-lg border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-3 text-xs text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none shadow-2xs"
+                    className="w-full h-10 rounded-lg border border-white/[0.12] bg-[#121620] px-3 text-xs text-white focus:border-purple-500 focus:outline-none shadow-2xs"
                   >
                     <option value="COMPANY">Limited Liability Company (RC)</option>
                     <option value="BUSINESS_NAME">Business Name (BN)</option>
@@ -236,17 +236,18 @@ export default function ManualVerifyPage() {
                   placeholder="0123456789"
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
+                  className="!text-white !bg-[#121620] !border-white/[0.12]"
                   maxLength={10}
                   required
                 />
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide">
                     Bank
                   </label>
                   <select
                     value={bankCode}
                     onChange={(e) => setBankCode(e.target.value)}
-                    className="w-full h-11 rounded-lg border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-3.5 text-sm text-slate-900 dark:text-zinc-100 focus:border-emerald-600 focus:outline-none shadow-2xs"
+                    className="w-full h-11 rounded-lg border border-white/[0.12] bg-[#121620] px-3.5 text-sm text-white focus:border-emerald-600 focus:outline-none shadow-2xs"
                   >
                     <option value="058">Guaranty Trust Bank (058)</option>
                     <option value="011">First Bank of Nigeria (011)</option>
@@ -266,9 +267,9 @@ export default function ManualVerifyPage() {
                 id="manualConsent"
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                className="h-4 w-4 rounded border-white/[0.2] bg-black/40 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
               />
-              <label htmlFor="manualConsent" className="text-xs text-slate-600 dark:text-zinc-400 select-none cursor-pointer">
+              <label htmlFor="manualConsent" className="text-xs text-zinc-400 select-none cursor-pointer">
                 I confirm applicant consent has been obtained.
               </label>
             </div>
@@ -288,10 +289,10 @@ export default function ManualVerifyPage() {
         </Card>
 
         {/* Verification Result Card */}
-        <Card className="bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 p-6 min-h-[380px] flex flex-col justify-between shadow-xs">
+        <Card className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 min-h-[380px] flex flex-col justify-between shadow-xl backdrop-blur-xl rounded-2xl">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-zinc-800">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Registry Result</h3>
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+              <h3 className="text-sm font-semibold text-white">Registry Result</h3>
               {result && (
                 <Badge variant={result.status === "success" || result.status === "verified" ? "verified" : "failed"} size="sm">
                   {result.status === "success" || result.status === "verified" ? "VERIFIED" : "FAILED"}
@@ -300,14 +301,14 @@ export default function ManualVerifyPage() {
             </div>
 
             {isLoading && (
-              <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-3">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" />
+              <div className="py-20 flex flex-col items-center justify-center text-zinc-400 gap-3">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
                 <span className="text-xs font-mono">Querying official registry...</span>
               </div>
             )}
 
             {!isLoading && !result && !error && (
-              <div className="py-20 text-center text-slate-400 dark:text-zinc-500">
+              <div className="py-20 text-center text-zinc-500">
                 <p className="text-xs">Fill out the verification details and submit.</p>
               </div>
             )}
@@ -316,9 +317,9 @@ export default function ManualVerifyPage() {
               <div className="mt-4 space-y-3 font-mono text-xs">
                 {result.data &&
                   Object.entries(result.data).map(([key, val]) => (
-                    <div key={key} className="flex justify-between py-1 border-b border-slate-100 dark:border-zinc-800/60">
-                      <span className="text-slate-500 dark:text-zinc-500 capitalize">{key.replace(/_/g, " ")}:</span>
-                      <span className="text-slate-900 dark:text-zinc-200 font-semibold">{String(val || "N/A")}</span>
+                    <div key={key} className="flex justify-between py-1 border-b border-white/[0.06]">
+                      <span className="text-zinc-400 capitalize">{key.replace(/_/g, " ")}:</span>
+                      <span className="text-zinc-100 font-semibold">{String(val || "N/A")}</span>
                     </div>
                   ))}
               </div>
@@ -326,7 +327,7 @@ export default function ManualVerifyPage() {
           </div>
 
           {result?.meta && (
-            <div className="pt-4 border-t border-slate-200 dark:border-zinc-800 flex items-center justify-between text-[11px] font-mono text-slate-500">
+            <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between text-[11px] font-mono text-zinc-500">
               <span>LATENCY: {result.meta.latency_ms || 120}ms</span>
               <span>REF: {result.meta.referenceId?.slice(0, 14)}</span>
             </div>

@@ -296,7 +296,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 {user?.org_name || "Verixa Organization"}
               </p>
               <p className="text-[11px] font-mono text-zinc-400 truncate">
-                {user?.email || "developer@verixaid.com"}
+                {user?.email || "Active User"}
               </p>
             </div>
             <button

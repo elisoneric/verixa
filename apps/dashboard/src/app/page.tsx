@@ -73,23 +73,27 @@ export default function PublicLandingPage() {
         <div className="max-w-5xl mx-auto px-6 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            Enterprise Identity & Compliance Cloud
+            Identity Verification & Biometric Engine
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-            Mission-Critical Identity Verification &{" "}
+            Fast, Reliable Identity Verification &{" "}
             <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
-              Compliance Infrastructure
+              Official NIMC Slips
             </span>
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-            Direct real-time identity lookups, automated official NIMC biometric slip generation, BVN validation, and high-throughput NUBAN resolution. Engineered with bank-grade security, automated NDPA audit trails, and intelligent cache split for African fintechs, lenders, and enterprises.
+            Real-time NIN verification, official NIMC biometric slip generation, BVN validation, and bank account resolution for Nigerian businesses and fintechs.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link href="/register">
-              <Button variant="emerald" size="lg" className="w-full sm:w-auto font-bold h-12 px-8 shadow-sm">
+              <Button
+                variant="emerald"
+                size="lg"
+                className="w-full sm:w-auto font-bold h-12 px-8 shadow-md !bg-emerald-600 hover:!bg-emerald-500 !text-white border border-emerald-600 transition-all cursor-pointer"
+              >
                 Get Started Free &rarr;
               </Button>
             </Link>
@@ -107,10 +111,10 @@ export default function PublicLandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
-              Enterprise Identity Services Built for Nigerian Scale
+              Identity Services Built for Scale
             </h2>
             <p className="text-sm text-slate-500 dark:text-zinc-400 mt-2">
-              High-throughput REST APIs and self-service web consoles with 99.9% verified uptime.
+              High-throughput REST APIs and self-service consoles with 99.9% uptime.
             </p>
           </div>
 
@@ -123,8 +127,8 @@ export default function PublicLandingPage() {
               <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
                 Retrieve verified registry demographics, residential address, telephone, tracking ID, and official portrait photo.
               </p>
-              <div className="pt-2 font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                ₦140 / query • Cache Split
+              <div className="pt-2 font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                ₦140 / query
               </div>
             </div>
 
@@ -136,8 +140,8 @@ export default function PublicLandingPage() {
               <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
                 Generate high-resolution A4 dual-slip PDF and editable Word (.docx) slips adhering to official NIMC paper specifications.
               </p>
-              <div className="pt-2 font-mono text-xs font-semibold text-sky-600 dark:text-sky-400">
-                ₦270 / slip • Cache Split
+              <div className="pt-2 font-mono text-sm font-bold text-sky-600 dark:text-sky-400">
+                ₦270 / slip
               </div>
             </div>
 
@@ -149,8 +153,8 @@ export default function PublicLandingPage() {
               <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
                 Real-time NIBSS BVN identity validation, date of birth verification, and name matching with automated audit trails.
               </p>
-              <div className="pt-2 font-mono text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-                ₦50 / query • Cache Split
+              <div className="pt-2 font-mono text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                ₦50 / query
               </div>
             </div>
 
@@ -158,15 +162,12 @@ export default function PublicLandingPage() {
               <div className="h-10 w-10 rounded-lg bg-emerald-200/80 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-bold">
                 BANK
               </div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">NUBAN Resolution</h3>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-500 text-white">Free</span>
-              </div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">NUBAN Resolution</h3>
               <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
                 Instant 10-digit NUBAN account name resolution across all commercial banks, microfinance institutions, and digital wallets.
               </p>
-              <div className="pt-2 font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                ₦0.00 (100% Free)
+              <div className="pt-2 font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                Free
               </div>
             </div>
           </div>
@@ -178,13 +179,13 @@ export default function PublicLandingPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-300 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 text-xs font-mono uppercase mb-3">
-              Transparent Enterprise Rates
+              Transparent Pricing
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               Pay As You Verify, Scale Without Barriers
             </h2>
             <p className="text-sm text-slate-500 dark:text-zinc-400 mt-2 max-w-xl mx-auto">
-              Transparent, volume-friendly pricing with zero subscription lock-in. Bank account resolution is currently 100% free.
+              Transparent rates with zero subscription lock-in. Bank account resolution is 100% free.
             </p>
           </div>
 
@@ -194,8 +195,7 @@ export default function PublicLandingPage() {
                 <tr>
                   <th className="py-3.5 px-5">Method & Endpoint</th>
                   <th className="py-3.5 px-5">Identity Service</th>
-                  <th className="py-3.5 px-5">Benchmark</th>
-                  <th className="py-3.5 px-5">Verixa Rate</th>
+                  <th className="py-3.5 px-5">Price</th>
                   <th className="py-3.5 px-5">Avg Latency</th>
                 </tr>
               </thead>
@@ -206,8 +206,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-verification</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Verification</td>
-                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦150</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦135 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦140 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 180ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -216,8 +215,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/bvn-verification</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">BVN Verification</td>
-                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦100</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦85 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦50 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 150ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -226,8 +224,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-phone</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Phone Search</td>
-                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦200</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦185 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦180 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 190ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -236,8 +233,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/bvn-phone</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">BVN Phone Search</td>
-                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦150</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦135 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦135 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 160ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -246,8 +242,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-demography</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Demography</td>
-                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦250</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦235 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦235 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 210ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -256,42 +251,38 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-tracking</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Tracking</td>
-                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦200</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦185 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦185 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 180ms</td>
+                </tr>
+                <tr className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs">
+                    <span className="text-sky-400 font-bold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20 mr-2">POST</span>
+                    <span className="text-zinc-300">/api/nin-slip</span>
+                  </td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white">Automated NIN Slip</td>
+                  <td className="py-3.5 px-5 font-sans text-sky-400 font-bold">₦270 / slip</td>
+                  <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 350ms</td>
+                </tr>
+                <tr className="bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs">
+                    <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                    <span className="text-zinc-300">/api/nuban-lookup</span>
+                  </td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white">NUBAN Resolution</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">Free</td>
+                  <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 120ms</td>
                 </tr>
                 <tr className="bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors">
                   <td className="py-3.5 px-5 font-mono text-xs">
                     <span className="text-sky-400 font-bold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20 mr-2">GET</span>
                     <span className="text-zinc-300">/api/balance</span>
                   </td>
-                  <td className="py-3.5 px-5 font-semibold font-sans text-white flex items-center gap-2">
-                    Account Balance
-                    <span className="text-[10px] font-sans font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                      FREE
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500">Free</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦0 (Free)</td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white">Account Balance</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">Free</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 40ms</td>
                 </tr>
               </tbody>
             </table>
-          </div>
-
-          {/* Cache Split Explanation Box */}
-          <div className="mt-6 p-6 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-900/40 flex flex-col sm:flex-row items-start gap-4">
-            <div className="h-9 w-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <div className="space-y-1">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white">How Cache Split Works</h4>
-              <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
-                Verixa operates high-performance cryptographic identity deduplication. When an identity record has been verified within your validity window, subsequent requests automatically utilize our intelligent Cache Split pipeline — eliminating upstream latency and reducing query overhead while preserving 100% NDPA regulatory integrity.
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -337,6 +328,8 @@ export default function PublicLandingPage() {
             </button>
             <Link href="/login" className="hover:text-slate-800 dark:hover:text-zinc-300">Sign In</Link>
             <Link href="/register" className="hover:text-slate-800 dark:hover:text-zinc-300">Create Account</Link>
+            <Link href="/terms" className="hover:text-slate-800 dark:hover:text-zinc-300">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-slate-800 dark:hover:text-zinc-300">Privacy Policy</Link>
             <a href="https://docs-verixa.esam.com.ng" target="_blank" rel="noreferrer" className="hover:text-slate-800 dark:hover:text-zinc-300">Documentation</a>
           </div>
         </div>

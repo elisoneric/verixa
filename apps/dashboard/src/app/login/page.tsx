@@ -38,11 +38,6 @@ export default function LoginPage() {
     }
   }
 
-  const fillDemoAccount = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail)
-    setPassword(demoPass)
-  }
-
   return (
     <div className="min-h-screen bg-[#06070a] text-zinc-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative font-sans selection:bg-emerald-500/25 selection:text-emerald-300">
       {/* Ambient glow in dark mode */}
@@ -59,7 +54,7 @@ export default function LoginPage() {
         <p className="mt-1 text-xs text-zinc-400">
           Or{" "}
           <Link href="/register" className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
-            create a new organization free
+            create a new account free
           </Link>
         </p>
       </div>
@@ -118,6 +113,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="!text-white !bg-[#121620] !border-white/[0.12] focus:!border-emerald-500"
               required
             />
 
@@ -126,6 +122,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="!text-white !bg-[#121620] !border-white/[0.12] focus:!border-emerald-500"
               required
             />
 
@@ -137,37 +134,12 @@ export default function LoginPage() {
               {isLoading ? "Signing in..." : "Sign In to Dashboard"}
             </button>
           </form>
-
-          {/* Demo Quick Fill Helper */}
-          <div className="mt-8 pt-6 border-t border-white/[0.08]">
-            <span className="block text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2 text-center">
-              Quick Test Credentials
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => fillDemoAccount("developer@verixaid.com", "Password123!")}
-                className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.2] hover:bg-white/[0.06] text-left text-xs transition-colors shadow-xs"
-              >
-                <div className="font-semibold text-zinc-200">Developer</div>
-                <div className="text-[10px] font-mono text-zinc-400">developer@verixaid.com</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemoAccount("admin@verixaid.com", "AdminPass123!")}
-                className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.2] hover:bg-white/[0.06] text-left text-xs transition-colors shadow-xs"
-              >
-                <div className="font-semibold text-rose-400">Super Admin</div>
-                <div className="text-[10px] font-mono text-zinc-400">admin@verixaid.com</div>
-              </button>
-            </div>
-          </div>
         </div>
 
         <p className="mt-6 text-center text-xs text-zinc-400">
-          Protected by bank-grade AES-256 encryption. By signing in, you agree to our{" "}
-          <AppLink app="www" path="/terms" className="underline hover:text-white">Terms</AppLink> and{" "}
-          <AppLink app="www" path="/privacy" className="underline hover:text-white">Privacy Policy</AppLink>.
+          By signing in, you agree to our{" "}
+          <Link href="/terms" className="underline hover:text-white">Terms of Service</Link> and{" "}
+          <Link href="/privacy" className="underline hover:text-white">Privacy Policy</Link>.
         </p>
       </div>
     </div>

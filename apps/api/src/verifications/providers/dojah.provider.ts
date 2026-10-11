@@ -10,6 +10,15 @@ import {
   BankAccountVerificationData, 
   PhoneNumberVerificationData,
   CacVerificationData,
+  TinVerificationData,
+  DriversLicenseVerificationData,
+  VotersCardVerificationData,
+  PassportVerificationData,
+  CreditScoreData,
+  FaceMatchData,
+  AmlScreeningData,
+  PhoneIntelligenceData,
+  EmailRiskData,
   NubanKycVerificationData,
   SmsDispatchData,
   AirtimePurchaseData,
@@ -329,7 +338,267 @@ export class DojahProvider implements IVerificationProvider {
         },
       };
     } catch (err: any) {
-      this.logger.error(`Dojah CAC lookup error: ${err?.message}`, err?.response?.data);
+      this.logger.error(`Upstream CAC lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async verifyTin(data: TinVerificationData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.verifyTin!(data);
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/kyc/tin`, {
+        params: { tin: data.tin },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 15000,
+      });
+
+      const entity = response.data?.entity || response.data || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Upstream TIN lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async verifyDriversLicense(data: DriversLicenseVerificationData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.verifyDriversLicense!(data);
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/kyc/dl`, {
+        params: { license_number: data.licenseNumber, dob: data.dob },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 18000,
+      });
+
+      const entity = response.data?.entity || response.data || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Upstream Driver's License lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async verifyVotersCard(data: VotersCardVerificationData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.verifyVotersCard!(data);
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/kyc/vin`, {
+        params: { vin: data.vin, state: data.state, last_name: data.lastName },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 18000,
+      });
+
+      const entity = response.data?.entity || response.data || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Upstream Voter's Card lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async verifyPassport(data: PassportVerificationData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.verifyPassport!(data);
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/kyc/passport`, {
+        params: { passport_number: data.passportNumber, last_name: data.lastName, dob: data.dob },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 20000,
+      });
+
+      const entity = response.data?.entity || response.data || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Upstream Passport lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async getCreditScore(data: CreditScoreData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.getCreditScore!(data);
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/credit/bvn`, {
+        params: { bvn: data.bvn, phone_number: data.phoneNumber },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 25000,
+      });
+
+      const entity = response.data?.entity || response.data || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Upstream Credit Score lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async verifyFaceMatch(data: FaceMatchData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.verifyFaceMatch!(data);
+    }
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/api/v1/kyc/photoid/verify`,
+        {
+          id_type: data.idType,
+          id_number: data.idNumber,
+          image: data.selfieImageBase64,
+        },
+        { headers: this.getHeaders(secretKey!, appId), timeout: 25000 }
+      );
+
+      const entity = response.data?.entity || response.data || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Upstream Face Match error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async screenAml(data: AmlScreeningData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.screenAml!(data);
+    }
+
+    try {
+      const response = await axios.post(
+        `${baseUrl}/api/v1/aml/screening`,
+        {
+          name: data.name,
+          date_of_birth: data.dob,
+          country: data.country || 'NG',
+        },
+        { headers: this.getHeaders(secretKey!, appId), timeout: 20000 }
+      );
+
+      const entity = response.data?.entity || response.data || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Upstream AML Screening error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async screenPhoneIntelligence(data: PhoneIntelligenceData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.screenPhoneIntelligence!(data);
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/kyc/phone_number`, {
+        params: { phone_number: data.phoneNumber },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 18000,
+      });
+
+      const entity = response.data?.entity || response.data || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Upstream Phone Intelligence error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async checkEmailRisk(data: EmailRiskData): Promise<VerificationResponse<any>> {
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      return this.mockProvider.checkEmailRisk!(data);
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/kyc/email`, {
+        params: { email: data.email },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 15000,
+      });
+
+      const entity = response.data?.entity || response.data || {};
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Upstream Email Risk error: ${err?.message}`, err?.response?.data);
       throw err;
     }
   }

@@ -24,9 +24,24 @@ export function Modal({
   maxWidth,
   size = "md",
 }: ModalProps) {
+  const modalRef = React.useRef<HTMLDivElement>(null)
+
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
+      if (e.key === "Escape") {
+        e.preventDefault()
+        onClose()
+      } else if (e.key === "Enter" && !e.shiftKey) {
+        // If Enter is pressed, trigger primary submit button in modal if not in textarea
+        const activeTag = document.activeElement?.tagName?.toLowerCase()
+        if (activeTag !== "textarea") {
+          const submitBtn = modalRef.current?.querySelector('button[type="submit"]') as HTMLButtonElement | null
+          if (submitBtn && !submitBtn.disabled) {
+            e.preventDefault()
+            submitBtn.click()
+          }
+        }
+      }
     }
     if (isOpen) {
       document.body.style.overflow = "hidden"
@@ -41,26 +56,30 @@ export function Modal({
   if (!isOpen) return null
 
   const effectiveSize = maxWidth || size || "md"
-  const maxWidthClasses = {
-    sm: "max-w-sm",
-    md: "max-w-md",
-    lg: "max-w-lg",
-    xl: "max-w-xl",
+  const maxWidthPixelMap: Record<string, string> = {
+    sm: "380px",
+    md: "480px",
+    lg: "600px",
+    xl: "720px",
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Modal Dialog */}
       <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        style={{ maxWidth: maxWidthPixelMap[effectiveSize] || "480px", width: "100%" }}
         className={cn(
-          "relative z-50 w-full rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 text-slate-900 dark:text-zinc-100 shadow-2xl transition-all duration-200",
-          maxWidthClasses[effectiveSize],
+          "relative z-50 w-full mx-auto my-auto rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 text-slate-900 dark:text-zinc-100 shadow-2xl transition-all duration-200",
           className
         )}
       >

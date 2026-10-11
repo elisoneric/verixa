@@ -59,6 +59,62 @@ export interface CacVerificationData {
   variant?: 'basic' | 'advance' | 'tin';
 }
 
+export interface TinVerificationData {
+  tin: string;
+  consent?: boolean;
+}
+
+export interface DriversLicenseVerificationData {
+  licenseNumber: string;
+  dob?: string;
+  consent?: boolean;
+}
+
+export interface VotersCardVerificationData {
+  vin: string;
+  state?: string;
+  lastName?: string;
+  consent?: boolean;
+}
+
+export interface PassportVerificationData {
+  passportNumber: string;
+  lastName?: string;
+  dob?: string;
+  consent?: boolean;
+}
+
+export interface CreditScoreData {
+  bvn: string;
+  phoneNumber?: string;
+  consent?: boolean;
+}
+
+export interface FaceMatchData {
+  idType: 'BVN' | 'NIN';
+  idNumber: string;
+  selfieImageBase64: string;
+  livenessCheck?: boolean;
+  consent?: boolean;
+}
+
+export interface AmlScreeningData {
+  name: string;
+  dob?: string;
+  country?: string;
+  consent?: boolean;
+}
+
+export interface PhoneIntelligenceData {
+  phoneNumber: string;
+  consent?: boolean;
+}
+
+export interface EmailRiskData {
+  email: string;
+  consent?: boolean;
+}
+
 export interface NubanKycVerificationData {
   accountNumber: string;
   bankCode: string;
@@ -100,6 +156,15 @@ export interface IVerificationProvider {
   verifyBankAccount(data: BankAccountVerificationData): Promise<VerificationResponse<any>>;
   verifyPhoneNumber?(data: PhoneNumberVerificationData): Promise<VerificationResponse<any>>;
   verifyCac?(data: CacVerificationData): Promise<VerificationResponse<any>>;
+  verifyTin?(data: TinVerificationData): Promise<VerificationResponse<any>>;
+  verifyDriversLicense?(data: DriversLicenseVerificationData): Promise<VerificationResponse<any>>;
+  verifyVotersCard?(data: VotersCardVerificationData): Promise<VerificationResponse<any>>;
+  verifyPassport?(data: PassportVerificationData): Promise<VerificationResponse<any>>;
+  getCreditScore?(data: CreditScoreData): Promise<VerificationResponse<any>>;
+  verifyFaceMatch?(data: FaceMatchData): Promise<VerificationResponse<any>>;
+  screenAml?(data: AmlScreeningData): Promise<VerificationResponse<any>>;
+  screenPhoneIntelligence?(data: PhoneIntelligenceData): Promise<VerificationResponse<any>>;
+  checkEmailRisk?(data: EmailRiskData): Promise<VerificationResponse<any>>;
   verifyNubanKycStatus?(data: NubanKycVerificationData): Promise<VerificationResponse<any>>;
   sendSms?(data: SmsDispatchData): Promise<any>;
   purchaseAirtime?(data: AirtimePurchaseData): Promise<any>;

@@ -53,6 +53,12 @@ export class Organization {
     verifiedAt?: string;
     upgradedAt?: string;
     authProvider?: string;
+    dva?: {
+      bankName?: string;
+      accountNumber?: string;
+      accountName?: string;
+      provisionedAt?: string;
+    };
   };
 
   @OneToMany(() => User, user => user.organization)
