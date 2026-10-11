@@ -28,7 +28,7 @@ export default function EnvironmentsDocsPage() {
           <TableRow>
             <TableCell className="font-semibold text-white">Identity Data Source</TableCell>
             <TableCell className="text-zinc-300">Mock Nigerian Data Generator</TableCell>
-            <TableCell className="text-emerald-400 font-semibold">Authorised Official Registries</TableCell>
+            <TableCell className="text-emerald-400 font-semibold">Live Upstream Registries</TableCell>
           </TableRow>
           <TableRow>
             <TableCell className="font-semibold text-white">Billing Deductions</TableCell>

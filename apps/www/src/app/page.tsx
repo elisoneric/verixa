@@ -651,7 +651,7 @@ func main() {
                       <div className="text-zinc-400 text-xs mt-0.5">/api/nin-verification</div>
                     </td>
                     <td className="py-4 px-4 text-zinc-400">
-                      Official NIMC national ID validation, vNIN lookup, real-time match
+                      National ID validation, vNIN lookup, real-time match
                     </td>
                     <td className="py-4 px-4 font-sans text-zinc-300">sub-180ms · 99.9%</td>
                     <td className="py-4 px-4 font-sans">

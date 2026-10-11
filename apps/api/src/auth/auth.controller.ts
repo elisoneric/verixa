@@ -21,7 +21,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('google')
   googleLogin(@Body() body: any) {
-    return this.authService.googleAuth(body.email, body.name, body.credential);
+    return this.authService.googleAuth(body.credential);
   }
 
   @UseGuards(JwtAuthGuard)

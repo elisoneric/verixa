@@ -303,7 +303,7 @@ export default function ManualVerifyPage() {
             {isLoading && (
               <div className="py-20 flex flex-col items-center justify-center text-zinc-400 gap-3">
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-                <span className="text-xs font-mono">Querying official registry...</span>
+                <span className="text-xs font-mono">Querying verification registry...</span>
               </div>
             )}
 

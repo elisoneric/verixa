@@ -11,9 +11,9 @@ interface AuthContextType {
   balance: BalanceData | null
   isLoading: boolean
   setEnvironment: (env: "sandbox" | "live") => void
-  login: (email: string, pass: string) => Promise<void>
-  loginWithGoogle: (email?: string, name?: string) => Promise<void>
-  register: (email: string, pass: string, orgName: string, complianceData?: any) => Promise<void>
+  login: (email: string, pass: string, redirectUrl?: string) => Promise<void>
+  loginWithGoogle: (credential: string, redirectUrl?: string) => Promise<void>
+  register: (email: string, pass: string, orgName: string, complianceData?: any, redirectUrl?: string) => Promise<void>
   logout: () => void
   refreshBalance: () => Promise<void>
 }
@@ -69,31 +69,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("vrx_env", env)
   }
 
-  const login = async (email: string, pass: string) => {
+  const login = async (email: string, pass: string, redirectUrl?: string) => {
     const res = await ApiClient.login(email, pass)
     localStorage.setItem("vrx_token", res.access_token)
     setToken(res.access_token)
     setUser(res.user)
     await refreshBalance()
-    router.push("/dashboard")
+    router.push(redirectUrl || "/dashboard")
   }
 
-  const loginWithGoogle = async (email?: string, name?: string) => {
-    const res = await ApiClient.googleLogin(email, name)
+  const loginWithGoogle = async (credential: string, redirectUrl?: string) => {
+    const res = await ApiClient.googleLogin(credential)
     localStorage.setItem("vrx_token", res.access_token)
     setToken(res.access_token)
     setUser(res.user)
     await refreshBalance()
-    router.push("/dashboard")
+    router.push(redirectUrl || "/dashboard")
   }
 
-  const register = async (email: string, pass: string, orgName: string, complianceData?: any) => {
+  const register = async (email: string, pass: string, orgName: string, complianceData?: any, redirectUrl?: string) => {
     const res = await ApiClient.register(email, pass, orgName, complianceData)
     localStorage.setItem("vrx_token", res.access_token)
     setToken(res.access_token)
     setUser(res.user)
     await refreshBalance()
-    router.push("/dashboard")
+    router.push(redirectUrl || "/dashboard")
   }
 
   const logout = () => {

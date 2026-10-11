@@ -15,8 +15,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Verixa — Identity Verification & Official NIN Slip Engine",
-  description: "Enterprise identity, KYC verification, and official NIMC NIN slip engine for Nigerian businesses",
+  title: "Verixa — Identity Verification & KYC Infrastructure",
+  description: "Developer-first identity verification, KYC lookup, and automated slip generation for fintech, betting, and digital commerce",
 };
 
 export default function RootLayout({

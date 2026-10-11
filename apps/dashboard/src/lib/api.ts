@@ -43,7 +43,7 @@ export interface BalanceData {
     accountName: string
     status: string
     note: string
-  }
+  } | null
   tier?: "STARTER" | "GROWTH" | "ENTERPRISE" | "CUSTOM"
   rates?: {
     bvn: number
@@ -120,10 +120,10 @@ export class ApiClient {
     })
   }
 
-  static async googleLogin(email?: string, name?: string, credential?: string) {
+  static async googleLogin(credential: string) {
     return this.request<{ access_token: string; user: ApiUser }>("/auth/google", {
       method: "POST",
-      body: JSON.stringify({ email, name, credential }),
+      body: JSON.stringify({ credential }),
     })
   }
 

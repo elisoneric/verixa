@@ -11,6 +11,7 @@ import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { PaystackService } from '../billing/paystack.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -91,8 +92,7 @@ export class AuthService {
 
     // Async tasks after successful DB commit
     try {
-      const customerCode = await this.paystackService.createCustomer(email, orgName);
-      await this.paystackService.createDedicatedAccount(customerCode);
+      await this.paystackService.createCustomer(email, orgName);
       await this.notificationsService.sendWelcomeEmail(email, orgName);
     } catch (e) {
       console.error('Failed to run post-registration hooks', e);
@@ -131,9 +131,33 @@ export class AuthService {
     };
   }
 
-  async googleAuth(email?: string, name?: string, credential?: string) {
-    const userEmail = email || 'developer@gmail.com';
-    const orgName = name ? `${name}'s Org` : 'Google Workspace Org';
+  async googleAuth(credential?: string) {
+    if (!credential) {
+      throw new UnauthorizedException('Missing Google credential ID token.');
+    }
+
+    let googlePayload: any;
+    try {
+      const response = await axios.get(
+        `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`,
+        { timeout: 8000 }
+      );
+      googlePayload = response.data;
+    } catch (err: any) {
+      throw new UnauthorizedException('Failed to verify Google ID token with Google OAuth.');
+    }
+
+    if (!googlePayload || !googlePayload.email) {
+      throw new UnauthorizedException('Invalid Google token payload.');
+    }
+
+    const expectedClientId = process.env.GOOGLE_CLIENT_ID;
+    if (expectedClientId && googlePayload.aud !== expectedClientId) {
+      throw new UnauthorizedException('Google token audience does not match configured GOOGLE_CLIENT_ID.');
+    }
+
+    const userEmail = googlePayload.email.toLowerCase();
+    const orgName = googlePayload.name ? `${googlePayload.name}'s Organization` : `${userEmail.split('@')[0]}'s Organization`;
 
     let user = await this.userRepository.findOne({ where: { email: userEmail } });
     let orgId: string;

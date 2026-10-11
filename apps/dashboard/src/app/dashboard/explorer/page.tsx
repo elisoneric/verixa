@@ -29,7 +29,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     path: "/api/nin-verification",
     benchmark: "₦150",
     verixaRate: "₦135",
-    description: "Official National Identity Number lookup directly against NIMC database.",
+    description: "National Identity Number verification lookup.",
     defaultPayload: {
       nin: "11234567890",
       consent: true,
@@ -99,7 +99,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     path: "/api/nin-tracking",
     benchmark: "₦200",
     verixaRate: "₦185",
-    description: "Track official NIMC slip issuance and demographic status by tracking ID.",
+    description: "Track slip issuance and demographic status by tracking ID.",
     defaultPayload: {
       tracking_id: "TRK-982183719",
       consent: true,
@@ -172,7 +172,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     path: "/api/drivers-license",
     benchmark: "₦180",
     verixaRate: "₦160",
-    description: "FRSC driver's license record verification, expiry status, and official license photo.",
+    description: "FRSC driver's license record verification, expiry status, and license photo.",
     defaultPayload: {
       license_number: "AAA001928374",
       date_of_birth: "1988-04-14",

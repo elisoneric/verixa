@@ -73,18 +73,18 @@ export default function PublicLandingPage() {
         <div className="max-w-5xl mx-auto px-6 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            Identity Verification & Biometric Engine
+            Developer Identity & KYC APIs
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
             Fast, Reliable Identity Verification &{" "}
             <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
-              Official NIMC Slips
+              Standardized PDF Slips
             </span>
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-            Real-time NIN verification, official NIMC biometric slip generation, BVN validation, and bank account resolution for Nigerian businesses and fintechs.
+            Real-time identity verification, KYC lookup, automated PDF slip generation, and bank account resolution built for fintechs, betting platforms, digital lenders, and fraud prevention teams.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -125,7 +125,7 @@ export default function PublicLandingPage() {
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">NIN Advance Verification</h3>
               <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
-                Retrieve verified registry demographics, residential address, telephone, tracking ID, and official portrait photo.
+                Retrieve verified demographics, residential address, telephone, tracking ID, and portrait image.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
                 ₦140 / query
@@ -138,7 +138,7 @@ export default function PublicLandingPage() {
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Automated NIN Slip Engine</h3>
               <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
-                Generate high-resolution A4 dual-slip PDF and editable Word (.docx) slips adhering to official NIMC paper specifications.
+                Generate high-resolution A4 dual-slip PDF and editable Word (.docx) slips adhering to standard paper specifications.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-sky-600 dark:text-sky-400">
                 ₦270 / slip

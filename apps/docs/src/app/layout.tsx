@@ -16,7 +16,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: "Verixa ID Documentation — Developer API Reference",
-  description: "Official integration guides, API schemas, and SDKs for BVN, NIN, and Bank Account verification.",
+  description: "Developer integration guides, API schemas, and SDKs for BVN, NIN, and Bank Account verification.",
 };
 
 export default function RootLayout({

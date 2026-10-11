@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SystemConfig } from '../admin/entities/system-config.entity';
@@ -59,15 +59,9 @@ export class PaystackService {
 
   async createDedicatedAccount(customerCode: string, options?: { nin?: string; phone?: string; orgName?: string }) {
     const key = await this.getSecretKey();
-    const fallbackAcc = options?.phone ? '99' + options.phone.replace(/\D/g, '').slice(-8) : '9940182741';
-    const fallbackName = options?.orgName ? `${options.orgName} / Settlement` : 'Verixa ID / Settlement';
 
     if (!key || key.startsWith('sk_test_mock')) {
-      return {
-        bank: 'Titan Trust Bank',
-        accountName: fallbackName,
-        accountNumber: fallbackAcc,
-      };
+      throw new BadRequestException('Paystack Dedicated Virtual Account provisioning requires active live Paystack credentials. Please configure PAYSTACK_SECRET_KEY in production.');
     }
     try {
       const response = await axios.post(
@@ -77,16 +71,13 @@ export class PaystackService {
       );
       return {
         bank: response.data?.data?.bank?.name || 'Titan Trust Bank',
-        accountName: response.data?.data?.account_name || fallbackName,
-        accountNumber: response.data?.data?.account_number || fallbackAcc,
+        accountName: response.data?.data?.account_name || (options?.orgName ? `${options.orgName} / Settlement` : 'Verixa ID / Settlement'),
+        accountNumber: response.data?.data?.account_number,
       };
     } catch (error: any) {
       this.logger.error('Failed to create DVA', error?.response?.data || error.message);
-      return {
-        bank: 'Titan Trust Bank',
-        accountName: fallbackName,
-        accountNumber: fallbackAcc,
-      };
+      const errMsg = error?.response?.data?.message || 'Failed to create Dedicated Virtual Account with Paystack. Please verify customer KYC and live credentials.';
+      throw new BadRequestException(errMsg);
     }
   }
 

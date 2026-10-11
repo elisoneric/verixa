@@ -51,7 +51,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     {
       id: "nav-slips",
       title: "NIN Slip Generator",
-      subtitle: "Generate official NIMC PDF & Word slips",
+      subtitle: "Generate standard PDF & Word slips",
       category: "Verification",
       shortcut: "G S",
       onSelect: () => router.push("/dashboard/slips"),

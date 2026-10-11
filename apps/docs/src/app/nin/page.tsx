@@ -12,7 +12,7 @@ export default function NinDocsPage() {
           National Identification Number (NIN)
         </h1>
         <p className="mt-2 text-base text-zinc-400 leading-relaxed">
-          Verify an 11-digit NIN and retrieve official citizen demographic and residency details.
+          Verify an 11-digit NIN and retrieve citizen demographic and residency details.
         </p>
       </div>
 

@@ -39,9 +39,24 @@ export class DojahProvider implements IVerificationProvider {
   ) {}
 
   private getCredentials(): { appId: string | null; secretKey: string | null; baseUrl: string } {
-    const appId = this.adminService.getConfig('vx_APP_ID') || process.env.vx_APP_ID || null;
-    const secretKey = this.adminService.getConfig('vx_SECRET_KEY') || process.env.vx_SECRET_KEY || null;
-    const isSandbox = (this.adminService.getConfig('vx_ENVIRONMENT') || process.env.vx_ENVIRONMENT) === 'sandbox';
+    const appId =
+      this.adminService.getConfig('DOJAH_APP_ID') ||
+      this.adminService.getConfig('vx_APP_ID') ||
+      process.env.DOJAH_APP_ID ||
+      process.env.vx_APP_ID ||
+      null;
+    const secretKey =
+      this.adminService.getConfig('DOJAH_SECRET_KEY') ||
+      this.adminService.getConfig('vx_SECRET_KEY') ||
+      process.env.DOJAH_SECRET_KEY ||
+      process.env.vx_SECRET_KEY ||
+      null;
+    const envVal =
+      this.adminService.getConfig('DOJAH_ENVIRONMENT') ||
+      this.adminService.getConfig('vx_ENVIRONMENT') ||
+      process.env.DOJAH_ENVIRONMENT ||
+      process.env.vx_ENVIRONMENT;
+    const isSandbox = envVal === 'sandbox';
     const baseUrl = isSandbox ? 'https://sandbox.dojah.io' : 'https://api.dojah.io';
     return { appId, secretKey, baseUrl };
   }

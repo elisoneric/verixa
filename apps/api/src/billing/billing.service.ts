@@ -188,14 +188,14 @@ export class BillingService {
         balance: sandboxWallet ? Number(sandboxWallet.balance) : 0,
         currency: 'NGX',
       },
-      dedicatedVirtualAccount: {
-        bankName: orgDva?.bankName || 'Titan Trust Bank',
-        accountNumber: orgDva?.accountNumber || '9940182741',
-        accountName: orgDva?.accountName || (org?.name ? `${org.name} / Settlement` : 'Verixa ID / Settlement'),
+      dedicatedVirtualAccount: orgDva?.accountNumber ? {
+        bankName: orgDva.bankName || 'Dedicated Virtual Account',
+        accountNumber: orgDva.accountNumber,
+        accountName: orgDva.accountName || `${org?.name || 'Verixa'} / Settlement`,
         status: 'active',
         note: 'Funds transferred to this account auto-credit your Live NGX balance instantly via Paystack.',
-        isCustom: Boolean(orgDva?.accountNumber),
-      },
+        isCustom: true,
+      } : null,
       tier: org?.tier || OrganizationTier.STARTER,
       rates: {
         bvn: bvnLive.effectiveRate,

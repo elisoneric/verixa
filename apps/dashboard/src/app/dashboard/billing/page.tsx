@@ -24,13 +24,7 @@ export default function BillingPage() {
       ? balance?.live.balance ?? 0
       : balance?.sandbox.balance ?? 100000
 
-  const dva = balance?.dedicatedVirtualAccount || {
-    bankName: "Titan Trust Bank",
-    accountNumber: "9940182741",
-    accountName: "Verixa ID / Settlement",
-    status: "active",
-    note: "Transfers to this dedicated bank account automatically credit your live NGX balance.",
-  }
+  const dva = balance?.dedicatedVirtualAccount;
 
   const tier = balance?.tier || "STARTER"
 
@@ -213,57 +207,91 @@ export default function BillingPage() {
 
         {/* Dedicated Virtual Account (DVA) Card */}
         <Card className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 flex flex-col justify-between shadow-xl backdrop-blur-xl rounded-2xl">
-          <div>
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-4">
-              <div>
-                <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">PAYSTACK DEDICATED ACCOUNT</span>
-                <h4 className="text-sm font-bold text-white">{dva.bankName}</h4>
+          {dva ? (
+            <div>
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-4">
+                <div>
+                  <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">PAYSTACK DEDICATED ACCOUNT</span>
+                  <h4 className="text-sm font-bold text-white">{dva.bankName}</h4>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="verified" size="sm">AUTO-CREDIT</Badge>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="verified" size="sm">AUTO-CREDIT</Badge>
+
+              <div className="space-y-3">
+                <div>
+                  <span className="text-xs text-zinc-400">Dedicated Account Number</span>
+                  <div className="mt-1 flex items-center gap-3">
+                    <span className="font-mono text-2xl font-bold text-white tracking-widest">
+                      {dva.accountNumber}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="xs"
+                      onClick={() => {
+                        navigator.clipboard.writeText(dva.accountNumber)
+                        alert("Account number copied!")
+                      }}
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-xs text-zinc-400">Account Beneficiary</span>
+                  <p className="text-xs font-semibold text-zinc-200">{dva.accountName}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/[0.08] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <p className="text-[11px] text-zinc-400">
+                  {dva.note}
+                </p>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={() => setProvisionModalOpen(true)}
+                  className="shrink-0 text-[11px]"
+                >
+                  Update NIN / Phone &rarr;
+                </Button>
               </div>
             </div>
-
-            <div className="space-y-3">
+          ) : (
+            <div className="flex flex-col justify-between h-full">
               <div>
-                <span className="text-xs text-zinc-400">Dedicated Account Number</span>
-                <div className="mt-1 flex items-center gap-3">
-                  <span className="font-mono text-2xl font-bold text-white tracking-widest">
-                    {dva.accountNumber}
-                  </span>
+                <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-4">
+                  <div>
+                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">PAYSTACK DEDICATED ACCOUNT</span>
+                    <h4 className="text-sm font-bold text-white">Direct Virtual Account Funding</h4>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="neutral" size="sm">NOT PROVISIONED</Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    Automate live wallet funding via direct bank transfer. Provision a dedicated virtual bank account with applicant NIN and phone number.
+                  </p>
                   <Button
-                    variant="outline"
-                    size="xs"
-                    onClick={() => {
-                      navigator.clipboard.writeText(dva.accountNumber)
-                      alert("Account number copied!")
-                    }}
+                    variant="emerald"
+                    size="sm"
+                    onClick={() => setProvisionModalOpen(true)}
+                    className="mt-2 font-semibold"
                   >
-                    Copy
+                    + Provision Dedicated Account
                   </Button>
                 </div>
               </div>
 
-              <div>
-                <span className="text-xs text-zinc-400">Account Beneficiary</span>
-                <p className="text-xs font-semibold text-zinc-200">{dva.accountName}</p>
+              <div className="mt-6 pt-3 border-t border-white/[0.08] text-[11px] text-zinc-400">
+                Transfers auto-credit your Live NGX balance instantly via Paystack.
               </div>
             </div>
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-white/[0.08] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <p className="text-[11px] text-zinc-400">
-              {dva.note}
-            </p>
-            <Button
-              variant="outline"
-              size="xs"
-              onClick={() => setProvisionModalOpen(true)}
-              className="shrink-0 text-[11px]"
-            >
-              Verify NIN / Phone &rarr;
-            </Button>
-          </div>
+          )}
         </Card>
       </div>
 
@@ -431,7 +459,7 @@ export default function BillingPage() {
                 className="mt-0.5 h-4 w-4 rounded border-white/[0.2] bg-black/40 text-emerald-500 focus:ring-emerald-500"
               />
               <span className="text-xs text-zinc-300 leading-relaxed">
-                I give consent to Verixa to verify my NIN and phone number with official registries to provision a Dedicated Virtual Account with Paystack in compliance with the Nigeria Data Protection Act (NDPA 2023).
+                I give consent to Verixa to verify my NIN and phone number for identity compliance to provision a Dedicated Virtual Account with Paystack in compliance with the Nigeria Data Protection Act (NDPA 2023).
               </span>
             </label>
           </div>
@@ -466,43 +494,66 @@ export default function BillingPage() {
       >
         <div className="space-y-4 mt-2">
           {/* Primary Recommended Method: Dedicated Account */}
-          <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-emerald-400">RECOMMENDED: AUTOMATED BANK TRANSFER</span>
-              <Badge variant="verified" size="sm">INSTANT CREDIT</Badge>
-            </div>
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              Transfer directly from your bank app or USSD to your Paystack Dedicated Account. Your live NGX balance is auto-credited immediately upon settlement:
-            </p>
-            <div className="p-3 rounded-lg bg-[#0e1118] border border-white/[0.08] space-y-2">
+          {dva ? (
+            <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 space-y-2">
               <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] text-zinc-400 block uppercase font-mono">Bank Name</span>
-                  <span className="text-xs font-bold text-white">{dva.bankName}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-zinc-400 block uppercase font-mono">Beneficiary</span>
-                  <span className="text-xs font-semibold text-zinc-300">{dva.accountName}</span>
-                </div>
+                <span className="text-xs font-mono font-bold text-emerald-400">RECOMMENDED: AUTOMATED BANK TRANSFER</span>
+                <Badge variant="verified" size="sm">INSTANT CREDIT</Badge>
               </div>
-              <div className="pt-2 flex items-center justify-between border-t border-white/[0.08]">
-                <div>
-                  <span className="text-[10px] text-zinc-400 block uppercase font-mono">Dedicated Account</span>
-                  <span className="font-mono text-base font-extrabold text-emerald-400 tracking-wider">{dva.accountNumber}</span>
+              <p className="text-xs text-zinc-300 leading-relaxed">
+                Transfer directly from your bank app or USSD to your Paystack Dedicated Account. Your live NGX balance is auto-credited immediately upon settlement:
+              </p>
+              <div className="p-3 rounded-lg bg-[#0e1118] border border-white/[0.08] space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-zinc-400 block uppercase font-mono">Bank Name</span>
+                    <span className="text-xs font-bold text-white">{dva.bankName}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-zinc-400 block uppercase font-mono">Beneficiary</span>
+                    <span className="text-xs font-semibold text-zinc-300">{dva.accountName}</span>
+                  </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="xs"
-                  onClick={() => {
-                    navigator.clipboard.writeText(dva.accountNumber)
-                    alert(`Account number ${dva.accountNumber} copied to clipboard!`)
-                  }}
-                >
-                  Copy Number
-                </Button>
+                <div className="pt-2 flex items-center justify-between border-t border-white/[0.08]">
+                  <div>
+                    <span className="text-[10px] text-zinc-400 block uppercase font-mono">Dedicated Account</span>
+                    <span className="font-mono text-base font-extrabold text-emerald-400 tracking-wider">{dva.accountNumber}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    onClick={() => {
+                      navigator.clipboard.writeText(dva.accountNumber)
+                      alert(`Account number ${dva.accountNumber} copied to clipboard!`)
+                    }}
+                  >
+                    Copy Number
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-950/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-amber-400">AUTOMATED BANK TRANSFER</span>
+                <Badge variant="neutral" size="sm">NOT PROVISIONED</Badge>
+              </div>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                You do not have a dedicated virtual account provisioned yet. Provision your account to enable instant bank transfers, or fund via card below.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full mt-1 border-amber-500/30 text-amber-300 hover:bg-amber-500/10"
+                onClick={() => {
+                  setTopupModalOpen(false)
+                  setProvisionModalOpen(true)
+                }}
+              >
+                + Provision Dedicated Account
+              </Button>
+            </div>
+          )}
 
           {/* Secondary Method: Online Paystack */}
           <form onSubmit={handleTopupCheckout} className="space-y-3 pt-2 border-t border-white/[0.08]">

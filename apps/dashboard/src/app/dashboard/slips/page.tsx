@@ -156,7 +156,7 @@ export default function NinSlipGeneratorPage() {
               className="h-4 w-4 rounded border-white/[0.2] bg-black/40 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
             />
             <label htmlFor="consentCheckbox" className="text-xs text-zinc-400 select-none cursor-pointer">
-              I confirm applicant consent has been obtained for official identity retrieval.
+              I confirm applicant consent has been obtained for identity verification and slip generation.
             </label>
           </div>
 

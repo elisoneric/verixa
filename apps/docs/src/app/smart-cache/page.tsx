@@ -32,7 +32,7 @@ export default function SmartCacheDocsPage() {
             </div>
             <h4 className="text-sm font-bold text-white">Live Upstream Query</h4>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              When an identity is verified for the first time, Verixa routes the request to authorized official registries (NIMC / NIBSS Primary Registries). The verified payload is stored in Verixa's tenant-isolated in-memory Redis cache with a 30-day retention window. Billed at standard live rate (₦50).
+              When an identity is verified for the first time, Verixa routes the request to authorized upstream verification registries. The verified payload is stored in Verixa's tenant-isolated in-memory Redis cache with a 30-day retention window. Billed at standard live rate (₦50).
             </p>
           </div>
 
@@ -129,7 +129,7 @@ export default function SmartCacheDocsPage() {
       <div className="space-y-4">
         <h2 className="text-lg font-bold text-white tracking-tight">Forcing a Fresh Live Lookup (Cache Bypass)</h2>
         <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-          If you need to guarantee that data is re-queried directly from official government registries (for example, during annual AML re-kyc reviews), include the <code className="text-emerald-400">X-Bypass-Cache: true</code> HTTP header.
+          If you need to guarantee that data is re-queried directly from upstream verification registries (for example, during annual AML re-kyc reviews), include the <code className="text-emerald-400">X-Bypass-Cache: true</code> HTTP header.
         </p>
 
         <CodeBlock
