@@ -106,7 +106,7 @@ export default function AdminOverviewPage() {
               {(metrics.upstreamCallsSaved || metrics.cachedVerifications || 0).toLocaleString()}
             </span>
           </div>
-          <span className="mt-4 block text-xs text-slate-400 dark:text-zinc-500 font-mono">Dojah/SmileID calls avoided</span>
+          <span className="mt-4 block text-xs text-slate-400 dark:text-zinc-500 font-mono">Registry calls avoided</span>
         </Card>
 
         <Card className="p-6 bg-white dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 shadow-xs">
@@ -160,7 +160,7 @@ export default function AdminOverviewPage() {
 
           <Card className="p-5 bg-white dark:bg-zinc-900/50 border border-slate-200 dark:border-zinc-800 space-y-2 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-900 dark:text-white text-sm">Dojah Upstream KYC</span>
+              <span className="font-semibold text-slate-900 dark:text-white text-sm">Primary Gateway KYC</span>
               <Badge variant="neutral" size="sm">STANDBY</Badge>
             </div>
             <p className="text-xs text-slate-500 dark:text-zinc-400 font-mono">Dynamic fallback configured</p>

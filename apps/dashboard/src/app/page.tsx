@@ -26,12 +26,12 @@ export default function PublicLandingPage() {
             <a href="https://docs-verixa.esam.com.ng" target="_blank" rel="noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">API Docs</a>
           </nav>
 
-          <div className="flex items-center gap-3">
-            {/* Theme Switcher Button */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Theme Switcher Button - Desktop Only (Hidden on Mobile to keep header clean and uncluttered) */}
             <button
               onClick={toggleTheme}
               title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-              className="flex items-center justify-center h-10 w-10 rounded-lg border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors shadow-2xs cursor-pointer"
+              className="hidden md:flex items-center justify-center h-9 w-9 rounded-full border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-white/[0.04] text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors shadow-2xs cursor-pointer"
             >
               {theme === "light" ? (
                 <svg className="w-4 h-4 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -46,19 +46,19 @@ export default function PublicLandingPage() {
 
             {token ? (
               <Link href="/dashboard">
-                <Button variant="emerald" size="md" className="font-semibold h-10 px-5">
-                  Open Dashboard &rarr;
+                <Button variant="emerald" size="sm" className="font-semibold h-9 px-4">
+                  Dashboard &rarr;
                 </Button>
               </Link>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="outline" size="md" className="font-semibold h-10 px-4">
+                  <Button variant="outline" size="sm" className="font-semibold h-9 px-3 sm:px-4">
                     Sign In
                   </Button>
                 </Link>
-                <Link href="/register">
-                  <Button variant="emerald" size="md" className="font-semibold h-10 px-5">
+                <Link href="/register" className="hidden sm:inline-block">
+                  <Button variant="emerald" size="sm" className="font-semibold h-9 px-4">
                     Create Account
                   </Button>
                 </Link>
@@ -188,45 +188,92 @@ export default function PublicLandingPage() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 overflow-hidden shadow-xs">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0e14]/70 backdrop-blur-xl overflow-hidden shadow-2xl">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-slate-50 dark:bg-zinc-950/80 border-b border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 uppercase font-mono text-[11px]">
+              <thead className="bg-[#0e1118]/90 border-b border-white/[0.08] text-zinc-400 uppercase font-mono text-[11px]">
                 <tr>
-                  <th className="py-4 px-6">Identity Service</th>
-                  <th className="py-4 px-6">Live Query Rate</th>
-                  <th className="py-4 px-6">Intelligent Cache</th>
-                  <th className="py-4 px-6">Avg Latency</th>
+                  <th className="py-3.5 px-5">Method & Endpoint</th>
+                  <th className="py-3.5 px-5">Identity Service</th>
+                  <th className="py-3.5 px-5">Benchmark</th>
+                  <th className="py-3.5 px-5">Verixa Rate</th>
+                  <th className="py-3.5 px-5">Avg Latency</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60 font-mono">
-                <tr className="bg-emerald-50/30 dark:bg-emerald-950/10">
-                  <td className="py-4 px-6 font-semibold font-sans text-slate-900 dark:text-white flex items-center gap-2">
-                    Bank Account NUBAN Resolution
-                    <span className="text-[10px] font-sans font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
-                      FREE NOW
+              <tbody className="divide-y divide-white/[0.06]">
+                <tr className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs">
+                    <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                    <span className="text-zinc-300">/api/nin-verification</span>
+                  </td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Verification</td>
+                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦150</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦135 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 180ms</td>
+                </tr>
+                <tr className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs">
+                    <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                    <span className="text-zinc-300">/api/bvn-verification</span>
+                  </td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white">BVN Verification</td>
+                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦100</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦85 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 150ms</td>
+                </tr>
+                <tr className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs">
+                    <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                    <span className="text-zinc-300">/api/nin-phone</span>
+                  </td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Phone Search</td>
+                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦200</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦185 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 190ms</td>
+                </tr>
+                <tr className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs">
+                    <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                    <span className="text-zinc-300">/api/bvn-phone</span>
+                  </td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white">BVN Phone Search</td>
+                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦150</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦135 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 160ms</td>
+                </tr>
+                <tr className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs">
+                    <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                    <span className="text-zinc-300">/api/nin-demography</span>
+                  </td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Demography</td>
+                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦250</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦235 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 210ms</td>
+                </tr>
+                <tr className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs">
+                    <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                    <span className="text-zinc-300">/api/nin-tracking</span>
+                  </td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Tracking</td>
+                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500 line-through">₦200</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦185 <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 ml-1">-₦15</span></td>
+                  <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 180ms</td>
+                </tr>
+                <tr className="bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors">
+                  <td className="py-3.5 px-5 font-mono text-xs">
+                    <span className="text-sky-400 font-bold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20 mr-2">GET</span>
+                    <span className="text-zinc-300">/api/balance</span>
+                  </td>
+                  <td className="py-3.5 px-5 font-semibold font-sans text-white flex items-center gap-2">
+                    Account Balance
+                    <span className="text-[10px] font-sans font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      FREE
                     </span>
                   </td>
-                  <td className="py-4 px-6 text-emerald-600 font-bold">₦0.00</td>
-                  <td className="py-4 px-6 text-slate-600 dark:text-zinc-400">Cache Split Included</td>
-                  <td className="py-4 px-6 text-slate-400">&lt; 120ms</td>
-                </tr>
-                <tr>
-                  <td className="py-4 px-6 font-semibold font-sans text-slate-900 dark:text-white">NIN Advance Verification</td>
-                  <td className="py-4 px-6 text-emerald-600 font-bold">₦140</td>
-                  <td className="py-4 px-6 text-slate-600 dark:text-zinc-400">Cache Split Enabled</td>
-                  <td className="py-4 px-6 text-slate-400">&lt; 180ms</td>
-                </tr>
-                <tr>
-                  <td className="py-4 px-6 font-semibold font-sans text-slate-900 dark:text-white">Official NIN Slip (Standard & Premium)</td>
-                  <td className="py-4 px-6 text-emerald-600 font-bold">₦270</td>
-                  <td className="py-4 px-6 text-slate-600 dark:text-zinc-400">Cache Split Enabled</td>
-                  <td className="py-4 px-6 text-slate-400">&lt; 250ms</td>
-                </tr>
-                <tr>
-                  <td className="py-4 px-6 font-semibold font-sans text-slate-900 dark:text-white">BVN Validation Match</td>
-                  <td className="py-4 px-6 text-emerald-600 font-bold">₦50</td>
-                  <td className="py-4 px-6 text-slate-600 dark:text-zinc-400">Cache Split Enabled</td>
-                  <td className="py-4 px-6 text-slate-400">&lt; 150ms</td>
+                  <td className="py-3.5 px-5 font-sans text-xs text-zinc-500">Free</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦0 (Free)</td>
+                  <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 40ms</td>
                 </tr>
               </tbody>
             </table>
@@ -266,8 +313,29 @@ export default function PublicLandingPage() {
       <footer className="mt-auto border-t border-slate-200 dark:border-zinc-800/80 py-8 bg-slate-100 dark:bg-zinc-950 text-slate-500 text-xs">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>© {new Date().getFullYear()} Verixa Identity Platform. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <Link href="/login" className="hover:text-slate-800 dark:hover:text-zinc-300">Customer Sign In</Link>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            {/* Theme Toggle in Footer (Clean Spot for Mobile) */}
+            <button
+              onClick={toggleTheme}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-xs"
+            >
+              {theme === "light" ? (
+                <>
+                  <svg className="w-3.5 h-3.5 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                  <span>Dark Mode</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <span>Light Mode</span>
+                </>
+              )}
+            </button>
+            <Link href="/login" className="hover:text-slate-800 dark:hover:text-zinc-300">Sign In</Link>
             <Link href="/register" className="hover:text-slate-800 dark:hover:text-zinc-300">Create Account</Link>
             <a href="https://docs-verixa.esam.com.ng" target="_blank" rel="noreferrer" className="hover:text-slate-800 dark:hover:text-zinc-300">Documentation</a>
           </div>

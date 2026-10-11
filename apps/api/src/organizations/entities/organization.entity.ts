@@ -52,6 +52,7 @@ export class Organization {
     registeredIp?: string;
     verifiedAt?: string;
     upgradedAt?: string;
+    authProvider?: string;
   };
 
   @OneToMany(() => User, user => user.organization)

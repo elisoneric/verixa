@@ -3,14 +3,12 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Logo, Badge, Button, AppLink, CommandPalette, CommandItem, getDocsUrl } from "@verixa/ui"
+import { Logo, Badge, AppLink, CommandPalette, CommandItem, getDocsUrl } from "@verixa/ui"
 import { useAuth } from "../lib/auth-context"
-import { useTheme } from "../lib/theme-context"
 import { ApiClient } from "../lib/api"
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
-  const { user, environment, setEnvironment, balance, logout, refreshBalance } = useAuth()
-  const { theme, toggleTheme } = useTheme()
+  const { user, environment, setEnvironment, balance, logout } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
   const [cmdOpen, setCmdOpen] = React.useState(false)
@@ -181,38 +179,45 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       ]
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-100 selection:bg-emerald-500/30 selection:text-emerald-800 dark:selection:text-emerald-300">
+    <div className="flex min-h-screen bg-[#06070a] text-zinc-100 font-sans selection:bg-emerald-500/25 selection:text-emerald-300 relative">
+      {/* Ambient glowing mesh backdrop */}
+      <div aria-hidden="true" className="fixed inset-0 mesh-glow pointer-events-none -z-10 opacity-60" />
+      <div aria-hidden="true" className="fixed inset-0 grid-backdrop pointer-events-none -z-10 opacity-30" />
+
       {/* Global Cmd+K Palette */}
       <CommandPalette isOpen={cmdOpen} onClose={() => setCmdOpen(false)} items={commandItems} />
 
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col border-r border-slate-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 shrink-0">
+      {/* Desktop Sidebar (Glass Sidebar) */}
+      <aside className="hidden lg:flex w-64 flex-col border-r border-white/[0.08] bg-[#080a0f]/85 backdrop-blur-2xl shrink-0">
         {/* Brand Header */}
-        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-200 dark:border-zinc-800/80">
+        <div className="h-16 px-6 flex items-center justify-between border-b border-white/[0.08]">
           <Link href="/dashboard" className="hover:opacity-90 transition-opacity">
             <Logo size="md" />
           </Link>
+          <span className="font-mono text-[10px] tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            SOVEREIGN
+          </span>
         </div>
 
         {/* Environment Selector Switch */}
-        <div className="p-4 border-b border-slate-200 dark:border-zinc-800/60">
-          <div className="flex items-center justify-between p-1 bg-slate-100 dark:bg-zinc-900/90 rounded-lg border border-slate-200 dark:border-zinc-800">
+        <div className="p-4 border-b border-white/[0.08]">
+          <div className="flex items-center justify-between p-1 bg-black/40 rounded-xl border border-white/[0.08]">
             <button
               onClick={() => setEnvironment("sandbox")}
-              className={`flex-1 py-1.5 text-xs font-mono font-medium rounded-md transition-all ${
+              className={`flex-1 py-1.5 text-xs font-mono font-medium rounded-lg transition-all cursor-pointer ${
                 environment === "sandbox"
-                  ? "bg-white dark:bg-zinc-800 text-amber-600 dark:text-amber-400 font-semibold shadow-2xs border border-amber-200 dark:border-zinc-700/60"
-                  : "text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  ? "bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 shadow-xs"
+                  : "text-zinc-400 hover:text-white"
               }`}
             >
               Sandbox
             </button>
             <button
               onClick={() => setEnvironment("live")}
-              className={`flex-1 py-1.5 text-xs font-mono font-medium rounded-md transition-all ${
+              className={`flex-1 py-1.5 text-xs font-mono font-medium rounded-lg transition-all cursor-pointer ${
                 environment === "live"
-                  ? "bg-emerald-500 text-white dark:bg-emerald-500/20 dark:text-emerald-400 font-semibold shadow-2xs border border-emerald-500/30"
-                  : "text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  ? "bg-emerald-500 text-zinc-950 font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                  : "text-zinc-400 hover:text-white"
               }`}
             >
               Live
@@ -221,10 +226,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Navigation Groups */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-6">
           {navSections.map((section) => (
             <div key={section.title} className="space-y-1">
-              <span className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+              <span className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400">
                 {section.title}
               </span>
               {section.items.map((item) => {
@@ -233,13 +238,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                       isActive
-                        ? "bg-emerald-50 text-emerald-900 font-bold border border-emerald-200 shadow-2xs dark:bg-zinc-900 dark:text-white dark:border-zinc-800/90"
-                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-zinc-400 dark:hover:bg-zinc-900/50 dark:hover:text-zinc-200"
+                        ? "bg-white/[0.08] text-white font-bold border border-white/[0.12] shadow-xs"
+                        : "text-zinc-400 hover:bg-white/[0.04] hover:text-white"
                     }`}
                   >
-                    <svg className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-zinc-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-400" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={item.icon} />
                     </svg>
                     <span>{item.label}</span>
@@ -251,30 +256,30 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
           {/* Individual Upgrade Banner */}
           {isIndividual && (
-            <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-zinc-900 border border-emerald-200 dark:border-emerald-800/40 space-y-2">
+            <div className="glass-card p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-950/20 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-900 dark:text-emerald-300">Developer API</span>
+                <span className="text-xs font-bold text-emerald-300">Developer API</span>
                 <Badge variant="verified" size="sm">UPGRADE</Badge>
               </div>
-              <p className="text-[11px] text-slate-600 dark:text-zinc-400 leading-tight">
+              <p className="text-[11px] text-zinc-400 leading-tight">
                 Unlock automated API keys, webhooks, and REST explorer.
               </p>
               <button
                 onClick={handleUpgradeToDeveloper}
                 disabled={isUpgrading}
-                className="w-full py-1.5 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors shadow-2xs cursor-pointer"
+                className="btn-pill-primary !w-full !py-1.5 !text-xs cursor-pointer"
               >
-                {isUpgrading ? "Upgrading..." : "Enable API Access &rarr;"}
+                {isUpgrading ? "Upgrading..." : "Enable API Access →"}
               </button>
             </div>
           )}
 
           {/* Platform Admin Link ONLY for Super Admins */}
           {isPlatformSuperAdmin && (
-            <div className="pt-2 border-t border-slate-200 dark:border-zinc-800/80">
+            <div className="pt-2 border-t border-white/[0.08]">
               <Link
                 href="/admin"
-                className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 border border-rose-200 dark:border-rose-500/20 transition-colors"
+                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-colors"
               >
                 <span className="font-mono font-semibold">Admin Console</span>
                 <Badge variant="failed" size="sm">SUPER</Badge>
@@ -284,20 +289,20 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* User Footer Card */}
-        <div className="p-4 border-t border-slate-200 dark:border-zinc-800/80 bg-slate-50 dark:bg-zinc-900/30">
+        <div className="p-4 border-t border-white/[0.08] bg-[#0c0e14]/50">
           <div className="flex items-center justify-between">
             <div className="truncate">
-              <p className="text-xs font-semibold text-slate-800 dark:text-white truncate">
+              <p className="text-xs font-semibold text-white truncate">
                 {user?.org_name || "Verixa Organization"}
               </p>
-              <p className="text-[11px] font-mono text-slate-500 dark:text-zinc-500 truncate">
+              <p className="text-[11px] font-mono text-zinc-400 truncate">
                 {user?.email || "developer@verixaid.com"}
               </p>
             </div>
             <button
               onClick={logout}
               title="Sign Out"
-              className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-slate-200 dark:text-zinc-400 dark:hover:text-rose-400 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-white/[0.06] transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -310,65 +315,49 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Main Content View */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="sticky top-0 z-30 h-16 border-b border-slate-200 dark:border-zinc-800/80 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md px-6 flex items-center justify-between gap-4">
+        <header className="glass-header sticky top-0 z-30 h-16 border-b border-white/[0.08] bg-[#06070a]/80 backdrop-blur-xl px-6 flex items-center justify-between gap-4">
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-900"
+            className="lg:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06]"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
 
-          {/* Quick Search / Cmd+K trigger */}
+          {/* Search Trigger Button */}
           <button
+            type="button"
             onClick={() => setCmdOpen(true)}
-            className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/60 text-xs text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 hover:border-slate-400 dark:hover:border-zinc-700 transition-colors"
+            className="hidden sm:flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.08] text-xs font-mono text-zinc-400 hover:text-white transition-all cursor-pointer shadow-xs"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <span>Search workspace...</span>
-            <kbd className="ml-4 rounded border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-600 dark:text-zinc-300 shadow-2xs">
+            <kbd className="ml-3 rounded border border-white/[0.12] bg-white/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-zinc-300">
               ⌘K
             </kbd>
           </button>
 
           {/* Right Header Controls */}
           <div className="flex items-center gap-3 ml-auto">
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-              className="flex items-center justify-center h-10 w-10 rounded-lg border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors shadow-2xs cursor-pointer"
-            >
-              {theme === "light" ? (
-                <svg className="w-4 h-4 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              )}
-            </button>
-
-            {/* Live Balance Chip */}
+            {/* Live Balance Pill */}
             <Link
               href="/dashboard/billing"
-              className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg border border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 hover:border-slate-400 dark:hover:border-zinc-700 shadow-2xs transition-colors"
+              className="flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.08] transition-colors shadow-xs"
             >
               <div className="text-right">
-                <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-500 uppercase block leading-none">
+                <span className="text-[10px] font-mono text-zinc-400 uppercase block leading-none">
                   {environment} Balance
                 </span>
-                <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                  {currentBalance.toLocaleString()} NGX
+                <span className="text-xs font-mono font-bold text-emerald-400">
+                  ₦{currentBalance.toLocaleString()} NGX
                 </span>
               </div>
-              <span className="text-slate-300 dark:text-zinc-600">|</span>
-              <span className="text-[11px] font-semibold text-slate-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              <span className="text-zinc-400">|</span>
+              <span className="text-[11px] font-semibold text-zinc-300 hover:text-emerald-400 transition-colors">
                 + Top up
               </span>
             </Link>
@@ -376,19 +365,19 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             {/* Docs link */}
             <AppLink
               app="docs"
-              className="hidden sm:inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors px-2"
+              className="hidden sm:inline-flex items-center text-xs font-semibold text-zinc-400 hover:text-white transition-colors px-2"
             >
-              Docs &rarr;
+              Docs →
             </AppLink>
           </div>
         </header>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-b border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 space-y-6 shadow-xl">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-zinc-800">
+          <div className="lg:hidden border-b border-white/[0.1] bg-[#09090b]/95 backdrop-blur-2xl p-6 space-y-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
               <Logo size="sm" />
-              <button onClick={() => setMobileMenuOpen(false)} className="text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white p-1 rounded-md">
+              <button onClick={() => setMobileMenuOpen(false)} className="text-zinc-400 hover:text-white p-1 rounded-md">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -398,32 +387,32 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => { setEnvironment("sandbox"); setMobileMenuOpen(false); }}
-                className={`py-2 text-xs font-mono rounded-lg border transition-colors ${environment === "sandbox" ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-500/30 font-bold" : "bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800"}`}
+                className={`py-2 text-xs font-mono rounded-lg border transition-colors ${environment === "sandbox" ? "bg-amber-500/20 text-amber-300 border-amber-500/30 font-bold" : "bg-white/[0.04] text-zinc-400 border-white/[0.08]"}`}
               >
                 Sandbox
               </button>
               <button
                 onClick={() => { setEnvironment("live"); setMobileMenuOpen(false); }}
-                className={`py-2 text-xs font-mono rounded-lg border transition-colors ${environment === "live" ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30 font-bold" : "bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800"}`}
+                className={`py-2 text-xs font-mono rounded-lg border transition-colors ${environment === "live" ? "bg-emerald-500 text-zinc-950 font-bold border-emerald-500" : "bg-white/[0.04] text-zinc-400 border-white/[0.08]"}`}
               >
                 Live
               </button>
             </div>
 
             <div className="space-y-1">
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Overview</Link>
-              <Link href="/dashboard/api-keys" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">API Keys</Link>
-              <Link href="/dashboard/explorer" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">API Explorer</Link>
-              <Link href="/dashboard/verify" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Manual Workspace</Link>
-              <Link href="/dashboard/logs" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Verification Logs</Link>
-              <Link href="/dashboard/billing" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Billing & Credits</Link>
-              <Link href="/dashboard/webhooks" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Webhooks</Link>
-              <Link href="/dashboard/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white py-1.5 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-900">Settings</Link>
+              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 hover:text-white py-1.5 px-2 rounded-md hover:bg-white/[0.04]">Overview</Link>
+              <Link href="/dashboard/api-keys" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 hover:text-white py-1.5 px-2 rounded-md hover:bg-white/[0.04]">API Keys</Link>
+              <Link href="/dashboard/explorer" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 hover:text-white py-1.5 px-2 rounded-md hover:bg-white/[0.04]">API Explorer</Link>
+              <Link href="/dashboard/verify" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 hover:text-white py-1.5 px-2 rounded-md hover:bg-white/[0.04]">Manual Workspace</Link>
+              <Link href="/dashboard/logs" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 hover:text-white py-1.5 px-2 rounded-md hover:bg-white/[0.04]">Verification Logs</Link>
+              <Link href="/dashboard/billing" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 hover:text-white py-1.5 px-2 rounded-md hover:bg-white/[0.04]">Billing & Credits</Link>
+              <Link href="/dashboard/webhooks" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 hover:text-white py-1.5 px-2 rounded-md hover:bg-white/[0.04]">Webhooks</Link>
+              <Link href="/dashboard/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-zinc-300 hover:text-white py-1.5 px-2 rounded-md hover:bg-white/[0.04]">Settings</Link>
             </div>
 
-            <div className="pt-4 border-t border-slate-200 dark:border-zinc-800 flex justify-between items-center">
-              <span className="text-xs text-slate-500 dark:text-zinc-400">{user?.email}</span>
-              <button onClick={logout} className="text-xs text-rose-500 hover:text-rose-600 dark:text-rose-400 font-semibold">Sign Out</button>
+            <div className="pt-4 border-t border-white/[0.08] flex justify-between items-center">
+              <span className="text-xs text-zinc-400">{user?.email}</span>
+              <button onClick={logout} className="text-xs text-rose-400 font-semibold">Sign Out</button>
             </div>
           </div>
         )}

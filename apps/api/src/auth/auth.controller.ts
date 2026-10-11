@@ -18,6 +18,12 @@ export class AuthController {
     return this.authService.register(body.email, body.password, body.orgName, body.complianceData);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Post('google')
+  googleLogin(@Body() body: any) {
+    return this.authService.googleAuth(body.email, body.name, body.credential);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@Req() req: any) {

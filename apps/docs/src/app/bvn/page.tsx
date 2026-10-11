@@ -112,7 +112,7 @@ export default function BvnDocsPage() {
   "cached": false,
   "billed_amount": 50,
   "meta": {
-    "provider": "dojah",
+    "provider": "nibss_direct",
     "variant": "advance",
     "request_id": "vx_req_8f19a02d",
     "latency_ms": 142

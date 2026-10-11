@@ -6,8 +6,8 @@ import { ApiClient } from "../../../lib/api"
 
 export default function AdminSettingsPage() {
   const [paystackKey, setPaystackKey] = React.useState("")
-  const [dojahAppId, setDojahAppId] = React.useState("")
-  const [dojahKey, setDojahKey] = React.useState("")
+  const [upstreamAppId, setupstreamAppId] = React.useState("")
+  const [upstreamKey, setupstreamKey] = React.useState("")
   const [smileIdKey, setSmileIdKey] = React.useState("")
   const [isSaving, setIsSaving] = React.useState(false)
   const [savedSuccess, setSavedSuccess] = React.useState(false)
@@ -24,20 +24,20 @@ export default function AdminSettingsPage() {
           "Paystack Master Secret Key for DVA and Checkouts"
         )
       }
-      if (dojahAppId.trim()) {
+      if (upstreamAppId.trim()) {
         await ApiClient.updateAdminConfig(
           "DOJAH_APP_ID",
-          dojahAppId,
+          upstreamAppId,
           false,
-          "Dojah Application ID (AppId)"
+          "Upstream Gateway Application ID"
         )
       }
-      if (dojahKey.trim()) {
+      if (upstreamKey.trim()) {
         await ApiClient.updateAdminConfig(
           "DOJAH_SECRET_KEY",
-          dojahKey,
+          upstreamKey,
           true,
-          "Dojah Upstream Identity API Secret Key"
+          "Upstream Gateway Secret Key"
         )
       }
       if (smileIdKey.trim()) {
@@ -50,8 +50,8 @@ export default function AdminSettingsPage() {
       }
       setSavedSuccess(true)
       setPaystackKey("")
-      setDojahAppId("")
-      setDojahKey("")
+      setupstreamAppId("")
+      setupstreamKey("")
       setSmileIdKey("")
       setTimeout(() => setSavedSuccess(false), 4000)
     } catch (e: any) {
@@ -108,25 +108,23 @@ export default function AdminSettingsPage() {
 
           <div className="space-y-4 max-w-xl">
             <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 text-xs text-blue-700 dark:text-blue-400">
-              <span className="font-semibold">Hybrid Provider Engine:</span> When keys are absent, Verixa runs in realistic Zero-Config Mock Mode (with authentic Nigerian photos and slip rendering). Once Dojah keys are configured, Verixa automatically routes live queries upstream.
+              <span className="font-semibold">Hybrid Provider Engine:</span> When keys are absent, Verixa runs in realistic Zero-Config Mock Mode (with authentic Nigerian photos and slip rendering). Once upstream gateway keys are configured, Verixa automatically routes live queries upstream.
             </div>
 
             <Input
-              label="Dojah Application ID (AppId)"
+              label="Primary Gateway App ID"
               type="text"
-              placeholder="app_id_••••••••••••••••••••"
-              value={dojahAppId}
-              onChange={(e) => setDojahAppId(e.target.value)}
-              hint="Required header (AppId) for official Dojah API queries."
+              value={upstreamAppId}
+              onChange={(e) => setupstreamAppId(e.target.value)}
+              hint="Required header for upstream identity API queries."
             />
 
             <Input
-              label="Dojah Secret API Key (Authorization)"
+              label="Primary Gateway Secret Key (Authorization)"
               type="password"
-              placeholder="prod_sk_••••••••••••••••••••••••"
-              value={dojahKey}
-              onChange={(e) => setDojahKey(e.target.value)}
-              hint="Primary upstream fallback for BVN & NIN Advance identity registry queries."
+              value={upstreamKey}
+              onChange={(e) => setupstreamKey(e.target.value)}
+              hint="Primary upstream gateway for BVN & NIN Advance identity registry queries."
             />
 
             <Input

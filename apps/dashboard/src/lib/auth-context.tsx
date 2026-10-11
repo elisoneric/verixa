@@ -12,6 +12,7 @@ interface AuthContextType {
   isLoading: boolean
   setEnvironment: (env: "sandbox" | "live") => void
   login: (email: string, pass: string) => Promise<void>
+  loginWithGoogle: (email?: string, name?: string) => Promise<void>
   register: (email: string, pass: string, orgName: string, complianceData?: any) => Promise<void>
   logout: () => void
   refreshBalance: () => Promise<void>
@@ -77,13 +78,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/dashboard")
   }
 
+  const loginWithGoogle = async (email?: string, name?: string) => {
+    const res = await ApiClient.googleLogin(email, name)
+    localStorage.setItem("vrx_token", res.access_token)
+    setToken(res.access_token)
+    setUser(res.user)
+    await refreshBalance()
+    router.push("/dashboard")
+  }
+
   const register = async (email: string, pass: string, orgName: string, complianceData?: any) => {
     const res = await ApiClient.register(email, pass, orgName, complianceData)
     localStorage.setItem("vrx_token", res.access_token)
     setToken(res.access_token)
     setUser(res.user)
     await refreshBalance()
-    router.push("/onboarding")
+    router.push("/dashboard")
   }
 
   const logout = () => {
@@ -104,6 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         setEnvironment,
         login,
+        loginWithGoogle,
         register,
         logout,
         refreshBalance,

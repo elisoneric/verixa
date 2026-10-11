@@ -131,7 +131,7 @@ export class NinSlipController {
         api_key_id: req.apiKeyId || 'sdk_key',
         serviceType: 'nin_advance',
         status: result.status === 'success' ? VerificationStatus.SUCCESS : VerificationStatus.FAILED,
-        upstreamProvider: result.meta?.provider || 'dojah',
+        upstreamProvider: result.meta?.provider || 'direct',
         isCached: false,
         source: 'LIVE',
         costDeducted: cost,

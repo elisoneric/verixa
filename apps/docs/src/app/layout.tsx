@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import Link from "next/link";
 import { Logo, AppLink, GlassyHeader } from "@verixa/ui";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
 });
 
@@ -66,8 +66,8 @@ export default function RootLayout({
   ];
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}>
-      <body className="min-h-screen bg-[#09090b] text-zinc-100 font-sans flex flex-col selection:bg-emerald-500/25 selection:text-emerald-300">
+    <html lang="en" className={`${inter.variable} ${outfit.variable} antialiased dark`}>
+      <body className="min-h-screen bg-[#06070a] text-zinc-100 font-sans flex flex-col selection:bg-emerald-500/25 selection:text-emerald-300">
         {/* Sleek Glassy Floating Header (docs.x.ai Parity) */}
         <GlassyHeader
           logoBadge="DOCS"

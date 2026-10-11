@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Card, Button, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, EmptyState, AppLink } from "@verixa/ui"
+import { Card, Button, Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, EmptyState } from "@verixa/ui"
 import { useAuth } from "../../lib/auth-context"
 import { ApiClient } from "../../lib/api"
 
@@ -56,27 +56,27 @@ export default function DashboardOverviewPage() {
     <div className="space-y-8">
       {/* Promotional Flash Sale Banner if active */}
       {balance?.bonusPromotion?.active && (
-        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-gradient-to-r dark:from-emerald-950/80 dark:via-emerald-900/40 dark:to-zinc-950 border border-emerald-300 dark:border-emerald-500/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
+        <div className="glass-card p-4 rounded-2xl bg-gradient-to-r from-emerald-950/60 via-emerald-900/30 to-zinc-950/60 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-lg">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">{balance.bonusPromotion.title}</span>
+                <span className="text-sm font-bold text-white tracking-tight font-heading">{balance.bonusPromotion.title}</span>
                 <Badge variant="verified" size="sm">
                   {balance.bonusPromotion.discountPercent}% OFF ALL VERIFICATIONS
                 </Badge>
               </div>
-              <p className="text-xs text-emerald-800 dark:text-emerald-300/80 mt-0.5">
+              <p className="text-xs text-emerald-300/80 mt-0.5">
                 Promotional price slash active. All live BVN, NIN, and NUBAN checks are automatically discounted.
               </p>
             </div>
           </div>
           <Link href="/dashboard/billing">
-            <Button size="sm" variant="emerald" className="shrink-0 font-semibold">
+            <Button size="sm" variant="emerald" className="shrink-0 font-semibold btn-pill-primary !bg-emerald-400 !text-zinc-950">
               Top Up Balance &rarr;
             </Button>
           </Link>
@@ -86,8 +86,8 @@ export default function DashboardOverviewPage() {
       {/* Top Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-3xl font-extrabold tracking-tight text-white font-heading">
               {user?.org_name || "Overview"}
             </h1>
             <Badge variant={environment === "live" ? "verified" : "warning"} size="sm">
@@ -97,7 +97,7 @@ export default function DashboardOverviewPage() {
               {balance?.tier || "STARTER"} PLAN
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
             Real-time identity verification performance, available balance, and API health.
           </p>
         </div>
@@ -105,20 +105,20 @@ export default function DashboardOverviewPage() {
         {/* Quick Actions */}
         <div className="flex items-center gap-2.5">
           <Link href="/dashboard/explorer">
-            <Button variant="outline" size="sm" className="gap-2 font-semibold">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button className="btn-pill-secondary !px-4 !py-2 text-xs flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               <span>Test API</span>
-            </Button>
+            </button>
           </Link>
           <Link href="/dashboard/verify">
-            <Button variant="emerald" size="sm" className="gap-2 font-semibold">
+            <button className="btn-pill-primary !px-5 !py-2 text-xs flex items-center gap-1.5 shadow-[0_0_20px_rgba(255,255,255,0.25)]">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>Verify ID</span>
-            </Button>
+            </button>
           </Link>
         </div>
       </div>
@@ -126,180 +126,184 @@ export default function DashboardOverviewPage() {
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Available Balance */}
-        <Card className="p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">
-              {environment === "live" ? "Live NGX Balance" : "Sandbox Balance"}
+        <div className="glass-card p-5 rounded-2xl border border-white/[0.08] bg-[#0e1118]/65 backdrop-blur-xl">
+          <div className="flex items-center justify-between text-zinc-400">
+            <span className="text-xs font-semibold uppercase tracking-wider font-mono">
+              {environment === "live" ? "Live Balance" : "Sandbox Balance"}
             </span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-mono text-xs font-semibold">1 NGX = ₦1</span>
+            <span className="text-emerald-400 font-mono text-xs font-semibold">1 NGX = ₦1</span>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold font-mono tracking-tight text-white">
               ₦{currentBalance.toLocaleString()}
             </span>
-            <span className="text-xs font-mono text-slate-500 dark:text-zinc-400">NGX</span>
+            <span className="text-xs font-mono text-zinc-400">NGX</span>
           </div>
-          <div className="mt-3 flex items-center justify-between pt-3 border-t border-slate-100 dark:border-zinc-800/80">
-            <span className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">Auto-settled via DVA</span>
+          <div className="mt-3.5 flex items-center justify-between pt-3 border-t border-white/[0.07]">
+            <span className="text-[11px] text-zinc-400 font-medium">Auto-settled via DVA</span>
             <Link
               href="/dashboard/billing"
-              className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline transition-colors"
+              className="text-[11px] font-semibold text-emerald-400 hover:underline transition-colors"
             >
               + Top up
             </Link>
           </div>
-        </Card>
+        </div>
 
         {/* Total Verifications */}
-        <Card className="p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Total Volume</span>
-            <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">All Channels</span>
+        <div className="glass-card p-5 rounded-2xl border border-white/[0.08] bg-[#0e1118]/65 backdrop-blur-xl">
+          <div className="flex items-center justify-between text-zinc-400">
+            <span className="text-xs font-semibold uppercase tracking-wider font-mono">Total Volume</span>
+            <span className="text-emerald-400 text-xs font-semibold">All Channels</span>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold font-mono tracking-tight text-white">
               {metrics.totalRequests.toLocaleString()}
             </span>
-            <span className="text-xs text-slate-500 dark:text-zinc-400">queries</span>
+            <span className="text-xs text-zinc-400">queries</span>
           </div>
-          <div className="mt-3 flex items-center justify-between pt-3 border-t border-slate-100 dark:border-zinc-800/80 text-[11px] text-slate-500 dark:text-zinc-400 font-mono">
+          <div className="mt-3.5 flex items-center justify-between pt-3 border-t border-white/[0.07] text-[11px] text-zinc-400 font-mono">
             <span>BVN: {metrics.breakdown.bvn}</span>
             <span>NIN: {metrics.breakdown.nin}</span>
             <span>NUBAN: {metrics.breakdown.nuban}</span>
           </div>
-        </Card>
+        </div>
 
         {/* Smart Cache Hit Ratio */}
-        <Card className="p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Smart Cache Ratio</span>
-            <Badge variant="verified" size="sm" className="gap-1">
+        <div className="glass-card p-5 rounded-2xl border border-white/[0.08] bg-[#0e1118]/65 backdrop-blur-xl">
+          <div className="flex items-center justify-between text-zinc-400">
+            <span className="text-xs font-semibold uppercase tracking-wider font-mono">Smart Cache Ratio</span>
+            <Badge variant="verified" size="sm" className="gap-1 font-mono">
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               &lt;15ms
             </Badge>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold font-mono tracking-tight text-emerald-400">
               {hitRatio}
             </span>
-            <span className="text-xs text-slate-500 dark:text-zinc-400">hits</span>
+            <span className="text-xs text-zinc-400">hits</span>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-zinc-800/80 text-[11px] text-slate-500 dark:text-zinc-400 flex justify-between font-mono">
-            <span className="flex items-center gap-1">
-              <svg className="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mt-3.5 pt-3 border-t border-white/[0.07] text-[11px] text-zinc-400 flex justify-between font-mono">
+            <span className="flex items-center gap-1 text-emerald-400">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               {cacheCalls} Cached
             </span>
-            <span className="flex items-center gap-1">
-              <svg className="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <span className="flex items-center gap-1 text-zinc-400">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
               </svg>
               {liveCalls} Live
             </span>
           </div>
-        </Card>
+        </div>
 
         {/* Cost Savings via Cache */}
-        <Card className="p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Credits Saved</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-mono text-xs font-semibold">Cache Split</span>
+        <div className="glass-card p-5 rounded-2xl border border-white/[0.08] bg-[#0e1118]/65 backdrop-blur-xl">
+          <div className="flex items-center justify-between text-zinc-400">
+            <span className="text-xs font-semibold uppercase tracking-wider font-mono">Credits Saved</span>
+            <span className="text-emerald-400 font-mono text-xs font-semibold">Cache Split</span>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold font-mono tracking-tight text-white">
               ₦{savings.toLocaleString()}
             </span>
-            <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">NGX Saved</span>
+            <span className="text-xs font-mono text-emerald-400 font-semibold">Saved</span>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-zinc-800/80 text-[11px] text-slate-400 dark:text-zinc-500">
+          <div className="mt-3.5 pt-3 border-t border-white/[0.07] text-[11px] text-zinc-400">
             <span>From repeated verification lookups</span>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Smart Cache & Traffic Routing Analytics Widget */}
-      <Card className="p-6 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-100 dark:border-zinc-800">
+      <div className="glass-card p-6 rounded-2xl border border-white/[0.08] bg-[#0e1118]/65 backdrop-blur-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-white/[0.07]">
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Identity Traffic & Smart Cache Breakdown</h3>
+            <div className="flex items-center gap-2.5">
+              <h3 className="text-lg font-bold text-white tracking-tight font-heading">Identity Traffic & Smart Cache Breakdown</h3>
               <Badge variant="verified" size="sm">ACTIVE SAVINGS</Badge>
             </div>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-              Comparison between live upstream registry queries (Dojah / NIMC / NIBSS) and instant Smart Cache hits.
+            <p className="text-xs text-zinc-400 mt-1">
+              Comparison between live upstream registry queries (NIMC / NIBSS Primary Registries) and instant Smart Cache hits.
             </p>
           </div>
           <div className="flex items-center gap-3 text-xs font-mono">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <span className="text-slate-700 dark:text-zinc-300">Cache Hits: <b>{cacheCalls}</b> ({hitRatio})</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+              <span className="text-zinc-300">Cache Hits: <b className="text-white">{cacheCalls}</b> ({hitRatio})</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-sky-500" />
-              <span className="text-slate-700 dark:text-zinc-300">Live Calls: <b>{liveCalls}</b></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+              <span className="text-zinc-300">Live Calls: <b className="text-white">{liveCalls}</b></span>
             </div>
           </div>
         </div>
 
         {/* Visual Traffic Split Bar */}
-        <div className="mt-4 space-y-2">
-          <div className="h-3 w-full bg-slate-100 dark:bg-zinc-950 rounded-full overflow-hidden flex border border-slate-200 dark:border-zinc-800">
+        <div className="mt-5 space-y-3">
+          <div className="h-3 w-full bg-black/50 rounded-full overflow-hidden flex border border-white/[0.08]">
             <div
               style={{ width: metrics.totalRequests > 0 ? `${(cacheCalls / metrics.totalRequests) * 100}%` : "50%" }}
-              className="bg-emerald-500 transition-all duration-500"
+              className="bg-emerald-400 transition-all duration-500 shadow-[0_0_12px_rgba(52,211,153,0.5)]"
               title="Smart Cache Hits"
             />
             <div
               style={{ width: metrics.totalRequests > 0 ? `${(liveCalls / metrics.totalRequests) * 100}%` : "50%" }}
-              className="bg-sky-500 transition-all duration-500"
+              className="bg-sky-400 transition-all duration-500 shadow-[0_0_12px_rgba(56,189,248,0.5)]"
               title="Live Registry Calls"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 text-xs">
-            <div className="p-3 rounded-lg bg-slate-50 dark:bg-zinc-950/70 border border-slate-200 dark:border-zinc-800">
-              <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 uppercase font-semibold">Latency SLA Comparison</span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold font-mono">~14ms</span>
-                <span className="text-[11px] text-slate-500 dark:text-zinc-400">Cache vs</span>
-                <span className="text-sky-600 dark:text-sky-400 font-bold font-mono">~185ms</span>
-                <span className="text-[11px] text-slate-500 dark:text-zinc-400">Live</span>
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <span className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Latency SLA Comparison</span>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="text-emerald-400 font-bold font-mono text-sm">~14ms</span>
+                <span className="text-[11px] text-zinc-400">Cache vs</span>
+                <span className="text-sky-400 font-bold font-mono text-sm">~185ms</span>
+                <span className="text-[11px] text-zinc-400">Live</span>
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-slate-50 dark:bg-zinc-950/70 border border-slate-200 dark:border-zinc-800">
-              <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 uppercase font-semibold">Cost Optimization</span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold font-mono">Cache Split</span>
-                <span className="text-[11px] text-slate-500 dark:text-zinc-400">vs Upstream Registry Charges</span>
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <span className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Cost Optimization</span>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="text-emerald-400 font-bold font-mono text-sm">Cache Split</span>
+                <span className="text-[11px] text-zinc-400">vs Upstream Registry Charges</span>
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-slate-50 dark:bg-zinc-950/70 border border-slate-200 dark:border-zinc-800">
-              <span className="text-[10px] font-mono text-slate-400 dark:text-zinc-500 uppercase font-semibold">Cache Retention Policy</span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-slate-900 dark:text-white font-bold font-mono">30 Days TTL</span>
-                <span className="text-[11px] text-slate-500 dark:text-zinc-400">Auto-refresh available</span>
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <span className="text-[10px] font-mono text-zinc-400 uppercase font-semibold">Cache Retention Policy</span>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="text-white font-bold font-mono text-sm">30 Days TTL</span>
+                <span className="text-[11px] text-zinc-400">Auto-refresh available</span>
               </div>
             </div>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Account Plan Rates Schedule Banner */}
-      <div className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/40 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="glass-card p-4 rounded-2xl border border-white/[0.08] bg-[#0e1118]/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Badge variant="mono" size="sm">ACTIVE RATES</Badge>
-          <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
-            <span className="text-slate-700 dark:text-zinc-300">BVN: <b className="text-emerald-600 dark:text-emerald-400">₦50 Live</b> • Cache Split</span>
-            <span className="text-slate-700 dark:text-zinc-300">NIN: <b className="text-emerald-600 dark:text-emerald-400">₦140 Live</b> • Cache Split</span>
-            <span className="text-slate-700 dark:text-zinc-300">NUBAN: <b className="text-emerald-600 dark:text-emerald-400">₦0.00 Free</b> • Cache Split</span>
+          <Badge variant="mono" size="sm">ACTIVE RATES (-₦15 DROP)</Badge>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-sans">
+            <span className="text-zinc-300">BVN: <b className="text-emerald-400 font-bold">₦85</b></span>
+            <span className="text-zinc-300">NIN: <b className="text-emerald-400 font-bold">₦135</b></span>
+            <span className="text-zinc-300">NIN Phone: <b className="text-emerald-400 font-bold">₦185</b></span>
+            <span className="text-zinc-300">BVN Phone: <b className="text-emerald-400 font-bold">₦135</b></span>
+            <span className="text-zinc-300">Demography: <b className="text-emerald-400 font-bold">₦235</b></span>
+            <span className="text-zinc-300">Tracking: <b className="text-emerald-400 font-bold">₦185</b></span>
+            <span className="text-zinc-300">Balance: <b className="text-emerald-400 font-bold">Free</b></span>
           </div>
         </div>
-        <Link href="/dashboard/billing" className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold shrink-0">
+        <Link href="/dashboard/billing" className="text-xs text-emerald-400 hover:underline font-semibold shrink-0">
           View Full Rate Schedule &rarr;
         </Link>
       </div>
@@ -308,26 +312,26 @@ export default function DashboardOverviewPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Link
           href="/dashboard/api-keys"
-          className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 hover:bg-slate-50 dark:hover:bg-zinc-900 hover:border-slate-300 dark:hover:border-zinc-700 shadow-xs transition-all text-left"
+          className="glass-card p-4 rounded-2xl border border-white/[0.08] bg-[#0e1118]/55 hover:bg-[#121620]/80 transition-all text-left block"
         >
-          <span className="text-xs font-bold text-slate-900 dark:text-white block">API Credentials</span>
-          <span className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5 block">View secret keys & permissions</span>
+          <span className="text-sm font-bold text-white block font-heading">API Credentials</span>
+          <span className="text-xs text-zinc-400 mt-1 block">View secret keys & permissions</span>
         </Link>
         <Link
           href="/dashboard/billing"
-          className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 hover:bg-slate-50 dark:hover:bg-zinc-900 hover:border-slate-300 dark:hover:border-zinc-700 shadow-xs transition-all text-left"
+          className="glass-card p-4 rounded-2xl border border-white/[0.08] bg-[#0e1118]/55 hover:bg-[#121620]/80 transition-all text-left block"
         >
-          <span className="text-xs font-bold text-slate-900 dark:text-white block">Add NGX Credits</span>
-          <span className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5 block">Dedicated Virtual Account</span>
+          <span className="text-sm font-bold text-white block font-heading">Add NGX Credits</span>
+          <span className="text-xs text-zinc-400 mt-1 block">Dedicated Virtual Account</span>
         </Link>
         <a
           href="https://docs-verixa.esam.com.ng"
           target="_blank"
           rel="noreferrer"
-          className="p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 hover:bg-slate-50 dark:hover:bg-zinc-900 hover:border-slate-300 dark:hover:border-zinc-700 shadow-xs transition-all text-left block"
+          className="glass-card p-4 rounded-2xl border border-white/[0.08] bg-[#0e1118]/55 hover:bg-[#121620]/80 transition-all text-left block"
         >
-          <span className="text-xs font-bold text-slate-900 dark:text-white block">Smart Cache Docs</span>
-          <span className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5 block">How to optimize cache hit rates ↗</span>
+          <span className="text-sm font-bold text-white block font-heading">Smart Cache Docs</span>
+          <span className="text-xs text-zinc-400 mt-1 block">How to optimize cache hit rates ↗</span>
         </a>
       </div>
 
@@ -335,10 +339,10 @@ export default function DashboardOverviewPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Recent Verification Requests</h3>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">Audit log of recent identity checks and cache hits.</p>
+            <h3 className="text-lg font-bold text-white tracking-tight font-heading">Recent Verification Requests</h3>
+            <p className="text-xs text-zinc-400 mt-0.5">Audit log of recent identity checks and cache hits.</p>
           </div>
-          <Link href="/dashboard/logs" className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold">
+          <Link href="/dashboard/logs" className="text-xs text-emerald-400 hover:underline font-semibold">
             View All Logs &rarr;
           </Link>
         </div>
@@ -370,11 +374,11 @@ export default function DashboardOverviewPage() {
                 const latency = log.latencyMs ?? (isCache ? 12 : 142)
 
                 return (
-                  <TableRow key={log.id} className="hover:bg-slate-50 dark:hover:bg-zinc-900/50">
-                    <TableCell className="font-mono text-xs text-slate-800 dark:text-zinc-200 font-bold">
+                  <TableRow key={log.id} className="hover:bg-white/[0.03]">
+                    <TableCell className="font-mono text-xs text-zinc-200 font-bold">
                       {log.id.slice(0, 16)}...
                     </TableCell>
-                    <TableCell className="font-semibold text-slate-900 dark:text-white">
+                    <TableCell className="font-semibold text-white">
                       {log.service}
                     </TableCell>
                     <TableCell>
@@ -399,15 +403,15 @@ export default function DashboardOverviewPage() {
                         {log.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-slate-600 dark:text-zinc-400">
-                      <span className={isCache ? "text-emerald-600 dark:text-emerald-400 font-semibold" : "text-slate-600 dark:text-zinc-400"}>
+                    <TableCell className="font-mono text-xs">
+                      <span className={isCache ? "text-emerald-400 font-semibold" : "text-zinc-400"}>
                         {latency}ms
                       </span>
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-slate-800 dark:text-zinc-200 font-semibold">
+                    <TableCell className="font-mono text-xs text-zinc-200 font-semibold">
                       {cost} NGX
                     </TableCell>
-                    <TableCell className="text-right text-xs text-slate-500 font-mono">
+                    <TableCell className="text-right text-xs text-zinc-400 font-mono">
                       {new Date(log.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </TableCell>
                   </TableRow>

@@ -119,7 +119,7 @@ export default function CacDocsPage() {
   "cached": false,
   "billed_amount": 200,
   "meta": {
-    "provider": "dojah",
+    "provider": "cac_direct",
     "variant": "advance",
     "latency_ms": 234
   }

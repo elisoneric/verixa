@@ -21,7 +21,7 @@ import { AdminService } from '../../admin/admin.service';
 
 @Injectable()
 export class DojahProvider implements IVerificationProvider {
-  providerName = 'dojah';
+  providerName = 'direct';
   private readonly logger = new Logger(DojahProvider.name);
 
   constructor(
@@ -30,9 +30,9 @@ export class DojahProvider implements IVerificationProvider {
   ) {}
 
   private getCredentials(): { appId: string | null; secretKey: string | null; baseUrl: string } {
-    const appId = this.adminService.getConfig('DOJAH_APP_ID') || process.env.DOJAH_APP_ID || null;
-    const secretKey = this.adminService.getConfig('DOJAH_SECRET_KEY') || process.env.DOJAH_SECRET_KEY || null;
-    const isSandbox = (this.adminService.getConfig('DOJAH_ENVIRONMENT') || process.env.DOJAH_ENVIRONMENT) === 'sandbox';
+    const appId = this.adminService.getConfig('vx_APP_ID') || process.env.vx_APP_ID || null;
+    const secretKey = this.adminService.getConfig('vx_SECRET_KEY') || process.env.vx_SECRET_KEY || null;
+    const isSandbox = (this.adminService.getConfig('vx_ENVIRONMENT') || process.env.vx_ENVIRONMENT) === 'sandbox';
     const baseUrl = isSandbox ? 'https://sandbox.dojah.io' : 'https://api.dojah.io';
     return { appId, secretKey, baseUrl };
   }
@@ -83,8 +83,8 @@ export class DojahProvider implements IVerificationProvider {
         status: 'success',
         data: entity,
         meta: {
-          provider: 'dojah',
-          reference: `dojah_${uuidv4().slice(0, 12)}`,
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
         },
       };
     } catch (err: any) {
@@ -123,8 +123,8 @@ export class DojahProvider implements IVerificationProvider {
         status: 'success',
         data: entity,
         meta: {
-          provider: 'dojah',
-          reference: `dojah_${uuidv4().slice(0, 12)}`,
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
         },
       };
     } catch (err: any) {
@@ -182,8 +182,8 @@ export class DojahProvider implements IVerificationProvider {
           } : undefined,
         },
         meta: {
-          provider: 'dojah',
-          reference: `dojah_${uuidv4().slice(0, 12)}`,
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
         },
       };
     } catch (err: any) {
@@ -219,8 +219,8 @@ export class DojahProvider implements IVerificationProvider {
           bank_code: data.bankCode,
         },
         meta: {
-          provider: 'dojah',
-          reference: `dojah_${uuidv4().slice(0, 12)}`,
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
         },
       };
     } catch (err: any) {
@@ -250,8 +250,8 @@ export class DojahProvider implements IVerificationProvider {
         status: 'success',
         data: entity,
         meta: {
-          provider: 'dojah',
-          reference: `dojah_${uuidv4().slice(0, 12)}`,
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
         },
       };
     } catch (err: any) {
@@ -284,8 +284,8 @@ export class DojahProvider implements IVerificationProvider {
         status: 'success',
         data: entity,
         meta: {
-          provider: 'dojah',
-          reference: `dojah_${uuidv4().slice(0, 12)}`,
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
         },
       };
     } catch (err: any) {
@@ -324,8 +324,8 @@ export class DojahProvider implements IVerificationProvider {
         status: 'success',
         data: entity,
         meta: {
-          provider: 'dojah',
-          reference: `dojah_${uuidv4().slice(0, 12)}`,
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
         },
       };
     } catch (err: any) {

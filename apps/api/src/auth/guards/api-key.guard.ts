@@ -1,8 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApiKey } from '../entities/api-key.entity';
 import { Environment } from '../../organizations/entities/environment-config.entity';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
@@ -10,6 +11,8 @@ export class ApiKeyGuard implements CanActivate {
   constructor(
     @InjectRepository(ApiKey)
     private apiKeyRepository: Repository<ApiKey>,
+    @Optional()
+    private jwtService?: JwtService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -33,6 +36,19 @@ export class ApiKeyGuard implements CanActivate {
     const isTest = token.startsWith('vrx_test_');
 
     if (!isLive && !isTest) {
+      // Check if it's a valid dashboard JWT session
+      if (this.jwtService) {
+        try {
+          const payload = await this.jwtService.verifyAsync(token);
+          request.user = payload;
+          request.organizationId = payload.org_id;
+          request.environment = payload.environment || Environment.SANDBOX;
+          request.apiKeyId = 'session_token';
+          return true;
+        } catch {
+          // fall through to invalid format exception
+        }
+      }
       throw new UnauthorizedException('Invalid API key format');
     }
 

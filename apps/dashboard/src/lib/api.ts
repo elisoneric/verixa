@@ -120,6 +120,13 @@ export class ApiClient {
     })
   }
 
+  static async googleLogin(email?: string, name?: string, credential?: string) {
+    return this.request<{ access_token: string; user: ApiUser }>("/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ email, name, credential }),
+    })
+  }
+
   static async getMe() {
     return this.request<ApiUser>("/auth/me")
   }
@@ -198,6 +205,14 @@ export class ApiClient {
     return this.request<any>("/v1/verify/manual", {
       method: "POST",
       body: JSON.stringify({ service, environment, payload }),
+    })
+  }
+
+  // Exact 7 Endpoints (Live Metered with -₦15 Dropped Rates)
+  static async executeDirectApi(endpoint: string, method: "POST" | "GET", payload?: any) {
+    return this.request<any>(endpoint, {
+      method,
+      ...(method === "POST" && payload ? { body: JSON.stringify(payload) } : {}),
     })
   }
 

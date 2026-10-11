@@ -162,7 +162,7 @@ export default function AdminPricingPage() {
               <div>
                 <CardTitle className="text-base text-slate-900 dark:text-white">1. Live Upstream Verification Fees (₦ / NGX)</CardTitle>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-                  Standard fee charged when a verification query misses cache and queries upstream registries (Dojah / NIMC / NIBSS).
+                  Standard fee charged when a verification query misses cache and queries upstream registries (NIMC / NIBSS Primary Registries).
                 </p>
               </div>
               <Badge variant="mono" size="sm">LIVE LOOKUP</Badge>
@@ -221,7 +221,7 @@ export default function AdminPricingPage() {
                 </Badge>
               </div>
               <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-                When a client verifies an identity previously queried within the TTL window, response is served instantly from memory without querying Dojah.
+                When a client verifies an identity previously queried within the TTL window, response is served instantly from memory without querying upstream registries.
               </p>
             </div>
             <label className="flex items-center gap-2 cursor-pointer bg-slate-50 dark:bg-zinc-950 px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-800 shadow-2xs">

@@ -2,422 +2,190 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Button, Input, Logo, Card, Badge } from "@verixa/ui"
+import { Input, Logo } from "@verixa/ui"
 import { useAuth } from "../../lib/auth-context"
 
-type AccountType = "individual" | "developer"
-
 export default function RegisterPage() {
-  const { register } = useAuth()
-  const [accountType, setAccountType] = React.useState<AccountType>("individual")
+  const { register, loginWithGoogle } = useAuth()
+  const [name, setName] = React.useState("")
+  const [email, setEmail] = React.useState("")
+  const [password, setPassword] = React.useState("")
+  const [termsAgreed, setTermsAgreed] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
-  // Individual Form Fields
-  const [indFullName, setIndFullName] = React.useState("")
-  const [indNin, setIndNin] = React.useState("")
-  const [indEmail, setIndEmail] = React.useState("")
-  const [indPhone, setIndPhone] = React.useState("")
-  const [indPassword, setIndPassword] = React.useState("")
-  const [indConsent, setIndConsent] = React.useState(false)
-
-  // Developer Form Fields
-  const [devOrgName, setDevOrgName] = React.useState("")
-  const [devBusinessType, setDevBusinessType] = React.useState("Limited Liability Company (RC)")
-  const [devRcNumber, setDevRcNumber] = React.useState("")
-  const [devEmail, setDevEmail] = React.useState("")
-  const [devPhone, setDevPhone] = React.useState("")
-  const [devPassword, setDevPassword] = React.useState("")
-  const [devDirectorName, setDevDirectorName] = React.useState("")
-  const [devDirectorNin, setDevDirectorNin] = React.useState("")
-  const [devLawfulBasisAgreed, setDevLawfulBasisAgreed] = React.useState(false)
-  const [devTermsAgreed, setDevTermsAgreed] = React.useState(false)
-
-  const handleIndividualSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
-    if (!indFullName.trim() || !indNin.trim() || !indEmail.trim() || !indPassword.trim()) {
-      setError("Please fill in your name, 11-digit NIN, email, and password.")
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setError("Please fill in your name, email, and password.")
       return
     }
 
-    if (indNin.trim().length !== 11 || !/^\d+$/.test(indNin.trim())) {
-      setError("Your NIN must be exactly 11 digits.")
-      return
-    }
-
-    if (indPassword.length < 8) {
+    if (password.length < 8) {
       setError("Password must be at least 8 characters.")
       return
     }
 
-    if (!indConsent) {
-      setError("Please confirm your authorization for NIN verification and DVA generation.")
+    if (!termsAgreed) {
+      setError("Please agree to the Terms of Service and Privacy Policy.")
       return
     }
 
     setIsLoading(true)
     try {
-      await register(
-        indEmail.trim(),
-        indPassword,
-        indFullName.trim(),
-        {
-          accountType: "individual",
-          fullName: indFullName.trim(),
-          nin: indNin.trim(),
-          phone: indPhone.trim() || undefined,
-          consent: true,
-          lawfulBasisAgreed: true,
-        }
-      )
+      await register(email.trim(), password, name.trim(), {
+        accountType: "developer",
+        lawfulBasisAgreed: true,
+        termsAgreed: true,
+      })
     } catch (err: any) {
-      setError(err.message || "Registration failed. Please verify your details.")
+      setError(err.message || "Registration failed. Please check your details.")
       setIsLoading(false)
     }
   }
 
-  const handleDeveloperSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true)
     setError(null)
-
-    if (!devOrgName.trim() || !devEmail.trim() || !devPassword.trim()) {
-      setError("Please enter your organization name, work email, and password.")
-      return
-    }
-
-    if (!devDirectorName.trim() || !devDirectorNin.trim()) {
-      setError("Please provide the authorized representative's name and 11-digit NIN.")
-      return
-    }
-
-    if (devDirectorNin.trim().length !== 11 || !/^\d+$/.test(devDirectorNin.trim())) {
-      setError("Representative NIN must be exactly 11 digits.")
-      return
-    }
-
-    if (devPassword.length < 8) {
-      setError("Password must be at least 8 characters.")
-      return
-    }
-
-    if (!devLawfulBasisAgreed || !devTermsAgreed) {
-      setError("Please agree to the NDPA lawful basis guarantee and platform terms.")
-      return
-    }
-
-    setIsLoading(true)
     try {
-      await register(
-        devEmail.trim(),
-        devPassword,
-        devOrgName.trim(),
-        {
-          accountType: "developer",
-          businessType: devBusinessType,
-          rcNumber: devRcNumber.trim() || undefined,
-          phone: devPhone.trim() || undefined,
-          directorName: devDirectorName.trim(),
-          directorNin: devDirectorNin.trim(),
-          lawfulBasisAgreed: true,
-          termsAgreed: true,
-          consent: true,
-        }
-      )
+      await loginWithGoogle()
     } catch (err: any) {
-      setError(err.message || "Registration failed. Please check your credentials.")
-      setIsLoading(false)
+      setError(err.message || "Google sign in failed.")
+      setIsGoogleLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-lg text-center mb-6">
+    <div className="min-h-screen bg-[#06070a] text-zinc-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative font-sans selection:bg-emerald-500/25 selection:text-emerald-300">
+      <div aria-hidden="true" className="fixed inset-0 mesh-glow pointer-events-none -z-10 opacity-70" />
+      <div aria-hidden="true" className="fixed inset-0 grid-backdrop pointer-events-none -z-10 opacity-35" />
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
         <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
           <Logo size="lg" />
         </Link>
-        <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-          Create your Verixa Account
+        <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-white font-heading">
+          Create your account
         </h2>
-        <p className="mt-1 text-xs text-slate-500 dark:text-zinc-400">
-          Fast verification, automated official NIMC slips, and instant DVA settlement
+        <p className="mt-1 text-xs text-zinc-400">
+          Or{" "}
+          <Link href="/login" className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
+            sign in to an existing account
+          </Link>
         </p>
-
-        {/* Account Type Segmented Tab */}
-        <div className="mt-6 p-1 bg-slate-200/80 dark:bg-zinc-900 rounded-xl border border-slate-300 dark:border-zinc-800 grid grid-cols-2 gap-1 max-w-sm mx-auto">
-          <button
-            type="button"
-            onClick={() => { setAccountType("individual"); setError(null); }}
-            className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              accountType === "individual"
-                ? "bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 shadow-xs border border-slate-200 dark:border-zinc-700"
-                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            Individual / User
-          </button>
-          <button
-            type="button"
-            onClick={() => { setAccountType("developer"); setError(null); }}
-            className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              accountType === "developer"
-                ? "bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 shadow-xs border border-slate-200 dark:border-zinc-700"
-                : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-            </svg>
-            Developer & API
-          </button>
-        </div>
       </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-lg">
-        <Card className="bg-white dark:bg-zinc-900/80 border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-sm">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-2xl">
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/25 text-rose-700 dark:text-rose-400 text-xs font-medium">
+            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs font-medium">
               {error}
             </div>
           )}
 
-          {/* INDIVIDUAL ACCOUNT FORM */}
-          {accountType === "individual" && (
-            <form onSubmit={handleIndividualSubmit} className="space-y-4">
-              <div className="border-b border-slate-200 dark:border-zinc-800 pb-3 mb-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">Individual Workspace</h3>
-                  <Badge variant="verified" size="sm">NIN + DVA READY</Badge>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-                  Instant access to NIN Slips, BVN tools, and free NUBAN resolution.
-                </p>
-              </div>
-
-              <Input
-                label="Full Legal Name (as on your NIN) *"
-                type="text"
-                placeholder="OLUWASEUN ADEKUNLE BELLO"
-                value={indFullName}
-                onChange={(e) => setIndFullName(e.target.value)}
-                required
+          {/* Google Sign In Button */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={isGoogleLoading || isLoading}
+            className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.12] text-sm font-semibold text-white transition-all shadow-xs cursor-pointer active:scale-[0.99] disabled:opacity-50"
+          >
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
               />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="11-Digit National ID Number (NIN) *"
-                  type="text"
-                  maxLength={11}
-                  placeholder="22198765432"
-                  value={indNin}
-                  onChange={(e) => setIndNin(e.target.value)}
-                  hint="Required for dedicated Titan Trust Bank DVA"
-                  required
-                />
-
-                <Input
-                  label="Phone Number"
-                  type="tel"
-                  placeholder="0803 123 4567"
-                  value={indPhone}
-                  onChange={(e) => setIndPhone(e.target.value)}
-                />
-              </div>
-
-              <Input
-                label="Email Address *"
-                type="email"
-                placeholder="seun.bello@gmail.com"
-                value={indEmail}
-                onChange={(e) => setIndEmail(e.target.value)}
-                required
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
               />
-
-              <Input
-                label="Password (minimum 8 characters) *"
-                type="password"
-                placeholder="••••••••••••"
-                value={indPassword}
-                onChange={(e) => setIndPassword(e.target.value)}
-                required
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
               />
-
-              <div className="p-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950/60 text-xs space-y-2">
-                <label className="flex items-start gap-2.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={indConsent}
-                    onChange={(e) => setIndConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300 dark:border-zinc-700 text-emerald-600 focus:ring-emerald-500"
-                  />
-                  <span className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[11px]">
-                    I confirm my name and 11-digit NIN are accurate and authorize Verixa to verify my identity for dedicated bank account issuance & slip generation.
-                  </span>
-                </label>
-              </div>
-
-              <Button
-                type="submit"
-                variant="emerald"
-                size="md"
-                className="w-full font-bold h-11"
-                isLoading={isLoading}
-              >
-                Create Individual Account &rarr;
-              </Button>
-
-              <p className="text-[11px] text-center text-slate-500 dark:text-zinc-400">
-                Need automated API keys later? You can upgrade to a Developer account anytime in 1 click.
-              </p>
-            </form>
-          )}
-
-          {/* DEVELOPER ACCOUNT FORM */}
-          {accountType === "developer" && (
-            <form onSubmit={handleDeveloperSubmit} className="space-y-4">
-              <div className="border-b border-slate-200 dark:border-zinc-800 pb-3 mb-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">Developer & Organization</h3>
-                  <Badge variant="mono" size="sm">REST API + WEBHOOKS</Badge>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-                  Instant sandbox API keys, live keys, and dedicated high-volume rate limits.
-                </p>
-              </div>
-
-              <Input
-                label="Organization / Company / App Name *"
-                type="text"
-                placeholder="Apex Technologies Ltd"
-                value={devOrgName}
-                onChange={(e) => setDevOrgName(e.target.value)}
-                required
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
+            </svg>
+            <span>{isGoogleLoading ? "Connecting to Google..." : "Continue with Google"}</span>
+          </button>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700 dark:text-zinc-300">Entity Type</label>
-                  <select
-                    value={devBusinessType}
-                    onChange={(e) => setDevBusinessType(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700/80 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-emerald-500 focus:outline-none h-11"
-                  >
-                    <option value="Limited Liability Company (RC)">Limited Company (RC)</option>
-                    <option value="Business Name (BN)">Business Name (BN)</option>
-                    <option value="Fintech / Startup">Fintech / Startup</option>
-                    <option value="Independent Developer">Independent Developer</option>
-                  </select>
-                </div>
+          {/* Divider */}
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/[0.08]" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-[#0e1118] px-2 text-zinc-500 font-mono text-[11px]">
+                or continue with email
+              </span>
+            </div>
+          </div>
 
-                <Input
-                  label="CAC RC / BN Number (Optional)"
-                  type="text"
-                  placeholder="RC-1928374"
-                  value={devRcNumber}
-                  onChange={(e) => setDevRcNumber(e.target.value)}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Organization or Full Name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+
+            <Input
+              label="Work Email Address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            <Input
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <div className="pt-1">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={termsAgreed}
+                  onChange={(e) => setTermsAgreed(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-white/[0.2] bg-black/40 text-emerald-500 focus:ring-emerald-500"
                 />
-              </div>
+                <span className="text-zinc-400 text-xs leading-relaxed">
+                  I agree to the{" "}
+                  <Link href="/terms" className="underline hover:text-white">Terms of Service</Link>
+                  {" "}and{" "}
+                  <Link href="/privacy" className="underline hover:text-white">Privacy Policy</Link>.
+                </span>
+              </label>
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="Work Email Address *"
-                  type="email"
-                  placeholder="dev@apextech.ng"
-                  value={devEmail}
-                  onChange={(e) => setDevEmail(e.target.value)}
-                  required
-                />
+            <button
+              type="submit"
+              disabled={isLoading || isGoogleLoading}
+              className="btn-pill-primary !w-full !py-3 !text-sm !font-bold h-11 cursor-pointer mt-2 shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+            >
+              {isLoading ? "Creating account..." : "Create Account"}
+            </button>
+          </form>
 
-                <Input
-                  label="Official Telephone"
-                  type="tel"
-                  placeholder="0803 123 4567"
-                  value={devPhone}
-                  onChange={(e) => setDevPhone(e.target.value)}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="Representative Full Name *"
-                  type="text"
-                  placeholder="CHIDERA EMEKA"
-                  value={devDirectorName}
-                  onChange={(e) => setDevDirectorName(e.target.value)}
-                  required
-                />
-
-                <Input
-                  label="Representative 11-digit NIN *"
-                  type="text"
-                  maxLength={11}
-                  placeholder="22198765432"
-                  value={devDirectorNin}
-                  onChange={(e) => setDevDirectorNin(e.target.value)}
-                  required
-                />
-              </div>
-
-              <Input
-                label="Password (minimum 8 characters) *"
-                type="password"
-                placeholder="••••••••••••"
-                value={devPassword}
-                onChange={(e) => setDevPassword(e.target.value)}
-                required
-              />
-
-              <div className="space-y-2 p-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950/60 text-[11px]">
-                <label className="flex items-start gap-2.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={devLawfulBasisAgreed}
-                    onChange={(e) => setDevLawfulBasisAgreed(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300 dark:border-zinc-700 text-emerald-600 focus:ring-emerald-500"
-                  />
-                  <span className="text-slate-600 dark:text-zinc-300 leading-relaxed">
-                    I certify that our organization processes identity verifications strictly with end-user consent pursuant to Section 25 of the Nigeria Data Protection Act (NDPA 2023).
-                  </span>
-                </label>
-
-                <label className="flex items-start gap-2.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={devTermsAgreed}
-                    onChange={(e) => setDevTermsAgreed(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300 dark:border-zinc-700 text-emerald-600 focus:ring-emerald-500"
-                  />
-                  <span className="text-slate-600 dark:text-zinc-300 leading-relaxed">
-                    I agree to the Verixa Terms of Service, Privacy Policy, and Dedicated Virtual Account settlement conditions.
-                  </span>
-                </label>
-              </div>
-
-              <Button
-                type="submit"
-                variant="emerald"
-                size="md"
-                className="w-full font-bold h-11"
-                isLoading={isLoading}
-              >
-                Create Developer Account &rarr;
-              </Button>
-            </form>
-          )}
-
-          <div className="mt-6 pt-4 border-t border-slate-200 dark:border-zinc-800 text-center">
-            <span className="text-xs text-slate-500 dark:text-zinc-400">
+          <div className="mt-6 pt-4 border-t border-white/[0.08] text-center">
+            <span className="text-xs text-zinc-400">
               Already have an account?{" "}
-              <Link href="/login" className="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
-                Sign in &rarr;
+              <Link href="/login" className="font-semibold text-emerald-400 hover:underline">
+                Sign in →
               </Link>
             </span>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   )

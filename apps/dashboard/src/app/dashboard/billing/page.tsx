@@ -239,52 +239,118 @@ export default function BillingPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Service Endpoint</TableHead>
-              <TableHead>Live Upstream Rate</TableHead>
-              <TableHead>Intelligent Cache</TableHead>
-              <TableHead>Latency SLA</TableHead>
+              <TableHead>Method & Endpoint</TableHead>
+              <TableHead>Service</TableHead>
+              <TableHead>Benchmark</TableHead>
+              <TableHead>Active Verixa Rate</TableHead>
+              <TableHead>Cache Split</TableHead>
               <TableHead>Billing Policy</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
+            <TableRow>
+              <TableCell className="font-mono text-xs">
+                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                <span className="text-zinc-200">/api/nin-verification</span>
+              </TableCell>
+              <TableCell className="font-medium text-white">NIN Verification</TableCell>
+              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦150</TableCell>
+              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="text-sm">₦135</span>
+                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
+              </TableCell>
+              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
+              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell className="font-mono text-xs">
+                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                <span className="text-zinc-200">/api/bvn-verification</span>
+              </TableCell>
+              <TableCell className="font-medium text-white">BVN Verification</TableCell>
+              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦100</TableCell>
+              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="text-sm">₦85</span>
+                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
+              </TableCell>
+              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
+              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell className="font-mono text-xs">
+                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                <span className="text-zinc-200">/api/nin-phone</span>
+              </TableCell>
+              <TableCell className="font-medium text-white">NIN Phone Search</TableCell>
+              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦200</TableCell>
+              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="text-sm">₦185</span>
+                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
+              </TableCell>
+              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
+              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell className="font-mono text-xs">
+                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                <span className="text-zinc-200">/api/bvn-phone</span>
+              </TableCell>
+              <TableCell className="font-medium text-white">BVN Phone Search</TableCell>
+              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦150</TableCell>
+              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="text-sm">₦135</span>
+                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
+              </TableCell>
+              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
+              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell className="font-mono text-xs">
+                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                <span className="text-zinc-200">/api/nin-demography</span>
+              </TableCell>
+              <TableCell className="font-medium text-white">NIN Demography</TableCell>
+              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦250</TableCell>
+              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="text-sm">₦235</span>
+                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
+              </TableCell>
+              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
+              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell className="font-mono text-xs">
+                <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
+                <span className="text-zinc-200">/api/nin-tracking</span>
+              </TableCell>
+              <TableCell className="font-medium text-white">NIN Tracking</TableCell>
+              <TableCell className="font-sans text-xs text-zinc-500 line-through">₦200</TableCell>
+              <TableCell className="font-sans font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="text-sm">₦185</span>
+                <span className="text-[10px] font-normal text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">-₦15</span>
+              </TableCell>
+              <TableCell className="font-mono text-xs text-emerald-400">Up to 30% off</TableCell>
+              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+            </TableRow>
+
             <TableRow className="bg-emerald-500/5">
+              <TableCell className="font-mono text-xs">
+                <span className="text-sky-400 font-bold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20 mr-2">GET</span>
+                <span className="text-zinc-200">/api/balance</span>
+              </TableCell>
               <TableCell className="font-medium text-white flex items-center gap-2">
-                Bank Account Resolution (NUBAN)
-                <Badge variant="verified" size="sm">FREE FOR NOW</Badge>
+                Account Balance
+                <Badge variant="verified" size="sm">FREE</Badge>
               </TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">₦0.00 (Free)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">
-                Cache Split Included
-              </TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;120ms</TableCell>
-              <TableCell className="text-xs text-emerald-400">Zero Charge</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium text-white">NIN Advance Verification</TableCell>
-              <TableCell className="font-mono text-zinc-200 font-bold">140 NGX (₦140)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">
-                Cache Split Enabled
-              </TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;180ms</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium text-white">Official NIN Slip (Standard & Premium)</TableCell>
-              <TableCell className="font-mono text-zinc-200 font-bold">270 NGX (₦270)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">
-                Cache Split Enabled
-              </TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;250ms</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK generation</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium text-white">Bank Verification Number (BVN)</TableCell>
-              <TableCell className="font-mono text-zinc-200 font-bold">50 NGX (₦50)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">
-                Cache Split Enabled
-              </TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;150ms</TableCell>
-              <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+              <TableCell className="font-sans text-xs text-zinc-500">Free</TableCell>
+              <TableCell className="font-sans font-bold text-emerald-400">₦0 (Free)</TableCell>
+              <TableCell className="font-mono text-xs text-zinc-400">Instant</TableCell>
+              <TableCell className="text-xs text-emerald-400">Zero Charge Always</TableCell>
             </TableRow>
           </TableBody>
         </Table>

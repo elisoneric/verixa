@@ -100,7 +100,7 @@ export default function PhoneDocsPage() {
   "cached": false,
   "billed_amount": 50,
   "meta": {
-    "provider": "dojah",
+    "provider": "ncc_direct",
     "variant": "basic",
     "latency_ms": 178
   }

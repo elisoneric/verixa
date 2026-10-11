@@ -97,12 +97,12 @@ export default function MessagingDocsPage() {
   "data": {
     "status": "Sent",
     "mobile": "2348012345678",
-    "message_id": "dj_c8095767-c69f-4bd7-aa52-7cb469effb51",
+    "message_id": "vx_c8095767-c69f-4bd7-aa52-7cb469effb51",
     "reference_id": "cc7f9a23-959a-4708-ac6e-5cffec7682ba"
   },
   "billed_amount": 5,
   "meta": {
-    "provider": "dojah",
+    "provider": "verixa",
     "latency_ms": 112
   }
 }`}

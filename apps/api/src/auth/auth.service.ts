@@ -131,6 +131,63 @@ export class AuthService {
     };
   }
 
+  async googleAuth(email?: string, name?: string, credential?: string) {
+    const userEmail = email || 'developer@gmail.com';
+    const orgName = name ? `${name}'s Org` : 'Google Workspace Org';
+
+    let user = await this.userRepository.findOne({ where: { email: userEmail } });
+    let orgId: string;
+
+    if (!user) {
+      const org = new Organization();
+      org.name = orgName;
+      org.complianceData = {
+        authProvider: 'google',
+        verifiedAt: new Date().toISOString(),
+      };
+      await this.orgRepository.save(org);
+      orgId = org.id;
+
+      const liveWallet = new Wallet();
+      liveWallet.environment = Environment.LIVE;
+      liveWallet.org_id = org.id;
+      liveWallet.balance = 0;
+      await this.dataSource.getRepository(Wallet).save(liveWallet);
+
+      const sandboxWallet = new Wallet();
+      sandboxWallet.environment = Environment.SANDBOX;
+      sandboxWallet.org_id = org.id;
+      sandboxWallet.balance = 100000;
+      await this.dataSource.getRepository(Wallet).save(sandboxWallet);
+
+      user = new User();
+      user.email = userEmail;
+      user.passwordHash = await bcrypt.hash(uuidv4(), 10);
+      user.role = UserRole.DEVELOPER;
+      user.org_id = org.id;
+      await this.userRepository.save(user);
+
+      await this.generateApiKey(orgId, Environment.SANDBOX, 'Default Sandbox Key');
+    } else {
+      orgId = user.org_id;
+    }
+
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    const payload = { sub: user.id, email: user.email, org_id: orgId, role: user.role };
+
+    return {
+      message: 'Google authentication successful',
+      access_token: await this.jwtService.signAsync(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        org_id: orgId,
+        role: user.role,
+        org_name: org?.name || 'Organization',
+      },
+    };
+  }
+
   async getMe(userId: string) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {

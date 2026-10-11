@@ -190,8 +190,8 @@ export class VerificationsController {
   }
 
   @UseGuards(ApiKeyGuard)
-  @Get('providers/dojah/balance')
-  async getDojahBalance() {
+  @Get('providers/upstream/balance')
+  async getUpstreamBalance() {
     return this.dojahProvider.getUpstreamBalance();
   }
 
@@ -460,7 +460,7 @@ export class VerificationsController {
       }
     }
 
-    // 2. Cache MISS: Live Upstream Registry Query (e.g. Dojah / NIMC / NIBSS)
+    // 2. Cache MISS: Live Upstream Registry Query (e.g. Primary Registry / NIMC / NIBSS)
     const liveRate = await this.billingService.getEffectiveRate(req.organizationId, serviceType, false);
     const cost = liveRate.effectiveRate;
     const reference = uuidv4();
@@ -481,7 +481,7 @@ export class VerificationsController {
           serviceType,
           identifier,
           result.data,
-          result.meta?.provider || 'dojah',
+          result.meta?.provider || 'direct',
         );
       }
 
@@ -495,7 +495,7 @@ export class VerificationsController {
           result.status === 'success'
             ? VerificationStatus.SUCCESS
             : VerificationStatus.FAILED,
-        upstreamProvider: result.meta?.provider || 'dojah',
+        upstreamProvider: result.meta?.provider || 'direct',
         isCached: false,
         source: 'LIVE',
         costDeducted: cost,

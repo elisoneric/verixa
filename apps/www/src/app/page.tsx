@@ -235,7 +235,7 @@ func main() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans selection:bg-emerald-500/25 selection:text-emerald-300 antialiased relative">
+    <div className="min-h-screen bg-[#06070a] text-zinc-100 flex flex-col font-sans selection:bg-emerald-500/25 selection:text-emerald-300 antialiased relative">
       {/* Ambient Top Glow Orbs to give the Frosted Glass true translucent color diffusion */}
       <div
         aria-hidden="true"
@@ -263,7 +263,7 @@ func main() {
       <div
         className="sticky top-16 z-40 border-b border-white/[0.08]"
         style={{
-          backgroundColor: "rgba(9, 9, 11, 0.72)",
+          backgroundColor: "rgba(6, 7, 10, 0.75)",
           backdropFilter: "blur(20px) saturate(180%)",
           WebkitBackdropFilter: "blur(20px) saturate(180%)",
         }}
@@ -325,7 +325,7 @@ func main() {
                   <AppLink
                     app="dashboard"
                     path="/register"
-                    className="inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold bg-white hover:bg-zinc-200 text-zinc-950 transition-all shadow-md active:scale-[0.99]"
+                    className="btn-pill-primary !px-7 !py-3.5 text-sm flex items-center gap-2 shadow-[0_0_25px_rgba(255,255,255,0.25)]"
                   >
                     Get your API key &rarr;
                   </AppLink>
@@ -333,7 +333,7 @@ func main() {
                   <AppLink
                     app="docs"
                     path="/"
-                    className="inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium bg-white/[0.06] hover:bg-white/[0.12] text-zinc-200 border border-white/[0.1] transition-all backdrop-blur-md active:scale-[0.99]"
+                    className="btn-pill-secondary !px-6 !py-3.5 text-sm flex items-center gap-2"
                   >
                     Read the docs
                   </AppLink>
@@ -638,142 +638,225 @@ func main() {
                     <th className="w-[15%] text-right">Discount / Savings</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.06] text-xs sm:text-sm">
-                  {/* Airtime */}
-                  <tr className="hover:bg-white/[0.02] transition-colors bg-emerald-500/[0.02]">
+                <tbody className="divide-y divide-white/[0.06] text-xs sm:text-sm clean-nums">
+                  {/* 1. NIN Verification */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium flex items-center gap-2">
-                        Airtime Top-up (VTU)
-                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
-                          Telecom VAS
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
                         </span>
+                        <span>NIN Verification</span>
                       </div>
-                      <div className="text-zinc-500 text-xs">POST /v1/vas/airtime</div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/nin-verification</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      Official NIMC national ID validation, vNIN lookup, real-time match
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-180ms · 99.9%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-white font-bold text-sm">₦135.00</span>
+                        <span className="line-through text-zinc-500 text-xs">₦150.00</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
+                    </td>
+                  </tr>
+
+                  {/* 2. BVN Verification */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
+                        </span>
+                        <span>BVN Verification</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/bvn-verification</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      NIBSS bank verification number lookup, name match & confidence scoring
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-150ms · 99.9%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-white font-bold text-sm">₦85.00</span>
+                        <span className="line-through text-zinc-500 text-xs">₦100.00</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
+                    </td>
+                  </tr>
+
+                  {/* 3. NIN Phone Search */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
+                        </span>
+                        <span>NIN Phone Search</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/nin-phone</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      Discover linked NIN record using MSISDN telephone lookup
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-200ms · 99.9%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-white font-bold text-sm">₦185.00</span>
+                        <span className="line-through text-zinc-500 text-xs">₦200.00</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
+                    </td>
+                  </tr>
+
+                  {/* 4. BVN Phone Search */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
+                        </span>
+                        <span>BVN Phone Search</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/bvn-phone</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      Query linked BVN identity details via subscriber phone number
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-180ms · 99.9%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-white font-bold text-sm">₦135.00</span>
+                        <span className="line-through text-zinc-500 text-xs">₦150.00</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
+                    </td>
+                  </tr>
+
+                  {/* 5. NIN Demography */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
+                        </span>
+                        <span>NIN Demography</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/nin-demography</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      Comprehensive full demographic profile, photo, and address verification
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-240ms · 99.8%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-white font-bold text-sm">₦235.00</span>
+                        <span className="line-through text-zinc-500 text-xs">₦250.00</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
+                    </td>
+                  </tr>
+
+                  {/* 6. NIN Tracking */}
+                  <tr className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
+                        </span>
+                        <span>NIN Tracking</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/nin-tracking</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      Real-time enrollment tracking ID verification and status lookup
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-190ms · 99.9%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-white font-bold text-sm">₦185.00</span>
+                        <span className="line-through text-zinc-500 text-xs">₦200.00</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      -₦15.00 <span className="text-[10px] text-emerald-500/80 font-normal">Dropped Rate</span>
+                    </td>
+                  </tr>
+
+                  {/* 7. Account Balance */}
+                  <tr className="hover:bg-white/[0.02] transition-colors bg-emerald-500/[0.03]">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-500/15 text-sky-400 border border-sky-500/25">
+                          GET
+                        </span>
+                        <span>Account Balance</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/api/balance</div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-400">
+                      Instant wallet credit balance query for live & sandbox environments
+                    </td>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-15ms · 99.99%</td>
+                    <td className="py-4 px-4 font-sans">
+                      <span className="text-emerald-400 font-bold text-sm">Free (₦0.00)</span>
+                    </td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      100% Free
+                    </td>
+                  </tr>
+
+                  {/* Airtime VAS */}
+                  <tr className="hover:bg-white/[0.02] transition-colors bg-white/[0.01]">
+                    <td className="py-4 px-4 font-mono">
+                      <div className="text-white font-medium flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
+                        </span>
+                        <span>Airtime Top-up (VTU)</span>
+                      </div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/v1/vas/airtime</div>
                     </td>
                     <td className="py-4 px-4 text-zinc-400">
                       MTN, Airtel, Glo, 9mobile instant vending with auto-balance sync
                     </td>
-                    <td className="py-4 px-4 font-mono text-zinc-300">sub-2.0s · 99.9%</td>
-                    <td className="py-4 px-4 font-mono text-white font-medium">₦0 fee (Face Value)</td>
-                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      2.5% &ndash; 3.5% <span className="text-[10px] text-emerald-500/80">cashback</span>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-2.0s · 99.9%</td>
+                    <td className="py-4 px-4 font-sans text-white font-medium">₦0 fee (Face Value)</td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      2.5% &ndash; 3.5% cashback
                     </td>
                   </tr>
 
-                  {/* Mobile Data */}
-                  <tr className="hover:bg-white/[0.02] transition-colors bg-emerald-500/[0.02]">
+                  {/* Mobile Data VAS */}
+                  <tr className="hover:bg-white/[0.02] transition-colors bg-white/[0.01]">
                     <td className="py-4 px-4 font-mono">
                       <div className="text-white font-medium flex items-center gap-2">
-                        Mobile Data Bundles
-                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-sky-500/15 text-sky-400 border border-sky-500/20">
-                          Telecom VAS
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                          POST
                         </span>
+                        <span>Mobile Data Bundles</span>
                       </div>
-                      <div className="text-zinc-500 text-xs">POST /v1/vas/data</div>
+                      <div className="text-zinc-400 text-xs mt-0.5">/v1/vas/data</div>
                     </td>
                     <td className="py-4 px-4 text-zinc-400">
                       SME, Corporate & Direct data gifting (1GB to 50GB bundles)
                     </td>
-                    <td className="py-4 px-4 font-mono text-zinc-300">sub-2.5s · 99.9%</td>
-                    <td className="py-4 px-4 font-mono text-white font-medium">from ₦220.00 / GB</td>
-                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      Wholesale <span className="text-[10px] text-emerald-500/80">Tier 1</span>
-                    </td>
-                  </tr>
-
-                  {/* BVN */}
-                  <tr className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 font-mono">
-                      <div className="text-white font-medium">BVN Verification</div>
-                      <div className="text-zinc-500 text-xs">POST /v1/verify/bvn</div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-400">
-                      Full name, DOB, phone, photo match & fuzzy scoring
-                    </td>
-                    <td className="py-4 px-4 font-mono text-zinc-300">sub-200ms · 99.9%</td>
-                    <td className="py-4 px-4 font-mono text-white font-medium">₦50.00</td>
-                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦20.00 cache <span className="text-[10px] text-emerald-500/80">(-60%)</span>
-                    </td>
-                  </tr>
-
-                  {/* NIN */}
-                  <tr className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 font-mono">
-                      <div className="text-white font-medium">NIN National Identity</div>
-                      <div className="text-zinc-500 text-xs">POST /v1/verify/nin</div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-400">
-                      NIMC database lookup, vNIN validation, residence state
-                    </td>
-                    <td className="py-4 px-4 font-mono text-zinc-300">sub-220ms · 99.9%</td>
-                    <td className="py-4 px-4 font-mono text-white font-medium">₦50.00</td>
-                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦20.00 cache <span className="text-[10px] text-emerald-500/80">(-60%)</span>
-                    </td>
-                  </tr>
-
-                  {/* NUBAN */}
-                  <tr className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 font-mono">
-                      <div className="text-white font-medium">NUBAN Bank Account</div>
-                      <div className="text-zinc-500 text-xs">POST /v1/verify/bank-account</div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-400">
-                      Account name resolution, bank code validation, status
-                    </td>
-                    <td className="py-4 px-4 font-mono text-zinc-300">sub-120ms · 99.95%</td>
-                    <td className="py-4 px-4 font-mono text-white font-medium">₦10.00</td>
-                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦5.00 cache <span className="text-[10px] text-emerald-500/80">(-50%)</span>
-                    </td>
-                  </tr>
-
-                  {/* Messaging */}
-                  <tr className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 font-mono">
-                      <div className="text-white font-medium">SMS & WhatsApp Messaging</div>
-                      <div className="text-zinc-500 text-xs">POST /v1/messaging/sms</div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-400">
-                      DND bypass OTP, alphanumeric sender ID, WhatsApp delivery
-                    </td>
-                    <td className="py-4 px-4 font-mono text-zinc-300">sub-3.0s · 99.9%</td>
-                    <td className="py-4 px-4 font-mono text-white font-medium">₦3.50 / SMS</td>
-                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦12.00 / WhatsApp
-                    </td>
-                  </tr>
-
-                  {/* Phone KYC */}
-                  <tr className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 font-mono">
-                      <div className="text-white font-medium">Phone Number KYC</div>
-                      <div className="text-zinc-500 text-xs">POST /v1/verify/phone</div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-400">
-                      Network provider, active SIM status, subscriber match
-                    </td>
-                    <td className="py-4 px-4 font-mono text-zinc-300">sub-180ms · 99.9%</td>
-                    <td className="py-4 px-4 font-mono text-white font-medium">₦25.00</td>
-                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦12.50 cache <span className="text-[10px] text-emerald-500/80">(-50%)</span>
-                    </td>
-                  </tr>
-
-                  {/* CAC */}
-                  <tr className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-4 font-mono">
-                      <div className="text-white font-medium">CAC Corporate Entity (KYB)</div>
-                      <div className="text-zinc-500 text-xs">POST /v1/verify/cac</div>
-                    </td>
-                    <td className="py-4 px-4 text-zinc-400">
-                      RC/BN registration validation, directors, official address
-                    </td>
-                    <td className="py-4 px-4 font-mono text-zinc-300">sub-350ms · 99.8%</td>
-                    <td className="py-4 px-4 font-mono text-white font-medium">₦150.00</td>
-                    <td className="py-4 px-4 font-mono text-emerald-400 font-bold text-right">
-                      ₦75.00 cache <span className="text-[10px] text-emerald-500/80">(-50%)</span>
+                    <td className="py-4 px-4 font-sans text-zinc-300">sub-2.5s · 99.9%</td>
+                    <td className="py-4 px-4 font-sans text-white font-medium">from ₦220.00 / GB</td>
+                    <td className="py-4 px-4 font-sans text-emerald-400 font-bold text-right">
+                      Wholesale Tier 1
                     </td>
                   </tr>
                 </tbody>
@@ -864,7 +947,7 @@ func main() {
               <AppLink
                 app="docs"
                 path="/bvn"
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] p-5 transition-all block"
+                className="group rounded-xl glass-card border border-white/[0.08] bg-[#0e1118]/60 hover:bg-[#121620]/80 hover:border-white/[0.12] p-5 transition-all block"
               >
                 <div className="flex items-center gap-3 mb-2">
                   <svg className="size-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -885,7 +968,7 @@ func main() {
               <AppLink
                 app="docs"
                 path="/nin"
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] p-5 transition-all block"
+                className="group rounded-xl glass-card border border-white/[0.08] bg-[#0e1118]/60 hover:bg-[#121620]/80 hover:border-white/[0.12] p-5 transition-all block"
               >
                 <div className="flex items-center gap-3 mb-2">
                   <svg className="size-5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -907,7 +990,7 @@ func main() {
               <AppLink
                 app="docs"
                 path="/nuban"
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] p-5 transition-all block"
+                className="group rounded-xl glass-card border border-white/[0.08] bg-[#0e1118]/60 hover:bg-[#121620]/80 hover:border-white/[0.12] p-5 transition-all block"
               >
                 <div className="flex items-center gap-3 mb-2">
                   <svg className="size-5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -927,7 +1010,7 @@ func main() {
               <AppLink
                 app="docs"
                 path="/smart-cache"
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] p-5 transition-all block"
+                className="group rounded-xl glass-card border border-white/[0.08] bg-[#0e1118]/60 hover:bg-[#121620]/80 hover:border-white/[0.12] p-5 transition-all block"
               >
                 <div className="flex items-center gap-3 mb-2">
                   <svg className="size-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -946,7 +1029,7 @@ func main() {
               <AppLink
                 app="docs"
                 path="/cac"
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] p-5 transition-all block"
+                className="group rounded-xl glass-card border border-white/[0.08] bg-[#0e1118]/60 hover:bg-[#121620]/80 hover:border-white/[0.12] p-5 transition-all block"
               >
                 <div className="flex items-center gap-3 mb-2">
                   <svg className="size-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

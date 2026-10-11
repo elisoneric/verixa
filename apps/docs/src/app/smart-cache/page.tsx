@@ -32,7 +32,7 @@ export default function SmartCacheDocsPage() {
             </div>
             <h4 className="text-sm font-bold text-white">Live Upstream Query</h4>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              When an identity is verified for the first time, Verixa routes the request to authorized official registries (Dojah / NIMC / NIBSS). The verified payload is stored in Verixa's tenant-isolated in-memory Redis cache with a 30-day retention window. Billed at standard live rate (₦50).
+              When an identity is verified for the first time, Verixa routes the request to authorized official registries (NIMC / NIBSS Primary Registries). The verified payload is stored in Verixa's tenant-isolated in-memory Redis cache with a 30-day retention window. Billed at standard live rate (₦50).
             </p>
           </div>
 
@@ -115,7 +115,7 @@ export default function SmartCacheDocsPage() {
     "cached": true,
     "cached_at": "2026-10-01T14:22:10.450Z",
     "provider": "verixa_smart_cache",
-    "upstream_provider": "dojah",
+    "upstream_provider": "primary_gateway",
     "referenceId": "vx_cache_8f19a02d41ba",
     "cost_ngx": 20,
     "latency_ms": 12,

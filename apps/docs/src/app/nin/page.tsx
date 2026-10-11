@@ -109,7 +109,7 @@ export default function NinDocsPage() {
   "cached": false,
   "billed_amount": 100,
   "meta": {
-    "provider": "dojah",
+    "provider": "nimc_direct",
     "tier": "advance",
     "request_id": "vx_req_2b88f10c",
     "latency_ms": 168

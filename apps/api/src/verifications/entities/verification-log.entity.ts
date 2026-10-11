@@ -34,7 +34,7 @@ export class VerificationLog {
   status: VerificationStatus;
 
   @Column()
-  upstreamProvider: string; // e.g., 'mock', 'dojah'
+  upstreamProvider: string; // e.g., 'mock', 'direct', 'smart_cache'
 
   @Column({ nullable: true })
   @Index({ unique: true })

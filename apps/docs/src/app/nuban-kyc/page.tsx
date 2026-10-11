@@ -101,7 +101,7 @@ export default function NubanKycDocsPage() {
   "cached": false,
   "billed_amount": 80,
   "meta": {
-    "provider": "dojah",
+    "provider": "nibss_direct",
     "latency_ms": 164
   }
 }`}
