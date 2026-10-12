@@ -22,7 +22,7 @@ function getBaseHost(): { isProd: boolean; hostname: string; protocol: string } 
   const isProd = process.env.NODE_ENV === "production" && process.env.NEXT_PUBLIC_VERIXA_ENV !== "local"
   return {
     isProd,
-    hostname: isProd ? "verixa.esam.com.ng" : "localhost",
+    hostname: isProd ? "verixaid.com" : "localhost",
     protocol: isProd ? "https:" : "http:",
   }
 }
@@ -33,6 +33,9 @@ export function getDashboardUrl(path = ""): string {
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
+    if (hostname.includes("verixaid.com")) {
+      return "https://verixaid.com" + path
+    }
     return "https://verixa.esam.com.ng" + path
   }
   return `${protocol}//${hostname}:3000${path}`
@@ -44,6 +47,9 @@ export function getDocsUrl(path = ""): string {
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
+    if (hostname.includes("verixaid.com")) {
+      return "https://docs.verixaid.com" + path
+    }
     return "https://docs-verixa.esam.com.ng" + path
   }
   return `${protocol}//${hostname}:3002${path}`
@@ -55,6 +61,9 @@ export function getWwwUrl(path = ""): string {
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
+    if (hostname.includes("verixaid.com")) {
+      return "https://verixaid.com" + path
+    }
     return "https://verixa.esam.com.ng" + path
   }
   return `${protocol}//${hostname}:3001${path}`
@@ -66,6 +75,9 @@ export function getApiUrl(path = ""): string {
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
+    if (hostname.includes("verixaid.com")) {
+      return "https://api.verixaid.com" + path
+    }
     return "https://api-verixa.esam.com.ng" + path
   }
   return `${protocol}//${hostname}:4000${path}`

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import Link from "next/link";
 import { Logo, AppLink, GlassyHeader } from "@verixa/ui";
@@ -14,9 +14,59 @@ const outfit = Outfit({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#06070a",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
-  title: "Verixa ID Documentation — Developer API Reference",
-  description: "Developer integration guides, API schemas, and SDKs for BVN, NIN, and Bank Account verification.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_DOCS_URL || "https://docs.verixaid.com"),
+  title: {
+    default: "Documentation & API Reference — Verixa ID",
+    template: "%s | Verixa ID Docs",
+  },
+  description:
+    "Comprehensive developer documentation, endpoint reference, curl examples, and architecture guides for BVN, NIN, CAC, NUBAN, and biometric verification APIs.",
+  applicationName: "Verixa ID Docs",
+  keywords: [
+    "Verixa API documentation",
+    "BVN API integration",
+    "NIN API Nigeria",
+    "NUBAN lookup docs",
+    "KYC API reference",
+    "Dojah API compatibility",
+    "Smart Identity Cache documentation",
+  ],
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    shortcut: "/icon.svg",
+    apple: [{ url: "/icon.svg", sizes: "180x180" }],
+  },
+  openGraph: {
+    type: "website",
+    title: "Verixa ID Documentation — Developer API Reference",
+    description:
+      "Interactive endpoint documentation and implementation guides for African identity verification APIs.",
+    siteName: "Verixa ID Docs",
+    images: [{ url: "/icon.svg", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Verixa ID Documentation & API Reference",
+    description: "Explore 23+ endpoints for identity, KYB, and bank account resolution.",
+    creator: "@verixaid",
+    images: ["/icon.svg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

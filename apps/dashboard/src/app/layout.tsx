@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../lib/auth-context";
@@ -7,16 +7,51 @@ import { ThemeProvider } from "../lib/theme-context";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
+  display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#06070a",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
-  title: "Verixa — Identity Verification & KYC Infrastructure",
-  description: "Developer-first identity verification, KYC lookup, and automated slip generation for fintech, betting, and digital commerce",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_DASHBOARD_URL || "https://verixaid.com"),
+  title: {
+    default: "Developer Console — Verixa ID",
+    template: "%s | Verixa ID Console",
+  },
+  description:
+    "Developer console for API keys, Paystack DVA wallet management, verification transaction logs, interactive API explorer, and automated NIN dual-slip generation.",
+  applicationName: "Verixa ID Console",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    shortcut: "/icon.svg",
+    apple: [{ url: "/icon.svg", sizes: "180x180" }],
+  },
+  openGraph: {
+    type: "website",
+    title: "Verixa ID Developer Console",
+    description: "Manage API keys, inspect identity lookup audit trails, and top up prepaid verification credits.",
+    siteName: "Verixa ID",
+    images: [{ url: "/icon.svg", width: 1200, height: 630 }],
+  },
+  robots: {
+    index: false, // Internal console pages should not be indexed by search spiders for privacy
+    follow: true,
+  },
 };
 
 export default function RootLayout({

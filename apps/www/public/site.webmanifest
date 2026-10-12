@@ -1,0 +1,17 @@
+{
+  "name": "Verixa ID",
+  "short_name": "Verixa",
+  "description": "Enterprise identity verification and KYC infrastructure",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06070a",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="vx-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1117" />
+      <stop offset="100%" stop-color="#050608" />
+    </linearGradient>
+    <linearGradient id="vx-emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#vx-bg)" />
+  <rect x="1" y="1" width="62" height="62" rx="15" stroke="#10b981" stroke-opacity="0.35" stroke-width="2" />
+  <path d="M16 19L30 46L44 19H36.5L30 33L23.5 19H16Z" fill="#ffffff" />
+  <path d="M34 35L42 43L54 26" stroke="url(#vx-emerald)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
