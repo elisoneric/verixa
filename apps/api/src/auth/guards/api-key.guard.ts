@@ -17,19 +17,27 @@ export class ApiKeyGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const authHeader = (request.headers.authorization || '').trim();
-    const appIdHeader = request.headers.appid || request.headers['app-id'];
+    const rawApiKey = (
+      request.headers['x-api-key'] ||
+      request.headers['x-api-token'] ||
+      request.headers['api-key'] ||
+      request.headers.authorization ||
+      ''
+    ).trim();
+
+    // App ID is completely optional
+    const appIdHeader = request.headers.appid || request.headers['app-id'] || request.headers['x-app-id'];
     if (appIdHeader) {
       request.appId = Array.isArray(appIdHeader) ? appIdHeader[0] : appIdHeader;
     }
 
-    if (!authHeader) {
-      throw new UnauthorizedException('Missing or invalid API key');
+    if (!rawApiKey) {
+      throw new UnauthorizedException('Missing API key. Please provide your API key in the X-Api-Key or Authorization header.');
     }
 
-    const token = authHeader.startsWith('Bearer ')
-      ? authHeader.slice(7).trim()
-      : authHeader;
+    const token = rawApiKey.startsWith('Bearer ')
+      ? rawApiKey.slice(7).trim()
+      : rawApiKey;
 
     if (token === 'vrx_test_demo') {
       if (process.env.NODE_ENV === 'production') {

@@ -66,12 +66,7 @@ export function getApiUrl(path = ""): string {
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
-    // If the browser is directly hosted on api.verixaid.com
-    if (hostname === "api.verixaid.com") {
-      return "https://api.verixaid.com" + path
-    }
-    // Live backend cluster
-    return "https://api-verixa.esam.com.ng" + path
+    return "https://api.verixaid.com" + path
   }
   return `${protocol}//${hostname}:4000${path}`
 }
