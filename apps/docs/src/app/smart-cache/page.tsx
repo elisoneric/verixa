@@ -13,7 +13,7 @@ export default function SmartCacheDocsPage() {
           Smart Identity Cache & Billing
         </h1>
         <p className="mt-2 text-base text-zinc-400 leading-relaxed">
-          Accelerate recurring identity lookups to sub-15ms and slash verification costs by up to 60% with Verixa's automated identity caching engine.
+          Accelerate recurring identity lookups to sub-15ms and slash verification costs by 50% with Verixa's automated identity caching engine.
         </p>
       </div>
 
@@ -32,7 +32,7 @@ export default function SmartCacheDocsPage() {
             </div>
             <h4 className="text-sm font-bold text-white">Live Upstream Query</h4>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              When an identity is verified for the first time, Verixa routes the request to authorized upstream verification registries. The verified payload is stored in Verixa's tenant-isolated in-memory Redis cache with a 30-day retention window. Billed at standard live rate (₦50).
+              When an identity is verified for the first time, Verixa routes the request to authorized upstream verification registries. The verified payload is stored in Verixa's tenant-isolated in-memory Redis cache with a 30-day retention window. Billed at standard live rate (₦125 NIN / ₦95 BVN).
             </p>
           </div>
 
@@ -43,7 +43,7 @@ export default function SmartCacheDocsPage() {
             </div>
             <h4 className="text-sm font-bold text-white">Sub-15ms Cache Delivery</h4>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Subsequent queries for the same NIN, BVN, or account within 30 days are served instantly from cache memory without querying upstream registries. Billed at up to 60% discounted rates (₦20 for NIN/BVN, ₦5 for NUBAN).
+              Subsequent queries for the same NIN, BVN, or account within 30 days are served instantly from cache memory without querying upstream registries. Billed at 50% automated fee reduction (₦50 for NIN, ₦38 for BVN).
             </p>
           </div>
         </div>
@@ -71,21 +71,21 @@ export default function SmartCacheDocsPage() {
               <TableCell className="font-semibold text-white">BVN Verification</TableCell>
               <TableCell className="font-mono text-zinc-300">95 NGX (₦95.00)</TableCell>
               <TableCell className="font-mono text-emerald-400 font-bold">38 NGX (₦38.00)</TableCell>
-              <TableCell className="text-emerald-400 font-bold">60% OFF</TableCell>
+              <TableCell className="text-emerald-400 font-bold">50% OFF</TableCell>
               <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~140ms</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-semibold text-white">NIN Verification</TableCell>
               <TableCell className="font-mono text-zinc-300">125 NGX (₦125.00)</TableCell>
               <TableCell className="font-mono text-emerald-400 font-bold">50 NGX (₦50.00)</TableCell>
-              <TableCell className="text-emerald-400 font-bold">60% OFF</TableCell>
+              <TableCell className="text-emerald-400 font-bold">50% OFF</TableCell>
               <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~160ms</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-semibold text-white">CAC Company Verification</TableCell>
               <TableCell className="font-mono text-zinc-300">120 NGX (₦120.00)</TableCell>
               <TableCell className="font-mono text-emerald-400 font-bold">48 NGX (₦48.00)</TableCell>
-              <TableCell className="text-emerald-400 font-bold">60% OFF</TableCell>
+              <TableCell className="text-emerald-400 font-bold">50% OFF</TableCell>
               <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~220ms</TableCell>
             </TableRow>
             <TableRow>
@@ -124,7 +124,7 @@ export default function SmartCacheDocsPage() {
     "provider": "verixa_smart_cache",
     "upstream_provider": "primary_gateway",
     "referenceId": "vx_cache_8f19a02d41ba",
-    "cost_ngx": 20,
+    "cost_ngx": 50,
     "latency_ms": 12,
     "environment": "live"
   }
@@ -146,7 +146,7 @@ export default function SmartCacheDocsPage() {
   -H "Authorization: Bearer vrx_live_9f83a8f1e2..." \\
   -H "X-Bypass-Cache: true" \\
   -H "Content-Type: application/json" \\
-  -d '{"nin": "11234567890"}'`}
+  -d '{"nin": "11234567890", "consent": true}'`}
         />
       </div>
 

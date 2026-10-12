@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     "KYC API Nigeria",
     "KYB API Africa",
     "Smart Identity Cache",
-    "Dojah alternative",
+    "Identity Gateway",
     "NIMC slip generation",
     "Identity infrastructure",
     "Fintech onboarding Africa",

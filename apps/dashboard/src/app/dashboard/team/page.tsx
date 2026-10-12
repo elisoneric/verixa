@@ -14,23 +14,9 @@ export default function TeamPage() {
     {
       id: user?.id || "usr_1",
       email: user?.email || "admin@organization.com",
-      role: "ADMIN",
+      role: user?.is_super_admin ? "SUPER ADMIN" : "ADMIN",
       status: "Active",
       joinedAt: "Owner",
-    },
-    {
-      id: "usr_2",
-      email: "security-lead@acmefintech.com",
-      role: "DEVELOPER",
-      status: "Active",
-      joinedAt: "Aug 18, 2026",
-    },
-    {
-      id: "usr_3",
-      email: "finance-ops@acmefintech.com",
-      role: "VIEWER",
-      status: "Active",
-      joinedAt: "Aug 22, 2026",
     },
   ]
 

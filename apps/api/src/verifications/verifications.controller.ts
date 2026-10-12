@@ -24,7 +24,7 @@ import { VerificationLog, VerificationStatus } from './entities/verification-log
 import { v4 as uuidv4 } from 'uuid';
 import { IdempotencyInterceptor } from '../common/interceptors/idempotency.interceptor';
 import { maskPii } from '../common/utils/pii-masker.util';
-import { Environment } from '../organizations/entities/environment-config.entity';
+import { Environment, normalizeEnvironment } from '../organizations/entities/environment-config.entity';
 
 @Controller('v1/verify')
 export class VerificationsController {
@@ -421,11 +421,13 @@ export class VerificationsController {
       req.headers['x-refresh-cache'] === 'true' ||
       payload?.bypassCache === true;
 
+    const validEnv = normalizeEnvironment(req.environment);
+
     // 1. Check Smart Identity Cache (if enabled & not bypassed)
     if (!bypassCache && identifier) {
       const cached = await this.identityCacheService.getCachedRecord(
         req.organizationId,
-        req.environment,
+        validEnv,
         serviceType,
         identifier,
       );
@@ -437,14 +439,14 @@ export class VerificationsController {
         const reference = `vx_cache_${uuidv4().slice(0, 12)}`;
 
         // Deduct discounted cache fee atomically
-        await this.billingService.deductCredits(req.organizationId, req.environment, cost, reference);
+        await this.billingService.deductCredits(req.organizationId, validEnv, cost, reference);
 
         const latencyMs = Math.max(11, Date.now() - startTime);
 
         // Audit Log entry with isCached = true
         await this.logRepository.save({
           org_id: req.organizationId,
-          environment: req.environment,
+          environment: validEnv,
           api_key_id: req.apiKeyId || 'sdk_key',
           serviceType,
           status: VerificationStatus.SUCCESS,
@@ -453,7 +455,7 @@ export class VerificationsController {
           source: 'CACHE',
           costDeducted: cost,
           latencyMs,
-          cacheKey: this.identityCacheService.generateKey(req.organizationId, req.environment, serviceType, identifier),
+          cacheKey: this.identityCacheService.generateKey(req.organizationId, validEnv, serviceType, identifier),
           idempotencyKey: req.headers['idempotency-key'] || undefined,
           requestPayload: maskPii(payload),
           responsePayload: maskPii(cached.data),
@@ -470,7 +472,7 @@ export class VerificationsController {
             referenceId: reference,
             cost_ngx: cost,
             latency_ms: latencyMs,
-            environment: req.environment,
+            environment: validEnv,
           },
         };
       }
@@ -482,7 +484,7 @@ export class VerificationsController {
     const reference = uuidv4();
 
     // Deduct standard live fee atomically
-    await this.billingService.deductCredits(req.organizationId, req.environment, cost, reference);
+    await this.billingService.deductCredits(req.organizationId, validEnv, cost, reference);
 
     try {
       // Execute Upstream Provider Call
@@ -493,7 +495,7 @@ export class VerificationsController {
       if (result.status === 'success' && result.data && identifier) {
         await this.identityCacheService.setCachedRecord(
           req.organizationId,
-          req.environment,
+          validEnv,
           serviceType,
           identifier,
           result.data,
@@ -504,7 +506,7 @@ export class VerificationsController {
       // Log Live Request
       await this.logRepository.save({
         org_id: req.organizationId,
-        environment: req.environment,
+        environment: validEnv,
         api_key_id: req.apiKeyId || 'sdk_key',
         serviceType,
         status:
@@ -516,7 +518,7 @@ export class VerificationsController {
         source: 'LIVE',
         costDeducted: cost,
         latencyMs,
-        cacheKey: identifier ? this.identityCacheService.generateKey(req.organizationId, req.environment, serviceType, identifier) : undefined,
+        cacheKey: identifier ? this.identityCacheService.generateKey(req.organizationId, validEnv, serviceType, identifier) : undefined,
         idempotencyKey: req.headers['idempotency-key'] || undefined,
         requestPayload: maskPii(payload),
         responsePayload: maskPii(result.data || null),
@@ -530,12 +532,12 @@ export class VerificationsController {
           referenceId: reference,
           cost_ngx: cost,
           latency_ms: latencyMs,
-          environment: req.environment,
+          environment: validEnv,
         },
       };
     } catch (error) {
       // Refund if upstream fails
-      await this.billingService.refundCredits(req.organizationId, req.environment, cost, reference);
+      await this.billingService.refundCredits(req.organizationId, validEnv, cost, reference);
       throw new InternalServerErrorException('Upstream provider failed');
     }
   }

@@ -126,7 +126,7 @@ export default function AdminOverviewPage() {
               ₦{Number(metrics.totalSavingsNgx || 0).toLocaleString()}
             </span>
           </div>
-          <span className="mt-4 block text-xs text-slate-400 dark:text-zinc-500 font-mono">60% savings on repeat lookups</span>
+          <span className="mt-4 block text-xs text-slate-400 dark:text-zinc-500 font-mono">50% savings on repeat lookups</span>
         </Card>
       </div>
 

@@ -481,9 +481,13 @@ export class NotificationsService {
       };
     } catch (err: any) {
       this.logger.error(`SMTP diagnostic test failed for ${to}`, err);
+      let errMsg = err.message || 'Failed to dispatch test email';
+      if (errMsg.includes('ECONNREFUSED')) {
+        errMsg = `${errMsg} — No mail daemon running on target host. Note: If using cPanel (mail.verixaid.com), verify your DNS points to your cPanel server IP (not the VPS application server).`;
+      }
       return {
         success: false,
-        message: err.message || 'Failed to dispatch test email',
+        message: errMsg,
       };
     }
   }

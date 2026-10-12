@@ -9,41 +9,7 @@ import { VerificationLog, VerificationStatus } from '../verifications/entities/v
 import { Wallet } from '../billing/entities/wallet.entity';
 import { User } from '../users/entities/user.entity';
 import { NotificationsService, SmtpConfig } from '../notifications/notifications.service';
-import * as crypto from 'crypto';
-
-function getEncryptionKey(): string {
-  const key = process.env.SYSTEM_ENCRYPTION_KEY;
-  if (!key) {
-    return 'verixa_aes_encryption_key_default_32ch';
-  }
-  return key.padEnd(32, '0').slice(0, 32);
-}
-
-const ENCRYPTION_KEY = getEncryptionKey();
-const IV_LENGTH = 16;
-
-function encryptSecret(text: string): string {
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-  let encrypted = cipher.update(text);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return iv.toString('hex') + ':' + encrypted.toString('hex');
-}
-
-function decryptSecret(text: string): string {
-  try {
-    const textParts = text.split(':');
-    if (textParts.length < 2) return text;
-    const iv = Buffer.from(textParts.shift()!, 'hex');
-    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
-  } catch {
-    return text;
-  }
-}
+import { encryptSecret, decryptSecret } from '../common/utils/crypto.util';
 
 @Injectable()
 export class AdminService implements OnModuleInit {
@@ -127,6 +93,7 @@ export class AdminService implements OnModuleInit {
       key: c.key,
       value: c.isSecret ? '••••••••••••••••' : c.value,
       isSecret: c.isSecret,
+      isConfigured: Boolean(c.value && c.value.trim().length > 0 && !c.value.startsWith('sk_test_mock')),
       description: c.description,
       updatedAt: c.updatedAt,
     }));
@@ -525,7 +492,7 @@ export class AdminService implements OnModuleInit {
     const offset = query.offset || 0;
 
     const qb = this.verifyLogRepository.createQueryBuilder('log')
-      .leftJoin(Organization, 'org', 'org.id = log.org_id')
+      .leftJoin(Organization, 'org', 'org.id::text = log.org_id')
       .addSelect('org.name', 'orgName')
       .orderBy('log.createdAt', 'DESC')
       .limit(limit)
@@ -642,7 +609,7 @@ export class AdminService implements OnModuleInit {
         latency: '310ms',
       },
       {
-        provider: 'Dojah Upstream Gateway',
+        provider: 'Primary Upstream Gateway',
         status: (this.configCache['DOJAH_SECRET_KEY'] || this.configCache['vx_SECRET_KEY'] || process.env.DOJAH_SECRET_KEY || process.env.vx_SECRET_KEY) ? 'connected' : 'unconfigured',
         services: ['BVN', 'NIN', 'NIN Advance'],
         uptime: '99.91%',

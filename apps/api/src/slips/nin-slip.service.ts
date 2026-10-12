@@ -10,7 +10,7 @@ import { BillingService } from '../billing/billing.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VerificationLog, VerificationStatus } from '../verifications/entities/verification-log.entity';
-import { Environment } from '../organizations/entities/environment-config.entity';
+import { Environment, normalizeEnvironment } from '../organizations/entities/environment-config.entity';
 import { NinAdvanceResult } from '../verifications/providers/verification.provider.interface';
 
 @Injectable()
@@ -251,56 +251,98 @@ export class NinSlipService {
       throw new BadRequestException('A valid 11-digit NIN is required');
     }
 
+    const validEnv = normalizeEnvironment(environment);
     const startTime = Date.now();
 
-    // 1. Check Smart Identity Cache for existing NIN Advance record
+    // 1. Check Smart Identity Cache for existing NIN record
     const cached = await this.identityCacheService.getCachedRecord(
       orgId,
-      environment,
+      validEnv,
       'nin',
       cleanNin,
     );
 
-    let identityData: NinAdvanceResult;
+    let identityData: NinAdvanceResult | null = null;
     let isCacheHit = false;
     let cost = 0;
     const reference = `vx_slip_${uuidv4().slice(0, 12)}`;
 
-    if (cached && cached.data?.photo && cached.data?.trackingId) {
+    if (cached && cached.data?.photo) {
       // CACHE HIT! Discounted rate for regenerating existing verified slip
       isCacheHit = true;
       const rateInfo = await this.billingService.getEffectiveRate(orgId, 'nin_slip' as any, true);
       cost = rateInfo.effectiveRate;
-      await this.billingService.deductCredits(orgId, environment, cost, reference);
+      await this.billingService.deductCredits(orgId, validEnv, cost, reference);
       identityData = cached.data;
     } else {
-      // CACHE MISS: Live NIN Advance Query (Standard rate ₦250)
+      // CACHE MISS: Live NIN Query
       const rateInfo = await this.billingService.getEffectiveRate(orgId, 'nin_slip' as any, false);
       cost = rateInfo.effectiveRate;
-      await this.billingService.deductCredits(orgId, environment, cost, reference);
+      await this.billingService.deductCredits(orgId, validEnv, cost, reference);
 
       try {
-        const upstreamRes = await this.dojahProvider.verifyNinAdvance({ nin: cleanNin });
-        if (upstreamRes.status !== 'success' || !upstreamRes.data) {
-          throw new BadRequestException('NIN Advance verification failed or NIN not found');
+        let upstreamProviderName = 'direct';
+
+        // 1. Try Advance NIN lookup
+        try {
+          const upstreamRes = await this.dojahProvider.verifyNinAdvance({ nin: cleanNin });
+          if (upstreamRes.status === 'success' && upstreamRes.data) {
+            identityData = upstreamRes.data;
+            upstreamProviderName = upstreamRes.meta?.provider || 'direct';
+          }
+        } catch (advErr: any) {
+          this.logger.warn(`verifyNinAdvance attempt failed: ${advErr?.message}, falling back to verifyNin basic`);
         }
 
-        identityData = upstreamRes.data;
+        // 2. Fall back to Basic NIN lookup if Advance did not populate
+        if (!identityData) {
+          const basicRes = await this.dojahProvider.verifyNin({ nin: cleanNin });
+          if (basicRes.status !== 'success' || !basicRes.data) {
+            throw new BadRequestException('NIN verification failed or NIN record not found');
+          }
+          const b = basicRes.data;
+          let photoStr = b.photo || '';
+          if (photoStr.includes('base64,')) {
+            photoStr = photoStr.split('base64,')[1];
+          }
+
+          identityData = {
+            nin: cleanNin,
+            trackingId: b.tracking_id || b.trackingId || '',
+            firstName: b.firstname || b.first_name || '',
+            surname: b.surname || b.last_name || '',
+            middleName: b.middlename || b.middle_name || '',
+            gender: (b.gender || 'MALE').toUpperCase(),
+            birthdate: b.birthdate || b.date_of_birth || b.dob || '',
+            address: b.residence_address_line_1 || b.residence_address || b.address || '',
+            addressLine1: b.residence_address_line_1 || b.residence_town || '',
+            state: b.residence_state || b.birth_state || b.state || '',
+            lga: b.residence_lga || b.birth_lga || b.lga || '',
+            phoneNumber: b.telephoneno || b.phone_number || '',
+            photo: photoStr,
+            signature: b.signature || '',
+          };
+          upstreamProviderName = basicRes.meta?.provider || 'direct';
+        }
 
         // Store into Smart Cache
         await this.identityCacheService.setCachedRecord(
           orgId,
-          environment,
+          validEnv,
           'nin',
           cleanNin,
           identityData,
-          upstreamRes.meta?.provider || 'dojah',
+          upstreamProviderName,
         );
       } catch (err: any) {
         // Refund if lookup fails
-        await this.billingService.refundCredits(orgId, environment, cost, reference);
+        await this.billingService.refundCredits(orgId, validEnv, cost, reference);
         throw err;
       }
+    }
+
+    if (!identityData) {
+      throw new BadRequestException('Failed to retrieve verified NIN data');
     }
 
     // 2. Generate requested formats
@@ -316,19 +358,19 @@ export class NinSlipService {
 
     const latencyMs = Math.max(85, Date.now() - startTime);
 
-    // 3. Log into VerificationLog
+    // 3. Log into VerificationLog with valid TitleCase Environment enum
     await this.logRepository.save({
       org_id: orgId,
-      environment,
+      environment: validEnv,
       api_key_id: apiKeyId || 'dashboard_slip',
       serviceType: 'nin_slip',
       status: VerificationStatus.SUCCESS,
-      upstreamProvider: isCacheHit ? 'verixa_smart_cache' : 'dojah',
+      upstreamProvider: isCacheHit ? 'verixa_smart_cache' : 'direct',
       isCached: isCacheHit,
       source: isCacheHit ? 'CACHE' : 'LIVE',
       costDeducted: cost,
       latencyMs,
-      cacheKey: this.identityCacheService.generateKey(orgId, environment, 'nin', cleanNin),
+      cacheKey: this.identityCacheService.generateKey(orgId, validEnv, 'nin', cleanNin),
       requestPayload: { nin: cleanNin, format },
       responsePayload: {
         trackingId: identityData.trackingId,

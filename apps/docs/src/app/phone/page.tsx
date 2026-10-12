@@ -6,7 +6,7 @@ export default function PhoneDocsPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <Badge variant="verified">DOJAH PARITY</Badge>
+          <Badge variant="verified">UNIVERSAL TAXONOMY</Badge>
           <span className="font-mono text-xs text-sky-400 font-bold">/api/v1/kyc/phone_number</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
@@ -28,7 +28,7 @@ export default function PhoneDocsPage() {
           <span className="text-emerald-400 font-bold">120 NGX (₦120.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">SMART CACHE HIT</span>
+          <span className="text-zinc-500 block">SMART CACHE HIT (50% OFF)</span>
           <span className="text-cyan-400 font-bold">30 NGX (₦30.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
@@ -79,7 +79,7 @@ export default function PhoneDocsPage() {
 
       {/* Example Request & Response */}
       <div className="space-y-4 pt-4 border-t border-zinc-800">
-        <h2 className="text-lg font-bold text-white tracking-tight">Example Request & Response (Dojah Parity)</h2>
+        <h2 className="text-lg font-bold text-white tracking-tight">Example Request & Response (Universal Taxonomy)</h2>
         <CodeBlock
           language="bash"
           title="cURL Request"

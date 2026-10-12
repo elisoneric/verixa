@@ -6,7 +6,7 @@ export default function CacDocsPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <Badge variant="verified">DOJAH PARITY</Badge>
+          <Badge variant="verified">UNIVERSAL TAXONOMY</Badge>
           <span className="font-mono text-xs text-sky-400 font-bold">/api/v1/kyc/cac</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
@@ -92,7 +92,7 @@ export default function CacDocsPage() {
 
       {/* Code Examples */}
       <div className="space-y-4 pt-4 border-t border-zinc-800">
-        <h2 className="text-lg font-bold text-white tracking-tight">Example Request & Response (Dojah Parity)</h2>
+        <h2 className="text-lg font-bold text-white tracking-tight">Example Request & Response (Universal Taxonomy)</h2>
         <CodeBlock
           language="bash"
           title="cURL Request (CAC Basic)"

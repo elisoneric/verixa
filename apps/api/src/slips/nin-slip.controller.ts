@@ -20,6 +20,7 @@ import { IdentityCacheService } from '../verifications/identity-cache.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VerificationLog, VerificationStatus } from '../verifications/entities/verification-log.entity';
+import { normalizeEnvironment } from '../organizations/entities/environment-config.entity';
 import { v4 as uuidv4 } from 'uuid';
 
 @Controller('v1')
@@ -44,7 +45,7 @@ export class NinSlipController {
     const format = body.format || 'pdf';
     return this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
-      req.environment,
+      normalizeEnvironment(req.environment),
       nin,
       format,
       req.apiKeyId,
@@ -62,7 +63,7 @@ export class NinSlipController {
     const format = body.format || 'both';
     return this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
-      req.environment || 'live',
+      normalizeEnvironment(req.environment || 'live'),
       nin,
       format,
       'dashboard_ui',
@@ -81,7 +82,7 @@ export class NinSlipController {
     const cleanNin = String(nin || '').replace(/\D/g, '');
     const result = await this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
-      req.environment || 'live',
+      normalizeEnvironment(req.environment || 'live'),
       cleanNin,
       format,
       'dashboard_download',
@@ -119,7 +120,8 @@ export class NinSlipController {
     const cost = rateInfo.effectiveRate;
     const reference = `vx_adv_${uuidv4().slice(0, 12)}`;
 
-    await this.billingService.deductCredits(req.organizationId, req.environment, cost, reference);
+    const env = normalizeEnvironment(req.environment);
+    await this.billingService.deductCredits(req.organizationId, env, cost, reference);
 
     try {
       const result = await this.dojahProvider.verifyNinAdvance({ nin });
@@ -127,7 +129,7 @@ export class NinSlipController {
 
       await this.logRepository.save({
         org_id: req.organizationId,
-        environment: req.environment,
+        environment: env,
         api_key_id: req.apiKeyId || 'sdk_key',
         serviceType: 'nin_advance',
         status: result.status === 'success' ? VerificationStatus.SUCCESS : VerificationStatus.FAILED,

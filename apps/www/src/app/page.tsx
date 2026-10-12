@@ -128,7 +128,7 @@ func main() {
         },
         {
           label: "Smart Identity Cache",
-          description: "Sub-15ms cached lookups with 60% fee reduction",
+          description: "Sub-15ms cached lookups with 50% fee reduction",
           badge: "Sub-15ms",
           app: "docs" as const,
           path: "/smart-cache",
@@ -191,7 +191,7 @@ func main() {
         },
         {
           label: "Smart Identity Cache Guide",
-          description: "How to save 60% on recurring customer verification queries",
+          description: "How to save 50% on recurring customer verification queries",
           app: "docs" as const,
           path: "/smart-cache",
         },
@@ -218,8 +218,8 @@ func main() {
       a: "Yes. Verixa provides high-throughput REST APIs for instant VTU airtime vending (MTN, Airtel, Glo, 9mobile) and corporate SME data bundle gifting. All telecom requests are backed by multi-aggregator failovers and instant webhook callbacks.",
     },
     {
-      q: "What is Smart Identity Cache and how does it save 60%?",
-      a: "When your platform verifies a customer (e.g. NIN at ₦125 or BVN at ₦95), Verixa securely caches the verified record for 30 days within your private tenant partition. If you re-query that identity within 30 days, Verixa returns the result in sub-15ms for only ₦50 for NIN (or ₦38 for BVN), saving up to 60%.",
+      q: "What is Smart Identity Cache and how does it save 50%?",
+      a: "When your platform verifies a customer (e.g. NIN at ₦125 or BVN at ₦95), Verixa securely caches the verified record for 30 days within your private tenant partition. If you re-query that identity within 30 days, Verixa returns the result in sub-15ms for only ₦50 for NIN (or ₦38 for BVN), saving up to 50%.",
     },
     {
       q: "How does the multi-provider failover work?",
@@ -605,7 +605,7 @@ func main() {
                   APIs & usage pricing
                 </h2>
                 <p className="mt-4 text-zinc-400 max-w-xl text-sm sm:text-base leading-relaxed">
-                  No monthly seat fees or maintenance retainers. Prepaid credits billed per query with built-in Smart Cache repeat discounts up to 60% and wholesale telecom rates.
+                  No monthly seat fees or maintenance retainers. Prepaid credits billed per query with built-in Smart Cache repeat discounts up to 50% and wholesale telecom rates.
                 </p>
               </div>
 
@@ -1061,7 +1061,7 @@ func main() {
                   </h3>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
-                  Sub-15ms response times for repeat queries within 30 days, cutting lookup costs by 60%.
+                  Sub-15ms response times for repeat queries within 30 days, cutting lookup costs by 50%.
                 </p>
               </AppLink>
 

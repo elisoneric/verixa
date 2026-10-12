@@ -6,14 +6,14 @@ export default function GovernmentIdsDocsPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <Badge variant="verified">DOJAH PARITY</Badge>
+          <Badge variant="verified">UNIVERSAL TAXONOMY</Badge>
           <span className="font-mono text-xs text-sky-400 font-bold">FRSC / INEC / NIS</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
           Secondary Government IDs
         </h1>
         <p className="mt-2 text-base text-zinc-400 leading-relaxed">
-          Verify official Nigerian travel, voter, and driving credentials directly against issuing statutory bodies. Built with 100% Dojah endpoint and parameter compatibility.
+          Verify official Nigerian travel, voter, and driving credentials directly against issuing statutory bodies. Built with 100% universal enterprise identity endpoint and parameter compatibility.
         </p>
       </div>
 

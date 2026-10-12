@@ -15,7 +15,7 @@ import { DojahProvider } from './providers/dojah.provider';
 import { MockProvider } from './providers/mock.provider';
 import { BillingService } from '../billing/billing.service';
 import { IdentityCacheService } from './identity-cache.service';
-import { Environment } from '../organizations/entities/environment-config.entity';
+import { Environment, normalizeEnvironment } from '../organizations/entities/environment-config.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VerificationLog, VerificationStatus } from './entities/verification-log.entity';
@@ -35,6 +35,38 @@ export class ApiController {
     private walletRepository: Repository<Wallet>,
   ) {}
 
+  // 0. Balance API Endpoints (Programmatic Developer API Key)
+  @UseGuards(ApiKeyGuard)
+  @Get('balance')
+  @HttpCode(HttpStatus.OK)
+  async getDirectApiBalance(@Req() req: any) {
+    return this.getApiBalance(req);
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/balance')
+  @HttpCode(HttpStatus.OK)
+  async getApiBalance(@Req() req: any) {
+    const data = await this.billingService.getBalance(req.organizationId);
+    return {
+      status: 'success',
+      data: {
+        liveBalance: data.live?.balance ?? 0,
+        sandboxBalance: data.sandbox?.balance ?? 0,
+        currency: 'NGN',
+        environment: normalizeEnvironment(req.environment),
+        dedicatedVirtualAccount: data.dedicatedVirtualAccount,
+      },
+    };
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/billing/balance')
+  @HttpCode(HttpStatus.OK)
+  async getApiBillingBalance(@Req() req: any) {
+    return this.getApiBalance(req);
+  }
+
   private async executeVerification(
     req: any,
     service: string,
@@ -49,7 +81,7 @@ export class ApiController {
     }
 
     const orgId = req.organizationId;
-    const env = req.environment || Environment.SANDBOX;
+    const env = normalizeEnvironment(req.environment);
     const isLive = env === Environment.LIVE;
     const startTime = Date.now();
     const finalPrice = exactPrice !== undefined ? exactPrice : baseRate;
@@ -64,7 +96,7 @@ export class ApiController {
       );
 
       if (cached) {
-        const cacheCost = Math.max(10, Math.round(finalPrice * 0.4));
+        const cacheCost = Math.max(10, Math.round(finalPrice * 0.5));
         const reference = `vx_cache_${uuidv4().slice(0, 12)}`;
 
         if (orgId) {
@@ -170,7 +202,7 @@ export class ApiController {
   }
 
   // ==========================================
-  // DOJAH PARITY KYC & IDENTITY SUITE (/api/v1/...)
+  // UNIVERSAL REST KYC & IDENTITY SUITE (/api/v1/...)
   // ==========================================
 
   // --- 1. BVN Endpoints ---

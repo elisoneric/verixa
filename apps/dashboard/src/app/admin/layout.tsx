@@ -10,7 +10,7 @@ import { useTheme } from "../../lib/theme-context"
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { user, token, isLoading } = useAuth()
+  const { user, token, isLoading, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
 
   React.useEffect(() => {
@@ -53,20 +53,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-100 selection:bg-rose-500/30 selection:text-rose-700">
       {/* Admin Sidebar */}
-      <aside className="w-64 flex flex-col border-r border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shrink-0">
-        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-200 dark:border-zinc-800">
+      <aside className="w-64 flex flex-col h-screen sticky top-0 border-r border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shrink-0 overflow-hidden">
+        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-200 dark:border-zinc-800 shrink-0">
           <Link href="/admin" className="hover:opacity-90 transition-opacity">
             <Logo size="md" badge="ADMIN" badgeColor="rose" />
           </Link>
         </div>
 
-        <div className="p-4">
+        <div className="p-4 shrink-0">
           <div className="p-2.5 rounded-lg bg-rose-50 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20 text-rose-700 dark:text-rose-300 text-xs font-mono font-medium">
             Platform Operator Console
           </div>
         </div>
 
-        <nav className="flex-1 px-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-4 space-y-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -88,30 +88,42 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-200 dark:border-zinc-800 space-y-2">
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-lg border border-slate-300 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 text-slate-700 dark:text-zinc-300 transition-colors"
-          >
-            {theme === "light" ? (
-              <>
-                <svg className="w-3.5 h-3.5 text-slate-700 dark:text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-                <span>Dark Mode</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <span>Light Mode</span>
-              </>
-            )}
-          </button>
+        <div className="p-4 border-t border-slate-200 dark:border-zinc-800 space-y-2 shrink-0 mt-auto">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 text-xs font-medium rounded-lg border border-slate-300 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 text-slate-700 dark:text-zinc-300 transition-colors"
+            >
+              {theme === "light" ? (
+                <>
+                  <svg className="w-3.5 h-3.5 text-slate-700 dark:text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                  <span>Dark</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <span>Light</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={logout}
+              title="Sign Out"
+              className="px-3 py-1.5 rounded-lg border border-rose-300 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 text-xs font-semibold flex items-center gap-1 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Logout</span>
+            </button>
+          </div>
           <Link
             href="/dashboard"
-            className="block text-center rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 py-2 text-xs font-semibold text-slate-700 dark:text-zinc-300 transition-colors"
+            className="block text-center rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 py-1.5 text-xs font-semibold text-slate-700 dark:text-zinc-300 transition-colors"
           >
             &larr; Exit to Customer Portal
           </Link>

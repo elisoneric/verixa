@@ -111,55 +111,33 @@ export class BillingService {
     
     if (isCacheHit) {
       if (serviceType === 'bvn' && configMap['BASE_BVN_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_BVN_CACHE_PRICE'], 10);
-      if (serviceType === 'nin' && configMap['BASE_NIN_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_CACHE_PRICE'], 10);
-      if (serviceType === 'nin_advance' && configMap['BASE_NIN_ADVANCE_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_ADVANCE_CACHE_PRICE'], 10);
-      if (serviceType === 'nin_slip' && configMap['BASE_NIN_SLIP_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_SLIP_CACHE_PRICE'], 10);
+      else if ((serviceType === 'nin' || serviceType === 'nin_advance') && configMap['BASE_NIN_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_CACHE_PRICE'], 10);
+      else if (serviceType === 'nin_slip' && configMap['BASE_NIN_SLIP_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_SLIP_CACHE_PRICE'], 10);
+      else if (serviceType === 'phone' && configMap['BASE_PHONE_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_PHONE_CACHE_PRICE'], 10);
+      else if (serviceType === 'cac' && configMap['BASE_CAC_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_CAC_CACHE_PRICE'], 10);
     } else {
       if (serviceType === 'bvn' && configMap['BASE_BVN_PRICE']) baseRate = parseInt(configMap['BASE_BVN_PRICE'], 10);
-      if (serviceType === 'nin' && configMap['BASE_NIN_PRICE']) baseRate = parseInt(configMap['BASE_NIN_PRICE'], 10);
-      if (serviceType === 'nin_advance' && configMap['BASE_NIN_ADVANCE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_ADVANCE_PRICE'], 10);
-      if (serviceType === 'nin_slip' && configMap['BASE_NIN_SLIP_PRICE']) baseRate = parseInt(configMap['BASE_NIN_SLIP_PRICE'], 10);
+      else if (serviceType === 'nin' && configMap['BASE_NIN_PRICE']) baseRate = parseInt(configMap['BASE_NIN_PRICE'], 10);
+      else if (serviceType === 'nin_advance' && configMap['BASE_NIN_ADVANCE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_ADVANCE_PRICE'], 10);
+      else if (serviceType === 'nin_slip' && configMap['BASE_NIN_SLIP_PRICE']) baseRate = parseInt(configMap['BASE_NIN_SLIP_PRICE'], 10);
+      else if (serviceType === 'phone' && configMap['BASE_PHONE_PRICE']) baseRate = parseInt(configMap['BASE_PHONE_PRICE'], 10);
+      else if (serviceType === 'cac' && configMap['BASE_CAC_PRICE']) baseRate = parseInt(configMap['BASE_CAC_PRICE'], 10);
+      else if (serviceType === 'data' && configMap['BASE_DATA_PRICE']) baseRate = parseInt(configMap['BASE_DATA_PRICE'], 10);
+      else if (serviceType === 'sms' && configMap['BASE_SMS_PRICE']) baseRate = parseInt(configMap['BASE_SMS_PRICE'], 10);
+      else if (serviceType === 'airtime' && configMap['BASE_AIRTIME_PRICE']) baseRate = parseInt(configMap['BASE_AIRTIME_PRICE'], 10);
     }
 
     let price = baseRate;
     let isCustom = false;
 
-    // 2. Custom org rate if explicitly set (applies primarily to live calls)
+    // 2. Custom org rate if explicitly set (takes precedence)
     if (!isCacheHit) {
-      if (serviceType === 'bvn' && org?.customBvnRate != null) {
+      if (serviceType === 'bvn' && org?.customBvnRate != null && org.customBvnRate > 0) {
         price = org.customBvnRate;
         isCustom = true;
-      } else if (serviceType === 'nin' && org?.customNinRate != null) {
+      } else if (serviceType === 'nin' && org?.customNinRate != null && org.customNinRate > 0) {
         price = org.customNinRate;
         isCustom = true;
-      } else {
-        // 3. Organization tier standard pricing
-        if (org?.tier === OrganizationTier.ENTERPRISE) {
-          if (serviceType === 'nin' || serviceType === 'nin_advance') price = 100;
-          else if (serviceType === 'nin_slip') price = 200;
-          else if (serviceType === 'cac') price = 100;
-          else if (serviceType === 'bvn') price = 80;
-          else price = 100;
-        } else if (org?.tier === OrganizationTier.GROWTH) {
-          if (serviceType === 'nin' || serviceType === 'nin_advance') price = 112;
-          else if (serviceType === 'nin_slip') price = 225;
-          else if (serviceType === 'cac') price = 110;
-          else if (serviceType === 'bvn') price = 88;
-          else price = 112;
-        }
-      }
-    } else {
-      // Tier savings on cache hits
-      if (org?.tier === OrganizationTier.ENTERPRISE) {
-        if (serviceType === 'nin' || serviceType === 'nin_advance') price = 40;
-        else if (serviceType === 'nin_slip') price = 35;
-        else if (serviceType === 'bvn') price = 30;
-        else price = 30;
-      } else if (org?.tier === OrganizationTier.GROWTH) {
-        if (serviceType === 'nin' || serviceType === 'nin_advance') price = 45;
-        else if (serviceType === 'nin_slip') price = 42;
-        else if (serviceType === 'bvn') price = 34;
-        else price = 34;
       }
     }
 

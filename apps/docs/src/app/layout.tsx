@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     "NIN API Nigeria",
     "NUBAN lookup docs",
     "KYC API reference",
-    "Dojah API compatibility",
+    "Universal Identity API",
     "Smart Identity Cache documentation",
   ],
   icons: {
@@ -122,6 +122,7 @@ export default function RootLayout({
       title: "PLATFORM ARCHITECTURE",
       links: [
         { label: "Smart Identity Cache", href: "/smart-cache" },
+        { label: "Wallet Balance API", href: "/balance" },
         { label: "Billing & Credits", href: "/billing-api" },
         { label: "Redis Idempotency", href: "/idempotency" },
         { label: "Webhooks & Signatures", href: "/webhooks" },

@@ -6,13 +6,13 @@ export default function AuthenticationDocsPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">SECURITY & HEADERS</Badge>
-          <span className="text-xs font-mono text-zinc-500">DOJAH COMPATIBLE</span>
+          <span className="text-xs font-mono text-zinc-500">UNIVERSAL HEADERS</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
           API Authentication & Headers
         </h1>
         <p className="mt-2 text-base text-zinc-400 leading-relaxed">
-          The Verixa ID API supports 100% Dojah-compatible header authentication. Every API request must pass your secret credentials in the request headers.
+          The Verixa ID API supports universal REST header authentication. Every API request must pass your secret credentials in the request headers.
         </p>
       </div>
 
@@ -26,18 +26,18 @@ export default function AuthenticationDocsPage() {
               <Badge variant="failed" size="sm">REQUIRED</Badge>
             </div>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Your secret key. In Dojah fashion, send the raw key string directly or use the <code className="text-zinc-200 font-mono">Bearer</code> prefix.
+              Your secret key. Pass the raw key string directly or using the <code className="text-zinc-200 font-mono">Bearer</code> prefix.
             </p>
-            <code className="text-[11px] text-zinc-500 block font-mono">Example: vrx_live_9f83a8f1...</code>
+            <code className="text-[11px] text-zinc-500 block font-mono">Example: Bearer vrx_live_9f83a8f1...</code>
           </div>
 
           <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/50 space-y-1.5">
             <div className="flex items-center gap-2">
               <code className="text-sky-400 font-bold font-mono text-xs">AppId</code>
-              <Badge variant="mono" size="sm">RECOMMENDED</Badge>
+              <Badge variant="mono" size="sm">OPTIONAL</Badge>
             </div>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Your application identifier from the Verixa Console (Developers &rarr; API Keys). Used to route telemetry and tenant partitioning.
+              Your optional application identifier from the Verixa Console (Developers &rarr; API Keys). Used to route telemetry and tenant partitioning.
             </p>
             <code className="text-[11px] text-zinc-500 block font-mono">Example: app_8b2e1f4a9c</code>
           </div>
@@ -70,10 +70,9 @@ export default function AuthenticationDocsPage() {
         <div className="space-y-3">
           <CodeBlock
             language="bash"
-            title="cURL (Raw Key Header - Dojah Parity)"
+            title="cURL (Direct Key Header)"
             code={`curl -X GET "https://api.verixaid.com/api/v1/kyc/bvn?bvn=22123456789" \\
-  -H "Authorization: vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4e5f6..." \\
-  -H "AppId: app_8b2e1f4a9c" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4e5f6..." \\
   -H "Content-Type: application/json"`}
           />
 

@@ -27,8 +27,8 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     category: "identity",
     method: "POST",
     path: "/api/nin-verification",
-    benchmark: "₦95",
-    verixaRate: "₦95",
+    benchmark: "₦125",
+    verixaRate: "₦125",
     description: "National Identity Number verification lookup.",
     defaultPayload: {
       nin: "11234567890",
@@ -83,8 +83,8 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     category: "identity",
     method: "POST",
     path: "/api/nin-demography",
-    benchmark: "₦95",
-    verixaRate: "₦95",
+    benchmark: "₦125",
+    verixaRate: "₦125",
     description: "Full demographic profile including residential address, maiden name, and biometric timestamp.",
     defaultPayload: {
       nin: "11234567890",

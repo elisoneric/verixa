@@ -6,7 +6,7 @@ export default function BiometricsAmlDocsPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <Badge variant="verified">DOJAH PARITY</Badge>
+          <Badge variant="verified">UNIVERSAL TAXONOMY</Badge>
           <span className="font-mono text-xs text-sky-400 font-bold">FRAUD & COMPLIANCE</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
@@ -62,13 +62,13 @@ export default function BiometricsAmlDocsPage() {
           language="bash"
           title="cURL Request (Photo ID Face Match)"
           code={`curl -X POST https://api.verixaid.com/api/v1/kyc/photoid/verify \\
-  -H "Authorization: vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
-  -H "AppId: app_6a7b8c9d0e1f" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
   -H "Content-Type: application/json" \\
   -d '{
     "id_type": "BVN",
     "id_number": "22123456789",
-    "image": "/9j/4AAQSkZJRgABAQ..."
+    "image": "/9j/4AAQSkZJRgABAQ...",
+    "consent": true
   }'`}
         />
 
@@ -108,13 +108,13 @@ export default function BiometricsAmlDocsPage() {
           language="bash"
           title="cURL Request (AML Screening)"
           code={`curl -X POST https://api.verixaid.com/api/v1/aml/screening \\
-  -H "Authorization: vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
-  -H "AppId: app_6a7b8c9d0e1f" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
   -H "Content-Type: application/json" \\
   -d '{
     "name": "CHIDERA OLUTOLA",
     "date_of_birth": "1988-04-14",
-    "country": "NG"
+    "country": "NG",
+    "consent": true
   }'`}
         />
 

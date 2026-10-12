@@ -2,6 +2,7 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SystemConfig } from '../admin/entities/system-config.entity';
+import { decryptSecret } from '../common/utils/crypto.util';
 import axios from 'axios';
 
 export interface CheckoutResult {
@@ -31,7 +32,8 @@ export class PaystackService {
     try {
       const dbConfig = await this.configRepository.findOne({ where: { key: 'PAYSTACK_SECRET_KEY' } });
       if (dbConfig && dbConfig.value && !dbConfig.value.startsWith('sk_test_mock')) {
-        return dbConfig.value.trim();
+        const decrypted = dbConfig.isSecret ? decryptSecret(dbConfig.value) : dbConfig.value;
+        return decrypted.trim();
       }
     } catch {
       // Ignore and fallback to environment variable

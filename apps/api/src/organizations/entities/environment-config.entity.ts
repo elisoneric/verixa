@@ -6,6 +6,12 @@ export enum Environment {
   SANDBOX = 'Sandbox',
 }
 
+export function normalizeEnvironment(env?: any): Environment {
+  if (!env) return Environment.SANDBOX;
+  const s = String(env).trim().toLowerCase();
+  return s === 'live' ? Environment.LIVE : Environment.SANDBOX;
+}
+
 @Entity('environment_configs')
 export class EnvironmentConfig {
   @PrimaryGeneratedColumn('uuid')

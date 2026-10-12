@@ -6,14 +6,14 @@ export default function NinDocsPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <Badge variant="verified">DOJAH PARITY</Badge>
+          <Badge variant="verified">UNIVERSAL TAXONOMY</Badge>
           <span className="font-mono text-xs text-sky-400 font-bold">/api/v1/kyc/nin</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
           National Identification Number (NIN)
         </h1>
         <p className="mt-2 text-base text-zinc-400 leading-relaxed">
-          Verify an 11-digit NIN against the NIMC database. Verixa provides 100% Dojah endpoint parity across basic demographics, advance records with portraits and addresses, premium tiers, NIMC slips, and live biometric face matching.
+          Verify an 11-digit NIN against the NIMC database. Verixa provides universal REST endpoint compatibility across basic demographics, advance records with portraits and addresses, premium tiers, NIMC slips, and live biometric face matching.
         </p>
       </div>
 
@@ -28,7 +28,7 @@ export default function NinDocsPage() {
           <span className="text-emerald-400 font-bold">150 NGX</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">SMART CACHE HIT</span>
+          <span className="text-zinc-500 block">SMART CACHE HIT (50% OFF)</span>
           <span className="text-cyan-400 font-bold">50 NGX (₦50.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
@@ -43,12 +43,12 @@ export default function NinDocsPage() {
         <div className="grid sm:grid-cols-2 gap-3 text-xs font-mono">
           <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
             <span className="text-sky-400 font-bold block">1. Basic NIN Lookup</span>
-            <code className="text-white block text-[11px]">GET /api/v1/kyc/nin?nin=...</code>
+            <code className="text-white block text-[11px]">POST /api/v1/kyc/nin or GET /api/v1/kyc/nin?nin=...</code>
             <p className="text-zinc-400 font-sans text-xs">Returns full name, gender, phone number, and date of birth.</p>
           </div>
           <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
             <span className="text-sky-400 font-bold block">2. Advance NIN Lookup</span>
-            <code className="text-white block text-[11px]">GET /api/v1/kyc/nin/advance?nin=...</code>
+            <code className="text-white block text-[11px]">POST /api/v1/kyc/nin/advance or GET ?nin=...</code>
             <p className="text-zinc-400 font-sans text-xs">Adds residence address, state of origin, next-of-kin, and base64 portrait.</p>
           </div>
           <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
@@ -71,7 +71,7 @@ export default function NinDocsPage() {
 
       {/* Query Parameters Table */}
       <div className="space-y-3 pt-4 border-t border-zinc-800">
-        <h2 className="text-lg font-bold text-white tracking-tight">Query Parameters (GET /api/v1/kyc/nin/advance)</h2>
+        <h2 className="text-lg font-bold text-white tracking-tight">Request Parameters (POST /api/v1/kyc/nin)</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -88,6 +88,12 @@ export default function NinDocsPage() {
               <TableCell className="text-rose-400 font-bold">Required</TableCell>
               <TableCell className="text-zinc-300">The 11-digit National Identity Number.</TableCell>
             </TableRow>
+            <TableRow>
+              <TableCell className="font-mono text-emerald-400 font-bold">consent</TableCell>
+              <TableCell className="font-mono text-zinc-400">boolean</TableCell>
+              <TableCell className="text-rose-400 font-bold">Required</TableCell>
+              <TableCell className="text-zinc-300">Mandatory NDPA user consent flag. Must be <code className="text-emerald-300 font-mono">true</code>.</TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </div>
@@ -98,10 +104,13 @@ export default function NinDocsPage() {
         <CodeBlock
           language="bash"
           title="cURL Request (Advance Profile)"
-          code={`curl -X GET "https://api.verixaid.com/api/v1/kyc/nin/advance?nin=70123456789" \\
-  -H "Authorization: vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
-  -H "AppId: app_6a7b8c9d0e1f" \\
-  -H "Content-Type: application/json"`}
+          code={`curl -X POST "https://api.verixaid.com/api/v1/kyc/nin/advance" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "nin": "70123456789",
+    "consent": true
+  }'`}
         />
 
         <CodeBlock
@@ -126,7 +135,7 @@ export default function NinDocsPage() {
     "nok_firstname": "JANE",
     "nok_lastname": "ADAMU"
   },
-  "billed_amount": 100,
+  "billed_amount": 125,
   "cached": false,
   "meta": {
     "request_id": "vx_req_4f92a10c",
@@ -148,13 +157,13 @@ export default function NinDocsPage() {
           language="bash"
           title="cURL Request (Selfie Match)"
           code={`curl -X POST https://api.verixaid.com/api/v1/kyc/nin/verify \\
-  -H "Authorization: vrx_live_9f83a8f1..." \\
-  -H "AppId: app_6a7b8c9d0e1f" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1..." \\
   -H "Content-Type: application/json" \\
   -d '{
     "nin": "70123456789",
     "selfie_image": "/9j/4AAQSkZJRgABAQ...",
-    "threshold": 90
+    "threshold": 90,
+    "consent": true
   }'`}
         />
       </div>

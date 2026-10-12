@@ -14,21 +14,21 @@ export default function DocsHomePage() {
           Verixa ID Developer Platform
         </h1>
         <p className="mt-3 text-base sm:text-lg text-zinc-400 leading-relaxed max-w-3xl">
-          Unified, usage-based identity verification, KYB, biometric face match, and telecom APIs built for African fintechs and high-growth platforms. Engineered with 100% Dojah architecture parity and sub-15ms Smart Identity Caching.
+          Unified, usage-based identity verification, KYB, biometric face match, and telecom APIs built for African fintechs and high-growth platforms. Engineered with universal REST taxonomy and sub-15ms Smart Identity Caching.
         </p>
 
         {/* Highlight Architecture Cards */}
         <div className="grid sm:grid-cols-3 gap-3 mt-6">
           <div className="p-4 rounded-xl border border-white/[0.08] bg-white/[0.02]">
-            <span className="text-xs font-mono text-emerald-400 block mb-1">Dojah 1:1 Parity</span>
+            <span className="text-xs font-mono text-emerald-400 block mb-1">Universal REST Standard</span>
             <p className="text-xs text-zinc-300">
-              Drop-in endpoint taxonomy (<code className="text-emerald-300 font-mono">/api/v1/kyc/...</code>), headers (<code className="text-emerald-300 font-mono">AppId</code> + <code className="text-emerald-300 font-mono">Authorization</code>), and JSON envelope.
+              Drop-in endpoint taxonomy (<code className="text-emerald-300 font-mono">/api/v1/kyc/...</code>), headers (<code className="text-emerald-300 font-mono">Authorization</code> + optional <code className="text-emerald-300 font-mono">AppId</code>), and standardized JSON envelope.
             </p>
           </div>
           <div className="p-4 rounded-xl border border-white/[0.08] bg-white/[0.02]">
             <span className="text-xs font-mono text-sky-400 block mb-1">Smart Identity Cache</span>
             <p className="text-xs text-zinc-300">
-              Sub-15ms cached lookups with 60% automated fee reduction on repeat queries within your tenant partition.
+              Sub-15ms cached lookups with 50% automated fee reduction on repeat queries within your tenant partition.
             </p>
           </div>
           <div className="p-4 rounded-xl border border-white/[0.08] bg-white/[0.02]">
@@ -46,12 +46,12 @@ export default function DocsHomePage() {
           <div>
             <h2 className="text-base font-semibold text-white tracking-tight">Active API Endpoints & Usage Rates</h2>
             <p className="text-xs text-zinc-400 mt-0.5">
-              Standard rates across live government registries and 60% discounted Smart Cache hits.
+              Standard rates across live government registries and 50% discounted Smart Cache hits.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-              100% DOJAH PARITY
+              UNIVERSAL REST TAXONOMY
             </span>
             <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30">
               SUB-15MS CACHE
@@ -479,16 +479,21 @@ export default function DocsHomePage() {
       <div className="space-y-4 pt-6 border-t border-white/[0.08]">
         <h2 className="text-base font-semibold text-white tracking-tight">5-Minute Quickstart</h2>
         <p className="text-sm text-zinc-400 leading-relaxed">
-          Verixa implements Dojah-compatible authentication headers. Obtain your Sandbox or Live credentials from your Console dashboard and include your secret key in the <code className="text-emerald-400 font-mono text-xs">Authorization</code> header (with or without the <code className="text-zinc-300 font-mono text-xs">Bearer</code> prefix) alongside your <code className="text-emerald-400 font-mono text-xs">AppId</code>.
+          Verixa implements standard REST authentication headers. Obtain your Sandbox or Live credentials from your Console dashboard and include your secret key in the <code className="text-emerald-400 font-mono text-xs">Authorization</code> header (with or without the <code className="text-zinc-300 font-mono text-xs">Bearer</code> prefix) alongside your optional <code className="text-emerald-400 font-mono text-xs">AppId</code>. Mandatory regulatory applicant consent (<code className="text-emerald-300 font-mono text-xs">&quot;consent&quot;: true</code>) is included across all payloads.
         </p>
 
         <CodeBlock
           language="bash"
-          title="Making your first BVN lookup (Dojah Parity)"
-          code={`curl -X GET "https://api.verixaid.com/api/v1/kyc/bvn?bvn=22123456789&first_name=CHIDERA" \\
+          title="Making your first BVN lookup (POST with JSON Body)"
+          code={`curl -X POST "https://api.verixaid.com/api/v1/kyc/bvn" \\
   -H "Authorization: vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
   -H "AppId: app_6a7b8c9d0e1f" \\
-  -H "Content-Type: application/json"`}
+  -H "Content-Type: application/json" \\
+  -d '{
+    "bvn": "22123456789",
+    "first_name": "CHIDERA",
+    "consent": true
+  }'`}
         />
 
         <div className="space-y-2 pt-2">
@@ -506,7 +511,7 @@ export default function DocsHomePage() {
     "phone_number1": "08039218492",
     "gender": "Male"
   },
-  "billed_amount": 50,
+  "billed_amount": 95,
   "cached": false,
   "meta": {
     "request_id": "vx_req_8f19a02d",
@@ -528,7 +533,7 @@ export default function DocsHomePage() {
           <span className="text-xs font-medium text-white group-hover:text-emerald-400 transition-colors block">
             Authentication & Headers &rarr;
           </span>
-          <span className="text-[11px] text-zinc-500 mt-1 block">Dojah AppId and secret keys</span>
+          <span className="text-[11px] text-zinc-500 mt-1 block">API Key & Bearer auth headers</span>
         </Link>
         <Link
           href="/bvn"
@@ -555,7 +560,7 @@ export default function DocsHomePage() {
           <span className="text-xs font-medium text-white group-hover:text-emerald-400 transition-colors block">
             Smart Identity Cache &rarr;
           </span>
-          <span className="text-[11px] text-zinc-500 mt-1 block">Save 60% with sub-15ms hits</span>
+          <span className="text-[11px] text-zinc-500 mt-1 block">Save 50% with sub-15ms hits</span>
         </Link>
       </div>
     </div>

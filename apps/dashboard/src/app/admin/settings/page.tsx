@@ -29,13 +29,20 @@ export default function AdminSettingsPage() {
 
   const [isSaving, setIsSaving] = React.useState(false)
   const [savedSuccess, setSavedSuccess] = React.useState(false)
+  const [configuredKeys, setConfiguredKeys] = React.useState<Record<string, boolean>>({})
 
   // Load current unmasked config names
   React.useEffect(() => {
     ApiClient.getAdminConfigs()
       .then((configs: any[]) => {
         if (!configs) return
-        const map = new Map(configs.map((c) => [c.key, c.value]))
+        const cfgStatus: Record<string, boolean> = {}
+        const map = new Map(configs.map((c) => {
+          cfgStatus[c.key] = c.isConfigured !== false && Boolean(c.value && c.value !== '')
+          return [c.key, c.value]
+        }))
+        setConfiguredKeys(cfgStatus)
+
         if (map.get("DOJAH_APP_ID") && map.get("DOJAH_APP_ID") !== "••••••••••••••••") {
           setupstreamAppId(map.get("DOJAH_APP_ID"))
         }
@@ -319,58 +326,128 @@ export default function AdminSettingsPage() {
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">Provider Secret Keys & Authentication</h3>
               <p className="text-xs text-slate-500 dark:text-zinc-400">
-                Paystack virtual account webhooks, Dojah upstream registry credentials, and Google OAuth GIS.
+                Paystack virtual account webhooks, primary upstream registry credentials, and Google OAuth GIS.
               </p>
             </div>
             <Badge variant="verified" size="sm">ENCRYPTED AT REST</Badge>
           </div>
 
           <div className="space-y-4">
-            <Input
-              label="Paystack Secret Key"
-              type="password"
-              placeholder="sk_••••••••••••••••••••••••"
-              value={paystackKey}
-              onChange={(e) => setPaystackKey(e.target.value)}
-              hint="Required for Dedicated Virtual Account auto-generation and Webhook verification."
-            />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Paystack Master Secret Key</span>
+                {configuredKeys["PAYSTACK_SECRET_KEY"] ? (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    CONFIGURED & ACTIVE
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-zinc-500/15 text-zinc-400 border border-zinc-500/20">
+                    NOT CONFIGURED
+                  </span>
+                )}
+              </div>
               <Input
-                label="Primary Gateway App ID (Dojah)"
-                type="text"
-                placeholder="app_••••••••••••••••"
-                value={upstreamAppId}
-                onChange={(e) => setupstreamAppId(e.target.value)}
-                hint="Upstream AppId header"
-              />
-              <Input
-                label="Primary Gateway Secret Key (Dojah)"
                 type="password"
-                placeholder="sk_••••••••••••••••"
-                value={upstreamKey}
-                onChange={(e) => setupstreamKey(e.target.value)}
-                hint="Live upstream Authorization key"
+                placeholder="sk_••••••••••••••••••••••••"
+                value={paystackKey}
+                onChange={(e) => setPaystackKey(e.target.value)}
+                hint="Required for Dedicated Virtual Account auto-generation, Deposits, and Webhook verification."
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="SmileID API Key"
-                type="password"
-                placeholder="sid_••••••••••••••••"
-                value={smileIdKey}
-                onChange={(e) => setSmileIdKey(e.target.value)}
-                hint="Secondary fallback biometric gateway"
-              />
-              <Input
-                label="Google OAuth Web Client ID"
-                type="text"
-                placeholder="••••••.apps.googleusercontent.com"
-                value={googleClientId}
-                onChange={(e) => setGoogleClientId(e.target.value)}
-                hint="Verified on backend during Google GIS sign-in"
-              />
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Primary Gateway App ID</span>
+                  {configuredKeys["DOJAH_APP_ID"] ? (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      CONFIGURED
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-zinc-500/15 text-zinc-400 border border-zinc-500/20">
+                      NOT CONFIGURED
+                    </span>
+                  )}
+                </div>
+                <Input
+                  type="text"
+                  placeholder="app_••••••••••••••••"
+                  value={upstreamAppId}
+                  onChange={(e) => setupstreamAppId(e.target.value)}
+                  hint="Primary registry Application ID header"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Primary Gateway Secret Key</span>
+                  {configuredKeys["DOJAH_SECRET_KEY"] ? (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      CONFIGURED & ACTIVE
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-zinc-500/15 text-zinc-400 border border-zinc-500/20">
+                      NOT CONFIGURED
+                    </span>
+                  )}
+                </div>
+                <Input
+                  type="password"
+                  placeholder="sk_••••••••••••••••"
+                  value={upstreamKey}
+                  onChange={(e) => setupstreamKey(e.target.value)}
+                  hint="Live primary registry Authorization key"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">SmileID API Key</span>
+                  {configuredKeys["SMILE_ID_KEY"] ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      CONFIGURED
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-zinc-500/15 text-zinc-400 border border-zinc-500/20">
+                      NOT CONFIGURED
+                    </span>
+                  )}
+                </div>
+                <Input
+                  type="password"
+                  placeholder="sid_••••••••••••••••"
+                  value={smileIdKey}
+                  onChange={(e) => setSmileIdKey(e.target.value)}
+                  hint="Secondary fallback biometric gateway"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Google OAuth Web Client ID</span>
+                  {configuredKeys["GOOGLE_CLIENT_ID"] ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      CONFIGURED
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-zinc-500/15 text-zinc-400 border border-zinc-500/20">
+                      NOT CONFIGURED
+                    </span>
+                  )}
+                </div>
+                <Input
+                  type="text"
+                  placeholder="••••••.apps.googleusercontent.com"
+                  value={googleClientId}
+                  onChange={(e) => setGoogleClientId(e.target.value)}
+                  hint="Verified on backend during Google GIS sign-in"
+                />
+              </div>
             </div>
 
             <Input

@@ -4,16 +4,7 @@ import * as React from "react"
 import { Button, Input, Badge, Card, Modal, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, CodeBlock, EmptyState } from "@verixa/ui"
 
 export default function WebhooksPage() {
-  const [endpoints, setEndpoints] = React.useState<any[]>([
-    {
-      id: "ep_9f81a2",
-      url: "https://api.acmefintech.com/v1/webhooks/verixa",
-      events: ["verification.successful", "billing.deposit_credited"],
-      status: "active",
-      secret: "whsec_981a8f192b8c9d01248a9e102",
-      createdAt: "2026-08-20T10:15:00Z",
-    },
-  ])
+  const [endpoints, setEndpoints] = React.useState<any[]>([])
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [endpointUrl, setEndpointUrl] = React.useState("")
   const [selectedEvents, setSelectedEvents] = React.useState<string[]>([

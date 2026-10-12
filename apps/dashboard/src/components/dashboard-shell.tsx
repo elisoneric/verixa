@@ -188,7 +188,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <CommandPalette isOpen={cmdOpen} onClose={() => setCmdOpen(false)} items={commandItems} />
 
       {/* Desktop Sidebar (Glass Sidebar) */}
-      <aside className="hidden lg:flex w-64 flex-col border-r border-white/[0.08] bg-[#080a0f]/85 backdrop-blur-2xl shrink-0">
+      <aside className="hidden lg:flex w-64 flex-col h-screen sticky top-0 border-r border-white/[0.08] bg-[#080a0f]/85 backdrop-blur-2xl shrink-0 overflow-hidden">
         {/* Brand Header */}
         <div className="h-16 px-6 flex items-center justify-between border-b border-white/[0.08]">
           <Link href="/dashboard" className="hover:opacity-90 transition-opacity">
@@ -289,7 +289,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* User Footer Card */}
-        <div className="p-4 border-t border-white/[0.08] bg-[#0c0e14]/50">
+        <div className="p-4 border-t border-white/[0.08] bg-[#0c0e14]/50 shrink-0 mt-auto">
           <div className="flex items-center justify-between">
             <div className="truncate">
               <p className="text-xs font-semibold text-white truncate">
