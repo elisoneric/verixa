@@ -102,7 +102,7 @@ export class NinSlipController {
     throw new BadRequestException('Requested format could not be generated');
   }
 
-  // 4. NIN Advance Verification Endpoint (API Key - ₦140)
+  // 4. NIN Advance Verification Endpoint (API Key - ₦95)
   @UseGuards(ApiKeyGuard)
   @Post('verify/nin/advance')
   async verifyNinAdvance(@Req() req: any, @Body() body: any) {

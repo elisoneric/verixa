@@ -6,25 +6,25 @@ import { ApiClient } from "../../../lib/api"
 
 export default function AdminPricingPage() {
   // 1. Live Base Rates
-  const [baseBvn, setBaseBvn] = React.useState("50")
-  const [baseNin, setBaseNin] = React.useState("50")
-  const [baseNinAdvance, setBaseNinAdvance] = React.useState("140")
-  const [baseNinSlip, setBaseNinSlip] = React.useState("270")
+  const [baseBvn, setBaseBvn] = React.useState("95")
+  const [baseNin, setBaseNin] = React.useState("95")
+  const [baseNinAdvance, setBaseNinAdvance] = React.useState("95")
+  const [baseNinSlip, setBaseNinSlip] = React.useState("250")
   const [baseNuban, setBaseNuban] = React.useState("0")
-  const [basePhone, setBasePhone] = React.useState("85")
+  const [basePhone, setBasePhone] = React.useState("50")
   const [baseCac, setBaseCac] = React.useState("120")
   const [baseData, setBaseData] = React.useState("220")
   const [baseAirtime, setBaseAirtime] = React.useState("0")
   const [baseSms, setBaseSms] = React.useState("5")
 
   // 2. Smart Cache Base Rates
-  const [cacheBvn, setCacheBvn] = React.useState("20")
-  const [cacheNin, setCacheNin] = React.useState("20")
-  const [cacheNinAdvance, setCacheNinAdvance] = React.useState("30")
+  const [cacheBvn, setCacheBvn] = React.useState("38")
+  const [cacheNin, setCacheNin] = React.useState("38")
+  const [cacheNinAdvance, setCacheNinAdvance] = React.useState("38")
   const [cacheNinSlip, setCacheNinSlip] = React.useState("50")
   const [cacheNuban, setCacheNuban] = React.useState("0")
-  const [cachePhone, setCachePhone] = React.useState("30")
-  const [cacheCac, setCacheCac] = React.useState("40")
+  const [cachePhone, setCachePhone] = React.useState("20")
+  const [cacheCac, setCacheCac] = React.useState("48")
   const [cacheEnabled, setCacheEnabled] = React.useState(true)
   const [cacheTtlDays, setCacheTtlDays] = React.useState("30")
 

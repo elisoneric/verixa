@@ -52,7 +52,7 @@ export default function NinSlipGeneratorPage() {
           pdfBase64: res.data.pdfBase64,
           docxBase64: res.data.docxBase64,
           cached: res.meta?.cached || false,
-          cost: res.meta?.cost_ngx || 270,
+          cost: res.meta?.cost_ngx || 250,
           latencyMs: res.meta?.latency_ms || 120,
           timestamp: new Date().toLocaleTimeString(),
         }
