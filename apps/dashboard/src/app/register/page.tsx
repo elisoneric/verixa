@@ -112,7 +112,17 @@ function RegisterForm() {
         redirectUrl
       )
     } catch (err: any) {
-      setError(err.message || "Registration failed. Please check your details.")
+      const msg = String(err?.message || "")
+      if (
+        msg.includes("Failed to fetch") ||
+        msg.includes("Load failed") ||
+        msg.includes("NetworkError") ||
+        msg.includes("network error")
+      ) {
+        setError("Unable to connect to the Verixa server. Please check your connection or verify the API gateway status.")
+      } else {
+        setError(msg || "Registration failed. Please check your details.")
+      }
       setIsLoading(false)
     }
   }

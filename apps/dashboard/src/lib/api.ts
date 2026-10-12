@@ -91,13 +91,36 @@ export class ApiClient {
       headers["Authorization"] = `Bearer ${token}`
     }
 
-    const response = await fetch(`${baseUrl}${path}`, {
-      ...options,
-      headers,
-    })
+    let response: Response
+    try {
+      response = await fetch(`${baseUrl}${path}`, {
+        ...options,
+        headers,
+      })
+    } catch (netErr: any) {
+      throw new Error(
+        "Unable to connect to the Verixa server. Please verify your network connection or ensure the API gateway is online."
+      )
+    }
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}))
+      if (response.status === 401 || response.status === 403) {
+        const rawMsg = errData.message || ""
+        if (
+          !rawMsg ||
+          rawMsg.toLowerCase().includes("invalid credentials") ||
+          rawMsg.toLowerCase().includes("unauthorized")
+        ) {
+          throw new Error("Invalid email or password. Please double-check your credentials.")
+        }
+        throw new Error(Array.isArray(rawMsg) ? rawMsg.join(", ") : rawMsg)
+      }
+      if (response.status === 502 || response.status === 503 || response.status === 504) {
+        throw new Error(
+          "The verification server is temporarily unreachable or restarting. Please try again in a moment."
+        )
+      }
       const message = errData.message || response.statusText || "Request failed"
       throw new Error(Array.isArray(message) ? message.join(", ") : message)
     }

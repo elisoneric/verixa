@@ -33,10 +33,7 @@ export function getDashboardUrl(path = ""): string {
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
-    if (hostname.includes("verixaid.com")) {
-      return "https://verixaid.com" + path
-    }
-    return "https://verixa.esam.com.ng" + path
+    return "https://verixaid.com" + path
   }
   return `${protocol}//${hostname}:3000${path}`
 }
@@ -47,10 +44,7 @@ export function getDocsUrl(path = ""): string {
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
-    if (hostname.includes("verixaid.com")) {
-      return "https://docs.verixaid.com" + path
-    }
-    return "https://docs-verixa.esam.com.ng" + path
+    return "https://docs.verixaid.com" + path
   }
   return `${protocol}//${hostname}:3002${path}`
 }
@@ -61,10 +55,7 @@ export function getWwwUrl(path = ""): string {
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
-    if (hostname.includes("verixaid.com")) {
-      return "https://verixaid.com" + path
-    }
-    return "https://verixa.esam.com.ng" + path
+    return "https://verixaid.com" + path
   }
   return `${protocol}//${hostname}:3001${path}`
 }
@@ -75,9 +66,11 @@ export function getApiUrl(path = ""): string {
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
-    if (hostname.includes("verixaid.com")) {
+    // If the browser is directly hosted on api.verixaid.com
+    if (hostname === "api.verixaid.com") {
       return "https://api.verixaid.com" + path
     }
+    // Live backend cluster
     return "https://api-verixa.esam.com.ng" + path
   }
   return `${protocol}//${hostname}:4000${path}`

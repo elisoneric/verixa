@@ -125,11 +125,11 @@ export class NotificationsService {
       </p>
       <ul style="font-size: 13px; color: #475569; padding-left: 20px; line-height: 1.8;">
         <li>Generate your <b>Sandbox API Key</b> in the console</li>
-        <li>Review API definitions in our <a href="https://docs-verixa.esam.com.ng" style="color: #10b981; font-weight: bold;">Interactive Docs</a></li>
+        <li>Review API definitions in our <a href="https://docs.verixaid.com" style="color: #10b981; font-weight: bold;">Interactive Docs</a></li>
         <li>Provision your <b>Dedicated Paystack Account</b> for automated live wallet funding</li>
       </ul>
 
-      <a href="https://verixa.esam.com.ng/dashboard" class="btn">Open Developer Console &rarr;</a>
+      <a href="https://verixaid.com/dashboard" class="btn">Open Developer Console &rarr;</a>
     `, `Welcome to Verixa ID, ${orgName}. Your 100,000 Sandbox test credits are active.`);
 
     await this.sendMail(to, 'Welcome to Verixa ID — Developer Account Ready', html);
@@ -170,7 +170,7 @@ export class NotificationsService {
         If you initiated this sign-in, no action is needed. If you did not authorize this, please revoke your API keys immediately and update your password.
       </p>
 
-      <a href="https://verixa.esam.com.ng/dashboard/settings" class="btn" style="background: #0f172a;">Review Security Settings</a>
+      <a href="https://verixaid.com/dashboard/settings" class="btn" style="background: #0f172a;">Review Security Settings</a>
     `, `New sign-in detected on your Verixa ID account at ${details.time}`);
 
     await this.sendMail(to, 'Security Notice: New Login to Verixa ID', html);
@@ -215,7 +215,7 @@ export class NotificationsService {
         </tr>
       </table>
 
-      <a href="https://verixa.esam.com.ng/dashboard/billing" class="btn">View Ledger & Transactions &rarr;</a>
+      <a href="https://verixaid.com/dashboard/billing" class="btn">View Ledger & Transactions &rarr;</a>
     `, `Payment Confirmed: ₦${amount.toLocaleString()} credited to your Verixa ID balance.`);
 
     await this.sendMail(to, `Payment Received: ₦${amount.toLocaleString()} Credited — Verixa ID`, html);
@@ -245,7 +245,7 @@ export class NotificationsService {
         Transfer directly to your Dedicated Virtual Account for instant automated top-up within seconds.
       </p>
 
-      <a href="https://verixa.esam.com.ng/dashboard/billing" class="btn" style="background: #d97706;">Fund Live Balance Now &rarr;</a>
+      <a href="https://verixaid.com/dashboard/billing" class="btn" style="background: #d97706;">Fund Live Balance Now &rarr;</a>
     `, `Low Balance Alert: Your Verixa ID balance is ${currentBalance.toLocaleString()} NGX.`);
 
     await this.sendMail(to, `⚠️ Low Balance Warning: ${currentBalance.toLocaleString()} NGX Remaining — Verixa ID`, html);
@@ -286,7 +286,7 @@ export class NotificationsService {
         Never commit your API keys into public git repositories. If you did not create this key, revoke it immediately in your console.
       </p>
 
-      <a href="https://verixa.esam.com.ng/dashboard/api-keys" class="btn">Manage API Keys &rarr;</a>
+      <a href="https://verixaid.com/dashboard/api-keys" class="btn">Manage API Keys &rarr;</a>
     `, `New ${details.environment} API Key provisioned: ${details.keyName}`);
 
     await this.sendMail(to, `New ${details.environment.toUpperCase()} API Key Created — Verixa ID`, html);
@@ -329,7 +329,7 @@ export class NotificationsService {
         </table>
       </div>
 
-      <a href="https://verixa.esam.com.ng/dashboard/billing" class="btn">View Ledger &rarr;</a>
+      <a href="https://verixaid.com/dashboard/billing" class="btn">View Ledger &rarr;</a>
     `, `Balance adjustment: ${isCredit ? '+' : ''}${amount.toLocaleString()} NGX`);
 
     await this.sendMail(to, `Account Balance Adjustment: ${isCredit ? '+' : ''}${amount.toLocaleString()} NGX — Verixa ID`, html);
@@ -379,7 +379,7 @@ export class NotificationsService {
         These rates are active immediately across all your live API requests and dashboard explorer lookups.
       </p>
 
-      <a href="https://verixa.esam.com.ng/dashboard/billing" class="btn">View Plan in Console &rarr;</a>
+      <a href="https://verixaid.com/dashboard/billing" class="btn">View Plan in Console &rarr;</a>
     `, `Account upgraded to ${tier} with customized volume rates.`);
 
     await this.sendMail(to, `Account Upgraded to ${tier} — Verixa ID`, html);
@@ -408,7 +408,7 @@ export class NotificationsService {
         Fund your wallet balance now to take full advantage of this promotional window.
       </p>
 
-      <a href="https://verixa.esam.com.ng/dashboard/billing" class="btn">Top Up Live Balance &rarr;</a>
+      <a href="https://verixaid.com/dashboard/billing" class="btn">Top Up Live Balance &rarr;</a>
     `, `Special Announcement: ${discountPercent}% Rate Slash Active on Verixa ID!`);
 
     await this.sendMail(to, `⚡ Special Rate Slash: ${discountPercent}% Off All Verifications — Verixa ID`, html);

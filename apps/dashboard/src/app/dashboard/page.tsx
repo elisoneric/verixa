@@ -325,7 +325,7 @@ export default function DashboardOverviewPage() {
           <span className="text-xs text-zinc-400 mt-1 block">Dedicated Virtual Account</span>
         </Link>
         <a
-          href="https://docs-verixa.esam.com.ng"
+          href="https://docs.verixaid.com"
           target="_blank"
           rel="noreferrer"
           className="glass-card p-4 rounded-2xl border border-white/[0.08] bg-[#0e1118]/55 hover:bg-[#121620]/80 transition-all text-left block"

@@ -85,7 +85,17 @@ function LoginForm() {
     try {
       await login(email, password, redirectUrl)
     } catch (err: any) {
-      setError(err.message || "Failed to sign in. Please verify your email and password.")
+      const msg = String(err?.message || "")
+      if (
+        msg.includes("Failed to fetch") ||
+        msg.includes("Load failed") ||
+        msg.includes("NetworkError") ||
+        msg.includes("network error")
+      ) {
+        setError("Unable to connect to the Verixa server. Please check your connection or verify the API gateway status.")
+      } else {
+        setError(msg || "Invalid email or password. Please double-check your credentials.")
+      }
     } finally {
       setIsLoading(false)
     }

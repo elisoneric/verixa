@@ -23,7 +23,7 @@ export default function PublicLandingPage() {
             <a href="#services" className="hover:text-slate-900 dark:hover:text-white transition-colors">Services</a>
             <a href="#pricing" className="hover:text-slate-900 dark:hover:text-white transition-colors">Pricing</a>
             <a href="#compliance" className="hover:text-slate-900 dark:hover:text-white transition-colors">Compliance</a>
-            <a href="https://docs-verixa.esam.com.ng" target="_blank" rel="noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">API Docs</a>
+            <a href="https://docs.verixaid.com" target="_blank" rel="noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">API Docs</a>
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -97,7 +97,7 @@ export default function PublicLandingPage() {
                 Get Started Free &rarr;
               </Button>
             </Link>
-            <a href="https://docs-verixa.esam.com.ng" target="_blank" rel="noreferrer">
+            <a href="https://docs.verixaid.com" target="_blank" rel="noreferrer">
               <Button variant="outline" size="lg" className="w-full sm:w-auto font-semibold h-12 px-7">
                 API Documentation
               </Button>
@@ -330,7 +330,7 @@ export default function PublicLandingPage() {
             <Link href="/register" className="hover:text-slate-800 dark:hover:text-zinc-300">Create Account</Link>
             <Link href="/terms" className="hover:text-slate-800 dark:hover:text-zinc-300">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-slate-800 dark:hover:text-zinc-300">Privacy Policy</Link>
-            <a href="https://docs-verixa.esam.com.ng" target="_blank" rel="noreferrer" className="hover:text-slate-800 dark:hover:text-zinc-300">Documentation</a>
+            <a href="https://docs.verixaid.com" target="_blank" rel="noreferrer" className="hover:text-slate-800 dark:hover:text-zinc-300">Documentation</a>
           </div>
         </div>
       </footer>
