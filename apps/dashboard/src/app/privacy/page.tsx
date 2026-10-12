@@ -51,7 +51,7 @@ export default function PrivacyPolicyPage() {
               This Privacy Policy explains how personal and corporate data is collected, processed, encrypted, and safeguarded when businesses (&quot;Customers&quot;, &quot;Developers&quot;) access our APIs and management consoles.
             </p>
             <p>
-              Our operations adhere strictly to the <strong>Nigeria Data Protection Act (NDPA 2023)</strong> and international data protection standards.
+              Our operations adhere strictly to the <strong>Nigeria Data Protection Act (NDPA 2023)</strong> and NDPC regulatory guidelines. All identity verifications require explicit applicant consent, with automated audit trails and zero unauthorized data persistence.
             </p>
           </section>
 

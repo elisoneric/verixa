@@ -22,7 +22,6 @@ export default function PublicLandingPage() {
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-zinc-400">
             <a href="#services" className="hover:text-slate-900 dark:hover:text-white transition-colors">Services</a>
             <a href="#pricing" className="hover:text-slate-900 dark:hover:text-white transition-colors">Pricing</a>
-            <a href="#compliance" className="hover:text-slate-900 dark:hover:text-white transition-colors">Compliance</a>
             <a href="https://docs.verixaid.com" target="_blank" rel="noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">API Docs</a>
           </nav>
 
@@ -73,18 +72,15 @@ export default function PublicLandingPage() {
         <div className="max-w-5xl mx-auto px-6 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            Developer Identity & KYC APIs
+            Built for fintechs, digital lenders, betting platforms, and businesses that require secure, authorized identity verification.
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-            Fast, Reliable Identity Verification &{" "}
-            <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
-              Standardized PDF Slips
-            </span>
+            Identity Verification APIs Built for Business
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-            Real-time identity verification, KYC lookup, automated PDF slip generation, and bank account resolution built for fintechs, betting platforms, digital lenders, and fraud prevention teams.
+            Verify identity information, validate customer details, and streamline digital onboarding with reliable NIN, BVN, and bank account verification APIs.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -287,18 +283,6 @@ export default function PublicLandingPage() {
         </div>
       </section>
 
-      {/* Compliance Umbrella */}
-      <section id="compliance" className="py-14 border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30">
-        <div className="max-w-5xl mx-auto px-6 text-center space-y-4">
-          <Badge variant="verified" size="sm">REGULATORY COMPLIANCE</Badge>
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-            Full NDPA & NDPC Regulatory Alignment
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 max-w-2xl mx-auto">
-            Operating under strict Nigeria Data Protection Act (NDPA) guidelines. All identity verifications require explicit applicant consent, with automated audit trails and zero unauthorized data persistence.
-          </p>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-200 dark:border-zinc-800/80 py-8 bg-slate-100 dark:bg-zinc-950 text-slate-500 text-xs">

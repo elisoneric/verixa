@@ -4,95 +4,106 @@ import * as React from "react"
 import Link from "next/link"
 import { GlassyHeader, AppLink, useLivePricing, formatPriceString } from "@verixa/ui"
 
-type CodeTab = "bvn_ts" | "airtime_curl" | "data_py" | "nuban_go"
+type PreviewService = "bvn" | "nin" | "phone" | "cac" | "nuban"
+
+const previewRecords: Record<
+  PreviewService,
+  {
+    serviceName: string
+    identifierValue: string
+    results: Record<string, string>
+    latency: string
+    reference: string
+  }
+> = {
+  nin: {
+    serviceName: "NIN",
+    identifierValue: "30882411172",
+    results: {
+      nin: "30882411172",
+      trackingId: "N/A",
+      firstName: "ELISON",
+      surname: "ERIC",
+      middleName: "EDWARD",
+      gender: "MALE",
+      birthdate: "2005-01-03",
+      address: "ARMY BARRACK ROAD BEHIND HOMTEL",
+      addressLine1: "ARMY BARRACK ROAD BEHIND HOMTEL",
+      state: "Adamawa",
+      lga: "Yola North",
+      phoneNumber: "0803894606",
+      photo: "/image text..... long text N/A",
+      nextOfKin: "[object Object]",
+    },
+    latency: "12ms",
+    reference: "vx_cache_a7344",
+  },
+  bvn: {
+    serviceName: "BVN",
+    identifierValue: "22604012847",
+    results: {
+      bvn: "22604012847",
+      firstName: "CHIDERA",
+      surname: "OLUTOLA",
+      middleName: "FOLASHADE",
+      gender: "FEMALE",
+      birthdate: "1994-08-14",
+      phoneNumber: "08031234567",
+      enrollmentBank: "GTBank (058)",
+      levelOfAccount: "Level 3",
+      stateOfOrigin: "Lagos",
+      lgaOfOrigin: "Ikeja",
+    },
+    latency: "18ms",
+    reference: "vx_cache_b8912",
+  },
+  phone: {
+    serviceName: "Phone",
+    identifierValue: "0803894606",
+    results: {
+      phoneNumber: "0803894606",
+      network: "MTN Nigeria",
+      status: "ACTIVE",
+      simRegistration: "Biometrically Verified",
+      ported: "FALSE",
+    },
+    latency: "22ms",
+    reference: "vx_cache_d1033",
+  },
+  cac: {
+    serviceName: "CAC Company",
+    identifierValue: "1234567",
+    results: {
+      rcNumber: "1234567",
+      companyName: "VERIXA TECHNOLOGIES LTD",
+      companyType: "Private Company Limited by Shares",
+      registrationDate: "2021-04-12",
+      status: "ACTIVE",
+      branchAddress: "Plot 12 Marina, Lagos Island",
+    },
+    latency: "25ms",
+    reference: "vx_cache_e7729",
+  },
+  nuban: {
+    serviceName: "Bank (NUBAN)",
+    identifierValue: "0123456789 (058)",
+    results: {
+      accountNumber: "0123456789",
+      accountName: "ELISON ERIC EDWARD",
+      bankName: "Guaranty Trust Bank",
+      bankCode: "058",
+      status: "ACTIVE",
+      kycTier: "CBN Tier 3 Verified",
+    },
+    latency: "14ms",
+    reference: "vx_cache_c4521",
+  },
+}
 
 export default function HomePage() {
   const { pricing } = useLivePricing()
-  const [activeTab, setActiveTab] = React.useState<CodeTab>("bvn_ts")
-  const [copied, setCopied] = React.useState(false)
+  const [previewService, setPreviewService] = React.useState<PreviewService>("nin")
   const [activeFaq, setActiveFaq] = React.useState<number | null>(null)
-
-  const codeSnippets: Record<CodeTab, { title: string; code: string; lang: string }> = {
-    bvn_ts: {
-      title: "BVN Verification (TypeScript SDK)",
-      lang: "TypeScript",
-      code: `import { VerixaClient } from "@verixa/sdk";
-
-const verixa = new VerixaClient({
-  apiKey: process.env.VERIXA_API_KEY,
-  environment: "production",
-});
-
-const verification = await verixa.verify.bvn({
-  bvn: "22123456789",
-  firstName: "CHIDERA",
-  lastName: "OLUTOLA",
-});
-
-console.log(verification.status); // "verified"
-console.log(verification.data.matchScore); // 0.98`,
-    },
-    airtime_curl: {
-      title: "Airtime Vending VTU (cURL)",
-      lang: "cURL",
-      code: `curl -X POST https://api.verixaid.com/v1/vas/airtime \\
-  -H "Authorization: Bearer vx_live_9f83a8f1e29c..." \\
-  -H "Idempotency-Key: a1b2c3d4-e5f6-7890..." \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "network": "MTN",
-    "phoneNumber": "08031234567",
-    "amount": 1000
-  }'`,
-    },
-    data_py: {
-      title: "Mobile Data Bundle (Python)",
-      lang: "Python",
-      code: `from verixa import VerixaClient
-import os
-
-client = VerixaClient(api_key=os.getenv("VERIXA_API_KEY"))
-
-# Vend 5GB SME data plan to customer
-bundle = client.vas.purchase_data(
-    network="AIRTEL",
-    phone_number="08029876543",
-    plan_code="AIRTEL-5GB-SME"
-)
-
-print(bundle.status) # "success"
-print(bundle.reference) # "vx_vas_89b21f"`,
-    },
-    nuban_go: {
-      title: "NUBAN Bank Account (Go)",
-      lang: "Go",
-      code: `package main
-
-import (
-    "context"
-    "fmt"
-    "github.com/verixa/verixa-go"
-)
-
-func main() {
-    client := verixa.NewClient("vx_live_9f83a8f1...")
-    res, err := client.VerifyBankAccount(context.Background(), &verixa.BankLookup{
-        AccountNumber: "0123456789",
-        BankCode:      "058", // GTBank
-    })
-    if err != nil {
-        panic(err)
-    }
-    fmt.Println(res.AccountName) // "TOBILOBA OLUFEYIKEMI"
-}`,
-    },
-  }
-
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(codeSnippets[activeTab].code)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
 
   const navItems = [
     {
@@ -308,17 +319,17 @@ func main() {
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
               {/* Left Column: Editorial Display Typography */}
               <div>
-                <span className="inline-block text-xs font-mono font-medium tracking-wider text-emerald-400/90 uppercase">
-                  VERIXA API // IDENTITY & TELECOM GATEWAY
-                </span>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-xs font-medium mb-3">
+                  <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Built for fintechs, digital lenders, betting platforms, and businesses that require secure, authorized identity verification.
+                </div>
 
-                <h1 className="mt-4 font-display text-4xl sm:text-5xl lg:text-6xl font-[450] leading-[1.08] tracking-tight text-white text-balance">
-                  Build with Verixa.
-                  <span className="block text-zinc-400 font-light mt-1">Verify in milliseconds.</span>
+                <h1 className="mt-2 font-display text-4xl sm:text-5xl lg:text-6xl font-[450] leading-[1.08] tracking-tight text-white text-balance">
+                  Identity Verification APIs Built for Business
                 </h1>
 
-                <p className="mt-6 text-base sm:text-lg text-zinc-400 max-w-xl leading-relaxed">
-                  Verify BVN, NIN, and bank accounts, and vend automated Airtime and Mobile Data with sub-150ms multi-provider failover. One usage-based API built for African fintech and enterprise.
+                <p className="mt-5 text-base sm:text-lg text-zinc-400 max-w-xl leading-relaxed">
+                  Verify identity information, validate customer details, and streamline digital onboarding with reliable NIN, BVN, and bank account verification APIs.
                 </p>
 
                 {/* Pill Action CTAs */}
@@ -346,24 +357,24 @@ func main() {
                     <svg className="size-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none">
                       <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span>Works with your existing HTTP & SDK stack in Python, TypeScript, or plain cURL</span>
+                    <span>Sub-15ms Smart Identity Cache with automated 50% discount</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <svg className="size-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none">
                       <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span>Identity verification from ₦10 per check & wholesale Mobile Data from ₦220/GB</span>
+                    <span>Straight BVN, real-time NIN advance, and bank account resolution</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <svg className="size-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none">
                       <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span>Free sandbox & simulated Playground included with every account</span>
+                    <span>Strict NDPA & NDPR regulatory compliance with applicant consent verification</span>
                   </li>
                 </ul>
               </div>
 
-              {/* Right Column: The Cyber-Sleek Terminal Chrome with Aurora Glow */}
+              {/* Right Column: High-Fidelity Identity Verification Console Preview */}
               <div className="relative w-full">
                 {/* Aurora Mesh Glow Backdrop */}
                 <div
@@ -376,78 +387,115 @@ func main() {
                 />
 
                 {/* Cyber Notch Frame Wrapper */}
-                <div className="relative p-6 sm:p-8 rounded-2xl bg-zinc-950/90 border border-white/[0.08] shadow-[0_24px_64px_-16px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+                <div className="relative p-5 sm:p-7 rounded-2xl bg-[#090b10]/95 border border-white/[0.1] shadow-[0_24px_64px_-16px_rgba(0,0,0,0.85)] backdrop-blur-xl">
                   {/* Stepped Corner Notches (14px Geometric Accents) */}
                   <span className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-emerald-500/80 pointer-events-none rounded-tl-sm" />
                   <span className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-emerald-500/80 pointer-events-none rounded-tr-sm" />
                   <span className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-emerald-500/80 pointer-events-none rounded-bl-sm" />
                   <span className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-emerald-500/80 pointer-events-none rounded-br-sm" />
 
-                  {/* Terminal Chrome Titlebar */}
+                  {/* Header */}
                   <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
-                    <div className="flex items-center gap-2">
-                      <span className="size-2.5 rounded-full bg-[#ff5f57] shadow-[0_0_8px_rgba(255,95,87,0.5)]" />
-                      <span className="size-2.5 rounded-full bg-[#febc2e] shadow-[0_0_8px_rgba(254,188,46,0.5)]" />
-                      <span className="size-2.5 rounded-full bg-[#28c840] shadow-[0_0_8px_rgba(40,200,64,0.5)]" />
-                      <span className="ml-3 font-mono text-xs text-zinc-400 font-medium">
-                        {codeSnippets[activeTab].title}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                          Identity Verification
+                        </h2>
+                      </div>
+                      <p className="text-xs text-zinc-400 mt-0.5">
+                        Perform individual KYC identity and bank account checks.
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold tracking-wider">
+                      LIVE REGISTER
+                    </span>
+                  </div>
+
+                  {/* Verification Service Selector */}
+                  <div className="mt-4 space-y-2">
+                    <span className="text-[11px] font-mono text-zinc-400 font-medium uppercase tracking-wider block">
+                      Verification Service
+                    </span>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+                      {(
+                        [
+                          { id: "bvn", label: "BVN" },
+                          { id: "nin", label: "NIN" },
+                          { id: "phone", label: "Phone" },
+                          { id: "cac", label: "CAC Company" },
+                          { id: "nuban", label: "Bank (NUBAN)" },
+                        ] as const
+                      ).map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setPreviewService(item.id)}
+                          className={`h-9 px-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer flex items-center justify-center text-center ${
+                            previewService === item.id
+                              ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] font-bold"
+                              : "bg-[#11141e] border-white/[0.08] text-zinc-400 hover:text-white hover:border-white/[0.2]"
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Simulated Input Query Bar */}
+                  <div className="mt-3.5 p-2.5 rounded-xl bg-[#11141e] border border-white/[0.08] flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="text-[11px] font-mono text-zinc-500 uppercase shrink-0">
+                        QUERY:
+                      </span>
+                      <span className="font-mono text-xs text-emerald-300 font-bold truncate">
+                        {previewRecords[previewService].identifierValue}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 shrink-0">
+                      Validated
+                    </span>
+                  </div>
+
+                  {/* Registry Result Display Card */}
+                  <div className="mt-4 rounded-xl border border-white/[0.08] bg-[#0c0e14]/90 p-4 space-y-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+                      <div className="flex items-center gap-2">
+                        <span className="size-2 rounded-full bg-emerald-400" />
+                        <span className="text-xs font-bold text-white tracking-wide">
+                          Registry Result
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">
+                        VERIFIED
                       </span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleCopyCode}
-                      className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer"
-                    >
-                      {copied ? (
-                        <>
-                          <svg className="size-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none">
-                            <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                          <span className="text-emerald-400">Copied</span>
-                        </>
-                      ) : (
-                        <>
-                          <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                          </svg>
-                          <span>Copy</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
+                    {/* Result Key-Value Monospace Lines */}
+                    <div className="space-y-1.5 font-mono text-[11px] max-h-[220px] overflow-y-auto pr-1">
+                      {Object.entries(previewRecords[previewService].results).map(([key, val]) => (
+                        <div
+                          key={key}
+                          className="flex items-start justify-between py-1 border-b border-white/[0.04] gap-2"
+                        >
+                          <span className="text-zinc-400 lowercase">{key}:</span>
+                          <span className="text-zinc-200 font-medium text-right break-all">
+                            {val}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
 
-                  {/* Code Editor Window */}
-                  <div className="py-4 font-mono text-[13px] leading-relaxed overflow-x-auto min-h-[220px]">
-                    <pre className="text-zinc-300">
-                      <code>{codeSnippets[activeTab].code}</code>
-                    </pre>
-                  </div>
-
-                  {/* API & Language Switcher Tab Pills */}
-                  <div className="pt-4 border-t border-white/[0.08] flex items-center gap-1.5 flex-wrap">
-                    {(
-                      [
-                        { id: "bvn_ts", label: "BVN (TypeScript)" },
-                        { id: "airtime_curl", label: "Airtime VTU (cURL)" },
-                        { id: "data_py", label: "Mobile Data (Python)" },
-                        { id: "nuban_go", label: "NUBAN Bank (Go)" },
-                      ] as const
-                    ).map((item) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => setActiveTab(item.id)}
-                        className={`rounded-full px-3 py-1 text-xs font-medium transition-all cursor-pointer ${
-                          activeTab === item.id
-                            ? "bg-white text-zinc-950 font-semibold shadow-sm"
-                            : "text-zinc-400 hover:text-white hover:bg-white/[0.06]"
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
+                    {/* Footer Latency & Reference Audit Stamp */}
+                    <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between text-[11px] font-mono">
+                      <span className="text-emerald-400 font-bold">
+                        LATENCY: {previewRecords[previewService].latency}
+                      </span>
+                      <span className="text-zinc-400">
+                        REF: {previewRecords[previewService].reference}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

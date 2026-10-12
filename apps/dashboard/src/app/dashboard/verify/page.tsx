@@ -8,13 +8,12 @@ import { ApiClient } from "../../../lib/api"
 export default function ManualVerifyPage() {
   const { environment, setEnvironment, refreshBalance } = useAuth()
   const [service, setService] = React.useState<"bvn" | "nin" | "nuban" | "phone" | "cac">("bvn")
-  const [bvn, setBvn] = React.useState("22123456789")
-  const [firstName, setFirstName] = React.useState("CHIDERA")
-  const [nin, setNin] = React.useState("11234567890")
-  const [accountNumber, setAccountNumber] = React.useState("0123456789")
+  const [bvn, setBvn] = React.useState("")
+  const [nin, setNin] = React.useState("")
+  const [accountNumber, setAccountNumber] = React.useState("")
   const [bankCode, setBankCode] = React.useState("058")
-  const [phone, setPhone] = React.useState("08012345678")
-  const [rcNumber, setRcNumber] = React.useState("1234567")
+  const [phone, setPhone] = React.useState("")
+  const [rcNumber, setRcNumber] = React.useState("")
   const [companyType, setCompanyType] = React.useState("COMPANY")
   const [consent, setConsent] = React.useState(true)
 
@@ -35,15 +34,15 @@ export default function ManualVerifyPage() {
 
     let payload: any = {}
     if (service === "bvn") {
-      payload = { bvn, firstName, consent: true }
+      payload = { bvn: bvn.trim(), consent: true }
     } else if (service === "nin") {
-      payload = { nin, consent: true }
+      payload = { nin: nin.trim(), consent: true }
     } else if (service === "phone") {
-      payload = { phoneNumber: phone, consent: true }
+      payload = { phoneNumber: phone.trim(), consent: true }
     } else if (service === "cac") {
-      payload = { rcNumber, companyType, consent: true }
-    } else {
-      payload = { accountNumber, bankCode, consent: true }
+      payload = { rcNumber: rcNumber.trim(), companyType, consent: true }
+    } else if (service === "nuban") {
+      payload = { accountNumber: accountNumber.trim(), bankCode, consent: true }
     }
 
     try {
@@ -94,7 +93,7 @@ export default function ManualVerifyPage() {
             <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wide">
               Verification Service
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               <button
                 type="button"
                 onClick={() => setService("bvn")}
@@ -142,7 +141,7 @@ export default function ManualVerifyPage() {
               <button
                 type="button"
                 onClick={() => setService("nuban")}
-                className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer sm:col-span-2 ${
+                className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
                   service === "nuban"
                     ? "bg-indigo-500/20 border-indigo-500 text-indigo-400 font-bold shadow-2xs"
                     : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
@@ -161,28 +160,18 @@ export default function ManualVerifyPage() {
             )}
 
             {service === "bvn" && (
-              <>
-                <Input
-                  label="11-Digit BVN"
-                  placeholder="22123456789"
-                  value={bvn}
-                  onChange={(e) => setBvn(e.target.value)}
-                  maxLength={11}
-                  required
-                />
-                <Input
-                  label="First Name (For Matching)"
-                  placeholder="CHIDERA"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              </>
+              <Input
+                label="11-Digit BVN"
+                value={bvn}
+                onChange={(e) => setBvn(e.target.value)}
+                maxLength={11}
+                required
+              />
             )}
 
             {service === "nin" && (
               <Input
                 label="11-Digit NIN"
-                placeholder="11234567890"
                 value={nin}
                 onChange={(e) => setNin(e.target.value)}
                 maxLength={11}
@@ -193,7 +182,6 @@ export default function ManualVerifyPage() {
             {service === "phone" && (
               <Input
                 label="Nigerian Phone Number"
-                placeholder="08012345678"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 maxLength={14}
@@ -205,7 +193,6 @@ export default function ManualVerifyPage() {
               <>
                 <Input
                   label="CAC Registration / RC Number"
-                  placeholder="1234567"
                   value={rcNumber}
                   onChange={(e) => setRcNumber(e.target.value)}
                   required
@@ -233,7 +220,6 @@ export default function ManualVerifyPage() {
               <>
                 <Input
                   label="10-Digit Account Number"
-                  placeholder="0123456789"
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
                   className="!text-white !bg-[#121620] !border-white/[0.12]"
@@ -254,6 +240,15 @@ export default function ManualVerifyPage() {
                     <option value="033">United Bank for Africa (033)</option>
                     <option value="057">Zenith Bank (057)</option>
                     <option value="044">Access Bank (044)</option>
+                    <option value="070">Fidelity Bank (070)</option>
+                    <option value="214">First City Monument Bank (214)</option>
+                    <option value="221">Stanbic IBTC Bank (221)</option>
+                    <option value="232">Sterling Bank (232)</option>
+                    <option value="035">Wema Bank (035)</option>
+                    <option value="50211">Kuda Bank (50211)</option>
+                    <option value="50515">Moniepoint Microfinance Bank (50515)</option>
+                    <option value="999992">OPay / PayCom (999992)</option>
+                    <option value="999991">PalmPay (999991)</option>
                     <option value="999">Titan Trust Bank (999)</option>
                   </select>
                 </div>
@@ -314,14 +309,33 @@ export default function ManualVerifyPage() {
             )}
 
             {!isLoading && result && (
-              <div className="mt-4 space-y-3 font-mono text-xs">
+              <div className="mt-4 space-y-2.5 font-mono text-xs max-h-[380px] overflow-y-auto pr-1">
                 {result.data &&
-                  Object.entries(result.data).map(([key, val]) => (
-                    <div key={key} className="flex justify-between py-1 border-b border-white/[0.06]">
-                      <span className="text-zinc-400 capitalize">{key.replace(/_/g, " ")}:</span>
-                      <span className="text-zinc-100 font-semibold">{String(val || "N/A")}</span>
-                    </div>
-                  ))}
+                  Object.entries(result.data).map(([key, val]) => {
+                    const isPhoto = key.toLowerCase() === "photo" && typeof val === "string" && val.length > 50
+                    const isObject = typeof val === "object" && val !== null
+                    return (
+                      <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-white/[0.06] gap-1">
+                        <span className="text-zinc-400 capitalize">{key.replace(/_/g, " ")}:</span>
+                        {isPhoto ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Photo Verified</span>
+                            <img
+                              src={val.startsWith("data:") ? val : `data:image/jpeg;base64,${val}`}
+                              alt="Applicant Portrait"
+                              className="h-8 w-8 rounded object-cover border border-emerald-500/40"
+                            />
+                          </div>
+                        ) : isObject ? (
+                          <span className="text-zinc-200 font-medium text-[11px] bg-white/[0.04] px-2 py-1 rounded max-w-[260px] truncate" title={JSON.stringify(val)}>
+                            {JSON.stringify(val)}
+                          </span>
+                        ) : (
+                          <span className="text-zinc-100 font-semibold">{String(val || "N/A")}</span>
+                        )}
+                      </div>
+                    )
+                  })}
               </div>
             )}
           </div>

@@ -69,6 +69,9 @@ export default function TermsOfServicePage() {
               <li>
                 <strong>API Key Confidentiality:</strong> You are solely responsible for maintaining the confidentiality of your Verixa API keys. You must never expose secret keys in client-side code (browsers or mobile binaries).
               </li>
+              <li>
+                <strong>Regulatory Compliance Alignment:</strong> Verixa operates under strict Nigeria Data Protection Act (NDPA) and NDPC regulatory guidelines. All identity verifications require explicit applicant consent, with automated audit trails and zero unauthorized data persistence.
+              </li>
             </ul>
           </section>
 

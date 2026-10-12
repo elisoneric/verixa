@@ -27,6 +27,7 @@ import {
 } from './verification.provider.interface';
 import { MockProvider } from './mock.provider';
 import { AdminService } from '../../admin/admin.service';
+import { decryptSecret } from '../../common/utils/crypto.util';
 
 @Injectable()
 export class DojahProvider implements IVerificationProvider {
@@ -84,25 +85,43 @@ export class DojahProvider implements IVerificationProvider {
     }
 
     try {
-      let endpoint = `${baseUrl}/api/v1/kyc/bvn/full`;
+      // Default to straight BVN lookup /api/v1/kyc/bvn?bvn=...
+      let endpoint = `${baseUrl}/api/v1/kyc/bvn`;
       const params: any = { bvn: data.bvn };
 
-      if (data.variant === 'match') {
+      if (data.variant === 'full') {
+        endpoint = `${baseUrl}/api/v1/kyc/bvn/full`;
+      } else if (data.variant === 'advance') {
+        endpoint = `${baseUrl}/api/v1/kyc/bvn/advance`;
+      } else if (data.variant === 'match') {
         endpoint = `${baseUrl}/api/v1/kyc/bvn`;
         if (data.firstName) params.first_name = data.firstName;
         if (data.lastName) params.last_name = data.lastName;
         if (data.dob) params.dob = data.dob;
-      } else if (data.variant === 'advance') {
-        endpoint = `${baseUrl}/api/v1/kyc/bvn/advance`;
       }
 
-      const response = await axios.get(endpoint, {
-        params,
-        headers: this.getHeaders(secretKey!, appId),
-        timeout: 15000,
-      });
+      let response: any;
+      try {
+        response = await axios.get(endpoint, {
+          params,
+          headers: this.getHeaders(secretKey!, appId),
+          timeout: 15000,
+        });
+      } catch (err: any) {
+        // Resilient fallback: If /full or /advance fails, query straight /api/v1/kyc/bvn
+        if (endpoint !== `${baseUrl}/api/v1/kyc/bvn`) {
+          this.logger.warn(`Dojah BVN variant ${data.variant} failed, retrying straight /api/v1/kyc/bvn...`);
+          response = await axios.get(`${baseUrl}/api/v1/kyc/bvn`, {
+            params: { bvn: data.bvn },
+            headers: this.getHeaders(secretKey!, appId),
+            timeout: 15000,
+          });
+        } else {
+          throw err;
+        }
+      }
 
-      const entity = response.data?.entity || {};
+      const entity = response.data?.entity || response.data?.data || {};
       return {
         status: 'success',
         data: entity,
@@ -225,16 +244,44 @@ export class DojahProvider implements IVerificationProvider {
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/api/v1/kyc/account`, {
-        params: {
-          account_number: data.accountNumber,
-          bank_code: data.bankCode,
-        },
-        headers: this.getHeaders(secretKey!, appId),
-        timeout: 12000,
-      });
+      let entity: any = null;
+      try {
+        const response = await axios.get(`${baseUrl}/api/v1/kyc/account`, {
+          params: {
+            account_number: data.accountNumber,
+            bank_code: data.bankCode,
+          },
+          headers: this.getHeaders(secretKey!, appId),
+          timeout: 12000,
+        });
+        entity = response.data?.entity || response.data?.data || {};
+      } catch (dojahErr: any) {
+        this.logger.warn(`Dojah NUBAN lookup failed: ${dojahErr?.message}. Resiliently falling back to Paystack bank resolve...`);
+        const paystackKey =
+          this.adminService.getConfig('PAYSTACK_SECRET_KEY') ||
+          process.env.PAYSTACK_SECRET_KEY;
+        if (paystackKey && !paystackKey.startsWith('sk_test_mock')) {
+          const decryptedKey = paystackKey.includes(':') ? decryptSecret(paystackKey) : paystackKey;
+          const paystackRes = await axios.get('https://api.paystack.co/bank/resolve', {
+            params: {
+              account_number: data.accountNumber,
+              bank_code: data.bankCode,
+            },
+            headers: { Authorization: `Bearer ${decryptedKey.trim()}` },
+            timeout: 10000,
+          });
+          const pData = paystackRes.data?.data || {};
+          entity = {
+            account_name: pData.account_name,
+            account_number: pData.account_number || data.accountNumber,
+            bank_code: data.bankCode,
+            bank_id: pData.bank_id,
+          };
+        } else {
+          throw dojahErr;
+        }
+      }
 
-      const entity = response.data?.entity || {};
       return {
         status: 'success',
         data: {
@@ -248,7 +295,7 @@ export class DojahProvider implements IVerificationProvider {
         },
       };
     } catch (err: any) {
-      this.logger.error(`Dojah NUBAN lookup error: ${err?.message}`, err?.response?.data);
+      this.logger.error(`NUBAN resolution error: ${err?.message}`, err?.response?.data);
       throw err;
     }
   }

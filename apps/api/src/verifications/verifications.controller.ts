@@ -371,7 +371,7 @@ export class VerificationsController {
     else if (body.service === 'nin') identifier = String(body.payload?.nin || '').trim();
     else if (body.service === 'phone') identifier = String(body.payload?.phoneNumber || body.payload?.phone_number || '').trim();
     else if (body.service === 'cac') identifier = String(body.payload?.rcNumber || body.payload?.rc_number || '').trim();
-    else identifier = `${body.payload?.bankCode || ''}_${body.payload?.accountNumber || ''}`.trim();
+    else if (body.service === 'nuban' || body.service === 'nuban_kyc') identifier = `${body.payload?.bankCode || ''}_${body.payload?.accountNumber || ''}`.trim();
 
     const mockReq = {
       organizationId: req.organizationId,
@@ -403,7 +403,10 @@ export class VerificationsController {
         if (body.service === 'nuban_kyc') {
           return isLive ? this.dojahProvider.verifyNubanKycStatus(body.payload) : this.mockProvider.verifyNubanKycStatus(body.payload);
         }
-        return isLive ? this.dojahProvider.verifyBankAccount(body.payload) : this.mockProvider.verifyBankAccount(body.payload);
+        if (body.service === 'nuban') {
+          return isLive ? this.dojahProvider.verifyBankAccount(body.payload) : this.mockProvider.verifyBankAccount(body.payload);
+        }
+        throw new BadRequestException(`Unsupported verification service: ${body.service}`);
       }
     );
   }
