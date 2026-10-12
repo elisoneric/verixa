@@ -27,8 +27,8 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     category: "identity",
     method: "POST",
     path: "/api/nin-verification",
-    benchmark: "₦150",
-    verixaRate: "₦135",
+    benchmark: "₦50",
+    verixaRate: "₦50",
     description: "National Identity Number verification lookup.",
     defaultPayload: {
       nin: "11234567890",
@@ -41,8 +41,8 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     category: "identity",
     method: "POST",
     path: "/api/bvn-verification",
-    benchmark: "₦100",
-    verixaRate: "₦85",
+    benchmark: "₦50",
+    verixaRate: "₦50",
     description: "Instant Bank Verification Number verification against NIBSS registry.",
     defaultPayload: {
       bvn: "22123456789",
@@ -55,8 +55,8 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     category: "identity",
     method: "POST",
     path: "/api/nin-phone",
-    benchmark: "₦200",
-    verixaRate: "₦185",
+    benchmark: "₦50",
+    verixaRate: "₦50",
     description: "Reverse lookup and corroborate linked National Identity Number via registered phone line.",
     defaultPayload: {
       phone: "08012345678",
@@ -69,8 +69,8 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     category: "identity",
     method: "POST",
     path: "/api/bvn-phone",
-    benchmark: "₦150",
-    verixaRate: "₦135",
+    benchmark: "₦50",
+    verixaRate: "₦50",
     description: "Query bank customer records and verified financial profile by registered telephone number.",
     defaultPayload: {
       phone: "08012345678",
@@ -83,8 +83,8 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     category: "identity",
     method: "POST",
     path: "/api/nin-demography",
-    benchmark: "₦250",
-    verixaRate: "₦235",
+    benchmark: "₦100",
+    verixaRate: "₦100",
     description: "Full demographic profile including residential address, maiden name, and biometric timestamp.",
     defaultPayload: {
       nin: "11234567890",
@@ -97,8 +97,8 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     category: "identity",
     method: "POST",
     path: "/api/nin-tracking",
-    benchmark: "₦200",
-    verixaRate: "₦185",
+    benchmark: "₦50",
+    verixaRate: "₦50",
     description: "Track slip issuance and demographic status by tracking ID.",
     defaultPayload: {
       tracking_id: "TRK-982183719",
@@ -524,19 +524,9 @@ export default function ApiExplorerPage() {
                   <span className="text-zinc-200 font-semibold">{currentConfig.path}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
-                  {currentConfig.benchmark !== "Free" && (
-                    <span className="text-zinc-500 line-through font-sans text-[11px]">
-                      {currentConfig.benchmark}
-                    </span>
-                  )}
                   <span className="font-sans font-bold text-emerald-400">
                     {currentConfig.verixaRate}
                   </span>
-                  {currentConfig.benchmark !== "Free" && (
-                    <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">
-                      -₦15
-                    </span>
-                  )}
                 </div>
               </div>
               <p className="text-xs text-zinc-400 leading-relaxed font-sans">

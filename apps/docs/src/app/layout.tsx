@@ -28,39 +28,56 @@ export default function RootLayout({
     {
       title: "GET STARTED",
       links: [
-        { label: "Introduction", href: "/" },
-        { label: "Authentication", href: "/authentication" },
-        { label: "Environments", href: "/environments" },
+        { label: "Introduction & Overview", href: "/" },
+        { label: "Authentication & Headers", href: "/authentication" },
+        { label: "Environments & Base URLs", href: "/environments" },
       ],
     },
     {
-      title: "VERIFICATION APIS",
+      title: "KYC IDENTITY VERIFICATION",
       links: [
-        { label: "BVN Verification", href: "/bvn" },
-        { label: "NIN Verification", href: "/nin" },
-        { label: "Phone Number Lookup", href: "/phone" },
-        { label: "CAC Business Verification", href: "/cac" },
-        { label: "NUBAN Resolve", href: "/nuban" },
+        { label: "BVN Verification (4 Tiers)", href: "/bvn" },
+        { label: "NIN Verification (5 Tiers)", href: "/nin" },
+        { label: "Phone Number Intelligence", href: "/phone" },
+        { label: "Secondary Government IDs", href: "/government-ids" },
+      ],
+    },
+    {
+      title: "KYB CORPORATE VERIFICATION",
+      links: [
+        { label: "CAC Business & TIN", href: "/cac" },
+      ],
+    },
+    {
+      title: "BANKING & FINANCIAL",
+      links: [
+        { label: "Bank Account (NUBAN)", href: "/nuban" },
         { label: "NUBAN KYC Status", href: "/nuban-kyc" },
-        { label: "Upcoming APIs (Roadmap)", href: "/roadmap" },
+      ],
+    },
+    {
+      title: "BIOMETRICS & RISK INTELLIGENCE",
+      links: [
+        { label: "Biometrics, AML & Credit", href: "/biometrics-aml" },
       ],
     },
     {
       title: "VALUE-ADDED SERVICES",
       links: [
-        { label: "SMS & WhatsApp Messaging", href: "/messaging" },
-        { label: "Airtime & Mobile Data", href: "/airtime-data" },
+        { label: "Airtime & Mobile Data VTU", href: "/airtime-data" },
+        { label: "SMS & WhatsApp OTP", href: "/messaging" },
       ],
     },
     {
-      title: "PLATFORM GUIDES",
+      title: "PLATFORM ARCHITECTURE",
       links: [
-        { label: "Billing & Payment API", href: "/billing-api" },
         { label: "Smart Identity Cache", href: "/smart-cache" },
+        { label: "Billing & Credits", href: "/billing-api" },
         { label: "Redis Idempotency", href: "/idempotency" },
         { label: "Webhooks & Signatures", href: "/webhooks" },
         { label: "Rate Limits", href: "/rate-limits" },
-        { label: "Error Taxonomy", href: "/errors" },
+        { label: "Error Reference", href: "/errors" },
+        { label: "Upcoming Roadmap", href: "/roadmap" },
       ],
     },
   ];

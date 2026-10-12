@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Body,
+  Query,
   Req,
   UseGuards,
   BadRequestException,
@@ -43,7 +44,7 @@ export class ApiController {
     queryFn: () => Promise<any>,
     exactPrice?: number,
   ) {
-    if (payload?.consent !== true && payload?.consent !== 'true') {
+    if (payload?.consent === false || payload?.consent === 'false') {
       throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
     }
 
@@ -51,7 +52,7 @@ export class ApiController {
     const env = req.environment || Environment.SANDBOX;
     const isLive = env === Environment.LIVE;
     const startTime = Date.now();
-    const reducedPrice = exactPrice !== undefined ? exactPrice : Math.max(0, baseRate - 15);
+    const finalPrice = exactPrice !== undefined ? exactPrice : baseRate;
 
     // 1. Check Smart Identity Cache
     if (identifier) {
@@ -63,7 +64,7 @@ export class ApiController {
       );
 
       if (cached) {
-        const cacheCost = Math.max(10, Math.round(reducedPrice * 0.4));
+        const cacheCost = Math.max(10, Math.round(finalPrice * 0.4));
         const reference = `vx_cache_${uuidv4().slice(0, 12)}`;
 
         if (orgId) {
@@ -95,6 +96,7 @@ export class ApiController {
 
         return {
           status: 'success',
+          entity: cached.data,
           data: cached.data,
           billed_amount: cacheCost,
           cached: true,
@@ -118,10 +120,10 @@ export class ApiController {
 
     const reference = `vx_live_${uuidv4().slice(0, 12)}`;
 
-    // 3. Deduct dropped rate (reduced by ₦15)
+    // 3. Deduct standard usage fee
     if (orgId) {
       try {
-        await this.billingService.deductCredits(orgId, env, reducedPrice, reference);
+        await this.billingService.deductCredits(orgId, env, finalPrice, reference);
       } catch {
         // proceed
       }
@@ -143,7 +145,7 @@ export class ApiController {
       upstreamProvider: 'direct',
       isCached: false,
       source: 'LIVE',
-      costDeducted: reducedPrice,
+      costDeducted: finalPrice,
       latencyMs,
       cacheKey: this.identityCacheService.generateKey(orgId, env, service, identifier),
       idempotencyKey: req.headers?.['idempotency-key'] || undefined,
@@ -151,10 +153,12 @@ export class ApiController {
       responsePayload: result?.data || result,
     });
 
+    const payloadData = result?.data || result;
     return {
       status: 'success',
-      data: result?.data || result,
-      billed_amount: reducedPrice,
+      entity: payloadData,
+      data: payloadData,
+      billed_amount: finalPrice,
       cached: false,
       meta: {
         request_id: reference,
@@ -165,7 +169,671 @@ export class ApiController {
     };
   }
 
-  // 1. POST /api/nin-verification (Standard ₦150 -> Dropped by ₦15: ₦135)
+  // ==========================================
+  // DOJAH PARITY KYC & IDENTITY SUITE (/api/v1/...)
+  // ==========================================
+
+  // --- 1. BVN Endpoints ---
+
+  // GET & POST /api/v1/kyc/bvn (Validate & Match)
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/bvn')
+  @HttpCode(HttpStatus.OK)
+  async getKycBvn(@Req() req: any, @Query() query: any) {
+    const bvn = String(query.bvn || query.id || '').trim();
+    if (!bvn) throw new BadRequestException('bvn query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'bvn',
+      bvn,
+      query,
+      50,
+      () => (isLive ? this.dojahProvider.verifyBvn({ ...query, bvn, variant: 'match' }) : this.mockProvider.verifyBvn({ ...query, bvn, variant: 'match' }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/bvn')
+  @HttpCode(HttpStatus.OK)
+  async postKycBvn(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const bvn = String(payload.bvn || payload.id || '').trim();
+    if (!bvn) throw new BadRequestException('bvn is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'bvn',
+      bvn,
+      payload,
+      50,
+      () => (isLive ? this.dojahProvider.verifyBvn({ ...payload, bvn, variant: 'match' }) : this.mockProvider.verifyBvn({ ...payload, bvn, variant: 'match' }))
+    );
+  }
+
+  // GET /api/v1/kyc/bvn/full
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/bvn/full')
+  @HttpCode(HttpStatus.OK)
+  async getKycBvnFull(@Req() req: any, @Query() query: any) {
+    const bvn = String(query.bvn || query.id || '').trim();
+    if (!bvn) throw new BadRequestException('bvn query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'bvn',
+      bvn,
+      query,
+      50,
+      () => (isLive ? this.dojahProvider.verifyBvn({ ...query, bvn, variant: 'full' }) : this.mockProvider.verifyBvn({ ...query, bvn, variant: 'full' }))
+    );
+  }
+
+  // GET /api/v1/kyc/bvn/advance
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/bvn/advance')
+  @HttpCode(HttpStatus.OK)
+  async getKycBvnAdvance(@Req() req: any, @Query() query: any) {
+    const bvn = String(query.bvn || query.id || '').trim();
+    if (!bvn) throw new BadRequestException('bvn query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'bvn_advance',
+      bvn,
+      query,
+      100,
+      () => (isLive ? this.dojahProvider.verifyBvn({ ...query, bvn, variant: 'advance' }) : this.mockProvider.verifyBvn({ ...query, bvn, variant: 'advance' }))
+    );
+  }
+
+  // POST /api/v1/kyc/bvn/verify (Biometric Selfie Match)
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/bvn/verify')
+  @HttpCode(HttpStatus.OK)
+  async verifyKycBvnSelfie(@Req() req: any, @Body() body: any) {
+    const bvn = String(body.bvn || body.id || '').trim();
+    const selfie = String(body.selfie_image || body.image || '').trim();
+    if (!bvn || !selfie) throw new BadRequestException('bvn and selfie_image (base64) are required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'bvn_face_match',
+      bvn,
+      body,
+      150,
+      () => (isLive ? this.dojahProvider.verifyFaceMatch({ idType: 'BVN', idNumber: bvn, selfieImageBase64: selfie }) : this.mockProvider.verifyFaceMatch({ idType: 'BVN', idNumber: bvn, selfieImageBase64: selfie }))
+    );
+  }
+
+  // --- 2. NIN Endpoints ---
+
+  // GET & POST /api/v1/kyc/nin (Basic NIN)
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/nin')
+  @HttpCode(HttpStatus.OK)
+  async getKycNin(@Req() req: any, @Query() query: any) {
+    const nin = String(query.nin || query.id || '').trim();
+    if (!nin) throw new BadRequestException('nin query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin',
+      nin,
+      query,
+      50,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...query, tier: 'basic' }) : this.mockProvider.verifyNin({ nin, ...query, tier: 'basic' }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/nin')
+  @HttpCode(HttpStatus.OK)
+  async postKycNin(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const nin = String(payload.nin || payload.id || '').trim();
+    if (!nin) throw new BadRequestException('nin is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin',
+      nin,
+      payload,
+      50,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: payload.tier || 'basic' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: payload.tier || 'basic' }))
+    );
+  }
+
+  // GET & POST /api/v1/kyc/nin/advance
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/nin/advance')
+  @HttpCode(HttpStatus.OK)
+  async getKycNinAdvance(@Req() req: any, @Query() query: any) {
+    const nin = String(query.nin || query.id || '').trim();
+    if (!nin) throw new BadRequestException('nin query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_advance',
+      nin,
+      query,
+      100,
+      () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin, ...query }) : this.mockProvider.verifyNinAdvance({ nin, ...query }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/nin/advance')
+  @HttpCode(HttpStatus.OK)
+  async postKycNinAdvance(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const nin = String(payload.nin || payload.id || '').trim();
+    if (!nin) throw new BadRequestException('nin is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_advance',
+      nin,
+      payload,
+      100,
+      () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin, ...payload }) : this.mockProvider.verifyNinAdvance({ nin, ...payload }))
+    );
+  }
+
+  // GET /api/v1/kyc/nin/premium
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/nin/premium')
+  @HttpCode(HttpStatus.OK)
+  async getKycNinPremium(@Req() req: any, @Query() query: any) {
+    const nin = String(query.nin || query.id || '').trim();
+    if (!nin) throw new BadRequestException('nin query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_premium',
+      nin,
+      query,
+      120,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, tier: 'premium' }))
+    );
+  }
+
+  // GET /api/v1/kyc/nin/nin_slip
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/nin/nin_slip')
+  @HttpCode(HttpStatus.OK)
+  async getKycNinSlip(@Req() req: any, @Query() query: any) {
+    const nin = String(query.nin || query.id || '').trim();
+    if (!nin) throw new BadRequestException('nin query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_slip',
+      nin,
+      query,
+      200,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, tier: 'slip' }) : this.mockProvider.verifyNin({ nin, tier: 'slip' }))
+    );
+  }
+
+  // POST /api/v1/kyc/nin/verify (Biometric Selfie Match)
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/nin/verify')
+  @HttpCode(HttpStatus.OK)
+  async verifyKycNinSelfie(@Req() req: any, @Body() body: any) {
+    const nin = String(body.nin || body.id || '').trim();
+    const selfie = String(body.selfie_image || body.image || '').trim();
+    if (!nin || !selfie) throw new BadRequestException('nin and selfie_image (base64) are required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_face_match',
+      nin,
+      body,
+      150,
+      () => (isLive ? this.dojahProvider.verifyFaceMatch({ idType: 'NIN', idNumber: nin, selfieImageBase64: selfie }) : this.mockProvider.verifyFaceMatch({ idType: 'NIN', idNumber: nin, selfieImageBase64: selfie }))
+    );
+  }
+
+  // --- 3. Phone Number Endpoints ---
+
+  // GET /api/v1/kyc/phone_number/basic
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/phone_number/basic')
+  @HttpCode(HttpStatus.OK)
+  async getKycPhoneBasic(@Req() req: any, @Query() query: any) {
+    const phone = String(query.phone_number || query.phone || '').trim();
+    if (!phone) throw new BadRequestException('phone_number query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'phone_basic',
+      phone,
+      query,
+      85,
+      () => (isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'basic' }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'basic' }))
+    );
+  }
+
+  // GET /api/v1/kyc/phone_number (Full)
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/phone_number')
+  @HttpCode(HttpStatus.OK)
+  async getKycPhoneAdvance(@Req() req: any, @Query() query: any) {
+    const phone = String(query.phone_number || query.phone || '').trim();
+    if (!phone) throw new BadRequestException('phone_number query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'phone_advance',
+      phone,
+      query,
+      120,
+      () => (isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'advance' }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'advance' }))
+    );
+  }
+
+  // --- 4. Bank Account & NUBAN ---
+
+  // GET & POST /api/v1/kyc/account (Resolve Account)
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/account')
+  @HttpCode(HttpStatus.OK)
+  async getKycAccount(@Req() req: any, @Query() query: any) {
+    const accountNumber = String(query.account_number || query.accountNumber || '').trim();
+    const bankCode = String(query.bank_code || query.bankCode || '').trim();
+    if (!accountNumber || !bankCode) throw new BadRequestException('account_number and bank_code query parameters are required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'account_resolve',
+      `${bankCode}_${accountNumber}`,
+      query,
+      0,
+      () => (isLive ? this.dojahProvider.verifyBankAccount({ accountNumber, bankCode }) : this.mockProvider.verifyBankAccount({ accountNumber, bankCode })),
+      0
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/account')
+  @HttpCode(HttpStatus.OK)
+  async postKycAccount(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const accountNumber = String(payload.account_number || payload.accountNumber || '').trim();
+    const bankCode = String(payload.bank_code || payload.bankCode || '').trim();
+    if (!accountNumber || !bankCode) throw new BadRequestException('account_number and bank_code are required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'account_resolve',
+      `${bankCode}_${accountNumber}`,
+      payload,
+      0,
+      () => (isLive ? this.dojahProvider.verifyBankAccount({ accountNumber, bankCode }) : this.mockProvider.verifyBankAccount({ accountNumber, bankCode })),
+      0
+    );
+  }
+
+  // GET /api/v1/kyc/nuban/status
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/nuban/status')
+  @HttpCode(HttpStatus.OK)
+  async getKycNubanStatus(@Req() req: any, @Query() query: any) {
+    const accountNumber = String(query.account_number || query.accountNumber || '').trim();
+    const bankCode = String(query.bank_code || query.bankCode || '').trim();
+    if (!accountNumber || !bankCode) throw new BadRequestException('account_number and bank_code are required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nuban_status',
+      `${bankCode}_${accountNumber}`,
+      query,
+      25,
+      () => (isLive ? this.dojahProvider.verifyNubanKycStatus({ accountNumber, bankCode }) : this.mockProvider.verifyNubanKycStatus({ accountNumber, bankCode }))
+    );
+  }
+
+  // --- 5. Business Verification (CAC & TIN) ---
+
+  // GET & POST /api/v1/kyc/cac/basic
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/cac/basic')
+  @HttpCode(HttpStatus.OK)
+  async getKycCacBasic(@Req() req: any, @Query() query: any) {
+    const rc = String(query.rc_number || query.rcNumber || '').trim();
+    if (!rc) throw new BadRequestException('rc_number query parameter is required');
+    const companyType = query.company_type || query.companyType || 'COMPANY';
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'cac_basic',
+      rc,
+      query,
+      120,
+      () => (isLive ? this.dojahProvider.verifyCac({ rcNumber: rc, companyType, variant: 'basic' }) : this.mockProvider.verifyCac({ rcNumber: rc, companyType, variant: 'basic' }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/cac/basic')
+  @HttpCode(HttpStatus.OK)
+  async postKycCacBasic(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const rc = String(payload.rc_number || payload.rcNumber || '').trim();
+    if (!rc) throw new BadRequestException('rc_number is required');
+    const companyType = payload.company_type || payload.companyType || 'COMPANY';
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'cac_basic',
+      rc,
+      payload,
+      120,
+      () => (isLive ? this.dojahProvider.verifyCac({ rcNumber: rc, companyType, variant: 'basic' }) : this.mockProvider.verifyCac({ rcNumber: rc, companyType, variant: 'basic' }))
+    );
+  }
+
+  // GET & POST /api/v1/kyc/cac/advance
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/cac/advance')
+  @HttpCode(HttpStatus.OK)
+  async getKycCacAdvance(@Req() req: any, @Query() query: any) {
+    const rc = String(query.rc_number || query.rcNumber || '').trim();
+    if (!rc) throw new BadRequestException('rc_number query parameter is required');
+    const companyType = query.company_type || query.companyType || 'COMPANY';
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'cac_advance',
+      rc,
+      query,
+      250,
+      () => (isLive ? this.dojahProvider.verifyCac({ rcNumber: rc, companyType, variant: 'advance' }) : this.mockProvider.verifyCac({ rcNumber: rc, companyType, variant: 'advance' }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/cac/advance')
+  @HttpCode(HttpStatus.OK)
+  async postKycCacAdvance(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const rc = String(payload.rc_number || payload.rcNumber || '').trim();
+    if (!rc) throw new BadRequestException('rc_number is required');
+    const companyType = payload.company_type || payload.companyType || 'COMPANY';
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'cac_advance',
+      rc,
+      payload,
+      250,
+      () => (isLive ? this.dojahProvider.verifyCac({ rcNumber: rc, companyType, variant: 'advance' }) : this.mockProvider.verifyCac({ rcNumber: rc, companyType, variant: 'advance' }))
+    );
+  }
+
+  // GET & POST /api/v1/kyc/tin
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/tin')
+  @HttpCode(HttpStatus.OK)
+  async getKycTin(@Req() req: any, @Query() query: any) {
+    const tin = String(query.tin || query.tax_id || '').trim();
+    if (!tin) throw new BadRequestException('tin query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'tin_verification',
+      tin,
+      query,
+      100,
+      () => (isLive ? this.dojahProvider.verifyTin({ tin }) : this.mockProvider.verifyTin({ tin }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/tin')
+  @HttpCode(HttpStatus.OK)
+  async postKycTin(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const tin = String(payload.tin || payload.tax_id || '').trim();
+    if (!tin) throw new BadRequestException('tin is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'tin_verification',
+      tin,
+      payload,
+      100,
+      () => (isLive ? this.dojahProvider.verifyTin({ tin }) : this.mockProvider.verifyTin({ tin }))
+    );
+  }
+
+  // --- 6. Government Identity Documents ---
+
+  // GET & POST /api/v1/kyc/dl (Driver's License)
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/dl')
+  @HttpCode(HttpStatus.OK)
+  async getKycDl(@Req() req: any, @Query() query: any) {
+    const license = String(query.license_number || query.licenseNumber || '').trim();
+    if (!license) throw new BadRequestException('license_number query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'drivers_license',
+      license,
+      query,
+      120,
+      () => (isLive ? this.dojahProvider.verifyDriversLicense({ licenseNumber: license, dob: query.dob || query.date_of_birth }) : this.mockProvider.verifyDriversLicense({ licenseNumber: license, dob: query.dob || query.date_of_birth }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/dl')
+  @HttpCode(HttpStatus.OK)
+  async postKycDl(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const license = String(payload.license_number || payload.licenseNumber || '').trim();
+    if (!license) throw new BadRequestException('license_number is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'drivers_license',
+      license,
+      payload,
+      120,
+      () => (isLive ? this.dojahProvider.verifyDriversLicense({ licenseNumber: license, dob: payload.dob || payload.date_of_birth }) : this.mockProvider.verifyDriversLicense({ licenseNumber: license, dob: payload.dob || payload.date_of_birth }))
+    );
+  }
+
+  // GET & POST /api/v1/kyc/vin (Voter's Card)
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/vin')
+  @HttpCode(HttpStatus.OK)
+  async getKycVin(@Req() req: any, @Query() query: any) {
+    const vin = String(query.vin || query.voter_id || '').trim();
+    if (!vin) throw new BadRequestException('vin query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'voters_card',
+      vin,
+      query,
+      100,
+      () => (isLive ? this.dojahProvider.verifyVotersCard({ vin, state: query.state, lastName: query.last_name || query.lastName }) : this.mockProvider.verifyVotersCard({ vin, state: query.state, lastName: query.last_name || query.lastName }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/vin')
+  @HttpCode(HttpStatus.OK)
+  async postKycVin(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const vin = String(payload.vin || payload.voter_id || '').trim();
+    if (!vin) throw new BadRequestException('vin is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'voters_card',
+      vin,
+      payload,
+      100,
+      () => (isLive ? this.dojahProvider.verifyVotersCard({ vin, state: payload.state, lastName: payload.last_name || payload.lastName }) : this.mockProvider.verifyVotersCard({ vin, state: payload.state, lastName: payload.last_name || payload.lastName }))
+    );
+  }
+
+  // GET & POST /api/v1/kyc/passport
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/passport')
+  @HttpCode(HttpStatus.OK)
+  async getKycPassport(@Req() req: any, @Query() query: any) {
+    const passport = String(query.passport_number || query.passportNumber || '').trim();
+    if (!passport) throw new BadRequestException('passport_number query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'passport_verification',
+      passport,
+      query,
+      150,
+      () => (isLive ? this.dojahProvider.verifyPassport({ passportNumber: passport, lastName: query.last_name || query.lastName, dob: query.dob || query.date_of_birth }) : this.mockProvider.verifyPassport({ passportNumber: passport, lastName: query.last_name || query.lastName, dob: query.dob || query.date_of_birth }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/passport')
+  @HttpCode(HttpStatus.OK)
+  async postKycPassport(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const passport = String(payload.passport_number || payload.passportNumber || '').trim();
+    if (!passport) throw new BadRequestException('passport_number is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'passport_verification',
+      passport,
+      payload,
+      150,
+      () => (isLive ? this.dojahProvider.verifyPassport({ passportNumber: passport, lastName: payload.last_name || payload.lastName, dob: payload.dob || payload.date_of_birth }) : this.mockProvider.verifyPassport({ passportNumber: passport, lastName: payload.last_name || payload.lastName, dob: payload.dob || payload.date_of_birth }))
+    );
+  }
+
+  // --- 7. Biometrics, AML & Credit Risk ---
+
+  // POST /api/v1/kyc/photoid/verify
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/photoid/verify')
+  @HttpCode(HttpStatus.OK)
+  async verifyKycPhotoId(@Req() req: any, @Body() body: any) {
+    const idNumber = String(body.id_number || body.idNumber || body.bvn || body.nin || '').trim();
+    const selfie = String(body.image || body.selfie_image_base64 || '').trim();
+    if (!idNumber || !selfie) throw new BadRequestException('id_number and image (base64) are required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'face_match',
+      idNumber,
+      body,
+      150,
+      () => (isLive ? this.dojahProvider.verifyFaceMatch({ idType: body.id_type || 'BVN', idNumber, selfieImageBase64: selfie, livenessCheck: body.liveness_check !== false }) : this.mockProvider.verifyFaceMatch({ idType: body.id_type || 'BVN', idNumber, selfieImageBase64: selfie, livenessCheck: body.liveness_check !== false }))
+    );
+  }
+
+  // POST /api/v1/aml/screening
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/aml/screening')
+  @HttpCode(HttpStatus.OK)
+  async screenAmlDojah(@Req() req: any, @Body() body: any) {
+    const name = String(body.name || body.full_name || '').trim();
+    if (!name) throw new BadRequestException('name is required for AML screening');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'aml_screening',
+      name,
+      body,
+      120,
+      () => (isLive ? this.dojahProvider.screenAml({ name, dob: body.date_of_birth || body.dob, country: body.country || 'NG' }) : this.mockProvider.screenAml({ name, dob: body.date_of_birth || body.dob, country: body.country || 'NG' }))
+    );
+  }
+
+  // GET & POST /api/v1/credit/bvn
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/credit/bvn')
+  @HttpCode(HttpStatus.OK)
+  async getCreditScoreDojah(@Req() req: any, @Query() query: any) {
+    const bvn = String(query.bvn || query.id || '').trim();
+    if (!bvn) throw new BadRequestException('bvn query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'credit_score',
+      bvn,
+      query,
+      250,
+      () => (isLive ? this.dojahProvider.getCreditScore({ bvn, phoneNumber: query.phone_number || query.phoneNumber }) : this.mockProvider.getCreditScore({ bvn, phoneNumber: query.phone_number || query.phoneNumber }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/credit/bvn')
+  @HttpCode(HttpStatus.OK)
+  async postCreditScoreDojah(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const bvn = String(payload.bvn || payload.id || '').trim();
+    if (!bvn) throw new BadRequestException('bvn is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'credit_score',
+      bvn,
+      payload,
+      250,
+      () => (isLive ? this.dojahProvider.getCreditScore({ bvn, phoneNumber: payload.phone_number || payload.phoneNumber }) : this.mockProvider.getCreditScore({ bvn, phoneNumber: payload.phone_number || payload.phoneNumber }))
+    );
+  }
+
+  // GET & POST /api/v1/kyc/email
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/email')
+  @HttpCode(HttpStatus.OK)
+  async getEmailRiskDojah(@Req() req: any, @Query() query: any) {
+    const email = String(query.email || '').trim();
+    if (!email) throw new BadRequestException('email query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'email_risk',
+      email,
+      query,
+      50,
+      () => (isLive ? this.dojahProvider.checkEmailRisk({ email }) : this.mockProvider.checkEmailRisk({ email }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/email')
+  @HttpCode(HttpStatus.OK)
+  async postEmailRiskDojah(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const email = String(payload.email || '').trim();
+    if (!email) throw new BadRequestException('email is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'email_risk',
+      email,
+      payload,
+      50,
+      () => (isLive ? this.dojahProvider.checkEmailRisk({ email }) : this.mockProvider.checkEmailRisk({ email }))
+    );
+  }
+
+  // ==========================================
+  // LEGACY ALIAS ENDPOINTS
+  // ==========================================
+
+  // 1. POST /api/nin-verification
   @UseGuards(ApiKeyGuard)
   @Post('nin-verification')
   @HttpCode(HttpStatus.OK)
@@ -178,12 +846,12 @@ export class ApiController {
       'nin',
       nin,
       body,
-      150,
+      50,
       () => (isLive ? this.dojahProvider.verifyNin(body) : this.mockProvider.verifyNin(body))
     );
   }
 
-  // 2. POST /api/bvn-verification (Standard ₦100 -> Dropped by ₦15: ₦85)
+  // 2. POST /api/bvn-verification
   @UseGuards(ApiKeyGuard)
   @Post('bvn-verification')
   @HttpCode(HttpStatus.OK)
@@ -196,12 +864,12 @@ export class ApiController {
       'bvn',
       bvn,
       body,
-      100,
+      50,
       () => (isLive ? this.dojahProvider.verifyBvn(body) : this.mockProvider.verifyBvn(body))
     );
   }
 
-  // 3. POST /api/nin-phone (Standard ₦200 -> Dropped by ₦15: ₦185)
+  // 3. POST /api/nin-phone
   @UseGuards(ApiKeyGuard)
   @Post('nin-phone')
   @HttpCode(HttpStatus.OK)
@@ -214,12 +882,12 @@ export class ApiController {
       'phone',
       phone,
       body,
-      200,
+      120,
       () => (isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'advance' }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'advance' }))
     );
   }
 
-  // 4. POST /api/bvn-phone (Standard ₦150 -> Dropped by ₦15: ₦135)
+  // 4. POST /api/bvn-phone
   @UseGuards(ApiKeyGuard)
   @Post('bvn-phone')
   @HttpCode(HttpStatus.OK)
@@ -232,12 +900,12 @@ export class ApiController {
       'phone',
       phone,
       body,
-      150,
+      85,
       () => (isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'basic' }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'basic' }))
     );
   }
 
-  // 5. POST /api/nin-demography (Standard ₦250 -> Dropped by ₦15: ₦235)
+  // 5. POST /api/nin-demography
   @UseGuards(ApiKeyGuard)
   @Post('nin-demography')
   @HttpCode(HttpStatus.OK)
@@ -250,12 +918,12 @@ export class ApiController {
       'nin',
       nin,
       body,
-      250,
+      100,
       () => (isLive ? this.dojahProvider.verifyNinAdvance(body) : this.mockProvider.verifyNinAdvance(body))
     );
   }
 
-  // 6. POST /api/nin-tracking (Standard ₦200 -> Dropped by ₦15: ₦185)
+  // 6. POST /api/nin-tracking
   @UseGuards(ApiKeyGuard)
   @Post('nin-tracking')
   @HttpCode(HttpStatus.OK)
@@ -268,7 +936,7 @@ export class ApiController {
       'nin',
       trackingId,
       body,
-      200,
+      100,
       () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin: trackingId }) : this.mockProvider.verifyNinAdvance({ nin: trackingId }))
     );
   }
@@ -307,7 +975,7 @@ export class ApiController {
     };
   }
 
-  // 8. POST /api/cac-basic (Benchmark ₦250 -> Verixa ₦220)
+  // 8. POST /api/cac-basic
   @UseGuards(ApiKeyGuard)
   @Post('cac-basic')
   @HttpCode(HttpStatus.OK)
@@ -320,13 +988,13 @@ export class ApiController {
       'cac_basic',
       rc,
       body,
-      250,
+      120,
       () => (isLive ? this.dojahProvider.verifyCac({ rcNumber: rc, companyType: body.company_type || body.companyType, variant: 'basic' }) : this.mockProvider.verifyCac({ rcNumber: rc, companyType: body.company_type || body.companyType, variant: 'basic' })),
-      220
+      120
     );
   }
 
-  // 9. POST /api/cac-advance (Benchmark ₦600 -> Verixa ₦540)
+  // 9. POST /api/cac-advance
   @UseGuards(ApiKeyGuard)
   @Post('cac-advance')
   @HttpCode(HttpStatus.OK)
@@ -339,13 +1007,13 @@ export class ApiController {
       'cac_advance',
       rc,
       body,
-      600,
+      250,
       () => (isLive ? this.dojahProvider.verifyCac({ rcNumber: rc, companyType: body.company_type || body.companyType, variant: 'advance' }) : this.mockProvider.verifyCac({ rcNumber: rc, companyType: body.company_type || body.companyType, variant: 'advance' })),
-      540
+      250
     );
   }
 
-  // 10. POST /api/tin-verification (Benchmark ₦200 -> Verixa ₦180)
+  // 10. POST /api/tin-verification
   @UseGuards(ApiKeyGuard)
   @Post('tin-verification')
   @HttpCode(HttpStatus.OK)
@@ -358,13 +1026,13 @@ export class ApiController {
       'tin_verification',
       tin,
       body,
-      200,
+      100,
       () => (isLive ? this.dojahProvider.verifyTin({ tin }) : this.mockProvider.verifyTin({ tin })),
-      180
+      100
     );
   }
 
-  // 11. POST /api/drivers-license (Benchmark ₦180 -> Verixa ₦160)
+  // 11. POST /api/drivers-license
   @UseGuards(ApiKeyGuard)
   @Post('drivers-license')
   @HttpCode(HttpStatus.OK)
@@ -377,13 +1045,13 @@ export class ApiController {
       'drivers_license',
       license,
       body,
-      180,
+      120,
       () => (isLive ? this.dojahProvider.verifyDriversLicense({ licenseNumber: license, dob: body.date_of_birth || body.dob }) : this.mockProvider.verifyDriversLicense({ licenseNumber: license, dob: body.date_of_birth || body.dob })),
-      160
+      120
     );
   }
 
-  // 12. POST /api/voters-card (Benchmark ₦150 -> Verixa ₦130)
+  // 12. POST /api/voters-card
   @UseGuards(ApiKeyGuard)
   @Post('voters-card')
   @HttpCode(HttpStatus.OK)
@@ -396,13 +1064,13 @@ export class ApiController {
       'voters_card',
       vin,
       body,
-      150,
+      100,
       () => (isLive ? this.dojahProvider.verifyVotersCard({ vin, state: body.state, lastName: body.last_name || body.lastName }) : this.mockProvider.verifyVotersCard({ vin, state: body.state, lastName: body.last_name || body.lastName })),
-      130
+      100
     );
   }
 
-  // 13. POST /api/passport-verification (Benchmark ₦300 -> Verixa ₦270)
+  // 13. POST /api/passport-verification
   @UseGuards(ApiKeyGuard)
   @Post('passport-verification')
   @HttpCode(HttpStatus.OK)
@@ -415,9 +1083,9 @@ export class ApiController {
       'passport_verification',
       passport,
       body,
-      300,
+      150,
       () => (isLive ? this.dojahProvider.verifyPassport({ passportNumber: passport, lastName: body.last_name || body.lastName, dob: body.date_of_birth || body.dob }) : this.mockProvider.verifyPassport({ passportNumber: passport, lastName: body.last_name || body.lastName, dob: body.date_of_birth || body.dob })),
-      270
+      150
     );
   }
 
@@ -441,7 +1109,7 @@ export class ApiController {
     );
   }
 
-  // 15. POST /api/credit-score (Benchmark ₦450 -> Verixa ₦390)
+  // 15. POST /api/credit-score
   @UseGuards(ApiKeyGuard)
   @Post('credit-score')
   @HttpCode(HttpStatus.OK)
@@ -454,13 +1122,13 @@ export class ApiController {
       'credit_score',
       bvn,
       body,
-      450,
+      250,
       () => (isLive ? this.dojahProvider.getCreditScore({ bvn, phoneNumber: body.phone_number || body.phoneNumber }) : this.mockProvider.getCreditScore({ bvn, phoneNumber: body.phone_number || body.phoneNumber })),
-      390
+      250
     );
   }
 
-  // 16. POST /api/face-match (Benchmark ₦250 -> Verixa ₦220)
+  // 16. POST /api/face-match
   @UseGuards(ApiKeyGuard)
   @Post('face-match')
   @HttpCode(HttpStatus.OK)
@@ -474,13 +1142,13 @@ export class ApiController {
       'face_match',
       idNumber,
       body,
-      250,
+      150,
       () => (isLive ? this.dojahProvider.verifyFaceMatch({ idType: body.id_type || 'BVN', idNumber, selfieImageBase64: selfie, livenessCheck: body.liveness_check !== false }) : this.mockProvider.verifyFaceMatch({ idType: body.id_type || 'BVN', idNumber, selfieImageBase64: selfie, livenessCheck: body.liveness_check !== false })),
-      220
+      150
     );
   }
 
-  // 17. POST /api/aml-screening (Benchmark ₦200 -> Verixa ₦175)
+  // 17. POST /api/aml-screening
   @UseGuards(ApiKeyGuard)
   @Post('aml-screening')
   @HttpCode(HttpStatus.OK)
@@ -493,13 +1161,13 @@ export class ApiController {
       'aml_screening',
       name,
       body,
-      200,
+      120,
       () => (isLive ? this.dojahProvider.screenAml({ name, dob: body.date_of_birth || body.dob, country: body.country || 'NG' }) : this.mockProvider.screenAml({ name, dob: body.date_of_birth || body.dob, country: body.country || 'NG' })),
-      175
+      120
     );
   }
 
-  // 18. POST /api/phone-intelligence (Benchmark ₦150 -> Verixa ₦130)
+  // 18. POST /api/phone-intelligence
   @UseGuards(ApiKeyGuard)
   @Post('phone-intelligence')
   @HttpCode(HttpStatus.OK)
@@ -512,13 +1180,13 @@ export class ApiController {
       'phone_intelligence',
       phone,
       body,
-      150,
+      120,
       () => (isLive ? this.dojahProvider.screenPhoneIntelligence({ phoneNumber: phone }) : this.mockProvider.screenPhoneIntelligence({ phoneNumber: phone })),
-      130
+      120
     );
   }
 
-  // 19. POST /api/email-risk (Benchmark ₦80 -> Verixa ₦65)
+  // 19. POST /api/email-risk
   @UseGuards(ApiKeyGuard)
   @Post('email-risk')
   @HttpCode(HttpStatus.OK)
@@ -531,9 +1199,9 @@ export class ApiController {
       'email_risk',
       email,
       body,
-      80,
+      50,
       () => (isLive ? this.dojahProvider.checkEmailRisk({ email }) : this.mockProvider.checkEmailRisk({ email })),
-      65
+      50
     );
   }
 

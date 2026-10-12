@@ -3,38 +3,70 @@ import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, T
 export default function BvnDocsPage() {
   return (
     <div className="space-y-8">
+      {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <Badge variant="verified">POST</Badge>
-          <span className="font-mono text-xs text-emerald-400 font-bold">/v1/verify/bvn</span>
+          <Badge variant="verified">DOJAH PARITY</Badge>
+          <span className="font-mono text-xs text-sky-400 font-bold">/api/v1/kyc/bvn</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
           Bank Verification Number (BVN)
         </h1>
         <p className="mt-2 text-base text-zinc-400 leading-relaxed">
-          Verify an 11-digit BVN against the national database and resolve the customer&apos;s verified full name, date of birth, phone number, and gender.
+          Verify an 11-digit BVN against the national database. Verixa provides 100% Dojah endpoint parity across validation matching, full demographics, advance branch tier lookups, and biometric selfie face verification.
         </p>
       </div>
 
-      {/* Pricing and SLA Chip */}
+      {/* Pricing and SLA Chips */}
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">COST</span>
+          <span className="text-zinc-500 block">STANDARD LOOKUP</span>
           <span className="text-emerald-400 font-bold">50 NGX (₦50.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">CACHE SPLIT</span>
+          <span className="text-zinc-500 block">ADVANCE / BIOMETRIC</span>
+          <span className="text-emerald-400 font-bold">100 - 150 NGX</span>
+        </div>
+        <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+          <span className="text-zinc-500 block">SMART CACHE HIT</span>
           <span className="text-cyan-400 font-bold">20 NGX (₦20.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">TARGET SLA</span>
-          <span className="text-white font-bold">&lt; 180ms</span>
+          <span className="text-zinc-500 block">LATENCY (CACHE / LIVE)</span>
+          <span className="text-white font-bold">&lt;15ms / ~140ms</span>
         </div>
       </div>
 
-      {/* Request Body Parameters Table */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-bold text-white tracking-tight">Request Parameters</h2>
+      {/* Available Tiers Overview */}
+      <div className="space-y-4 pt-2">
+        <h2 className="text-lg font-bold text-white tracking-tight">Available Endpoints & Tiers</h2>
+        <div className="grid sm:grid-cols-2 gap-3 text-xs font-mono">
+          <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
+            <span className="text-sky-400 font-bold block">1. Field Validation & Match</span>
+            <code className="text-white block text-[11px]">GET /api/v1/kyc/bvn?bvn=...</code>
+            <p className="text-zinc-400 font-sans text-xs">Validates if user-supplied name and DOB match BVN records.</p>
+          </div>
+          <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
+            <span className="text-sky-400 font-bold block">2. Full Profile Lookup</span>
+            <code className="text-white block text-[11px]">GET /api/v1/kyc/bvn/full?bvn=...</code>
+            <p className="text-zinc-400 font-sans text-xs">Returns customer names, verified phone number, gender, and DOB.</p>
+          </div>
+          <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
+            <span className="text-sky-400 font-bold block">3. Advance Profile</span>
+            <code className="text-white block text-[11px]">GET /api/v1/kyc/bvn/advance?bvn=...</code>
+            <p className="text-zinc-400 font-sans text-xs">Includes enrollment branch, bank code, and account level tier.</p>
+          </div>
+          <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
+            <span className="text-emerald-400 font-bold block">4. Selfie Face Verification</span>
+            <code className="text-white block text-[11px]">POST /api/v1/kyc/bvn/verify</code>
+            <p className="text-zinc-400 font-sans text-xs">Performs facial matching between live selfie and government photo.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Request Parameters Table */}
+      <div className="space-y-3 pt-4 border-t border-zinc-800">
+        <h2 className="text-lg font-bold text-white tracking-tight">Query Parameters (GET /api/v1/kyc/bvn)</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -52,72 +84,86 @@ export default function BvnDocsPage() {
               <TableCell className="text-zinc-300">The 11-digit Bank Verification Number.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">variant</TableCell>
+              <TableCell className="font-mono text-zinc-300 font-bold">first_name</TableCell>
               <TableCell className="font-mono text-zinc-400">string</TableCell>
               <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">
-                Lookup variant: <code className="text-sky-300 font-mono">full</code> (default, masked BVN with demographics), <code className="text-sky-300 font-mono">match</code> (confidence score matching), or <code className="text-sky-300 font-mono">advance</code> (adds enrollment branch, level, nationality).
-              </TableCell>
+              <TableCell className="text-zinc-300">Customer first name for verification matching.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">firstName</TableCell>
+              <TableCell className="font-mono text-zinc-300 font-bold">last_name</TableCell>
               <TableCell className="font-mono text-zinc-400">string</TableCell>
               <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Customer first name for registry match scoring.</TableCell>
+              <TableCell className="text-zinc-300">Customer surname / last name for match scoring.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-amber-400 font-bold">consent</TableCell>
-              <TableCell className="font-mono text-zinc-400">boolean</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">Must be set to <code className="text-amber-300 font-mono">true</code> per NDPA regulatory compliance.</TableCell>
+              <TableCell className="font-mono text-zinc-300 font-bold">dob</TableCell>
+              <TableCell className="font-mono text-zinc-400">string</TableCell>
+              <TableCell className="text-zinc-500">Optional</TableCell>
+              <TableCell className="text-zinc-300">Date of birth in <code className="text-sky-300 font-mono">YYYY-MM-DD</code> format.</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
 
       {/* Code Examples */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-bold text-white tracking-tight">Example Request & Response</h2>
+      <div className="space-y-4 pt-4 border-t border-zinc-800">
+        <h2 className="text-lg font-bold text-white tracking-tight">Example Request & Response (Dojah Parity)</h2>
         <CodeBlock
           language="bash"
-          title="cURL Request"
-          code={`curl -X POST https://api.verixaid.com/v1/verify/bvn \\
-  -H "Authorization: Bearer vrx_live_..." \\
-  -H "Idempotency-Key: 7b3e6d1a-4c2e-48a9-981f-1c4a92b02e11" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "bvn": "22123456789",
-    "variant": "advance",
-    "consent": true
-  }'`}
+          title="cURL Request (Full Profile)"
+          code={`curl -X GET "https://api.verixaid.com/api/v1/kyc/bvn/full?bvn=22123456789" \\
+  -H "Authorization: vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
+  -H "AppId: app_6a7b8c9d0e1f" \\
+  -H "Content-Type: application/json"`}
         />
 
         <CodeBlock
           language="json"
-          title="Response (200 OK)"
+          title="HTTP 200 OK Response"
           code={`{
-  "status": "verified",
-  "data": {
-    "bvn": "2*****34567",
+  "status": "success",
+  "entity": {
+    "bvn": "22123456789",
     "first_name": "JOHN",
     "last_name": "MUSA",
     "middle_name": "DOE",
     "date_of_birth": "1997-05-16",
     "phone_number1": "08012345678",
+    "gender": "Male",
     "enrollment_bank": "GTB",
-    "enrollment_branch": "IKEJA",
-    "level_of_account": "LEVEL 2",
-    "watch_listed": "NO"
+    "enrollment_branch": "Ikeja",
+    "level_of_account": "LEVEL 2"
   },
-  "cached": false,
   "billed_amount": 50,
+  "cached": false,
   "meta": {
-    "provider": "nibss_direct",
-    "variant": "advance",
     "request_id": "vx_req_8f19a02d",
+    "service": "bvn",
     "latency_ms": 142
   }
 }`}
+        />
+      </div>
+
+      {/* Biometric Verification */}
+      <div className="space-y-4 pt-4 border-t border-zinc-800">
+        <h2 className="text-lg font-bold text-white tracking-tight">BVN Face Match Verification (POST /api/v1/kyc/bvn/verify)</h2>
+        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+          Pass the user&apos;s live camera selfie base64 image along with their BVN to cross-reference facial landmarks against the NIBSS facial database with liveness detection.
+        </p>
+
+        <CodeBlock
+          language="bash"
+          title="cURL Request (Selfie Match)"
+          code={`curl -X POST https://api.verixaid.com/api/v1/kyc/bvn/verify \\
+  -H "Authorization: vrx_live_9f83a8f1..." \\
+  -H "AppId: app_6a7b8c9d0e1f" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "bvn": "22123456789",
+    "selfie_image": "/9j/4AAQSkZJRgABAQ...",
+    "threshold": 90
+  }'`}
         />
       </div>
     </div>

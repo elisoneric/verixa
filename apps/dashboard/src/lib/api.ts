@@ -208,7 +208,7 @@ export class ApiClient {
     })
   }
 
-  // Exact 7 Endpoints (Live Metered with -₦15 Dropped Rates)
+  // Direct Verification Endpoints
   static async executeDirectApi(endpoint: string, method: "POST" | "GET", payload?: any) {
     return this.request<any>(endpoint, {
       method,

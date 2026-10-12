@@ -292,14 +292,13 @@ export default function DashboardOverviewPage() {
       {/* Account Plan Rates Schedule Banner */}
       <div className="glass-card p-4 rounded-2xl border border-white/[0.08] bg-[#0e1118]/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Badge variant="mono" size="sm">ACTIVE RATES (-₦15 DROP)</Badge>
+          <Badge variant="mono" size="sm">ACTIVE RATES</Badge>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-sans">
-            <span className="text-zinc-300">BVN: <b className="text-emerald-400 font-bold">₦85</b></span>
-            <span className="text-zinc-300">NIN: <b className="text-emerald-400 font-bold">₦135</b></span>
-            <span className="text-zinc-300">NIN Phone: <b className="text-emerald-400 font-bold">₦185</b></span>
-            <span className="text-zinc-300">BVN Phone: <b className="text-emerald-400 font-bold">₦135</b></span>
-            <span className="text-zinc-300">Demography: <b className="text-emerald-400 font-bold">₦235</b></span>
-            <span className="text-zinc-300">Tracking: <b className="text-emerald-400 font-bold">₦185</b></span>
+            <span className="text-zinc-300">BVN: <b className="text-emerald-400 font-bold">₦50</b></span>
+            <span className="text-zinc-300">NIN: <b className="text-emerald-400 font-bold">₦50</b></span>
+            <span className="text-zinc-300">NIN Advance: <b className="text-emerald-400 font-bold">₦100</b></span>
+            <span className="text-zinc-300">CAC: <b className="text-emerald-400 font-bold">₦120</b></span>
+            <span className="text-zinc-300">Phone: <b className="text-emerald-400 font-bold">₦50</b></span>
             <span className="text-zinc-300">Balance: <b className="text-emerald-400 font-bold">Free</b></span>
           </div>
         </div>
