@@ -43,25 +43,25 @@ export default function AdminPricingPage() {
     ApiClient.getAdminPricing()
       .then((data: any) => {
         if (data?.baseRates) {
-          setBaseBvn(String(data.baseRates.bvn ?? 50))
-          setBaseNin(String(data.baseRates.nin ?? 50))
-          setBaseNinAdvance(String(data.baseRates.ninAdvance ?? 140))
-          setBaseNinSlip(String(data.baseRates.ninSlip ?? 270))
+          setBaseBvn(String(data.baseRates.bvn ?? 95))
+          setBaseNin(String(data.baseRates.nin ?? 95))
+          setBaseNinAdvance(String(data.baseRates.ninAdvance ?? 95))
+          setBaseNinSlip(String(data.baseRates.ninSlip ?? 250))
           setBaseNuban(String(data.baseRates.nuban ?? 0))
-          setBasePhone(String(data.baseRates.phone ?? 85))
+          setBasePhone(String(data.baseRates.phone ?? 50))
           setBaseCac(String(data.baseRates.cac ?? 120))
           setBaseData(String(data.baseRates.data ?? 220))
           setBaseAirtime(String(data.baseRates.airtime ?? 0))
           setBaseSms(String(data.baseRates.sms ?? 5))
         }
         if (data?.cacheRates) {
-          setCacheBvn(String(data.cacheRates.bvn ?? 20))
-          setCacheNin(String(data.cacheRates.nin ?? 20))
-          setCacheNinAdvance(String(data.cacheRates.ninAdvance ?? 30))
+          setCacheBvn(String(data.cacheRates.bvn ?? 38))
+          setCacheNin(String(data.cacheRates.nin ?? 38))
+          setCacheNinAdvance(String(data.cacheRates.ninAdvance ?? 38))
           setCacheNinSlip(String(data.cacheRates.ninSlip ?? 50))
           setCacheNuban(String(data.cacheRates.nuban ?? 0))
-          setCachePhone(String(data.cacheRates.phone ?? 30))
-          setCacheCac(String(data.cacheRates.cac ?? 40))
+          setCachePhone(String(data.cacheRates.phone ?? 20))
+          setCacheCac(String(data.cacheRates.cac ?? 48))
         }
         if (data?.cacheSettings) {
           setCacheEnabled(data.cacheSettings.enabled !== false)
@@ -416,18 +416,18 @@ export default function AdminPricingPage() {
                 </tr>
                 <tr>
                   <td className="py-2.5 font-bold text-blue-600 dark:text-blue-400">GROWTH (10% Off)</td>
-                  <td>₦{Math.round(parseInt(baseBvn || "50") * 0.9)}</td>
-                  <td>₦{Math.round(parseInt(baseNin || "50") * 0.9)}</td>
-                  <td>₦{Math.round(parseInt(baseNinAdvance || "140") * 0.9)}</td>
-                  <td>₦{Math.round(parseInt(baseNinSlip || "270") * 0.9)}</td>
+                  <td>₦{Math.round(parseInt(baseBvn || "95") * 0.9)}</td>
+                  <td>₦{Math.round(parseInt(baseNin || "95") * 0.9)}</td>
+                  <td>₦{Math.round(parseInt(baseNinAdvance || "95") * 0.9)}</td>
+                  <td>₦{Math.round(parseInt(baseNinSlip || "250") * 0.9)}</td>
                   <td className="text-emerald-500 font-bold">Free</td>
                 </tr>
                 <tr>
                   <td className="py-2.5 font-bold text-emerald-600 dark:text-emerald-400">ENTERPRISE (30% Off)</td>
-                  <td>₦{Math.round(parseInt(baseBvn || "50") * 0.7)}</td>
-                  <td>₦{Math.round(parseInt(baseNin || "50") * 0.7)}</td>
-                  <td>₦{Math.round(parseInt(baseNinAdvance || "140") * 0.7)}</td>
-                  <td>₦{Math.round(parseInt(baseNinSlip || "270") * 0.7)}</td>
+                  <td>₦{Math.round(parseInt(baseBvn || "95") * 0.7)}</td>
+                  <td>₦{Math.round(parseInt(baseNin || "95") * 0.7)}</td>
+                  <td>₦{Math.round(parseInt(baseNinAdvance || "95") * 0.7)}</td>
+                  <td>₦{Math.round(parseInt(baseNinSlip || "250") * 0.7)}</td>
                   <td className="text-emerald-500 font-bold">Free</td>
                 </tr>
               </tbody>

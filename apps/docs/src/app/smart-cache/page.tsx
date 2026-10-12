@@ -69,24 +69,31 @@ export default function SmartCacheDocsPage() {
           <TableBody>
             <TableRow>
               <TableCell className="font-semibold text-white">BVN Verification</TableCell>
-              <TableCell className="font-mono text-zinc-300">50 NGX (₦50.00)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">20 NGX (₦20.00)</TableCell>
+              <TableCell className="font-mono text-zinc-300">95 NGX (₦95.00)</TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">38 NGX (₦38.00)</TableCell>
               <TableCell className="text-emerald-400 font-bold">60% OFF</TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~180ms</TableCell>
+              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~140ms</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-semibold text-white">NIN Verification</TableCell>
-              <TableCell className="font-mono text-zinc-300">50 NGX (₦50.00)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">20 NGX (₦20.00)</TableCell>
+              <TableCell className="font-mono text-zinc-300">95 NGX (₦95.00)</TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">38 NGX (₦38.00)</TableCell>
               <TableCell className="text-emerald-400 font-bold">60% OFF</TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~180ms</TableCell>
+              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~160ms</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-semibold text-white">CAC Company Verification</TableCell>
+              <TableCell className="font-mono text-zinc-300">120 NGX (₦120.00)</TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">48 NGX (₦48.00)</TableCell>
+              <TableCell className="text-emerald-400 font-bold">60% OFF</TableCell>
+              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~220ms</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-semibold text-white">Bank Account (NUBAN)</TableCell>
-              <TableCell className="font-mono text-zinc-300">10 NGX (₦10.00)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">5 NGX (₦5.00)</TableCell>
-              <TableCell className="text-emerald-400 font-bold">50% OFF</TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~120ms</TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">Free (₦0.00)</TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">Free (₦0.00)</TableCell>
+              <TableCell className="text-emerald-400 font-bold">100% Free</TableCell>
+              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~80ms</TableCell>
             </TableRow>
           </TableBody>
         </Table>

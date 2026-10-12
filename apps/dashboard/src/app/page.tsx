@@ -128,7 +128,7 @@ export default function PublicLandingPage() {
                 Retrieve verified demographics, residential address, telephone, tracking ID, and portrait image.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                ₦140 / query
+                ₦95 / query
               </div>
             </div>
 
@@ -141,7 +141,7 @@ export default function PublicLandingPage() {
                 Generate high-resolution A4 dual-slip PDF and editable Word (.docx) slips adhering to standard paper specifications.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-sky-600 dark:text-sky-400">
-                ₦270 / slip
+                ₦250 / slip
               </div>
             </div>
 
@@ -154,7 +154,7 @@ export default function PublicLandingPage() {
                 Real-time NIBSS BVN identity validation, date of birth verification, and name matching with automated audit trails.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                ₦50 / query
+                ₦95 / query
               </div>
             </div>
 
@@ -206,7 +206,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-verification</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Verification</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦140 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦95 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 180ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -215,7 +215,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/bvn-verification</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">BVN Verification</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦50 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦95 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 150ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -224,7 +224,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-phone</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Phone Search</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦180 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦50 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 190ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -233,7 +233,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/bvn-phone</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">BVN Phone Search</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦135 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦50 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 160ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -242,7 +242,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-demography</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Demography</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦235 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦95 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 210ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -251,7 +251,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-tracking</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Tracking</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦185 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦50 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 180ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -260,7 +260,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-slip</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">Automated NIN Slip</td>
-                  <td className="py-3.5 px-5 font-sans text-sky-400 font-bold">₦270 / slip</td>
+                  <td className="py-3.5 px-5 font-sans text-sky-400 font-bold">₦250 / slip</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 350ms</td>
                 </tr>
                 <tr className="bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors">

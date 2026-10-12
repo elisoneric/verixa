@@ -107,7 +107,7 @@ export default function NinSlipGeneratorPage() {
 
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#121620] border border-white/[0.08] text-xs shadow-2xs">
           <span className="text-zinc-400 font-mono">RATE:</span>
-          <span className="font-semibold text-emerald-400 font-mono">₦270 / slip</span>
+          <span className="font-semibold text-emerald-400 font-mono">₦250 / slip</span>
         </div>
       </div>
 
@@ -141,7 +141,7 @@ export default function NinSlipGeneratorPage() {
                 disabled={isGenerating || ninInput.length !== 11 || !consent}
                 className="shrink-0 px-6 font-semibold h-11"
               >
-                {isGenerating ? "Generating..." : "Generate NIN Slip (₦270)"}
+                {isGenerating ? "Generating..." : "Generate NIN Slip (₦250)"}
               </Button>
             </div>
           </div>

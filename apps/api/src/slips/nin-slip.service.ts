@@ -274,7 +274,7 @@ export class NinSlipService {
       await this.billingService.deductCredits(orgId, environment, cost, reference);
       identityData = cached.data;
     } else {
-      // CACHE MISS: Live NIN Advance Query (Standard rate ₦270)
+      // CACHE MISS: Live NIN Advance Query (Standard rate ₦250)
       const rateInfo = await this.billingService.getEffectiveRate(orgId, 'nin_slip' as any, false);
       cost = rateInfo.effectiveRate;
       await this.billingService.deductCredits(orgId, environment, cost, reference);

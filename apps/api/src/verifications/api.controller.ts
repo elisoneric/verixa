@@ -188,7 +188,7 @@ export class ApiController {
       'bvn',
       bvn,
       query,
-      50,
+      95,
       () => (isLive ? this.dojahProvider.verifyBvn({ ...query, bvn, variant: 'match' }) : this.mockProvider.verifyBvn({ ...query, bvn, variant: 'match' }))
     );
   }
@@ -206,7 +206,7 @@ export class ApiController {
       'bvn',
       bvn,
       payload,
-      50,
+      95,
       () => (isLive ? this.dojahProvider.verifyBvn({ ...payload, bvn, variant: 'match' }) : this.mockProvider.verifyBvn({ ...payload, bvn, variant: 'match' }))
     );
   }
@@ -224,7 +224,7 @@ export class ApiController {
       'bvn',
       bvn,
       query,
-      50,
+      95,
       () => (isLive ? this.dojahProvider.verifyBvn({ ...query, bvn, variant: 'full' }) : this.mockProvider.verifyBvn({ ...query, bvn, variant: 'full' }))
     );
   }
@@ -242,7 +242,7 @@ export class ApiController {
       'bvn_advance',
       bvn,
       query,
-      100,
+      125,
       () => (isLive ? this.dojahProvider.verifyBvn({ ...query, bvn, variant: 'advance' }) : this.mockProvider.verifyBvn({ ...query, bvn, variant: 'advance' }))
     );
   }
@@ -281,7 +281,7 @@ export class ApiController {
       'nin',
       nin,
       query,
-      50,
+      95,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, ...query, tier: 'basic' }) : this.mockProvider.verifyNin({ nin, ...query, tier: 'basic' }))
     );
   }
@@ -299,7 +299,7 @@ export class ApiController {
       'nin',
       nin,
       payload,
-      50,
+      95,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: payload.tier || 'basic' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: payload.tier || 'basic' }))
     );
   }
@@ -317,7 +317,7 @@ export class ApiController {
       'nin_advance',
       nin,
       query,
-      100,
+      95,
       () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin, ...query }) : this.mockProvider.verifyNinAdvance({ nin, ...query }))
     );
   }
@@ -335,7 +335,7 @@ export class ApiController {
       'nin_advance',
       nin,
       payload,
-      100,
+      95,
       () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin, ...payload }) : this.mockProvider.verifyNinAdvance({ nin, ...payload }))
     );
   }
@@ -353,7 +353,7 @@ export class ApiController {
       'nin_premium',
       nin,
       query,
-      120,
+      125,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, tier: 'premium' }))
     );
   }
@@ -371,7 +371,7 @@ export class ApiController {
       'nin_slip',
       nin,
       query,
-      200,
+      150,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, tier: 'slip' }) : this.mockProvider.verifyNin({ nin, tier: 'slip' }))
     );
   }
@@ -410,7 +410,7 @@ export class ApiController {
       'phone_basic',
       phone,
       query,
-      85,
+      50,
       () => (isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'basic' }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'basic' }))
     );
   }
@@ -428,7 +428,7 @@ export class ApiController {
       'phone_advance',
       phone,
       query,
-      120,
+      95,
       () => (isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'advance' }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'advance' }))
     );
   }
@@ -489,7 +489,7 @@ export class ApiController {
       'nuban_status',
       `${bankCode}_${accountNumber}`,
       query,
-      25,
+      35,
       () => (isLive ? this.dojahProvider.verifyNubanKycStatus({ accountNumber, bankCode }) : this.mockProvider.verifyNubanKycStatus({ accountNumber, bankCode }))
     );
   }
@@ -585,7 +585,7 @@ export class ApiController {
       'tin_verification',
       tin,
       query,
-      100,
+      90,
       () => (isLive ? this.dojahProvider.verifyTin({ tin }) : this.mockProvider.verifyTin({ tin }))
     );
   }
@@ -603,7 +603,7 @@ export class ApiController {
       'tin_verification',
       tin,
       payload,
-      100,
+      90,
       () => (isLive ? this.dojahProvider.verifyTin({ tin }) : this.mockProvider.verifyTin({ tin }))
     );
   }
@@ -623,7 +623,7 @@ export class ApiController {
       'drivers_license',
       license,
       query,
-      120,
+      95,
       () => (isLive ? this.dojahProvider.verifyDriversLicense({ licenseNumber: license, dob: query.dob || query.date_of_birth }) : this.mockProvider.verifyDriversLicense({ licenseNumber: license, dob: query.dob || query.date_of_birth }))
     );
   }
@@ -641,7 +641,7 @@ export class ApiController {
       'drivers_license',
       license,
       payload,
-      120,
+      95,
       () => (isLive ? this.dojahProvider.verifyDriversLicense({ licenseNumber: license, dob: payload.dob || payload.date_of_birth }) : this.mockProvider.verifyDriversLicense({ licenseNumber: license, dob: payload.dob || payload.date_of_birth }))
     );
   }
@@ -659,7 +659,7 @@ export class ApiController {
       'voters_card',
       vin,
       query,
-      100,
+      80,
       () => (isLive ? this.dojahProvider.verifyVotersCard({ vin, state: query.state, lastName: query.last_name || query.lastName }) : this.mockProvider.verifyVotersCard({ vin, state: query.state, lastName: query.last_name || query.lastName }))
     );
   }
@@ -677,7 +677,7 @@ export class ApiController {
       'voters_card',
       vin,
       payload,
-      100,
+      80,
       () => (isLive ? this.dojahProvider.verifyVotersCard({ vin, state: payload.state, lastName: payload.last_name || payload.lastName }) : this.mockProvider.verifyVotersCard({ vin, state: payload.state, lastName: payload.last_name || payload.lastName }))
     );
   }
@@ -734,7 +734,7 @@ export class ApiController {
       'face_match',
       idNumber,
       body,
-      150,
+      120,
       () => (isLive ? this.dojahProvider.verifyFaceMatch({ idType: body.id_type || 'BVN', idNumber, selfieImageBase64: selfie, livenessCheck: body.liveness_check !== false }) : this.mockProvider.verifyFaceMatch({ idType: body.id_type || 'BVN', idNumber, selfieImageBase64: selfie, livenessCheck: body.liveness_check !== false }))
     );
   }
@@ -752,7 +752,7 @@ export class ApiController {
       'aml_screening',
       name,
       body,
-      120,
+      150,
       () => (isLive ? this.dojahProvider.screenAml({ name, dob: body.date_of_birth || body.dob, country: body.country || 'NG' }) : this.mockProvider.screenAml({ name, dob: body.date_of_birth || body.dob, country: body.country || 'NG' }))
     );
   }
@@ -806,7 +806,7 @@ export class ApiController {
       'email_risk',
       email,
       query,
-      50,
+      30,
       () => (isLive ? this.dojahProvider.checkEmailRisk({ email }) : this.mockProvider.checkEmailRisk({ email }))
     );
   }
@@ -824,7 +824,7 @@ export class ApiController {
       'email_risk',
       email,
       payload,
-      50,
+      30,
       () => (isLive ? this.dojahProvider.checkEmailRisk({ email }) : this.mockProvider.checkEmailRisk({ email }))
     );
   }
@@ -846,7 +846,7 @@ export class ApiController {
       'nin',
       nin,
       body,
-      50,
+      95,
       () => (isLive ? this.dojahProvider.verifyNin(body) : this.mockProvider.verifyNin(body))
     );
   }
@@ -864,7 +864,7 @@ export class ApiController {
       'bvn',
       bvn,
       body,
-      50,
+      95,
       () => (isLive ? this.dojahProvider.verifyBvn(body) : this.mockProvider.verifyBvn(body))
     );
   }
@@ -882,7 +882,7 @@ export class ApiController {
       'phone',
       phone,
       body,
-      120,
+      50,
       () => (isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'advance' }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'advance' }))
     );
   }
@@ -900,7 +900,7 @@ export class ApiController {
       'phone',
       phone,
       body,
-      85,
+      50,
       () => (isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'basic' }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: phone, variant: 'basic' }))
     );
   }
@@ -918,7 +918,7 @@ export class ApiController {
       'nin',
       nin,
       body,
-      100,
+      95,
       () => (isLive ? this.dojahProvider.verifyNinAdvance(body) : this.mockProvider.verifyNinAdvance(body))
     );
   }
@@ -936,7 +936,7 @@ export class ApiController {
       'nin',
       trackingId,
       body,
-      100,
+      50,
       () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin: trackingId }) : this.mockProvider.verifyNinAdvance({ nin: trackingId }))
     );
   }
@@ -1026,9 +1026,9 @@ export class ApiController {
       'tin_verification',
       tin,
       body,
-      100,
+      90,
       () => (isLive ? this.dojahProvider.verifyTin({ tin }) : this.mockProvider.verifyTin({ tin })),
-      100
+      90
     );
   }
 
@@ -1045,9 +1045,9 @@ export class ApiController {
       'drivers_license',
       license,
       body,
-      120,
+      95,
       () => (isLive ? this.dojahProvider.verifyDriversLicense({ licenseNumber: license, dob: body.date_of_birth || body.dob }) : this.mockProvider.verifyDriversLicense({ licenseNumber: license, dob: body.date_of_birth || body.dob })),
-      120
+      95
     );
   }
 
@@ -1064,9 +1064,9 @@ export class ApiController {
       'voters_card',
       vin,
       body,
-      100,
+      80,
       () => (isLive ? this.dojahProvider.verifyVotersCard({ vin, state: body.state, lastName: body.last_name || body.lastName }) : this.mockProvider.verifyVotersCard({ vin, state: body.state, lastName: body.last_name || body.lastName })),
-      100
+      80
     );
   }
 
@@ -1142,9 +1142,9 @@ export class ApiController {
       'face_match',
       idNumber,
       body,
-      150,
+      120,
       () => (isLive ? this.dojahProvider.verifyFaceMatch({ idType: body.id_type || 'BVN', idNumber, selfieImageBase64: selfie, livenessCheck: body.liveness_check !== false }) : this.mockProvider.verifyFaceMatch({ idType: body.id_type || 'BVN', idNumber, selfieImageBase64: selfie, livenessCheck: body.liveness_check !== false })),
-      150
+      120
     );
   }
 
@@ -1161,9 +1161,9 @@ export class ApiController {
       'aml_screening',
       name,
       body,
-      120,
+      150,
       () => (isLive ? this.dojahProvider.screenAml({ name, dob: body.date_of_birth || body.dob, country: body.country || 'NG' }) : this.mockProvider.screenAml({ name, dob: body.date_of_birth || body.dob, country: body.country || 'NG' })),
-      120
+      150
     );
   }
 
@@ -1180,9 +1180,9 @@ export class ApiController {
       'phone_intelligence',
       phone,
       body,
-      120,
+      95,
       () => (isLive ? this.dojahProvider.screenPhoneIntelligence({ phoneNumber: phone }) : this.mockProvider.screenPhoneIntelligence({ phoneNumber: phone })),
-      120
+      95
     );
   }
 
@@ -1199,9 +1199,9 @@ export class ApiController {
       'email_risk',
       email,
       body,
-      50,
+      30,
       () => (isLive ? this.dojahProvider.checkEmailRisk({ email }) : this.mockProvider.checkEmailRisk({ email })),
-      50
+      30
     );
   }
 

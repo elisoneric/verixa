@@ -77,8 +77,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦50.00</span>
-              <span className="text-zinc-500 font-sans text-xs">/ ₦20.00 cache</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦95.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦38.00 cache</span>
             </div>
           </div>
 
@@ -94,8 +94,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦50.00</span>
-              <span className="text-zinc-500 font-sans text-xs">/ ₦20.00 cache</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦95.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦38.00 cache</span>
             </div>
           </div>
 
@@ -111,8 +111,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦100.00</span>
-              <span className="text-zinc-500 font-sans text-xs">/ ₦30.00 cache</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦125.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦50.00 cache</span>
             </div>
           </div>
 
@@ -129,6 +129,7 @@ export default function DocsHomePage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-emerald-400 font-bold font-sans text-sm">₦150.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦60.00 cache</span>
             </div>
           </div>
 
@@ -144,8 +145,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦50.00</span>
-              <span className="text-zinc-500 font-sans text-xs">/ ₦20.00 cache</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦95.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦38.00 cache</span>
             </div>
           </div>
 
@@ -161,8 +162,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦100.00</span>
-              <span className="text-zinc-500 font-sans text-xs">/ ₦30.00 cache</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦95.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦38.00 cache</span>
             </div>
           </div>
 
@@ -178,7 +179,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦120.00</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦125.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦50.00 cache</span>
             </div>
           </div>
 
@@ -194,8 +196,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦200.00</span>
-              <span className="text-zinc-500 font-sans text-xs">/ ₦50.00 cache</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦150.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦60.00 cache</span>
             </div>
           </div>
 
@@ -212,6 +214,7 @@ export default function DocsHomePage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-emerald-400 font-bold font-sans text-sm">₦150.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦60.00 cache</span>
             </div>
           </div>
 
@@ -227,8 +230,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦85.00</span>
-              <span className="text-zinc-500 font-sans text-xs">/ ₦30.00 cache</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦50.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦20.00 cache</span>
             </div>
           </div>
 
@@ -244,7 +247,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦120.00</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦95.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦38.00 cache</span>
             </div>
           </div>
 
@@ -279,7 +283,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦25.00</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦35.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦14.00 cache</span>
             </div>
           </div>
 
@@ -301,7 +306,7 @@ export default function DocsHomePage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-emerald-400 font-bold font-sans text-sm">₦120.00</span>
-              <span className="text-zinc-500 font-sans text-xs">/ ₦40.00 cache</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦48.00 cache</span>
             </div>
           </div>
 
@@ -318,7 +323,7 @@ export default function DocsHomePage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-emerald-400 font-bold font-sans text-sm">₦250.00</span>
-              <span className="text-zinc-500 font-sans text-xs">/ ₦80.00 cache</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦100.00 cache</span>
             </div>
           </div>
 
@@ -334,7 +339,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦100.00</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦90.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦36.00 cache</span>
             </div>
           </div>
 
@@ -355,7 +361,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦120.00</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦95.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦38.00 cache</span>
             </div>
           </div>
 
@@ -371,7 +378,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦100.00</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦80.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦32.00 cache</span>
             </div>
           </div>
 
@@ -388,6 +396,7 @@ export default function DocsHomePage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-emerald-400 font-bold font-sans text-sm">₦150.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦60.00 cache</span>
             </div>
           </div>
 
@@ -408,7 +417,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦150.00</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦120.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦48.00 cache</span>
             </div>
           </div>
 
@@ -424,7 +434,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦120.00</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦150.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦60.00 cache</span>
             </div>
           </div>
 
@@ -441,6 +452,7 @@ export default function DocsHomePage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-emerald-400 font-bold font-sans text-sm">₦250.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦100.00 cache</span>
             </div>
           </div>
 
@@ -456,7 +468,8 @@ export default function DocsHomePage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-400 font-bold font-sans text-sm">₦50.00</span>
+              <span className="text-emerald-400 font-bold font-sans text-sm">₦30.00</span>
+              <span className="text-zinc-500 font-sans text-xs">/ ₦12.00 cache</span>
             </div>
           </div>
         </div>

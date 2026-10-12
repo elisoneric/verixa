@@ -326,7 +326,7 @@ export default function BillingPage() {
                   <span className="text-zinc-200">/api/nin-verification</span>
                 </TableCell>
                 <TableCell className="font-medium text-white">NIN Verification</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦140 / query</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦95 / query</TableCell>
                 <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
@@ -336,7 +336,7 @@ export default function BillingPage() {
                   <span className="text-zinc-200">/api/bvn-verification</span>
                 </TableCell>
                 <TableCell className="font-medium text-white">BVN Verification</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦50 / query</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦95 / query</TableCell>
                 <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
@@ -346,7 +346,7 @@ export default function BillingPage() {
                   <span className="text-zinc-200">/api/nin-phone</span>
                 </TableCell>
                 <TableCell className="font-medium text-white">NIN Phone Search</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦180 / query</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦50 / query</TableCell>
                 <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
@@ -356,7 +356,7 @@ export default function BillingPage() {
                   <span className="text-zinc-200">/api/bvn-phone</span>
                 </TableCell>
                 <TableCell className="font-medium text-white">BVN Phone Search</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦135 / query</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦50 / query</TableCell>
                 <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
@@ -366,7 +366,7 @@ export default function BillingPage() {
                   <span className="text-zinc-200">/api/nin-demography</span>
                 </TableCell>
                 <TableCell className="font-medium text-white">NIN Demography</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦235 / query</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦95 / query</TableCell>
                 <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
@@ -376,7 +376,7 @@ export default function BillingPage() {
                   <span className="text-zinc-200">/api/nin-tracking</span>
                 </TableCell>
                 <TableCell className="font-medium text-white">NIN Tracking</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦185 / query</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦50 / query</TableCell>
                 <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
@@ -386,7 +386,7 @@ export default function BillingPage() {
                   <span className="text-zinc-200">/api/nin-slip</span>
                 </TableCell>
                 <TableCell className="font-medium text-white">Automated NIN Slip</TableCell>
-                <TableCell className="font-sans font-bold text-sky-400">₦270 / slip</TableCell>
+                <TableCell className="font-sans font-bold text-sky-400">₦250 / slip</TableCell>
                 <TableCell className="text-xs text-zinc-400">A4 PDF & Word document output</TableCell>
               </TableRow>
 

@@ -69,8 +69,8 @@ export class BillingService {
     const configMap = await this.getConfigMap();
 
     // 1. Base default prices (Live vs Smart Cache)
-    let defaultLive = 50;
-    let defaultCache = 20;
+    let defaultLive = 95;
+    let defaultCache = 38;
 
     if (serviceType === 'nuban') {
       return {
@@ -82,20 +82,20 @@ export class BillingService {
         isCacheHit,
       };
     } else if (serviceType === 'nin_advance') {
-      defaultLive = 140;
-      defaultCache = 30;
+      defaultLive = 95;
+      defaultCache = 38;
     } else if (serviceType === 'nin_slip') {
-      defaultLive = 270;
+      defaultLive = 250;
       defaultCache = 50;
     } else if (serviceType === 'phone') {
       defaultLive = 50;
       defaultCache = 20;
     } else if (serviceType === 'cac') {
-      defaultLive = 200;
-      defaultCache = 80;
+      defaultLive = 120;
+      defaultCache = 48;
     } else if (serviceType === 'nuban_kyc') {
-      defaultLive = 80;
-      defaultCache = 30;
+      defaultLive = 35;
+      defaultCache = 14;
     } else if (serviceType === 'sms') {
       defaultLive = 5;
       defaultCache = 5;
@@ -132,25 +132,27 @@ export class BillingService {
       } else {
         // 3. Organization tier standard pricing
         if (org?.tier === OrganizationTier.ENTERPRISE) {
-          if (serviceType === 'nin_advance') price = 120;
-          else if (serviceType === 'nin_slip') price = 230;
-          else price = 35;
+          if (serviceType === 'nin_advance') price = 80;
+          else if (serviceType === 'nin_slip') price = 200;
+          else if (serviceType === 'cac') price = 100;
+          else price = 80;
         } else if (org?.tier === OrganizationTier.GROWTH) {
-          if (serviceType === 'nin_advance') price = 130;
-          else if (serviceType === 'nin_slip') price = 250;
-          else price = 45;
+          if (serviceType === 'nin_advance') price = 88;
+          else if (serviceType === 'nin_slip') price = 225;
+          else if (serviceType === 'cac') price = 110;
+          else price = 88;
         }
       }
     } else {
       // Tier savings on cache hits
       if (org?.tier === OrganizationTier.ENTERPRISE) {
-        if (serviceType === 'nin_advance') price = 20;
+        if (serviceType === 'nin_advance') price = 30;
         else if (serviceType === 'nin_slip') price = 35;
-        else price = 15;
+        else price = 30;
       } else if (org?.tier === OrganizationTier.GROWTH) {
-        if (serviceType === 'nin_advance') price = 25;
-        else if (serviceType === 'nin_slip') price = 40;
-        else price = 18;
+        if (serviceType === 'nin_advance') price = 34;
+        else if (serviceType === 'nin_slip') price = 42;
+        else price = 34;
       }
     }
 

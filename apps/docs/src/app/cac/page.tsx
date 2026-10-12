@@ -29,11 +29,11 @@ export default function CacDocsPage() {
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
           <span className="text-zinc-500 block">TIN VERIFICATION</span>
-          <span className="text-emerald-400 font-bold">100 NGX (₦100.00)</span>
+          <span className="text-emerald-400 font-bold">90 NGX (₦90.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
           <span className="text-zinc-500 block">SMART CACHE HIT</span>
-          <span className="text-cyan-400 font-bold">40 - 80 NGX</span>
+          <span className="text-cyan-400 font-bold">48 - 100 NGX</span>
         </div>
       </div>
 

@@ -294,9 +294,10 @@ export default function DashboardOverviewPage() {
         <div className="flex items-center gap-3">
           <Badge variant="mono" size="sm">ACTIVE RATES</Badge>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-sans">
-            <span className="text-zinc-300">BVN: <b className="text-emerald-400 font-bold">₦50</b></span>
-            <span className="text-zinc-300">NIN: <b className="text-emerald-400 font-bold">₦50</b></span>
-            <span className="text-zinc-300">NIN Advance: <b className="text-emerald-400 font-bold">₦100</b></span>
+            <span className="text-zinc-300">BVN: <b className="text-emerald-400 font-bold">₦95</b></span>
+            <span className="text-zinc-300">NIN: <b className="text-emerald-400 font-bold">₦95</b></span>
+            <span className="text-zinc-300">NIN Advance: <b className="text-emerald-400 font-bold">₦95</b></span>
+            <span className="text-zinc-300">NIN Premium: <b className="text-emerald-400 font-bold">₦125</b></span>
             <span className="text-zinc-300">CAC: <b className="text-emerald-400 font-bold">₦120</b></span>
             <span className="text-zinc-300">Phone: <b className="text-emerald-400 font-bold">₦50</b></span>
             <span className="text-zinc-300">Balance: <b className="text-emerald-400 font-bold">Free</b></span>

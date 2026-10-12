@@ -21,15 +21,15 @@ export default function BvnDocsPage() {
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
           <span className="text-zinc-500 block">STANDARD LOOKUP</span>
-          <span className="text-emerald-400 font-bold">50 NGX (₦50.00)</span>
+          <span className="text-emerald-400 font-bold">95 NGX (₦95.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
           <span className="text-zinc-500 block">ADVANCE / BIOMETRIC</span>
-          <span className="text-emerald-400 font-bold">100 - 150 NGX</span>
+          <span className="text-emerald-400 font-bold">125 - 150 NGX</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
           <span className="text-zinc-500 block">SMART CACHE HIT</span>
-          <span className="text-cyan-400 font-bold">20 NGX (₦20.00)</span>
+          <span className="text-cyan-400 font-bold">38 NGX (₦38.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
           <span className="text-zinc-500 block">LATENCY (CACHE / LIVE)</span>
