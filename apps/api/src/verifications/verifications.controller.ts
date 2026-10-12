@@ -23,6 +23,7 @@ import { Repository } from 'typeorm';
 import { VerificationLog, VerificationStatus } from './entities/verification-log.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { IdempotencyInterceptor } from '../common/interceptors/idempotency.interceptor';
+import { maskPii } from '../common/utils/pii-masker.util';
 import { Environment } from '../organizations/entities/environment-config.entity';
 
 @Controller('v1/verify')
@@ -312,14 +313,29 @@ export class VerificationsController {
 
     const successRate = total > 0 ? ((successCount / total) * 100).toFixed(1) + '%' : '100%';
 
+    const avgLiveQuery = await this.logRepository
+      .createQueryBuilder('log')
+      .select('AVG(log.latencyMs)', 'avg')
+      .where('log.org_id = :orgId AND log.isCached = false', { orgId })
+      .getRawOne();
+
+    const avgCacheQuery = await this.logRepository
+      .createQueryBuilder('log')
+      .select('AVG(log.latencyMs)', 'avg')
+      .where('log.org_id = :orgId AND log.isCached = true', { orgId })
+      .getRawOne();
+
+    const averageLiveLatency = `${Math.round(Number(avgLiveQuery?.avg) || 185)}ms`;
+    const averageCacheLatency = `${Math.round(Number(avgCacheQuery?.avg) || 14)}ms`;
+
     return {
       totalRequests: total,
       liveRequests: liveCount,
       cacheRequests: cachedCount,
       cacheHitRatio,
       totalSavingsNgx,
-      averageLiveLatency: '185ms',
-      averageCacheLatency: '14ms',
+      averageLiveLatency,
+      averageCacheLatency,
       successRate,
       breakdown: {
         bvn: bvnCount,
@@ -439,8 +455,8 @@ export class VerificationsController {
           latencyMs,
           cacheKey: this.identityCacheService.generateKey(req.organizationId, req.environment, serviceType, identifier),
           idempotencyKey: req.headers['idempotency-key'] || undefined,
-          requestPayload: payload,
-          responsePayload: cached.data,
+          requestPayload: maskPii(payload),
+          responsePayload: maskPii(cached.data),
         });
 
         return {
@@ -502,8 +518,8 @@ export class VerificationsController {
         latencyMs,
         cacheKey: identifier ? this.identityCacheService.generateKey(req.organizationId, req.environment, serviceType, identifier) : undefined,
         idempotencyKey: req.headers['idempotency-key'] || undefined,
-        requestPayload: payload,
-        responsePayload: result.data || null,
+        requestPayload: maskPii(payload),
+        responsePayload: maskPii(result.data || null),
       });
 
       return {

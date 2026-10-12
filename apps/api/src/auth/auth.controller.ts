@@ -1,26 +1,31 @@
 import { Controller, Post, Get, Delete, Param, Body, Req, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Environment } from '../organizations/entities/environment-config.entity';
+import { LoginDto, RegisterDto, GoogleAuthDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  login(@Body() body: any) {
+  login(@Body() body: LoginDto) {
     return this.authService.login(body.email, body.password);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register')
-  register(@Body() body: any) {
+  register(@Body() body: RegisterDto) {
     return this.authService.register(body.email, body.password, body.orgName, body.complianceData);
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @Post('google')
-  googleLogin(@Body() body: any) {
+  googleLogin(@Body() body: GoogleAuthDto) {
     return this.authService.googleAuth(body.credential);
   }
 

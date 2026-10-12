@@ -9,6 +9,8 @@ import { VerificationLog } from '../verifications/entities/verification-log.enti
 import { Wallet } from '../billing/entities/wallet.entity';
 import { User } from '../users/entities/user.entity';
 
+import { RolesGuard } from '../auth/guards/roles.guard';
+
 @Global()
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { User } from '../users/entities/user.entity';
     ])
   ],
   controllers: [AdminController, PricingController],
-  providers: [AdminService],
+  providers: [AdminService, RolesGuard],
   exports: [AdminService],
 })
 export class AdminModule {}

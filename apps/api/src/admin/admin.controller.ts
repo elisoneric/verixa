@@ -4,6 +4,10 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { OrganizationTier } from '../organizations/entities/organization.entity';
 import { SmtpConfig } from '../notifications/notifications.service';
 
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../users/entities/user.entity';
+
 @Controller('v1/pricing')
 export class PricingController {
   constructor(private adminService: AdminService) {}
@@ -15,6 +19,8 @@ export class PricingController {
 }
 
 @Controller('v1/admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.SUPER_ADMIN)
 export class AdminController {
   constructor(private adminService: AdminService) {}
 

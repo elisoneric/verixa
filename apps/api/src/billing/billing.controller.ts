@@ -13,6 +13,7 @@ import {
 import { BillingService } from './billing.service';
 import { PaystackService } from './paystack.service';
 import { DualAuthGuard } from '../auth/guards/dual-auth.guard';
+import { FundSandboxDto, ProvisionDedicatedAccountDto, VerifyPaymentDto } from './dto/billing.dto';
 import * as crypto from 'crypto';
 
 @Controller('v1/billing')
@@ -36,7 +37,7 @@ export class BillingController {
 
   @UseGuards(DualAuthGuard)
   @Post('fund-sandbox')
-  async fundSandbox(@Req() req: any, @Body() body: { amount?: number }) {
+  async fundSandbox(@Req() req: any, @Body() body: FundSandboxDto) {
     return this.billingService.fundSandbox(req.organizationId, body.amount || 10000);
   }
 
@@ -44,7 +45,7 @@ export class BillingController {
   @Post('dedicated-account')
   async provisionDedicatedAccount(
     @Req() req: any,
-    @Body() body: { nin: string; phone: string; consent: boolean },
+    @Body() body: ProvisionDedicatedAccountDto,
   ) {
     if (!body.consent) {
       throw new BadRequestException('Applicant consent is required under NDPA regulations.');
@@ -120,20 +121,23 @@ export class BillingController {
 
   @UseGuards(DualAuthGuard)
   @Post('payments/verify')
-  async verifyPaymentBody(@Req() req: any, @Body() body: { reference: string }) {
-    if (!body.reference) {
-      throw new BadRequestException('Payment reference is required');
-    }
+  async verifyPaymentBody(@Req() req: any, @Body() body: VerifyPaymentDto) {
     return this.billingService.verifyPayment(body.reference, req.organizationId);
   }
 
   @Post('webhook/paystack')
   async handleWebhook(@Headers('x-paystack-signature') signature: string, @Body() body: any) {
-    const secret = process.env.PAYSTACK_SECRET_KEY || 'sk_test_mock_secret_key';
-    const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(body)).digest('hex');
+    const secret = process.env.PAYSTACK_SECRET_KEY;
+    const isMock = !secret || secret.startsWith('sk_test_mock');
 
-    if (hash !== signature && process.env.NODE_ENV === 'production' && !secret.startsWith('sk_test_mock')) {
-      throw new UnauthorizedException('Invalid signature');
+    if (!isMock) {
+      if (!signature) {
+        throw new UnauthorizedException('Missing Paystack webhook signature header');
+      }
+      const hash = crypto.createHmac('sha512', secret!).update(JSON.stringify(body)).digest('hex');
+      if (hash !== signature) {
+        throw new UnauthorizedException('Invalid Paystack webhook signature');
+      }
     }
 
     const event = body.event;

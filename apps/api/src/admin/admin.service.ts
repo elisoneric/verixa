@@ -11,7 +11,18 @@ import { User } from '../users/entities/user.entity';
 import { NotificationsService, SmtpConfig } from '../notifications/notifications.service';
 import * as crypto from 'crypto';
 
-const ENCRYPTION_KEY = (process.env.SYSTEM_ENCRYPTION_KEY || '01234567890123456789012345678901').slice(0, 32);
+function getEncryptionKey(): string {
+  const key = process.env.SYSTEM_ENCRYPTION_KEY;
+  if (!key) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('FATAL: SYSTEM_ENCRYPTION_KEY environment variable is missing in production');
+    }
+    return '01234567890123456789012345678901';
+  }
+  return key.slice(0, 32);
+}
+
+const ENCRYPTION_KEY = getEncryptionKey();
 const IV_LENGTH = 16;
 
 function encryptSecret(text: string): string {
@@ -404,6 +415,12 @@ export class AdminService implements OnModuleInit {
 
     const successRate = totalVerifications > 0 ? ((successfulVerifications / totalVerifications) * 100).toFixed(2) + '%' : '100%';
 
+    const avgLatencyQuery = await this.verifyLogRepository
+      .createQueryBuilder('log')
+      .select('AVG(log.latencyMs)', 'avg')
+      .getRawOne();
+    const averageLatency = `${Math.round(Number(avgLatencyQuery?.avg) || 142)}ms`;
+
     return {
       totalOrgs,
       totalRevenueNgx,
@@ -414,41 +431,63 @@ export class AdminService implements OnModuleInit {
       upstreamCallsSaved: cachedVerifications,
       totalSavingsNgx: cachedVerifications * 30,
       successRate,
-      averageLatency: '142ms',
+      averageLatency,
     };
   }
 
   async getRevenueMetrics() {
-    // 1. Total top-up deposits
-    const completedDeposits = await this.txRepository.find({
-      where: { status: TransactionStatus.COMPLETED },
-      order: { createdAt: 'DESC' },
-      take: 200,
-    });
-
-    const topups = completedDeposits.filter(t => Number(t.amount) > 0);
-    const deductions = completedDeposits.filter(t => Number(t.amount) < 0);
-
-    const totalDepositedNgx = topups.reduce((sum, tx) => sum + Number(tx.amount), 0);
-    const totalConsumedNgx = Math.abs(deductions.reduce((sum, tx) => sum + Number(tx.amount), 0));
-
-    // Time-based calculations (Today, This Week, This Month)
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const depositsToday = topups
-      .filter(t => new Date(t.createdAt) >= startOfToday)
-      .reduce((sum, tx) => sum + Number(tx.amount), 0);
+    // 1. Total top-up deposits via SQL aggregation
+    const totalDepositedRes = await this.txRepository
+      .createQueryBuilder('tx')
+      .select('SUM(tx.amount)', 'sum')
+      .where('tx.status = :status AND tx.amount > 0', { status: TransactionStatus.COMPLETED })
+      .getRawOne();
+    const totalDepositedNgx = Number(totalDepositedRes?.sum) || 0;
 
-    const depositsThisWeek = topups
-      .filter(t => new Date(t.createdAt) >= startOfWeek)
-      .reduce((sum, tx) => sum + Number(tx.amount), 0);
+    // 2. Total consumed credits via SQL aggregation
+    const totalConsumedRes = await this.txRepository
+      .createQueryBuilder('tx')
+      .select('SUM(ABS(tx.amount))', 'sum')
+      .where('tx.status = :status AND tx.amount < 0', { status: TransactionStatus.COMPLETED })
+      .getRawOne();
+    const totalConsumedNgx = Number(totalConsumedRes?.sum) || 0;
 
-    const depositsThisMonth = topups
-      .filter(t => new Date(t.createdAt) >= startOfMonth)
-      .reduce((sum, tx) => sum + Number(tx.amount), 0);
+    // 3. Time-window aggregations directly in DB
+    const [depositsTodayRes, depositsThisWeekRes, depositsThisMonthRes] = await Promise.all([
+      this.txRepository
+        .createQueryBuilder('tx')
+        .select('SUM(tx.amount)', 'sum')
+        .where('tx.status = :status AND tx.amount > 0 AND tx.createdAt >= :date', {
+          status: TransactionStatus.COMPLETED,
+          date: startOfToday,
+        })
+        .getRawOne(),
+      this.txRepository
+        .createQueryBuilder('tx')
+        .select('SUM(tx.amount)', 'sum')
+        .where('tx.status = :status AND tx.amount > 0 AND tx.createdAt >= :date', {
+          status: TransactionStatus.COMPLETED,
+          date: startOfWeek,
+        })
+        .getRawOne(),
+      this.txRepository
+        .createQueryBuilder('tx')
+        .select('SUM(tx.amount)', 'sum')
+        .where('tx.status = :status AND tx.amount > 0 AND tx.createdAt >= :date', {
+          status: TransactionStatus.COMPLETED,
+          date: startOfMonth,
+        })
+        .getRawOne(),
+    ]);
+
+    const depositsToday = Number(depositsTodayRes?.sum) || 0;
+    const depositsThisWeek = Number(depositsThisWeekRes?.sum) || 0;
+    const depositsThisMonth = Number(depositsThisMonthRes?.sum) || 0;
 
     // Get recent 50 transactions with org details
     const recentTx = await this.txRepository.find({

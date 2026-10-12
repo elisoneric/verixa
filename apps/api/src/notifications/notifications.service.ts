@@ -23,7 +23,7 @@ export class NotificationsService {
       port: parseInt(process.env.SMTP_PORT || '465', 10),
       secure: parseInt(process.env.SMTP_PORT || '465', 10) === 465,
       user: process.env.SMTP_USER || 'no-reply@verixaid.com',
-      pass: process.env.SMTP_PASS || 'secret_password',
+      pass: process.env.SMTP_PASS || (process.env.NODE_ENV === 'production' ? '' : 'secret_password'),
       fromName: process.env.SMTP_FROM_NAME || 'Verixa ID',
       fromEmail: process.env.SMTP_FROM_EMAIL || 'no-reply@verixaid.com',
     });
@@ -35,7 +35,7 @@ export class NotificationsService {
     const port = this.currentConfig.port || parseInt(process.env.SMTP_PORT || '465', 10);
     const secure = this.currentConfig.secure ?? (port === 465);
     const user = this.currentConfig.user || process.env.SMTP_USER || 'no-reply@verixaid.com';
-    const pass = this.currentConfig.pass || process.env.SMTP_PASS || 'secret_password';
+    const pass = this.currentConfig.pass || process.env.SMTP_PASS || (process.env.NODE_ENV === 'production' ? '' : 'secret_password');
 
     this.transporter = nodemailer.createTransport({
       host,
@@ -46,7 +46,8 @@ export class NotificationsService {
         pass,
       },
     });
-    this.logger.log(`SMTP configured: ${user}@${host}:${port} (secure: ${secure})`);
+    const maskedUser = user.includes('@') ? `${user.split('@')[0].slice(0, 3)}***@${user.split('@')[1]}` : '***';
+    this.logger.debug(`SMTP configured for host: ${host}:${port} (account: ${maskedUser}, secure: ${secure})`);
   }
 
   private getFromHeader(): string {

@@ -12,10 +12,18 @@ import { Wallet } from '../billing/entities/wallet.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([ApiKey, User, Organization, Wallet]),
-    JwtModule.register({
+    JwtModule.registerAsync({
       global: true,
-      secret: process.env.JWT_SECRET || 'verixa_super_secret_dev_only',
-      signOptions: { expiresIn: '1d' },
+      useFactory: () => {
+        const secret = process.env.JWT_SECRET;
+        if (!secret && process.env.NODE_ENV === 'production') {
+          throw new Error('FATAL: JWT_SECRET environment variable is missing in production');
+        }
+        return {
+          secret: secret || 'verixa_super_secret_dev_only',
+          signOptions: { expiresIn: '1d' },
+        };
+      },
     }),
   ],
   providers: [ApiKeyGuard, AuthService],

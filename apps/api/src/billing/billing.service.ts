@@ -32,6 +32,27 @@ export class BillingService {
     private paystackService: PaystackService,
   ) {}
 
+  private cachedConfigs: Record<string, string> | null = null;
+  private configCacheExpiresAt = 0;
+
+  invalidateConfigCache() {
+    this.cachedConfigs = null;
+    this.configCacheExpiresAt = 0;
+  }
+
+  private async getConfigMap(): Promise<Record<string, string>> {
+    const now = Date.now();
+    if (this.cachedConfigs && now < this.configCacheExpiresAt) {
+      return this.cachedConfigs;
+    }
+    const configs = await this.configRepository.find();
+    const configMap: Record<string, string> = {};
+    configs.forEach((c) => (configMap[c.key] = c.value));
+    this.cachedConfigs = configMap;
+    this.configCacheExpiresAt = now + 60000; // 60s in-memory cache
+    return configMap;
+  }
+
   async getEffectiveRate(
     orgId: string,
     serviceType: 'bvn' | 'nin' | 'nuban' | 'nin_advance' | 'nin_slip' | 'phone' | 'cac' | 'nuban_kyc' | 'sms' | 'airtime' | 'data',
@@ -45,9 +66,7 @@ export class BillingService {
     isCacheHit: boolean;
   }> {
     const org = await this.orgRepository.findOne({ where: { id: orgId } });
-    const configs = await this.configRepository.find();
-    const configMap: Record<string, string> = {};
-    configs.forEach(c => configMap[c.key] = c.value);
+    const configMap = await this.getConfigMap();
 
     // 1. Base default prices (Live vs Smart Cache)
     let defaultLive = 50;

@@ -43,7 +43,9 @@ import { SlipsModule } from './slips/slips.module';
         VerificationLog,
         SystemConfig,
       ],
-      synchronize: true, // Use only in dev, disable in production
+      synchronize: process.env.NODE_ENV !== 'production' && process.env.TYPEORM_SYNC === 'true',
+      migrationsRun: process.env.NODE_ENV === 'production',
+      migrations: [__dirname + '/migrations/*{.ts,.js}'],
     }),
     NotificationsModule,
     AdminModule,

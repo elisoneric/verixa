@@ -35,4 +35,11 @@ Thumbs.db
 *.pem
 scratch/
 scratch_img1.jpg/
+*.docx
+*.pdf
+sample_nin_slip*
+ninslip.docx
+make_samples.js
 .agents/
+
+

@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -28,6 +28,9 @@ export class DualAuthGuard implements CanActivate {
 
     // 1. Demo sandbox bypass
     if (token === 'vrx_test_demo') {
+      if (process.env.NODE_ENV === 'production') {
+        throw new UnauthorizedException('Demo key is disabled in production environment');
+      }
       request.organizationId = 'dev-org-id';
       request.environment = Environment.SANDBOX;
       request.apiKeyId = 'dev-key-id';
@@ -56,6 +59,11 @@ export class DualAuthGuard implements CanActivate {
 
       if (!apiKeyRecord) {
         throw new UnauthorizedException('API key not found or revoked');
+      }
+
+      // GUARD-3: Enforce organization suspension
+      if (apiKeyRecord.organization?.complianceData?.status === 'suspended') {
+        throw new ForbiddenException('Organization account is suspended. Please contact support.');
       }
 
       const isMatch = await bcrypt.compare(secret, apiKeyRecord.keyHash);
