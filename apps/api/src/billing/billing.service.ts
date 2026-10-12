@@ -69,8 +69,8 @@ export class BillingService {
     const configMap = await this.getConfigMap();
 
     // 1. Base default prices (Live vs Smart Cache)
-    let defaultLive = 95;
-    let defaultCache = 38;
+    let defaultLive = 125;
+    let defaultCache = 50;
 
     if (serviceType === 'nuban') {
       return {
@@ -81,9 +81,12 @@ export class BillingService {
         isCustom: false,
         isCacheHit,
       };
-    } else if (serviceType === 'nin_advance') {
+    } else if (serviceType === 'bvn') {
       defaultLive = 95;
       defaultCache = 38;
+    } else if (serviceType === 'nin' || serviceType === 'nin_advance') {
+      defaultLive = 125;
+      defaultCache = 50;
     } else if (serviceType === 'nin_slip') {
       defaultLive = 250;
       defaultCache = 50;
@@ -132,26 +135,30 @@ export class BillingService {
       } else {
         // 3. Organization tier standard pricing
         if (org?.tier === OrganizationTier.ENTERPRISE) {
-          if (serviceType === 'nin_advance') price = 80;
+          if (serviceType === 'nin' || serviceType === 'nin_advance') price = 100;
           else if (serviceType === 'nin_slip') price = 200;
           else if (serviceType === 'cac') price = 100;
-          else price = 80;
+          else if (serviceType === 'bvn') price = 80;
+          else price = 100;
         } else if (org?.tier === OrganizationTier.GROWTH) {
-          if (serviceType === 'nin_advance') price = 88;
+          if (serviceType === 'nin' || serviceType === 'nin_advance') price = 112;
           else if (serviceType === 'nin_slip') price = 225;
           else if (serviceType === 'cac') price = 110;
-          else price = 88;
+          else if (serviceType === 'bvn') price = 88;
+          else price = 112;
         }
       }
     } else {
       // Tier savings on cache hits
       if (org?.tier === OrganizationTier.ENTERPRISE) {
-        if (serviceType === 'nin_advance') price = 30;
+        if (serviceType === 'nin' || serviceType === 'nin_advance') price = 40;
         else if (serviceType === 'nin_slip') price = 35;
+        else if (serviceType === 'bvn') price = 30;
         else price = 30;
       } else if (org?.tier === OrganizationTier.GROWTH) {
-        if (serviceType === 'nin_advance') price = 34;
+        if (serviceType === 'nin' || serviceType === 'nin_advance') price = 45;
         else if (serviceType === 'nin_slip') price = 42;
+        else if (serviceType === 'bvn') price = 34;
         else price = 34;
       }
     }

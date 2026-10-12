@@ -140,8 +140,8 @@ export class AdminService implements OnModuleInit {
     return {
       baseRates: {
         bvn: parseInt(map['BASE_BVN_PRICE'] || '95', 10),
-        nin: parseInt(map['BASE_NIN_PRICE'] || '95', 10),
-        ninAdvance: parseInt(map['BASE_NIN_ADVANCE_PRICE'] || '95', 10),
+        nin: parseInt(map['BASE_NIN_PRICE'] || '125', 10),
+        ninAdvance: parseInt(map['BASE_NIN_ADVANCE_PRICE'] || '125', 10),
         ninSlip: parseInt(map['BASE_NIN_SLIP_PRICE'] || '250', 10),
         nuban: parseInt(map['BASE_NUBAN_PRICE'] || '0', 10),
         phone: parseInt(map['BASE_PHONE_PRICE'] || '50', 10),
@@ -152,8 +152,8 @@ export class AdminService implements OnModuleInit {
       },
       cacheRates: {
         bvn: parseInt(map['BASE_BVN_CACHE_PRICE'] || '38', 10),
-        nin: parseInt(map['BASE_NIN_CACHE_PRICE'] || '38', 10),
-        ninAdvance: parseInt(map['BASE_NIN_ADVANCE_CACHE_PRICE'] || '38', 10),
+        nin: parseInt(map['BASE_NIN_CACHE_PRICE'] || '50', 10),
+        ninAdvance: parseInt(map['BASE_NIN_ADVANCE_CACHE_PRICE'] || '50', 10),
         ninSlip: parseInt(map['BASE_NIN_SLIP_CACHE_PRICE'] || '50', 10),
         nuban: parseInt(map['BASE_NUBAN_CACHE_PRICE'] || '0', 10),
         phone: parseInt(map['BASE_PHONE_CACHE_PRICE'] || '20', 10),

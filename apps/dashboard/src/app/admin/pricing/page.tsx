@@ -7,8 +7,8 @@ import { ApiClient } from "../../../lib/api"
 export default function AdminPricingPage() {
   // 1. Live Base Rates
   const [baseBvn, setBaseBvn] = React.useState("95")
-  const [baseNin, setBaseNin] = React.useState("95")
-  const [baseNinAdvance, setBaseNinAdvance] = React.useState("95")
+  const [baseNin, setBaseNin] = React.useState("125")
+  const [baseNinAdvance, setBaseNinAdvance] = React.useState("125")
   const [baseNinSlip, setBaseNinSlip] = React.useState("250")
   const [baseNuban, setBaseNuban] = React.useState("0")
   const [basePhone, setBasePhone] = React.useState("50")
@@ -19,8 +19,8 @@ export default function AdminPricingPage() {
 
   // 2. Smart Cache Base Rates
   const [cacheBvn, setCacheBvn] = React.useState("38")
-  const [cacheNin, setCacheNin] = React.useState("38")
-  const [cacheNinAdvance, setCacheNinAdvance] = React.useState("38")
+  const [cacheNin, setCacheNin] = React.useState("50")
+  const [cacheNinAdvance, setCacheNinAdvance] = React.useState("50")
   const [cacheNinSlip, setCacheNinSlip] = React.useState("50")
   const [cacheNuban, setCacheNuban] = React.useState("0")
   const [cachePhone, setCachePhone] = React.useState("20")
@@ -44,8 +44,8 @@ export default function AdminPricingPage() {
       .then((data: any) => {
         if (data?.baseRates) {
           setBaseBvn(String(data.baseRates.bvn ?? 95))
-          setBaseNin(String(data.baseRates.nin ?? 95))
-          setBaseNinAdvance(String(data.baseRates.ninAdvance ?? 95))
+          setBaseNin(String(data.baseRates.nin ?? 125))
+          setBaseNinAdvance(String(data.baseRates.ninAdvance ?? 125))
           setBaseNinSlip(String(data.baseRates.ninSlip ?? 250))
           setBaseNuban(String(data.baseRates.nuban ?? 0))
           setBasePhone(String(data.baseRates.phone ?? 50))
@@ -56,8 +56,8 @@ export default function AdminPricingPage() {
         }
         if (data?.cacheRates) {
           setCacheBvn(String(data.cacheRates.bvn ?? 38))
-          setCacheNin(String(data.cacheRates.nin ?? 38))
-          setCacheNinAdvance(String(data.cacheRates.ninAdvance ?? 38))
+          setCacheNin(String(data.cacheRates.nin ?? 50))
+          setCacheNinAdvance(String(data.cacheRates.ninAdvance ?? 50))
           setCacheNinSlip(String(data.cacheRates.ninSlip ?? 50))
           setCacheNuban(String(data.cacheRates.nuban ?? 0))
           setCachePhone(String(data.cacheRates.phone ?? 20))

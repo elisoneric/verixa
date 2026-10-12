@@ -76,8 +76,8 @@ export default function SmartCacheDocsPage() {
             </TableRow>
             <TableRow>
               <TableCell className="font-semibold text-white">NIN Verification</TableCell>
-              <TableCell className="font-mono text-zinc-300">95 NGX (₦95.00)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">38 NGX (₦38.00)</TableCell>
+              <TableCell className="font-mono text-zinc-300">125 NGX (₦125.00)</TableCell>
+              <TableCell className="font-mono text-emerald-400 font-bold">50 NGX (₦50.00)</TableCell>
               <TableCell className="text-emerald-400 font-bold">60% OFF</TableCell>
               <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~160ms</TableCell>
             </TableRow>

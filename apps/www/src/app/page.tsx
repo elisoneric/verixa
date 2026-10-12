@@ -219,7 +219,7 @@ func main() {
     },
     {
       q: "What is Smart Identity Cache and how does it save 60%?",
-      a: "When your platform verifies a customer (e.g. BVN or NIN), Verixa securely caches the verified record for 30 days within your private tenant partition. If you re-query that identity within 30 days, Verixa returns the result in sub-15ms for only ₦38 (instead of ₦95), saving up to 60%.",
+      a: "When your platform verifies a customer (e.g. NIN at ₦125 or BVN at ₦95), Verixa securely caches the verified record for 30 days within your private tenant partition. If you re-query that identity within 30 days, Verixa returns the result in sub-15ms for only ₦50 for NIN (or ₦38 for BVN), saving up to 60%.",
     },
     {
       q: "How does the multi-provider failover work?",

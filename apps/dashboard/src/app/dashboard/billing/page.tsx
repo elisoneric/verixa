@@ -326,7 +326,7 @@ export default function BillingPage() {
                   <span className="text-zinc-200">/api/nin-verification</span>
                 </TableCell>
                 <TableCell className="font-medium text-white">NIN Verification</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦95 / query</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦125 / query</TableCell>
                 <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
@@ -366,7 +366,7 @@ export default function BillingPage() {
                   <span className="text-zinc-200">/api/nin-demography</span>
                 </TableCell>
                 <TableCell className="font-medium text-white">NIN Demography</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦95 / query</TableCell>
+                <TableCell className="font-sans font-bold text-emerald-400">₦125 / query</TableCell>
                 <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
               </TableRow>
 

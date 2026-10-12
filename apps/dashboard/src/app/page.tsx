@@ -128,7 +128,7 @@ export default function PublicLandingPage() {
                 Retrieve verified demographics, residential address, telephone, tracking ID, and portrait image.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                ₦95 / query
+                ₦125 / query
               </div>
             </div>
 
@@ -206,7 +206,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-verification</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Verification</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦95 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦125 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 180ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">
@@ -242,7 +242,7 @@ export default function PublicLandingPage() {
                     <span className="text-zinc-300">/api/nin-demography</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-white">NIN Demography</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦95 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-400 font-bold">₦125 / query</td>
                   <td className="py-3.5 px-5 text-zinc-400 font-sans">&lt; 210ms</td>
                 </tr>
                 <tr className="hover:bg-white/[0.02] transition-colors">

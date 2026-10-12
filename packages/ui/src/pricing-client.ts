@@ -48,8 +48,8 @@ export interface PricingData {
 export const DEFAULT_PRICING: PricingData = {
   baseRates: {
     bvn: 95,
-    nin: 95,
-    ninAdvance: 95,
+    nin: 125,
+    ninAdvance: 125,
     ninSlip: 250,
     nuban: 0,
     phone: 50,
@@ -60,8 +60,8 @@ export const DEFAULT_PRICING: PricingData = {
   },
   cacheRates: {
     bvn: 38,
-    nin: 38,
-    ninAdvance: 38,
+    nin: 50,
+    ninAdvance: 50,
     ninSlip: 50,
     nuban: 0,
     phone: 20,
