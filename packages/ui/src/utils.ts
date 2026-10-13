@@ -28,8 +28,9 @@ function getBaseHost(): { isProd: boolean; hostname: string; protocol: string } 
 }
 
 export function getDashboardUrl(path = ""): string {
-  if (process.env.NEXT_PUBLIC_DASHBOARD_URL) {
-    return process.env.NEXT_PUBLIC_DASHBOARD_URL.replace(/\/$/, "") + path
+  const envUrl = process.env.NEXT_PUBLIC_DASHBOARD_URL
+  if (envUrl && !envUrl.includes("esam.com.ng")) {
+    return envUrl.replace(/\/$/, "") + path
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
@@ -39,8 +40,9 @@ export function getDashboardUrl(path = ""): string {
 }
 
 export function getDocsUrl(path = ""): string {
-  if (process.env.NEXT_PUBLIC_DOCS_URL) {
-    return process.env.NEXT_PUBLIC_DOCS_URL.replace(/\/$/, "") + path
+  const envUrl = process.env.NEXT_PUBLIC_DOCS_URL
+  if (envUrl && !envUrl.includes("esam.com.ng")) {
+    return envUrl.replace(/\/$/, "") + path
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
@@ -50,8 +52,9 @@ export function getDocsUrl(path = ""): string {
 }
 
 export function getWwwUrl(path = ""): string {
-  if (process.env.NEXT_PUBLIC_WWW_URL) {
-    return process.env.NEXT_PUBLIC_WWW_URL.replace(/\/$/, "") + path
+  const envUrl = process.env.NEXT_PUBLIC_WWW_URL
+  if (envUrl && !envUrl.includes("esam.com.ng")) {
+    return envUrl.replace(/\/$/, "") + path
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
@@ -61,8 +64,9 @@ export function getWwwUrl(path = ""): string {
 }
 
 export function getApiUrl(path = ""): string {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "") + path
+  const envUrl = process.env.NEXT_PUBLIC_API_URL
+  if (envUrl && !envUrl.includes("esam.com.ng")) {
+    return envUrl.replace(/\/$/, "") + path
   }
   const { isProd, hostname, protocol } = getBaseHost()
   if (isProd) {
