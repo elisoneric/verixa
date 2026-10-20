@@ -84,26 +84,10 @@ export function GlassyHeader({
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 duration-200 transition-all border-b border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]",
+        "fixed inset-x-0 top-0 z-50 duration-200 transition-all border-b border-slate-200/80 bg-white/90 backdrop-blur-md shadow-2xs",
         className
       )}
-      style={{
-        backgroundColor: "rgba(9, 9, 11, 0.65)",
-        backdropFilter: "blur(20px) saturate(190%)",
-        WebkitBackdropFilter: "blur(20px) saturate(190%)",
-      }}
     >
-      {/* Luminous Hairline Specular Highlight along Top */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
-      />
-
-      {/* Luminous Hairline Glow along Bottom */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"
-      />
 
       <div className="relative mx-auto w-full px-4 lg:px-6 max-w-7xl">
         <nav className="flex items-center justify-between gap-4 h-16">
@@ -341,14 +325,14 @@ export function GlassyHeader({
                   <AppLink
                     app={primaryCta.app}
                     path={primaryCta.path}
-                    className="inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-2 text-[13px] font-semibold bg-white hover:bg-zinc-200 text-zinc-950 transition-all shadow-md active:scale-[0.99]"
+                    className="inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-2 text-[13px] font-semibold bg-slate-900 hover:bg-slate-800 text-white transition-all shadow-sm active:scale-[0.99]"
                   >
                     {primaryCta.label}
                   </AppLink>
                 ) : (
                   <Link
                     href={primaryCta.href || "#"}
-                    className="inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-2 text-[13px] font-semibold bg-white hover:bg-zinc-200 text-zinc-950 transition-all shadow-md active:scale-[0.99]"
+                    className="inline-flex items-center justify-center rounded-full px-4 sm:px-5 py-2 text-[13px] font-semibold bg-slate-900 hover:bg-slate-800 text-white transition-all shadow-sm active:scale-[0.99]"
                   >
                     {primaryCta.label}
                   </Link>
@@ -361,7 +345,7 @@ export function GlassyHeader({
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle Navigation Menu"
-              className="md:hidden p-2 rounded-full border border-white/[0.1] bg-white/[0.05] text-zinc-300 hover:text-white hover:bg-white/[0.1] transition-colors"
+              className="md:hidden p-2 rounded-full border border-slate-200 bg-slate-50 text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             >
               <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileOpen ? (
@@ -378,12 +362,7 @@ export function GlassyHeader({
       {/* Mobile Drawer Glassy Dropdown */}
       {mobileOpen && (
         <div
-          className="md:hidden border-b border-white/[0.1] px-6 py-6 space-y-4 animate-in slide-in-from-top-4 duration-150"
-          style={{
-            backgroundColor: "rgba(9, 9, 11, 0.95)",
-            backdropFilter: "blur(24px) saturate(190%)",
-            WebkitBackdropFilter: "blur(24px) saturate(190%)",
-          }}
+          className="md:hidden border-b border-slate-200 px-6 py-6 space-y-4 animate-in slide-in-from-top-4 duration-150 bg-white"
         >
           {navItems && navItems.length > 0 && (
             <div className="space-y-2">

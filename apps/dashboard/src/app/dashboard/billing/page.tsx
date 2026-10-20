@@ -18,22 +18,28 @@ export default function BillingPage() {
   const [topupAmount, setTopupAmount] = React.useState("5000")
   const [isProcessing, setIsProcessing] = React.useState(false)
   const [isFaucetLoading, setIsFaucetLoading] = React.useState(false)
+  const [copiedAccount, setCopiedAccount] = React.useState(false)
 
   const currentBalance =
     environment === "live"
       ? balance?.live.balance ?? 0
       : balance?.sandbox.balance ?? 100000
 
-  const dva = balance?.dedicatedVirtualAccount;
-
+  const dva = balance?.dedicatedVirtualAccount
   const tier = balance?.tier || "STARTER"
+
+  const handleCopyAccount = (acc: string) => {
+    navigator.clipboard.writeText(acc)
+    setCopiedAccount(true)
+    setTimeout(() => setCopiedAccount(false), 2000)
+  }
 
   const handleSandboxFaucet = async () => {
     setIsFaucetLoading(true)
     try {
       await ApiClient.fundSandbox(10000)
       await refreshBalance()
-      alert("Success! 10,000 Sandbox NGX test credits added to your wallet.")
+      alert("Success: 10,000 Sandbox test credits added.")
     } catch (e: any) {
       alert(e.message || "Failed to add sandbox credits")
     } finally {
@@ -46,7 +52,7 @@ export default function BillingPage() {
     setIsProcessing(true)
     const amountNum = parseInt(topupAmount, 10)
     if (!amountNum || amountNum < 1000) {
-      alert("Minimum top-up is 1,000 NGX (₦1,000)")
+      alert("Minimum top-up is ₦1,000.")
       setIsProcessing(false)
       return
     }
@@ -80,7 +86,7 @@ export default function BillingPage() {
     }
 
     if (!consentAgreed) {
-      setProvisionError("Applicant consent is required under NDPA regulations.")
+      setProvisionError("Consent agreement is required.")
       return
     }
 
@@ -89,7 +95,7 @@ export default function BillingPage() {
       await ApiClient.provisionDedicatedAccount(ninInput.trim(), phoneInput.trim(), true)
       await refreshBalance()
       setProvisionModalOpen(false)
-      alert("Dedicated Paystack Virtual Account provisioned successfully!")
+      alert("Dedicated Virtual Account provisioned successfully.")
     } catch (err: any) {
       setProvisionError(err.message || "Failed to provision dedicated account.")
     } finally {
@@ -98,89 +104,69 @@ export default function BillingPage() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Promotional Flash Sale Banner if active */}
-      {balance?.bonusPromotion?.active && (
-        <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-              </svg>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-white tracking-tight">{balance.bonusPromotion.title}</span>
-                <Badge variant="verified" size="sm">
-                  {balance.bonusPromotion.discountPercent}% OFF ACTIVE
-                </Badge>
-              </div>
-              <p className="text-xs text-emerald-300/80 mt-0.5">
-                Limited promotional top-up discount automatically applied on instant checkout.
-              </p>
-            </div>
-          </div>
-          <Button size="sm" variant="emerald" onClick={() => setTopupModalOpen(true)} className="shrink-0 font-semibold">
-            Top Up &rarr;
-          </Button>
-        </div>
-      )}
-
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-white">
-              Billing & NGX Credits
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 font-heading">
+              Wallet & Billing
             </h1>
             <Badge variant="verified" size="sm">
               1 NGX = ₦1.00
             </Badge>
-            <Badge variant={tier === "ENTERPRISE" ? "verified" : tier === "GROWTH" ? "info" : "mono"} size="sm">
+            <Badge variant={tier === "ENTERPRISE" ? "verified" : "neutral"} size="sm">
               {tier} PLAN
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Prepaid credit balance, dedicated virtual account funding, and transaction ledgers.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Prepaid balance, automated bank funding account, and active rate schedule.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {environment === "sandbox" ? (
-            <Button
-              variant="outline"
-              size="sm"
+            <button
+              type="button"
               onClick={handleSandboxFaucet}
-              isLoading={isFaucetLoading}
-              className="border-amber-500/40 text-amber-400 hover:bg-amber-500/10"
+              disabled={isFaucetLoading}
+              className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
             >
-              + Add 10,000 Test Credits
-            </Button>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>{isFaucetLoading ? "Adding..." : "Add 10,000 Test Credits"}</span>
+            </button>
           ) : (
-            <Button
-              variant="emerald"
-              size="sm"
+            <button
+              type="button"
               onClick={() => setTopupModalOpen(true)}
+              className="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
             >
-              + Top Up NGX Balance
-            </Button>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>Deposit Funds</span>
+            </button>
           )}
-          <Link href="/dashboard/transactions">
-            <Button variant="outline" size="sm">
-              View Transactions &rarr;
-            </Button>
+
+          <Link
+            href="/dashboard/transactions"
+            className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs"
+          >
+            Transactions →
           </Link>
         </div>
       </div>
 
-      {/* Financial Overview Grid */}
-      <div className="grid md:grid-cols-2 gap-6">
+      {/* Financial Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Current Balance Card */}
-        <Card className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 flex flex-col justify-between shadow-xl backdrop-blur-xl rounded-2xl">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 flex flex-col justify-between shadow-xs">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-medium text-zinc-400 uppercase tracking-wider">
-                {environment} Available Balance
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 font-mono">
+                {environment} Available Credits
               </span>
               <Badge variant={environment === "live" ? "verified" : "warning"} size="sm">
                 {environment.toUpperCase()}
@@ -188,229 +174,229 @@ export default function BillingPage() {
             </div>
 
             <div className="mt-4 flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold font-mono text-white tracking-tight">
-                {currentBalance.toLocaleString()}
+              <span className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 tracking-tight">
+                ₦{currentBalance.toLocaleString()}
               </span>
-              <span className="text-sm font-mono text-emerald-400 font-bold">NGX</span>
+              <span className="text-sm font-semibold text-slate-500">NGX</span>
             </div>
 
-            <p className="text-xs text-zinc-400 mt-2">
-              Equivalent to <strong className="text-white">₦{currentBalance.toLocaleString()}.00 NGN</strong>
+            <p className="text-xs text-slate-500 mt-2">
+              Metered real-time deduction. Zero fees on failed lookups.
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-zinc-400">
-            <span>Prepaid metered deductions</span>
-            <span>Zero charges on failed requests</span>
+          <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-xs text-slate-500">Instant credit settlement</span>
+            <button
+              type="button"
+              onClick={() => setTopupModalOpen(true)}
+              className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition-colors cursor-pointer"
+            >
+              + Deposit Funds
+            </button>
           </div>
-        </Card>
+        </div>
 
-        {/* Dedicated Virtual Account (DVA) Card */}
-        <Card className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 flex flex-col justify-between shadow-xl backdrop-blur-xl rounded-2xl">
+        {/* Dedicated Virtual Account Card */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 flex flex-col justify-between shadow-xs">
           {dva ? (
             <div>
-              <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
                 <div>
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">PAYSTACK DEDICATED ACCOUNT</span>
-                  <h4 className="text-sm font-bold text-white">{dva.bankName}</h4>
+                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
+                    AUTOMATED BANK TRANSFER
+                  </span>
+                  <h3 className="text-sm font-bold text-slate-900">{dva.bankName}</h3>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="verified" size="sm">AUTO-CREDIT</Badge>
-                </div>
+                <Badge variant="verified" size="sm">
+                  AUTO-CREDIT
+                </Badge>
               </div>
 
               <div className="space-y-3">
-                <div>
-                  <span className="text-xs text-zinc-400">Dedicated Account Number</span>
-                  <div className="mt-1 flex items-center gap-3">
-                    <span className="font-mono text-2xl font-bold text-white tracking-widest">
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] text-slate-500 block uppercase font-medium">Account Number</span>
+                    <span className="font-mono text-2xl font-bold text-slate-900 tracking-wider">
                       {dva.accountNumber}
                     </span>
-                    <Button
-                      variant="outline"
-                      size="xs"
-                      onClick={() => {
-                        navigator.clipboard.writeText(dva.accountNumber)
-                        alert("Account number copied!")
-                      }}
-                    >
-                      Copy
-                    </Button>
+                    <span className="text-xs text-slate-600 block mt-0.5">{dva.accountName}</span>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleCopyAccount(dva.accountNumber)}
+                    className="px-3 py-1.5 text-xs font-semibold rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  >
+                    <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                    </svg>
+                    <span>{copiedAccount ? "Copied!" : "Copy"}</span>
+                  </button>
                 </div>
 
-                <div>
-                  <span className="text-xs text-zinc-400">Account Beneficiary</span>
-                  <p className="text-xs font-semibold text-zinc-200">{dva.accountName}</p>
+                <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+                  <span>Transfer from any Nigerian banking app</span>
+                  <button
+                    type="button"
+                    onClick={() => setProvisionModalOpen(true)}
+                    className="text-xs font-medium text-slate-600 hover:text-slate-900 underline"
+                  >
+                    Update Details
+                  </button>
                 </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-white/[0.08] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <p className="text-[11px] text-zinc-400">
-                  {dva.note}
-                </p>
-                <Button
-                  variant="outline"
-                  size="xs"
-                  onClick={() => setProvisionModalOpen(true)}
-                  className="shrink-0 text-[11px]"
-                >
-                  Update NIN / Phone &rarr;
-                </Button>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col justify-between h-full">
+            <div className="flex flex-col justify-between h-full space-y-4">
               <div>
-                <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
                   <div>
-                    <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">PAYSTACK DEDICATED ACCOUNT</span>
-                    <h4 className="text-sm font-bold text-white">Direct Virtual Account Funding</h4>
+                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
+                      DEDICATED BANK ACCOUNT
+                    </span>
+                    <h3 className="text-sm font-bold text-slate-900">Virtual Bank Account</h3>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="neutral" size="sm">NOT PROVISIONED</Badge>
-                  </div>
+                  <Badge variant="neutral" size="sm">
+                    NOT SET UP
+                  </Badge>
                 </div>
 
-                <div className="space-y-3">
-                  <p className="text-xs text-zinc-400 leading-relaxed">
-                    Automate live wallet funding via direct bank transfer. Provision a dedicated virtual bank account with applicant NIN and phone number.
-                  </p>
-                  <Button
-                    variant="emerald"
-                    size="sm"
-                    onClick={() => setProvisionModalOpen(true)}
-                    className="mt-2 font-semibold"
-                  >
-                    + Provision Dedicated Account
-                  </Button>
-                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Automate wallet top-ups via standard bank transfer. Link your verified NIN and phone number to provision a permanent dedicated virtual account.
+                </p>
               </div>
 
-              <div className="mt-6 pt-3 border-t border-white/[0.08] text-[11px] text-zinc-400">
-                Transfers auto-credit your Live NGX balance instantly via Paystack.
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setProvisionModalOpen(true)}
+                  className="w-full py-2 px-3 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors cursor-pointer shadow-xs text-center"
+                >
+                  + Setup Dedicated Account
+                </button>
               </div>
             </div>
           )}
-        </Card>
+        </div>
       </div>
 
       {/* Pricing Rates Table */}
-      <div className="space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white tracking-tight">Active Metered Rate Schedule ({tier} Plan)</h3>
-            </div>
-            <p className="text-xs text-zinc-400">Unit costs charged per successful verification. Zero charges on failed lookups.</p>
+            <h2 className="text-base font-bold text-slate-900 font-heading">
+              Active Metered Rate Schedule ({tier} Plan)
+            </h2>
+            <p className="text-xs text-slate-500">Unit rate per verified query. Failed lookups are never charged.</p>
           </div>
-          <AppLink app="www" path="/contact" className="text-xs text-emerald-400 hover:text-emerald-300 underline font-medium">
-            Contact Sales for Custom Volume Tier &rarr;
+          <AppLink app="www" path="/contact" className="text-xs text-slate-700 hover:text-slate-900 underline font-medium">
+            Custom Volume Pricing →
           </AppLink>
         </div>
 
-        <div className="rounded-xl border border-white/[0.08] overflow-hidden bg-[#0c0e14]/70 backdrop-blur-md">
+        <div className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0">
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-white/[0.08] bg-[#0e1118]/80 text-zinc-400">
-                <TableHead>Method & Endpoint</TableHead>
+              <TableRow className="border-b border-slate-200 bg-slate-50/70 text-slate-600">
+                <TableHead>Endpoint</TableHead>
                 <TableHead>Service</TableHead>
-                <TableHead>Active Rate</TableHead>
+                <TableHead>Rate</TableHead>
                 <TableHead>Billing Policy</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-y divide-white/[0.06]">
-              <TableRow className="hover:bg-white/[0.02] transition-colors">
-                <TableCell className="font-mono text-xs">
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                  <span className="text-zinc-200">/api/nin-verification</span>
+            <TableBody>
+              <TableRow className="hover:bg-slate-50 transition-colors">
+                <TableCell className="font-mono text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded mr-2">POST</span>
+                  /api/nin-verification
                 </TableCell>
-                <TableCell className="font-medium text-white">NIN Verification</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦125 / query</TableCell>
-                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+                <TableCell className="font-semibold text-slate-900 text-xs">NIN Verification</TableCell>
+                <TableCell className="font-mono text-xs font-bold text-slate-900">₦125 / query</TableCell>
+                <TableCell className="text-xs text-slate-500">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
-              <TableRow className="hover:bg-white/[0.02] transition-colors">
-                <TableCell className="font-mono text-xs">
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                  <span className="text-zinc-200">/api/bvn-verification</span>
+              <TableRow className="hover:bg-slate-50 transition-colors">
+                <TableCell className="font-mono text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded mr-2">POST</span>
+                  /api/bvn-verification
                 </TableCell>
-                <TableCell className="font-medium text-white">BVN Verification</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦95 / query</TableCell>
-                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+                <TableCell className="font-semibold text-slate-900 text-xs">BVN Verification</TableCell>
+                <TableCell className="font-mono text-xs font-bold text-slate-900">₦95 / query</TableCell>
+                <TableCell className="text-xs text-slate-500">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
-              <TableRow className="hover:bg-white/[0.02] transition-colors">
-                <TableCell className="font-mono text-xs">
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                  <span className="text-zinc-200">/api/nin-phone</span>
+              <TableRow className="hover:bg-slate-50 transition-colors">
+                <TableCell className="font-mono text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded mr-2">POST</span>
+                  /api/nin-phone
                 </TableCell>
-                <TableCell className="font-medium text-white">NIN Phone Search</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦50 / query</TableCell>
-                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+                <TableCell className="font-semibold text-slate-900 text-xs">NIN Phone Search</TableCell>
+                <TableCell className="font-mono text-xs font-bold text-slate-900">₦50 / query</TableCell>
+                <TableCell className="text-xs text-slate-500">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
-              <TableRow className="hover:bg-white/[0.02] transition-colors">
-                <TableCell className="font-mono text-xs">
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                  <span className="text-zinc-200">/api/bvn-phone</span>
+              <TableRow className="hover:bg-slate-50 transition-colors">
+                <TableCell className="font-mono text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded mr-2">POST</span>
+                  /api/bvn-phone
                 </TableCell>
-                <TableCell className="font-medium text-white">BVN Phone Search</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦50 / query</TableCell>
-                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+                <TableCell className="font-semibold text-slate-900 text-xs">BVN Phone Search</TableCell>
+                <TableCell className="font-mono text-xs font-bold text-slate-900">₦50 / query</TableCell>
+                <TableCell className="text-xs text-slate-500">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
-              <TableRow className="hover:bg-white/[0.02] transition-colors">
-                <TableCell className="font-mono text-xs">
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                  <span className="text-zinc-200">/api/nin-demography</span>
+              <TableRow className="hover:bg-slate-50 transition-colors">
+                <TableCell className="font-mono text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded mr-2">POST</span>
+                  /api/nin-demography
                 </TableCell>
-                <TableCell className="font-medium text-white">NIN Demography</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦125 / query</TableCell>
-                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+                <TableCell className="font-semibold text-slate-900 text-xs">NIN Demography</TableCell>
+                <TableCell className="font-mono text-xs font-bold text-slate-900">₦125 / query</TableCell>
+                <TableCell className="text-xs text-slate-500">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
-              <TableRow className="hover:bg-white/[0.02] transition-colors">
-                <TableCell className="font-mono text-xs">
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                  <span className="text-zinc-200">/api/nin-tracking</span>
+              <TableRow className="hover:bg-slate-50 transition-colors">
+                <TableCell className="font-mono text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded mr-2">POST</span>
+                  /api/nin-tracking
                 </TableCell>
-                <TableCell className="font-medium text-white">NIN Tracking</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">₦50 / query</TableCell>
-                <TableCell className="text-xs text-zinc-400">Charged on 200 OK lookup</TableCell>
+                <TableCell className="font-semibold text-slate-900 text-xs">NIN Tracking</TableCell>
+                <TableCell className="font-mono text-xs font-bold text-slate-900">₦50 / query</TableCell>
+                <TableCell className="text-xs text-slate-500">Charged on 200 OK lookup</TableCell>
               </TableRow>
 
-              <TableRow className="hover:bg-white/[0.02] transition-colors">
-                <TableCell className="font-mono text-xs">
-                  <span className="text-sky-400 font-bold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20 mr-2">POST</span>
-                  <span className="text-zinc-200">/api/nin-slip</span>
+              <TableRow className="hover:bg-slate-50 transition-colors">
+                <TableCell className="font-mono text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded mr-2">POST</span>
+                  /api/nin-slip
                 </TableCell>
-                <TableCell className="font-medium text-white">Automated NIN Slip</TableCell>
-                <TableCell className="font-sans font-bold text-sky-400">₦250 / slip</TableCell>
-                <TableCell className="text-xs text-zinc-400">A4 PDF & Word document output</TableCell>
+                <TableCell className="font-semibold text-slate-900 text-xs">Automated NIN Slip</TableCell>
+                <TableCell className="font-mono text-xs font-bold text-slate-900">₦250 / slip</TableCell>
+                <TableCell className="text-xs text-slate-500">A4 PDF & Word document output</TableCell>
               </TableRow>
 
-              <TableRow className="hover:bg-white/[0.02] transition-colors">
-                <TableCell className="font-mono text-xs">
-                  <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 mr-2">POST</span>
-                  <span className="text-zinc-200">/api/nuban-lookup</span>
+              <TableRow className="hover:bg-slate-50 transition-colors">
+                <TableCell className="font-mono text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded mr-2">POST</span>
+                  /api/nuban-lookup
                 </TableCell>
-                <TableCell className="font-medium text-white">NUBAN Resolution</TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">Free</TableCell>
-                <TableCell className="text-xs text-zinc-400">100% Free across all banks</TableCell>
+                <TableCell className="font-semibold text-slate-900 text-xs">NUBAN Resolution</TableCell>
+                <TableCell className="font-mono text-xs font-bold text-emerald-700">Free</TableCell>
+                <TableCell className="text-xs text-slate-500">100% Free across all commercial banks</TableCell>
               </TableRow>
 
-              <TableRow className="bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors">
-                <TableCell className="font-mono text-xs">
-                  <span className="text-sky-400 font-bold bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20 mr-2">GET</span>
-                  <span className="text-zinc-200">/api/balance</span>
+              <TableRow className="bg-slate-50/50">
+                <TableCell className="font-mono text-xs text-slate-700">
+                  <span className="font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded mr-2">GET</span>
+                  /api/balance
                 </TableCell>
-                <TableCell className="font-medium text-white flex items-center gap-2">
+                <TableCell className="font-semibold text-slate-900 text-xs flex items-center gap-1.5">
                   Account Balance
                   <Badge variant="verified" size="sm">FREE</Badge>
                 </TableCell>
-                <TableCell className="font-sans font-bold text-emerald-400">Free</TableCell>
-                <TableCell className="text-xs text-emerald-400">Zero Charge Always</TableCell>
+                <TableCell className="font-mono text-xs font-bold text-emerald-700">Free</TableCell>
+                <TableCell className="text-xs text-emerald-700 font-medium">Zero charge always</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -421,172 +407,163 @@ export default function BillingPage() {
       <Modal
         isOpen={provisionModalOpen}
         onClose={() => setProvisionModalOpen(false)}
-        title="Provision Dedicated Paystack Account"
-        description="Link your verified NIN and phone number to create a dedicated NUBAN account in your name."
+        title="Setup Dedicated Virtual Bank Account"
+        description="Link your verified NIN and phone number to provision a permanent account for instant bank transfer deposits."
       >
         <form onSubmit={handleProvisionDedicatedAccount} className="space-y-4 mt-2">
           {provisionError && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs">
+            <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs">
               {provisionError}
             </div>
           )}
 
-          <Input
-            label="National Identification Number (NIN)"
-            placeholder="11-digit NIN"
-            value={ninInput}
-            onChange={(e) => setNinInput(e.target.value.replace(/\D/g, "").slice(0, 11))}
-            className="!text-white !bg-[#121620] !border-white/[0.12]"
-            required
-          />
+          <div>
+            <label className="text-xs font-semibold text-slate-700 block mb-1">
+              National Identification Number (NIN)
+            </label>
+            <Input
+              placeholder="11-digit NIN"
+              value={ninInput}
+              onChange={(e) => setNinInput(e.target.value.replace(/\D/g, "").slice(0, 11))}
+              required
+            />
+          </div>
 
-          <Input
-            label="Phone Number"
-            placeholder="e.g. 08012345678"
-            type="tel"
-            value={phoneInput}
-            onChange={(e) => setPhoneInput(e.target.value)}
-            className="!text-white !bg-[#121620] !border-white/[0.12]"
-            required
-          />
+          <div>
+            <label className="text-xs font-semibold text-slate-700 block mb-1">
+              Nigerian Phone Number
+            </label>
+            <Input
+              placeholder="e.g. 08012345678"
+              type="tel"
+              value={phoneInput}
+              onChange={(e) => setPhoneInput(e.target.value)}
+              required
+            />
+            <p className="text-[11px] text-slate-500 mt-1">Must match the phone number registered with Paystack / BVN.</p>
+          </div>
 
-          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.08] space-y-2">
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
             <label className="flex items-start gap-2.5 cursor-pointer">
               <input
                 type="checkbox"
                 checked={consentAgreed}
                 onChange={(e) => setConsentAgreed(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-white/[0.2] bg-black/40 text-emerald-500 focus:ring-emerald-500"
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
               />
-              <span className="text-xs text-zinc-300 leading-relaxed">
-                I give consent to Verixa to verify my NIN and phone number for identity compliance to provision a Dedicated Virtual Account with Paystack in compliance with the Nigeria Data Protection Act (NDPA 2023).
+              <span className="text-xs text-slate-600 leading-relaxed">
+                I give consent to Verixa to verify my NIN and phone number for identity compliance to create a Dedicated Virtual Account in accordance with NDPA 2023 regulations.
               </span>
             </label>
           </div>
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-white/[0.08]">
-            <Button
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
               onClick={() => setProvisionModalOpen(false)}
+              className="px-3.5 py-2 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             >
               Cancel
-            </Button>
-            <Button
+            </button>
+            <button
               type="submit"
-              variant="emerald"
-              size="sm"
-              isLoading={isProvisioning}
+              disabled={isProvisioning}
+              className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors cursor-pointer shadow-xs"
             >
-              Provision Dedicated NUBAN
-            </Button>
+              {isProvisioning ? "Provisioning..." : "Create Virtual Account"}
+            </button>
           </div>
         </form>
       </Modal>
 
-      {/* Topup Modal */}
+      {/* Topup Checkout Modal */}
       <Modal
         isOpen={topupModalOpen}
         onClose={() => setTopupModalOpen(false)}
-        title="Fund Live Wallet Balance"
-        description="Transfer to your dedicated virtual account or initialize online checkout."
+        title="Deposit Funds"
+        description="Deposit into your prepaid verification wallet via direct bank transfer or online gateway."
       >
         <div className="space-y-4 mt-2">
-          {/* Primary Recommended Method: Dedicated Account */}
-          {dva ? (
-            <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 space-y-2">
+          {dva && (
+            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-emerald-400">RECOMMENDED: AUTOMATED BANK TRANSFER</span>
-                <Badge variant="verified" size="sm">INSTANT CREDIT</Badge>
+                <span className="text-xs font-bold text-slate-900">Bank Transfer (Instant Credit)</span>
+                <Badge variant="verified" size="sm">AUTO</Badge>
               </div>
-              <p className="text-xs text-zinc-300 leading-relaxed">
-                Transfer directly from your bank app or USSD to your Paystack Dedicated Account. Your live NGX balance is auto-credited immediately upon settlement:
-              </p>
-              <div className="p-3 rounded-lg bg-[#0e1118] border border-white/[0.08] space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] text-zinc-400 block uppercase font-mono">Bank Name</span>
-                    <span className="text-xs font-bold text-white">{dva.bankName}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-zinc-400 block uppercase font-mono">Beneficiary</span>
-                    <span className="text-xs font-semibold text-zinc-300">{dva.accountName}</span>
-                  </div>
+              <div className="bg-white border border-slate-200 rounded-lg p-2.5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase block font-mono">{dva.bankName}</span>
+                  <span className="font-mono text-lg font-bold text-slate-900">{dva.accountNumber}</span>
+                  <span className="text-xs text-slate-600 block">{dva.accountName}</span>
                 </div>
-                <div className="pt-2 flex items-center justify-between border-t border-white/[0.08]">
-                  <div>
-                    <span className="text-[10px] text-zinc-400 block uppercase font-mono">Dedicated Account</span>
-                    <span className="font-mono text-base font-extrabold text-emerald-400 tracking-wider">{dva.accountNumber}</span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="xs"
-                    onClick={() => {
-                      navigator.clipboard.writeText(dva.accountNumber)
-                      alert(`Account number ${dva.accountNumber} copied to clipboard!`)
-                    }}
-                  >
-                    Copy Number
-                  </Button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCopyAccount(dva.accountNumber)}
+                  className="px-2.5 py-1 text-xs font-semibold rounded border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700"
+                >
+                  {copiedAccount ? "Copied" : "Copy"}
+                </button>
               </div>
-            </div>
-          ) : (
-            <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-950/10 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-amber-400">AUTOMATED BANK TRANSFER</span>
-                <Badge variant="neutral" size="sm">NOT PROVISIONED</Badge>
-              </div>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                You do not have a dedicated virtual account provisioned yet. Provision your account to enable instant bank transfers, or fund via card below.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-1 border-amber-500/30 text-amber-300 hover:bg-amber-500/10"
-                onClick={() => {
-                  setTopupModalOpen(false)
-                  setProvisionModalOpen(true)
-                }}
-              >
-                + Provision Dedicated Account
-              </Button>
             </div>
           )}
 
-          {/* Secondary Method: Online Paystack */}
-          <form onSubmit={handleTopupCheckout} className="space-y-3 pt-2 border-t border-white/[0.08]">
-            <span className="text-xs font-semibold text-zinc-300 block">Alternative: Online Card / Gateway Checkout</span>
-            <Input
-              label="Deposit Amount (NGN / NGX)"
-              type="number"
-              min="1000"
-              step="1000"
-              value={topupAmount}
-              onChange={(e) => setTopupAmount(e.target.value)}
-              className="!text-white !bg-[#121620] !border-white/[0.12]"
-              hint="1 NGX = ₦1.00 NGN. Minimum topup is ₦1,000."
-              required
-            />
+          <form onSubmit={handleTopupCheckout} className="space-y-3 pt-2">
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-2">
+                Quick Select Amount
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {["2000", "5000", "10000", "25000"].map((amt) => (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => setTopupAmount(amt)}
+                    className={`py-1.5 px-2.5 text-xs font-semibold font-mono rounded-lg border transition-all cursor-pointer ${
+                      topupAmount === amt
+                        ? "bg-slate-900 text-white border-slate-900 shadow-2xs"
+                        : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                    }`}
+                  >
+                    ₦{parseInt(amt, 10).toLocaleString()}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-white/[0.08]">
-              <Button
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Custom Deposit Amount (NGN)
+              </label>
+              <Input
+                type="number"
+                min="1000"
+                step="500"
+                value={topupAmount}
+                onChange={(e) => setTopupAmount(e.target.value)}
+                placeholder="e.g. 5000"
+                required
+              />
+              <p className="text-[11px] text-slate-500 mt-1">Minimum top-up is ₦1,000.</p>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
                 type="button"
-                variant="ghost"
-                size="sm"
                 onClick={() => setTopupModalOpen(false)}
+                className="px-3.5 py-2 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
               >
-                Close
-              </Button>
-              <Button
+                Cancel
+              </button>
+              <button
                 type="submit"
-                variant="emerald"
-                size="sm"
-                isLoading={isProcessing}
+                disabled={isProcessing}
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
               >
-                Proceed Online
-              </Button>
+                <span>{isProcessing ? "Processing..." : `Pay ₦${(parseInt(topupAmount, 10) || 0).toLocaleString()}`}</span>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
             </div>
           </form>
         </div>

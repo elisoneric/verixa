@@ -7,13 +7,13 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Card({
   className,
-  variant = "glass",
+  variant = "default",
   ...props
 }: CardProps) {
   const variantStyles = {
-    default: "rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-[#0c0e14]/80 text-zinc-900 dark:text-zinc-100 shadow-xs backdrop-blur-md",
-    glass: "rounded-2xl border border-white/[0.08] bg-[#0e1118]/65 text-zinc-100 backdrop-blur-xl shadow-lg transition-all duration-200 hover:border-white/[0.16] hover:bg-[#121620]/80 hover:-translate-y-0.5 hover:shadow-2xl",
-    flat: "rounded-2xl border border-white/[0.06] bg-transparent text-zinc-100",
+    default: "rounded-2xl border border-slate-200/90 bg-white text-slate-900 shadow-xs transition-all",
+    glass: "rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-xs hover:border-slate-300 hover:shadow-md transition-all duration-200",
+    flat: "rounded-2xl border border-slate-200/60 bg-slate-50/60 text-slate-900",
   }
 
   return (
@@ -43,7 +43,7 @@ export function CardTitle({
   return (
     <h3
       className={cn(
-        "font-heading text-lg font-bold leading-none tracking-tight text-white",
+        "font-heading text-lg font-bold leading-none tracking-tight text-slate-900",
         className
       )}
       {...props}
@@ -57,7 +57,7 @@ export function CardDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn("text-xs sm:text-sm text-zinc-400 leading-relaxed", className)}
+      className={cn("text-xs sm:text-sm text-slate-500 leading-relaxed", className)}
       {...props}
     />
   )
@@ -76,7 +76,7 @@ export function CardFooter({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("flex items-center p-6 pt-0 border-t border-white/[0.07] mt-4", className)}
+      className={cn("flex items-center p-6 pt-0 border-t border-slate-100 mt-4", className)}
       {...props}
     />
   )

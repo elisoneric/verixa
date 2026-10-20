@@ -60,7 +60,7 @@ function RegisterForm() {
           container.innerHTML = ""
           window.google.accounts.id.renderButton(container, {
             type: "standard",
-            theme: "filled_black",
+            theme: "outline",
             size: "large",
             text: "signup_with",
             shape: "pill",
@@ -119,7 +119,7 @@ function RegisterForm() {
         msg.includes("NetworkError") ||
         msg.includes("network error")
       ) {
-        setError("Unable to connect to the Verixa server. Please check your connection or verify the API gateway status.")
+        setError("Unable to connect to the Verixa server. Please check your network connection.")
       } else {
         setError(msg || "Registration failed. Please check your details.")
       }
@@ -129,7 +129,7 @@ function RegisterForm() {
 
   const handleManualGoogleClick = () => {
     if (!googleClientId) {
-      setError("Google Sign-In is not configured on this deployment. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID or register with your email address.")
+      setError("Google Sign-In is not configured on this deployment. Please register with your email address.")
       return
     }
 
@@ -137,16 +137,16 @@ function RegisterForm() {
       initGoogle()
       window.google.accounts.id.prompt((notification: any) => {
         if (notification.isNotDisplayed()) {
-          setError("Google Sign-In popup was suppressed. Please use the Google button or register with email.")
+          setError("Google Sign-In popup was suppressed. Please use the Google button or email registration.")
         }
       })
     } else {
-      setError("Google authentication service is still initializing. Please try again in a few seconds.")
+      setError("Google authentication service is still initializing.")
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#06070a] text-zinc-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative font-sans selection:bg-emerald-500/25 selection:text-emerald-300">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative font-sans selection:bg-emerald-500/20 selection:text-emerald-900">
       {Boolean(googleClientId) && (
         <Script
           src="https://accounts.google.com/gsi/client"
@@ -158,21 +158,18 @@ function RegisterForm() {
         />
       )}
 
-      <div aria-hidden="true" className="fixed inset-0 mesh-glow pointer-events-none -z-10 opacity-70" />
-      <div aria-hidden="true" className="fixed inset-0 grid-backdrop pointer-events-none -z-10 opacity-35" />
-
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
         <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
           <Logo size="lg" />
         </Link>
-        <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-white font-heading">
+        <h1 className="mt-4 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-heading">
           Create your account
-        </h2>
-        <p className="mt-1 text-xs text-zinc-400">
+        </h1>
+        <p className="mt-1 text-xs sm:text-sm text-slate-500">
           Or{" "}
           <Link
             href={`/login${redirectUrl !== "/dashboard" ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`}
-            className="font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+            className="font-semibold text-slate-900 hover:underline"
           >
             sign in to an existing account
           </Link>
@@ -180,14 +177,14 @@ function RegisterForm() {
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-2xl">
+        <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl shadow-xs">
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs font-medium">
+            <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
               {error}
             </div>
           )}
 
-          {/* Google Identity Services Container - only shown when Google client ID is configured */}
+          {/* Google Identity Services Container */}
           {Boolean(googleClientId) && (
             <>
               <div className="flex flex-col items-center">
@@ -198,7 +195,7 @@ function RegisterForm() {
                     type="button"
                     onClick={handleManualGoogleClick}
                     disabled={isGoogleLoading || isLoading}
-                    className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.12] text-sm font-semibold text-white transition-all shadow-xs cursor-pointer active:scale-[0.99] disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-sm font-semibold text-slate-800 transition-all shadow-2xs cursor-pointer disabled:opacity-50"
                   >
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                       <path
@@ -226,11 +223,11 @@ function RegisterForm() {
               {/* Divider */}
               <div className="relative my-5">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/[0.08]" />
+                  <div className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-[#0e1118] px-2 text-zinc-500 font-mono text-[11px]">
-                    or continue with email
+                  <span className="bg-white px-2 text-slate-400 font-mono text-[11px]">
+                    or register with email
                   </span>
                 </div>
               </div>
@@ -238,32 +235,45 @@ function RegisterForm() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Organization or Full Name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="!text-white !bg-[#121620] !border-white/[0.12] focus:!border-emerald-500"
-              required
-            />
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Organization or Full Name
+              </label>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Acme Technologies"
+                required
+              />
+            </div>
 
-            <Input
-              label="Work Email Address"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="!text-white !bg-[#121620] !border-white/[0.12] focus:!border-emerald-500"
-              required
-            />
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Work Email Address
+              </label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@company.com"
+                required
+              />
+            </div>
 
-            <Input
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="!text-white !bg-[#121620] !border-white/[0.12] focus:!border-emerald-500"
-              required
-            />
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Password
+              </label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+              <p className="text-[11px] text-slate-500 mt-1">Must be at least 8 characters.</p>
+            </div>
 
             <div className="pt-1">
               <label className="flex items-start gap-2.5 cursor-pointer">
@@ -271,13 +281,13 @@ function RegisterForm() {
                   type="checkbox"
                   checked={termsAgreed}
                   onChange={(e) => setTermsAgreed(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-white/[0.2] bg-black/40 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                 />
-                <span className="text-zinc-400 text-xs leading-relaxed">
+                <span className="text-slate-600 text-xs leading-relaxed">
                   I agree to the{" "}
-                  <Link href="/terms" className="underline hover:text-white">Terms of Service</Link>
+                  <Link href="/terms" className="underline hover:text-slate-900">Terms of Service</Link>
                   {" "}and{" "}
-                  <Link href="/privacy" className="underline hover:text-white">Privacy Policy</Link>.
+                  <Link href="/privacy" className="underline hover:text-slate-900">Privacy Policy</Link>.
                 </span>
               </label>
             </div>
@@ -285,18 +295,18 @@ function RegisterForm() {
             <button
               type="submit"
               disabled={isLoading || isGoogleLoading}
-              className="btn-pill-primary !w-full !py-3 !text-sm !font-bold h-11 cursor-pointer mt-2 shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+              className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition-colors mt-2 shadow-xs cursor-pointer disabled:opacity-50"
             >
               {isLoading ? "Creating account..." : "Create Account"}
             </button>
           </form>
 
-          <div className="mt-6 pt-4 border-t border-white/[0.08] text-center">
-            <span className="text-xs text-zinc-400">
+          <div className="mt-6 pt-4 border-t border-slate-100 text-center">
+            <span className="text-xs text-slate-500">
               Already have an account?{" "}
               <Link
                 href={`/login${redirectUrl !== "/dashboard" ? `?redirect=${encodeURIComponent(redirectUrl)}` : ""}`}
-                className="font-semibold text-emerald-400 hover:underline"
+                className="font-semibold text-slate-900 hover:underline"
               >
                 Sign in →
               </Link>
@@ -310,7 +320,7 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#06070a]" />}>
+    <React.Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
       <RegisterForm />
     </React.Suspense>
   )

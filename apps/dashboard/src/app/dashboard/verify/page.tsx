@@ -59,18 +59,18 @@ export default function ManualVerifyPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 font-heading">
               Identity Verification
             </h1>
             <Badge variant={environment === "live" ? "verified" : "warning"} size="sm">
               {environment.toUpperCase()}
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Perform individual KYC identity and bank account checks.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Perform authorized individual KYC and bank account lookups.
           </p>
         </div>
 
@@ -87,74 +87,41 @@ export default function ManualVerifyPage() {
 
       {/* Main Form Grid */}
       <div className="grid md:grid-cols-2 gap-6 items-start">
-        <Card className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 space-y-5 shadow-xl backdrop-blur-xl rounded-2xl">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-5 shadow-xs">
           {/* Service Selector */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wide">
+            <label className="text-xs font-semibold text-slate-700 uppercase tracking-wide block">
               Verification Service
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              <button
-                type="button"
-                onClick={() => setService("bvn")}
-                className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
-                  service === "bvn"
-                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 font-bold shadow-2xs"
-                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
-                }`}
-              >
-                BVN
-              </button>
-              <button
-                type="button"
-                onClick={() => setService("nin")}
-                className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
-                  service === "nin"
-                    ? "bg-sky-500/20 border-sky-500 text-sky-400 font-bold shadow-2xs"
-                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
-                }`}
-              >
-                NIN
-              </button>
-              <button
-                type="button"
-                onClick={() => setService("phone")}
-                className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
-                  service === "phone"
-                    ? "bg-amber-500/20 border-amber-500 text-amber-400 font-bold shadow-2xs"
-                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
-                }`}
-              >
-                Phone
-              </button>
-              <button
-                type="button"
-                onClick={() => setService("cac")}
-                className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
-                  service === "cac"
-                    ? "bg-purple-500/20 border-purple-500 text-purple-400 font-bold shadow-2xs"
-                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
-                }`}
-              >
-                CAC Company
-              </button>
-              <button
-                type="button"
-                onClick={() => setService("nuban")}
-                className={`h-10 text-xs font-semibold rounded-lg border text-center transition-all cursor-pointer ${
-                  service === "nuban"
-                    ? "bg-indigo-500/20 border-indigo-500 text-indigo-400 font-bold shadow-2xs"
-                    : "bg-[#121620] border-white/[0.08] text-zinc-400 hover:border-white/[0.2]"
-                }`}
-              >
-                Bank (NUBAN)
-              </button>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+              {(
+                [
+                  { id: "bvn", label: "BVN" },
+                  { id: "nin", label: "NIN" },
+                  { id: "phone", label: "Phone" },
+                  { id: "cac", label: "CAC" },
+                  { id: "nuban", label: "Bank" },
+                ] as const
+              ).map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setService(item.id)}
+                  className={`h-9 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                    service === item.id
+                      ? "bg-slate-900 border-slate-900 text-white shadow-2xs font-bold"
+                      : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/25 text-rose-700 dark:text-rose-400 text-xs font-medium">
+              <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
                 {error}
               </div>
             )}
@@ -197,14 +164,14 @@ export default function ManualVerifyPage() {
                   onChange={(e) => setRcNumber(e.target.value)}
                   required
                 />
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 uppercase tracking-wide">
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wide">
                     Company Type
                   </label>
                   <select
                     value={companyType}
                     onChange={(e) => setCompanyType(e.target.value)}
-                    className="w-full h-10 rounded-lg border border-white/[0.12] bg-[#121620] px-3 text-xs text-white focus:border-purple-500 focus:outline-none shadow-2xs"
+                    className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-800 focus:border-slate-900 focus:outline-none shadow-2xs cursor-pointer"
                   >
                     <option value="COMPANY">Limited Liability Company (RC)</option>
                     <option value="BUSINESS_NAME">Business Name (BN)</option>
@@ -222,18 +189,17 @@ export default function ManualVerifyPage() {
                   label="10-Digit Account Number"
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
-                  className="!text-white !bg-[#121620] !border-white/[0.12]"
                   maxLength={10}
                   required
                 />
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide">
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wide">
                     Bank
                   </label>
                   <select
                     value={bankCode}
                     onChange={(e) => setBankCode(e.target.value)}
-                    className="w-full h-11 rounded-lg border border-white/[0.12] bg-[#121620] px-3.5 text-sm text-white focus:border-emerald-600 focus:outline-none shadow-2xs"
+                    className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-800 focus:border-slate-900 focus:outline-none shadow-2xs cursor-pointer"
                   >
                     <option value="058">Guaranty Trust Bank (058)</option>
                     <option value="011">First Bank of Nigeria (011)</option>
@@ -262,32 +228,30 @@ export default function ManualVerifyPage() {
                 id="manualConsent"
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
-                className="h-4 w-4 rounded border-white/[0.2] bg-black/40 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
               />
-              <label htmlFor="manualConsent" className="text-xs text-zinc-400 select-none cursor-pointer">
+              <label htmlFor="manualConsent" className="text-xs text-slate-600 select-none cursor-pointer">
                 I confirm applicant consent has been obtained.
               </label>
             </div>
 
             <div className="pt-2">
-              <Button
+              <button
                 type="submit"
-                variant="emerald"
-                size="md"
-                className="w-full font-semibold h-11"
                 disabled={isLoading || !consent}
+                className="w-full py-2.5 px-4 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors cursor-pointer shadow-xs disabled:opacity-50"
               >
                 {isLoading ? "Querying Registry..." : `Verify ${service.toUpperCase()}`}
-              </Button>
+              </button>
             </div>
           </form>
-        </Card>
+        </div>
 
         {/* Verification Result Card */}
-        <Card className="glass-card bg-[#0e1118]/70 border border-white/[0.08] p-6 min-h-[380px] flex flex-col justify-between shadow-xl backdrop-blur-xl rounded-2xl">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 min-h-[380px] flex flex-col justify-between shadow-xs">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-              <h3 className="text-sm font-semibold text-white">Registry Result</h3>
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-semibold text-slate-900">Registry Result</h2>
               {result && (
                 <Badge variant={result.status === "success" || result.status === "verified" ? "verified" : "failed"} size="sm">
                   {result.status === "success" || result.status === "verified" ? "VERIFIED" : "FAILED"}
@@ -296,42 +260,42 @@ export default function ManualVerifyPage() {
             </div>
 
             {isLoading && (
-              <div className="py-20 flex flex-col items-center justify-center text-zinc-400 gap-3">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+              <div className="py-20 flex flex-col items-center justify-center text-slate-500 gap-3">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-900 border-t-transparent" />
                 <span className="text-xs font-mono">Querying verification registry...</span>
               </div>
             )}
 
             {!isLoading && !result && !error && (
-              <div className="py-20 text-center text-zinc-500">
+              <div className="py-20 text-center text-slate-400">
                 <p className="text-xs">Fill out the verification details and submit.</p>
               </div>
             )}
 
             {!isLoading && result && (
-              <div className="mt-4 space-y-2.5 font-mono text-xs max-h-[380px] overflow-y-auto pr-1">
+              <div className="mt-4 space-y-2 font-mono text-xs max-h-[380px] overflow-y-auto pr-1">
                 {result.data &&
                   Object.entries(result.data).map(([key, val]) => {
                     const isPhoto = key.toLowerCase() === "photo" && typeof val === "string" && val.length > 50
                     const isObject = typeof val === "object" && val !== null
                     return (
-                      <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-white/[0.06] gap-1">
-                        <span className="text-zinc-400 capitalize">{key.replace(/_/g, " ")}:</span>
+                      <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-slate-100 gap-1">
+                        <span className="text-slate-500 capitalize">{key.replace(/_/g, " ")}:</span>
                         {isPhoto ? (
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Photo Verified</span>
+                            <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Photo Verified</span>
                             <img
                               src={val.startsWith("data:") ? val : `data:image/jpeg;base64,${val}`}
                               alt="Applicant Portrait"
-                              className="h-8 w-8 rounded object-cover border border-emerald-500/40"
+                              className="h-8 w-8 rounded object-cover border border-emerald-300"
                             />
                           </div>
                         ) : isObject ? (
-                          <span className="text-zinc-200 font-medium text-[11px] bg-white/[0.04] px-2 py-1 rounded max-w-[260px] truncate" title={JSON.stringify(val)}>
+                          <span className="text-slate-800 font-medium text-[11px] bg-slate-50 px-2 py-1 rounded max-w-[260px] truncate" title={JSON.stringify(val)}>
                             {JSON.stringify(val)}
                           </span>
                         ) : (
-                          <span className="text-zinc-100 font-semibold">{String(val || "N/A")}</span>
+                          <span className="text-slate-900 font-semibold">{String(val || "N/A")}</span>
                         )}
                       </div>
                     )
@@ -341,12 +305,12 @@ export default function ManualVerifyPage() {
           </div>
 
           {result?.meta && (
-            <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between text-[11px] font-mono text-zinc-500">
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
               <span>LATENCY: {result.meta.latency_ms || 120}ms</span>
               <span>REF: {result.meta.referenceId?.slice(0, 14)}</span>
             </div>
           )}
-        </Card>
+        </div>
       </div>
     </div>
   )

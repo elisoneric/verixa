@@ -41,15 +41,19 @@ export class PaystackService {
     return process.env.PAYSTACK_SECRET_KEY || 'sk_test_mock_secret_key';
   }
 
-  async createCustomer(email: string, orgName: string) {
+  async createCustomer(email: string, orgName: string, phone?: string) {
     const key = await this.getSecretKey();
     if (!key || key.startsWith('sk_test_mock')) {
       return 'CUS_mock123';
     }
     try {
+      const payload: any = { email, first_name: orgName, last_name: 'Organization' };
+      if (phone) {
+        payload.phone = phone;
+      }
       const response = await axios.post(
         'https://api.paystack.co/customer',
-        { email, first_name: orgName, last_name: 'Organization' },
+        payload,
         { headers: { Authorization: `Bearer ${key}` } }
       );
       return response.data.data.customer_code;
@@ -65,10 +69,32 @@ export class PaystackService {
     if (!key || key.startsWith('sk_test_mock')) {
       throw new BadRequestException('Paystack Dedicated Virtual Account provisioning requires active live Paystack credentials. Please configure PAYSTACK_SECRET_KEY in production.');
     }
+
+    // Ensure customer has phone attached on Paystack
+    if (options?.phone && customerCode && !customerCode.startsWith('CUS_mock')) {
+      try {
+        await axios.put(
+          `https://api.paystack.co/customer/${customerCode}`,
+          { phone: options.phone, first_name: options.orgName || 'Organization' },
+          { headers: { Authorization: `Bearer ${key}` } }
+        );
+      } catch (err: any) {
+        this.logger.warn(`Could not update customer phone on Paystack: ${err?.response?.data?.message || err.message}`);
+      }
+    }
+
     try {
+      const dvaPayload: any = {
+        customer: customerCode,
+        preferred_bank: 'titan-paystack',
+      };
+      if (options?.phone) {
+        dvaPayload.phone = options.phone;
+      }
+
       const response = await axios.post(
         'https://api.paystack.co/dedicated_account',
-        { customer: customerCode, preferred_bank: 'titan-paystack' },
+        dvaPayload,
         { headers: { Authorization: `Bearer ${key}` } }
       );
       return {

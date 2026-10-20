@@ -15,8 +15,8 @@ const outfit = Outfit({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#06070a",
-  colorScheme: "dark",
+  themeColor: "#ffffff",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Verixa ID Documentation & API Reference",
-    description: "Explore 23+ endpoints for identity, KYB, and bank account resolution.",
+    description: "Explore endpoints for identity, KYB, and bank account resolution.",
     creator: "@verixaid",
     images: ["/icon.svg"],
   },
@@ -86,8 +86,8 @@ export default function RootLayout({
     {
       title: "KYC IDENTITY VERIFICATION",
       links: [
-        { label: "BVN Verification (4 Tiers)", href: "/bvn" },
-        { label: "NIN Verification (5 Tiers)", href: "/nin" },
+        { label: "BVN Verification", href: "/bvn" },
+        { label: "NIN Verification", href: "/nin" },
         { label: "Phone Number Intelligence", href: "/phone" },
         { label: "Secondary Government IDs", href: "/government-ids" },
       ],
@@ -108,7 +108,7 @@ export default function RootLayout({
     {
       title: "BIOMETRICS & RISK INTELLIGENCE",
       links: [
-        { label: "Biometrics, AML & Credit", href: "/biometrics-aml" },
+        { label: "Biometrics & AML Screening", href: "/biometrics-aml" },
       ],
     },
     {
@@ -134,9 +134,9 @@ export default function RootLayout({
   ];
 
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} antialiased dark`}>
-      <body className="min-h-screen bg-[#06070a] text-zinc-100 font-sans flex flex-col selection:bg-emerald-500/25 selection:text-emerald-300">
-        {/* Sleek Glassy Floating Header (docs.x.ai Parity) */}
+    <html lang="en" className={`${inter.variable} ${outfit.variable} antialiased`}>
+      <body className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-emerald-500/20 selection:text-emerald-900">
+        {/* Floating Header */}
         <GlassyHeader
           logoBadge="DOCS"
           logoBadgeColor="emerald"
@@ -144,31 +144,31 @@ export default function RootLayout({
             <div className="flex items-center gap-1">
               <Link
                 href="/"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-white bg-white/[0.08] transition-colors"
+                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-900 bg-slate-100 transition-colors"
               >
                 API Reference
               </Link>
               <Link
                 href="/environments"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-colors"
+                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
               >
                 Environments
               </Link>
               <Link
                 href="/smart-cache"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-colors"
+                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
               >
                 Smart Cache
               </Link>
               <Link
                 href="/airtime-data"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-colors"
+                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
               >
                 Airtime & Data
               </Link>
               <Link
                 href="/roadmap"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-colors"
+                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
               >
                 Roadmap
               </Link>
@@ -189,11 +189,11 @@ export default function RootLayout({
         {/* Two-Panel Layout with Top Offset for Fixed Header */}
         <div className="pt-16 flex-1 flex max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
           {/* Left Navigation Sidebar */}
-          <aside className="hidden md:block w-64 shrink-0 border-r border-white/[0.08] py-8 pr-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+          <aside className="hidden md:block w-64 shrink-0 border-r border-slate-200 py-8 pr-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
             <nav className="space-y-6">
               {sections.map((sec) => (
                 <div key={sec.title} className="space-y-1.5">
-                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-500 block px-2.5">
+                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 block px-2.5">
                     {sec.title}
                   </span>
                   <div className="space-y-0.5">
@@ -201,7 +201,7 @@ export default function RootLayout({
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="block rounded-lg px-2.5 py-1.5 text-xs text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-colors"
+                        className="block rounded-lg px-2.5 py-1.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
                       >
                         {link.label}
                       </Link>

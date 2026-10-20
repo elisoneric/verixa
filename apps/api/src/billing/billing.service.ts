@@ -256,7 +256,8 @@ export class BillingService {
 
     const customerCode = await this.paystackService.createCustomer(
       `org-${org.id.slice(0, 8)}@verixaid.com`,
-      org.name
+      org.name,
+      phone
     );
 
     const account = await this.paystackService.createDedicatedAccount(customerCode, {

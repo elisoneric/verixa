@@ -25,32 +25,32 @@ export function Badge({
 }: BadgeProps) {
   const variants = {
     default:
-      "bg-zinc-800 text-zinc-200 border-zinc-700/80",
+      "bg-slate-900 text-white border-slate-800 shadow-2xs",
     verified:
-      "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
+      "bg-emerald-50 text-emerald-700 border-emerald-200/80 font-medium",
     failed:
-      "bg-rose-500/10 text-rose-400 border-rose-500/25",
+      "bg-rose-50 text-rose-700 border-rose-200/80 font-medium",
     warning:
-      "bg-amber-500/10 text-amber-400 border-amber-500/25",
+      "bg-amber-50 text-amber-700 border-amber-200/80 font-medium",
     info:
-      "bg-sky-500/10 text-sky-400 border-sky-500/25",
+      "bg-sky-50 text-sky-700 border-sky-200/80 font-medium",
     neutral:
-      "bg-zinc-900/80 text-zinc-400 border-zinc-800",
+      "bg-slate-100 text-slate-700 border-slate-200 font-medium",
     outline:
-      "bg-transparent text-zinc-400 border-zinc-700",
+      "bg-transparent text-slate-600 border-slate-200",
     mono:
-      "bg-zinc-900 text-zinc-300 font-mono border-zinc-800",
+      "bg-slate-100 text-slate-800 font-mono border-slate-200 text-[11px]",
   }
 
   const dotColors = {
-    default: "bg-zinc-400",
-    verified: "bg-emerald-400 animate-pulse",
-    failed: "bg-rose-400",
-    warning: "bg-amber-400",
-    info: "bg-sky-400",
-    neutral: "bg-zinc-500",
-    outline: "bg-zinc-400",
-    mono: "bg-emerald-400",
+    default: "bg-slate-400",
+    verified: "bg-emerald-500 animate-pulse",
+    failed: "bg-rose-500",
+    warning: "bg-amber-500",
+    info: "bg-sky-500",
+    neutral: "bg-slate-400",
+    outline: "bg-slate-400",
+    mono: "bg-emerald-500",
   }
 
   const sizes = {

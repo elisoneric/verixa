@@ -18,17 +18,19 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-3xl">
+    <div className="space-y-6 max-w-3xl">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Organization Settings</h1>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
-          Manage your organization profile, security credentials, and automated notification thresholds.
+      <div className="pb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 font-heading">
+          Organization Settings
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          Manage your organization profile, security details, and alert thresholds.
         </p>
       </div>
 
       {saved && (
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+        <div className="flex items-center gap-2 p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
           <svg className="w-4 h-4 shrink-0 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
@@ -37,8 +39,8 @@ export default function SettingsPage() {
       )}
 
       {/* Profile Section */}
-      <Card className="p-6 glass-card bg-[#0e1118]/70 border border-white/[0.08] text-white space-y-4 shadow-xs">
-        <h3 className="text-sm font-bold text-white tracking-tight">Organization Profile</h3>
+      <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-xs">
+        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Organization Profile</h2>
         <form onSubmit={handleSave} className="space-y-4 max-w-xl">
           <Input
             label="Organization Name"
@@ -51,39 +53,42 @@ export default function SettingsPage() {
             readOnly
             copyable
             value={user?.org_id || "org_9f83a8f1e2b4c6d8"}
-            className="font-mono text-xs text-zinc-400"
+            className="font-mono text-xs text-slate-600"
           />
 
           <Input
             label="Primary Administrator Email"
             readOnly
             value={user?.email || "admin@yourdomain.com"}
-            className="font-mono text-xs text-zinc-400"
+            className="font-mono text-xs text-slate-600"
           />
 
-          <Button type="submit" variant="emerald" size="sm">
+          <button
+            type="submit"
+            className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors cursor-pointer shadow-xs"
+          >
             Save Profile
-          </Button>
+          </button>
         </form>
-      </Card>
+      </div>
 
       {/* Automated Notifications & Alerts */}
-      <Card className="p-6 glass-card bg-[#0e1118]/70 border border-white/[0.08] text-white space-y-4 shadow-xs">
-        <h3 className="text-sm font-bold text-white tracking-tight">Email Notifications & Balance Alerts</h3>
+      <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-xs">
+        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Email Notifications & Balance Alerts</h2>
         <div className="space-y-4 max-w-xl text-xs">
-          <label className="flex items-center gap-3 text-zinc-300 cursor-pointer">
+          <label className="flex items-center gap-2.5 text-slate-700 cursor-pointer">
             <input
               type="checkbox"
               checked={emailAlerts}
               onChange={(e) => setEmailAlerts(e.target.checked)}
-              className="rounded border-zinc-700 bg-zinc-950 text-emerald-500 focus:ring-emerald-500"
+              className="rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
             />
-            <span>Send automated email receipt on every NGX top-up</span>
+            <span>Send automated email receipt on every wallet deposit</span>
           </label>
 
-          <div className="space-y-1.5 pt-2">
-            <label className="block text-xs font-medium text-zinc-300">
-              Low Balance Email Alert Threshold (NGX)
+          <div className="space-y-1.5 pt-1">
+            <label className="block text-xs font-semibold text-slate-700">
+              Low Balance Email Alert Threshold (NGN)
             </label>
             <Input
               type="number"
@@ -93,11 +98,15 @@ export default function SettingsPage() {
             />
           </div>
 
-          <Button variant="outline" size="sm" onClick={() => alert("Notification settings saved!")}>
+          <button
+            type="button"
+            onClick={() => alert("Notification settings saved.")}
+            className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer shadow-2xs"
+          >
             Update Alert Preferences
-          </Button>
+          </button>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }

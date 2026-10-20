@@ -3,18 +3,18 @@
 @source "../../../../packages/ui/src";
 
 :root {
-  color-scheme: dark;
-  --background: #06070a;
-  --foreground: #f8fafc;
+  color-scheme: light;
+  --background: #f8fafc;
+  --foreground: #0f172a;
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: var(--font-outfit), 'Outfit', sans-serif;
   --font-mono: var(--font-inter), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-:root:not(.dark) {
-  color-scheme: light;
-  --background: #f8fafc;
-  --foreground: #09090b;
+.dark {
+  color-scheme: dark;
+  --background: #090d16;
+  --foreground: #f8fafc;
 }
 
 @theme inline {
@@ -45,7 +45,6 @@ code, pre, .font-mono {
   font-feature-settings: "zero" 0;
 }
 
-/* Enforce clean open numbers without slashed zeroes */
 *, :root {
   font-variant-numeric: normal;
   font-feature-settings: "zero" 0;
@@ -56,69 +55,63 @@ code, pre, .font-mono {
   font-feature-settings: "zero" 0;
 }
 
-/* Grok / x.ai Sleek Glassmorphism System */
+/* Otobill / Stripe Clean Light UI System */
 .glass-header {
-  background: rgba(6, 7, 10, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .glass-panel {
-  background: rgba(12, 14, 20, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
 
 .glass-card {
-  background: rgba(14, 17, 24, 0.55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease-in-out;
 }
 
 .glass-card:hover {
-  background: rgba(18, 22, 32, 0.75);
-  border-color: rgba(255, 255, 255, 0.16);
-  transform: translateY(-1.5px);
-  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6);
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
 .glass-sidebar {
-  background: rgba(8, 10, 15, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
 }
 
-/* Grok Pill Button Styles */
+/* Clean Pill Button Styles */
 .btn-pill-primary {
   border-radius: 9999px;
-  background-color: #FFFFFF;
-  color: #06070A;
+  background-color: #0f172a;
+  color: #ffffff;
   font-weight: 600;
-  padding: 0.45rem 1.25rem;
+  padding: 0.45rem 1.15rem;
   font-size: 0.8125rem;
   transition: all 0.15s ease;
-  box-shadow: 0 0 20px -3px rgba(255, 255, 255, 0.2);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  border: 1px solid transparent;
 }
 .btn-pill-primary:hover {
-  background-color: #E2E8F0;
-  box-shadow: 0 0 25px 0 rgba(255, 255, 255, 0.35);
-  transform: scale(1.02);
+  background-color: #1e293b;
+  transform: translateY(-0.5px);
 }
 
 .btn-pill-secondary {
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #E2E8F0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
   padding: 0.45rem 1.15rem;
   font-size: 0.8125rem;
   font-weight: 500;
@@ -129,15 +122,15 @@ code, pre, .font-mono {
   cursor: pointer;
 }
 .btn-pill-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #FFFFFF;
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -145,23 +138,19 @@ code, pre, .font-mono {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.24);
+  background: #94a3b8;
 }
 
-/* Subtle Animated Mesh Background */
 .mesh-glow {
-  background: 
-    radial-gradient(circle at 18% 12%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 82% 16%, rgba(139, 92, 246, 0.09) 0%, transparent 50%),
-    radial-gradient(circle at 50% 65%, rgba(6, 182, 212, 0.05) 0%, transparent 55%);
+  background: radial-gradient(circle at 18% 12%, rgba(16, 185, 129, 0.03) 0%, transparent 45%);
 }
 
 .grid-backdrop {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-image: radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
 }

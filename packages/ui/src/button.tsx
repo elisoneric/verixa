@@ -40,27 +40,27 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       default:
-        "bg-zinc-900 text-white hover:bg-zinc-800 shadow-sm active:scale-[0.99] border border-zinc-900 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-100 dark:border-zinc-200",
+        "bg-slate-900 text-white hover:bg-slate-800 shadow-sm active:scale-[0.99] border border-slate-900",
       emerald:
         "bg-emerald-600 text-white font-semibold hover:bg-emerald-500 shadow-sm shadow-emerald-600/20 active:scale-[0.99]",
       secondary:
-        "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 border border-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700 dark:border-zinc-700",
+        "bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 shadow-2xs hover:text-slate-900",
       subtle:
-        "bg-zinc-100/80 text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900 border border-zinc-200 dark:bg-zinc-900/60 dark:text-zinc-300 dark:hover:bg-zinc-800/80 dark:hover:text-white dark:border-zinc-800",
+        "bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 border border-slate-200",
       outline:
-        "border border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-50 hover:text-zinc-950 shadow-2xs dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white",
+        "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-2xs",
       ghost:
-        "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800/70",
+        "text-slate-600 hover:text-slate-900 hover:bg-slate-100",
       destructive:
         "bg-rose-600 text-white hover:bg-rose-500 shadow-sm shadow-rose-600/20",
       link:
-        "text-emerald-600 dark:text-emerald-400 underline-offset-4 hover:underline p-0 h-auto font-normal",
+        "text-emerald-600 underline-offset-4 hover:underline p-0 h-auto font-normal",
       pill:
-        "bg-white text-zinc-950 hover:bg-zinc-200 rounded-full font-semibold shadow-sm active:scale-[0.99]",
+        "bg-slate-900 text-white hover:bg-slate-800 rounded-full font-semibold shadow-sm active:scale-[0.99]",
       glassy:
-        "bg-white/[0.05] hover:bg-white/[0.1] text-zinc-200 border border-white/[0.08] rounded-full backdrop-blur-md active:scale-[0.99]",
+        "bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 rounded-full shadow-2xs active:scale-[0.99]",
       "emerald-pill":
-        "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold rounded-full shadow-sm shadow-emerald-500/20 active:scale-[0.99]",
+        "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-full shadow-sm shadow-emerald-600/20 active:scale-[0.99]",
     }
 
     const sizes = {
