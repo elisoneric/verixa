@@ -271,7 +271,8 @@ export default function NinDocsPage() {
     "residence_lga": "Lagos West",
     "residence_state": "Lagos",
     "height": "171",
-    "nin_id": "JVBERi0xLjQ…"
+    "nin_id": "JVBERi0xLjQ…",
+    "docxBase64": "UEsDBBQAAAAIA…"
   }
 }`}
         />

@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Forbi
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApiKey } from '../entities/api-key.entity';
-import { Environment } from '../../organizations/entities/environment-config.entity';
+import { Environment, normalizeEnvironment } from '../../organizations/entities/environment-config.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
@@ -59,7 +59,24 @@ export class ApiKeyGuard implements CanActivate {
           const payload = await this.jwtService.verifyAsync(token);
           request.user = payload;
           request.organizationId = payload.org_id;
-          request.environment = payload.environment || Environment.SANDBOX;
+
+          const envHeader = (
+            request.headers['x-environment'] ||
+            request.headers['x-mode'] ||
+            request.headers['environment'] ||
+            request.query?.env ||
+            request.query?.mode ||
+            ''
+          ).toString().toLowerCase();
+
+          if (envHeader === 'live' || envHeader === 'production') {
+            request.environment = Environment.LIVE;
+          } else if (envHeader === 'sandbox' || envHeader === 'test') {
+            request.environment = Environment.SANDBOX;
+          } else {
+            request.environment = payload.environment ? normalizeEnvironment(payload.environment) : Environment.LIVE;
+          }
+
           request.apiKeyId = 'session_token';
           return true;
         } catch {

@@ -42,7 +42,7 @@ export class NinSlipController {
       throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
     }
     const nin = String(body.nin || '').trim();
-    const format = body.format || 'pdf';
+    const format = body.format || 'both';
     return this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
       normalizeEnvironment(req.environment),

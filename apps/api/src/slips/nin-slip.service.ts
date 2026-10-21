@@ -223,8 +223,8 @@ export class NinSlipService {
       data: {
         nin: cleanNin,
         trackingId: identityData.trackingId,
-        fullName: `${identityData.firstName} ${identityData.middleName || ''} ${identityData.surname}`.trim(),
-        pdfBase64: pdfBuffer ? pdfBuffer.toString('base64') : null,
+        nin_id: identityData.nin_id || (pdfBuffer ? pdfBuffer.toString('base64') : null),
+        pdfBase64: identityData.nin_id || (pdfBuffer ? pdfBuffer.toString('base64') : null),
         docxBase64: docxBuffer ? docxBuffer.toString('base64') : null,
         pdfBuffer,
         docxBuffer,

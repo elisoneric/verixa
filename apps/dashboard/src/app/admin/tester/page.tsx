@@ -22,7 +22,7 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
     method: "GET",
     description: "Queries Live Registry GET /api/v1/kyc/nin/nin_slip. Returns complete citizen identity plus base64-encoded PDF (nin_id).",
     defaultParams: {
-      nin: "70123456789",
+      nin: "30882411172",
       consent: true,
     },
   },
@@ -109,7 +109,7 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
 
 export default function AdminTesterPage() {
   const [selectedId, setSelectedId] = React.useState<string>("nin-slip")
-  const [mode, setMode] = React.useState<"live" | "sandbox">("sandbox")
+  const [mode, setMode] = React.useState<"live" | "sandbox">("live")
   const [params, setParams] = React.useState<string>("")
   const [isLoading, setIsLoading] = React.useState(false)
   const [response, setResponse] = React.useState<any | null>(null)
@@ -145,8 +145,8 @@ export default function AdminTesterPage() {
         return
       }
 
-      // Execute endpoint via direct REST call
-      const res = await ApiClient.executeDirectApi(currentEndpoint.path, currentEndpoint.method, parsed)
+      // Execute endpoint via direct REST call with selected environment (live or sandbox)
+      const res = await ApiClient.executeDirectApi(currentEndpoint.path, currentEndpoint.method, parsed, mode)
       const duration = Math.max(15, Math.round(performance.now() - startTime))
       setLatencyMs(duration)
       setHttpStatus(200)

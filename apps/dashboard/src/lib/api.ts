@@ -232,7 +232,12 @@ export class ApiClient {
   }
 
   // Direct Verification Endpoints
-  static async executeDirectApi(path: string, method: "POST" | "GET" | string, payload?: any) {
+  static async executeDirectApi(
+    path: string,
+    method: "POST" | "GET" | string,
+    payload?: any,
+    environment: "live" | "sandbox" | string = "live"
+  ) {
     const isGet = method.toUpperCase() === "GET"
     let url = path
     if (isGet && payload) {
@@ -248,6 +253,9 @@ export class ApiClient {
     }
     return this.request<any>(url, {
       method,
+      headers: {
+        "x-environment": environment,
+      },
       ...(isGet ? {} : { body: payload ? JSON.stringify(payload) : undefined }),
     })
   }
