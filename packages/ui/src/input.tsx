@@ -67,7 +67,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             value={value}
             defaultValue={defaultValue}
             className={cn(
-              "flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:placeholder-transparent shadow-2xs transition-all focus-visible:outline-none focus-visible:border-slate-900 focus-visible:ring-2 focus-visible:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-50",
+              "flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:placeholder-transparent shadow-2xs transition-all focus-visible:outline-none focus-visible:border-slate-900 focus-visible:ring-2 focus-visible:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-50",
               prefixIcon && "pl-10",
               (suffixIcon || copyable) && "pr-10",
               error &&

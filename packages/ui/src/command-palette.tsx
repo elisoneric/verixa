@@ -94,7 +94,7 @@ export function CommandPalette({ isOpen, onClose, items }: CommandPaletteProps) 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type a command, search logs, or go to page..."
-            className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+            className="w-full bg-transparent text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
           />
           <kbd className="hidden sm:inline-flex items-center rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-mono text-slate-500">
             ESC

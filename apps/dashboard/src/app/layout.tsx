@@ -21,10 +21,15 @@ export const viewport: Viewport = {
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_DASHBOARD_URL || "https://verixaid.com"),
+  verification: {
+    google: "googlef8be8c2862597e1b",
+  },
   title: {
     default: "Developer Console — Verixa ID",
     template: "%s | Verixa ID Console",

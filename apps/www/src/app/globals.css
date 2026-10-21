@@ -56,6 +56,24 @@ textarea:focus::placeholder {
   transition: opacity 0.1s ease-out;
 }
 
+/* Prevent iOS Safari from zooming when focusing input fields */
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea,
+  [contenteditable="true"] {
+    font-size: 16px !important;
+  }
+}
+
+/* Prevent horizontal viewport spillover on mobile */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
 /* Otobill / Stripe Clean Light UI System */
 .glass-header {
   background: rgba(255, 255, 255, 0.95);

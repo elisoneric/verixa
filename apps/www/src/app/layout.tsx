@@ -19,11 +19,15 @@ export const viewport: Viewport = {
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_WWW_URL || "https://verixaid.com"),
+  verification: {
+    google: "googlef8be8c2862597e1b",
+  },
   title: {
     default: "Verixa ID — Low-Cost NIN & BVN Verification APIs Nigeria",
     template: "%s | Verixa ID",

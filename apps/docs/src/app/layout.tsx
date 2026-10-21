@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import Link from "next/link";
 import { DocsHeader } from "../components/docs-header";
+import { DocsMobileNav } from "../components/docs-mobile-nav";
+import { DOCS_SECTIONS } from "../lib/navigation";
 import "./globals.css";
 
 const inter = Inter({
@@ -19,10 +21,15 @@ export const viewport: Viewport = {
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_DOCS_URL || "https://docs.verixaid.com"),
+  verification: {
+    google: "googlef8be8c2862597e1b",
+  },
   title: {
     default: "Verixa ID Docs — Low-Cost NIN, BVN & Identity API Reference",
     template: "%s | Verixa ID Docs",
@@ -132,65 +139,6 @@ export default function RootLayout({
     ]
   };
 
-  const sections = [
-    {
-      title: "GET STARTED",
-      links: [
-        { label: "Introduction & Overview", href: "/" },
-        { label: "Authentication & Headers", href: "/authentication" },
-        { label: "Environments & Base URLs", href: "/environments" },
-      ],
-    },
-    {
-      title: "KYC IDENTITY VERIFICATION",
-      links: [
-        { label: "BVN Verification", href: "/bvn" },
-        { label: "NIN Verification", href: "/nin" },
-        { label: "Phone Number Intelligence", href: "/phone" },
-        { label: "Secondary Government IDs", href: "/government-ids" },
-      ],
-    },
-    {
-      title: "KYB CORPORATE VERIFICATION",
-      links: [
-        { label: "CAC Business & TIN", href: "/cac" },
-      ],
-    },
-    {
-      title: "BANKING & FINANCIAL",
-      links: [
-        { label: "Bank Account (NUBAN)", href: "/nuban" },
-        { label: "NUBAN KYC Status", href: "/nuban-kyc" },
-      ],
-    },
-    {
-      title: "BIOMETRICS & RISK INTELLIGENCE",
-      links: [
-        { label: "Biometrics & AML Screening", href: "/biometrics-aml" },
-      ],
-    },
-    {
-      title: "VALUE-ADDED SERVICES",
-      links: [
-        { label: "Airtime & Mobile Data VTU", href: "/airtime-data" },
-        { label: "SMS & WhatsApp OTP", href: "/messaging" },
-      ],
-    },
-    {
-      title: "PLATFORM ARCHITECTURE",
-      links: [
-        { label: "Smart Identity Cache", href: "/smart-cache" },
-        { label: "Wallet Balance API", href: "/balance" },
-        { label: "Billing & Credits", href: "/billing-api" },
-        { label: "Redis Idempotency", href: "/idempotency" },
-        { label: "Webhooks & Signatures", href: "/webhooks" },
-        { label: "Rate Limits", href: "/rate-limits" },
-        { label: "Error Reference", href: "/errors" },
-        { label: "Upcoming Roadmap", href: "/roadmap" },
-      ],
-    },
-  ];
-
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} antialiased`}>
       <head>
@@ -199,16 +147,21 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(docsJsonLd) }}
         />
       </head>
-      <body className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-emerald-500/20 selection:text-emerald-900">
+      <body className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-emerald-500/20 selection:text-emerald-900">
         {/* Modern Docs Header with Back to Homepage */}
         <DocsHeader />
 
+        {/* Mobile Sticky Documentation Menu Sub-Bar & Drawer */}
+        <div className="pt-16 md:hidden w-full">
+          <DocsMobileNav />
+        </div>
+
         {/* Two-Panel Layout with Top Offset for Fixed Header */}
-        <div className="pt-16 flex-1 flex max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+        <div className="md:pt-16 flex-1 flex max-w-7xl mx-auto w-full px-3.5 sm:px-6 lg:px-8 overflow-x-hidden">
           {/* Left Navigation Sidebar */}
           <aside className="hidden md:block w-64 shrink-0 border-r border-slate-200 py-8 pr-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
             <nav className="space-y-6">
-              {sections.map((sec) => (
+              {DOCS_SECTIONS.map((sec) => (
                 <div key={sec.title} className="space-y-1.5">
                   <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 block px-2.5">
                     {sec.title}
@@ -218,9 +171,14 @@ export default function RootLayout({
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="block rounded-lg px-2.5 py-1.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                        className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
                       >
-                        {link.label}
+                        <span className="truncate">{link.label}</span>
+                        {link.badge && (
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0 ml-1">
+                            {link.badge}
+                          </span>
+                        )}
                       </Link>
                     ))}
                   </div>
@@ -230,7 +188,7 @@ export default function RootLayout({
           </aside>
 
           {/* Main Documentation Body */}
-          <main className="flex-1 min-w-0 py-8 md:px-10 lg:px-12 max-w-4xl">
+          <main className="flex-1 min-w-0 py-6 md:py-8 md:px-10 lg:px-12 max-w-4xl overflow-x-hidden">
             {children}
           </main>
         </div>

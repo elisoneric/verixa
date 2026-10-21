@@ -313,8 +313,20 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     </div>
   )
 
+  // Lock body scroll when mobile menu is open
+  React.useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [mobileMenuOpen])
+
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500/20 selection:text-emerald-900 relative">
+    <div className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500/20 selection:text-emerald-900 relative">
       {/* Global Cmd+K Palette */}
       <CommandPalette isOpen={cmdOpen} onClose={() => setCmdOpen(false)} items={commandItems} />
 
@@ -334,7 +346,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           />
 
           {/* Slide-in panel */}
-          <div className="relative w-72 max-w-[80vw] h-full bg-white shadow-2xl flex flex-col z-10 border-r border-slate-200">
+          <div className="relative w-72 max-w-[85vw] h-full bg-white shadow-2xl flex flex-col z-10 border-r border-slate-200">
             {/* Close button at top right */}
             <button
               type="button"
@@ -352,21 +364,28 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Main Content Viewport */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Clean Top Header (Balance Widget removed per user requirement) */}
-        <header className="sticky top-0 z-30 h-16 border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-3 shadow-2xs">
-          {/* Mobile hamburger button */}
-          <div className="flex items-center gap-3">
+      <div className="flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-hidden">
+        {/* Pinned Top Header (Never moves off screen on mobile) */}
+        <header className="sticky top-0 z-30 h-16 w-full max-w-full border-b border-slate-200 bg-white/95 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between gap-2 shadow-2xs shrink-0">
+          {/* Mobile hamburger & brand */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="lg:hidden p-2 -ml-1 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors shrink-0"
               aria-label="Open navigation menu"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
+
+            {/* Mobile Logo Branding */}
+            <div className="lg:hidden flex items-center shrink-0">
+              <Link href="/dashboard" className="flex items-center">
+                <Logo size="sm" badge="CONSOLE" badgeColor="emerald" />
+              </Link>
+            </div>
 
             {/* Quick search button */}
             <button
@@ -385,17 +404,29 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Right Header Navigation Controls */}
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
+            {/* Quick mobile search trigger */}
+            <button
+              type="button"
+              onClick={() => setCmdOpen(true)}
+              className="sm:hidden p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              aria-label="Search"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
             {/* Quick Environment Indicator */}
-            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+            <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100/80 border border-slate-200 px-2 py-1 rounded-full">
               <span className={`w-2 h-2 rounded-full ${environment === "live" ? "bg-emerald-500" : "bg-amber-500"}`} />
-              <span className="capitalize font-medium">{environment}</span>
+              <span className="capitalize font-medium text-[11px] sm:text-xs">{environment}</span>
             </div>
 
             {/* Documentation Link */}
             <AppLink
               app="docs"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-slate-100"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 hover:text-slate-900 transition-colors px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg hover:bg-slate-100"
             >
               <span>Docs</span>
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -406,7 +437,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page Body Viewport */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto min-w-0 overflow-x-hidden">
           {children}
         </main>
       </div>
