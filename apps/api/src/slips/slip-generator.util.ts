@@ -49,6 +49,26 @@ export function resolveSlipPhotoBuffer(photo?: string | Buffer): Buffer | null {
   }
 }
 
+export function wrapText(text: string | undefined, maxCharsPerLine = 28): string[] {
+  if (!text) return [];
+  const words = text.trim().split(/\s+/);
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    if (!currentLine) {
+      currentLine = word;
+    } else if ((currentLine + ' ' + word).length <= maxCharsPerLine) {
+      currentLine += ' ' + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
+
 export async function generateDocxSlip(data: SlipData): Promise<Buffer> {
   const templatePath = getSlipAssetPath('ninslip.docx');
   if (!fs.existsSync(templatePath)) {
@@ -62,8 +82,13 @@ export async function generateDocxSlip(data: SlipData): Promise<Buffer> {
   docXml = docXml.replace(/<w:proofErr[^>]*\/>/g, '');
 
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
-  const cleanTrackingId = data.trackingId ? String(data.trackingId).replace(/[\s-]/g, '') : '';
+  const rawTrackingId = data.trackingId || ((data as any).nin_id && !(data as any).nin_id.startsWith('JVBERi') && (data as any).nin_id.length < 50 ? (data as any).nin_id : '');
+  const cleanTrackingId = rawTrackingId ? String(rawTrackingId).replace(/[\s-]/g, '') : '';
   const genderChar = (data.gender || '').toUpperCase().startsWith('F') ? 'F' : 'M';
+
+  // Word-wrap long addresses across up to 2 lines inside Word text run
+  const addressLines = wrapText((data.address || '').toUpperCase(), 28);
+  const formattedAddress = addressLines.slice(0, 2).join('</w:t><w:br/><w:t>');
 
   const values: Record<string, string> = {
     trackid: cleanTrackingId,
@@ -73,7 +98,7 @@ export async function generateDocxSlip(data: SlipData): Promise<Buffer> {
     middle: (data.middleName || '').toUpperCase(),
     gender: genderChar,
     address1: (data.addressLine1 || '').toUpperCase(),
-    address: (data.address || '').toUpperCase(),
+    address: formattedAddress,
     state: (data.state || '').toUpperCase(),
   };
 
@@ -89,7 +114,7 @@ export async function generateDocxSlip(data: SlipData): Promise<Buffer> {
 
   zip.updateFile('word/document.xml', Buffer.from(docXml, 'utf-8'));
 
-  // Inject photo into both slips (top and duplicate)
+  // Inject photo into slip (image2 is DrawingML, image10 is VML fallback)
   const photoBuffer = resolveSlipPhotoBuffer(data.photo);
   if (photoBuffer) {
     zip.updateFile('word/media/image2.png', photoBuffer);
@@ -146,7 +171,8 @@ export async function generatePdfSlip(data: SlipData): Promise<Buffer> {
   const photoRelYFromTop = emuToPt(781050) + photoHeight;
 
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
-  const cleanTrackingId = data.trackingId ? String(data.trackingId).replace(/[\s-]/g, '') : '';
+  const rawTrackingId = data.trackingId || ((data as any).nin_id && !(data as any).nin_id.startsWith('JVBERi') && (data as any).nin_id.length < 50 ? (data as any).nin_id : '');
+  const cleanTrackingId = rawTrackingId ? String(rawTrackingId).replace(/[\s-]/g, '') : '';
   const genderChar = (data.gender || '').toUpperCase().startsWith('F') ? 'F' : 'M';
 
   const renderSlip = (topOffset: number) => {
@@ -188,36 +214,21 @@ export async function generatePdfSlip(data: SlipData): Promise<Buffer> {
     drawField(data.firstName, 2592677, 1314486, 7.5);
     drawField(data.middleName, 2598833, 1670684, 7.5);
     drawField(genderChar, 2592865, 1972564, 7.5);
-    drawField(data.address, 4104725, 1081024, 7.5);
+
+    // Multi-line address wrapping: if address exceeds 28 chars, wrap to 2nd line
+    const addressLines = wrapText((data.address || '').toUpperCase(), 28);
+    addressLines.slice(0, 2).forEach((line, idx) => {
+      drawField(line, 4104725, 1081024 + idx * 115000, 7.5);
+    });
+
     drawField(data.addressLine1, 4104873, 1881124, 7.5);
     drawField(data.state, 4104873, 2025904, 7.5);
 
     return slipY;
   };
 
-  // 1. Top slip
-  const topSlipY = renderSlip(pageHeight - 25);
-
-  // 2. Tear line in the middle
-  const tearY = topSlipY - 25;
-  page.drawLine({
-    start: { x: bgX, y: tearY },
-    end: { x: bgX + bgWidth, y: tearY },
-    thickness: 0.75,
-    color: rgb(0.65, 0.65, 0.65),
-    dashArray: [4, 4],
-  });
-
-  page.drawText('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  TEAR / CUT HERE  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -', {
-    x: bgX + 20,
-    y: tearY + 4,
-    size: 7,
-    font: fontRegular,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-
-  // 3. Bottom slip (Applicant duplicate)
-  renderSlip(tearY - 25);
+  // Render single official government slip at standard top margin (no duplicate, no tear line)
+  renderSlip(pageHeight - 35);
 
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);

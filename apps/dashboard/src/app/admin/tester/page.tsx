@@ -178,6 +178,31 @@ export default function AdminTesterPage() {
   const ninIdBase64 = entity?.nin_id || entity?.pdfBase64 || null
   const photoBase64 = entity?.photo ? (entity.photo.startsWith("data:") ? entity.photo : `data:image/jpeg;base64,${entity.photo}`) : null
 
+  // Generate Blob URL for base64 PDF to view authentic document
+  const pdfBlobUrl = React.useMemo(() => {
+    if (!ninIdBase64) return null
+    try {
+      const clean = ninIdBase64.replace(/^data:application\/pdf;base64,/, "").replace(/\s/g, "")
+      const byteCharacters = atob(clean)
+      const byteNumbers = new Array(byteCharacters.length)
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i)
+      }
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: "application/pdf" })
+      return URL.createObjectURL(blob)
+    } catch (e) {
+      console.error("Failed to parse PDF blob:", e)
+      return null
+    }
+  }, [ninIdBase64])
+
+  React.useEffect(() => {
+    return () => {
+      if (pdfBlobUrl) URL.revokeObjectURL(pdfBlobUrl)
+    }
+  }, [pdfBlobUrl])
+
   const downloadPdf = () => {
     if (!ninIdBase64) return
     try {
@@ -427,13 +452,19 @@ export default function AdminTesterPage() {
                   </div>
                 </div>
 
-                {/* Slip Visual Image */}
-                <div className="rounded-lg overflow-hidden border border-slate-200 bg-white shadow-xs relative">
-                  <img
-                    src="/filled_mock_nin_slip.jpg"
-                    alt="Official Filled NIN Slip Preview"
-                    className="w-full h-auto object-contain block"
-                  />
+                {/* Authentic Upstream / Generated PDF Slip Viewer */}
+                <div className="rounded-lg overflow-hidden border border-slate-200 bg-slate-900 shadow-xs relative">
+                  {pdfBlobUrl ? (
+                    <iframe
+                      src={`${pdfBlobUrl}#toolbar=0&navpanes=0`}
+                      title="Official Government NIN Slip Preview"
+                      className="w-full h-[680px] border-0 rounded-lg bg-white block"
+                    />
+                  ) : (
+                    <div className="py-16 text-center text-slate-400 text-xs">
+                      No PDF payload received in nin_id or pdfBase64.
+                    </div>
+                  )}
                 </div>
               </div>
 

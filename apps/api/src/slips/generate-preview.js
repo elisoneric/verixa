@@ -55,12 +55,13 @@ async function generatePreview() {
       <text x="567" y="380" class="bold">IFEANYI</text>
       <!-- Gender -->
       <text x="567" y="446" class="bold">M</text>
-      <!-- Address -->
-      <text x="898" y="251" class="regular">14 ADENIRAN OGUNSANYA STREET</text>
-      <!-- Address Line 1 -->
-      <text x="898" y="426" class="regular">SURULERE, IKEJA LGA</text>
+      <!-- Address (Line 1 & Line 2) -->
+      <text x="898" y="246" class="regular">14 ADENIRAN OGUNSANYA STREET</text>
+      <text x="898" y="270" class="regular">SURULERE DISTRICT</text>
+      <!-- Address Line 1 (LGA) -->
+      <text x="898" y="426" class="regular">SURULERE</text>
       <!-- State -->
-      <text x="898" y="458" class="regular">LAGOS STATE</text>
+      <text x="898" y="458" class="regular">LAGOS</text>
     </svg>
   `;
 
