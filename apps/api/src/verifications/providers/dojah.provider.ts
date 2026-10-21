@@ -28,6 +28,7 @@ import {
 import { MockProvider } from './mock.provider';
 import { AdminService } from '../../admin/admin.service';
 import { decryptSecret } from '../../common/utils/crypto.util';
+import { generatePdfSlip } from '../../slips/slip-generator.util';
 
 @Injectable()
 export class DojahProvider implements IVerificationProvider {
@@ -162,6 +163,28 @@ export class DojahProvider implements IVerificationProvider {
       });
 
       const entity = response.data?.entity || {};
+
+      // If Dojah live NDPC call returns all fields but nin_id is not yet populated, synthesize it from slip template
+      if (data.tier === 'slip' && !entity.nin_id && (entity.first_name || entity.firstname)) {
+        try {
+          const pdfBuf = await generatePdfSlip({
+            nin: data.nin,
+            trackingId: entity.tracking_id || entity.trackingId,
+            firstName: entity.first_name || entity.firstname,
+            surname: entity.last_name || entity.surname,
+            middleName: entity.middle_name || entity.middlename,
+            gender: entity.gender,
+            address: entity.residence_address_line_1 || entity.residence_address || entity.address,
+            addressLine1: entity.residence_lga || entity.residence_town || entity.addressLine1,
+            state: entity.residence_state || entity.birth_state || entity.state,
+            photo: entity.photo,
+          });
+          entity.nin_id = pdfBuf.toString('base64');
+        } catch (e: any) {
+          this.logger.warn(`Could not generate fallback slip PDF: ${e?.message}`);
+        }
+      }
+
       return {
         status: 'success',
         data: entity,

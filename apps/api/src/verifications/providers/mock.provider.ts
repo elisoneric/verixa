@@ -23,6 +23,7 @@ import {
 } from './verification.provider.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { faker } from '@faker-js/faker/locale/en_NG';
+import { generatePdfSlip } from '../../slips/slip-generator.util';
 
 @Injectable()
 export class MockProvider implements IVerificationProvider {
@@ -156,22 +157,60 @@ export class MockProvider implements IVerificationProvider {
       photoBase64 = '';
     }
 
+    let ninIdPdfBase64 = '';
+    if (data.isSlip) {
+      try {
+        const pdfBuf = await generatePdfSlip({
+          nin: data.nin,
+          trackingId: trackid,
+          firstName,
+          surname,
+          middleName,
+          gender: gender === 'MALE' ? 'M' : 'F',
+          address: '14 ADENIRAN OGUNSANYA STREET',
+          addressLine1: 'SURULERE, IKEJA LGA',
+          state: 'LAGOS STATE',
+          photo: photoBase64,
+        });
+        ninIdPdfBase64 = pdfBuf.toString('base64');
+      } catch {
+        ninIdPdfBase64 = '';
+      }
+    }
+
     return {
       status: 'success',
       data: {
         nin: data.nin,
-        trackingId: trackid,
+        first_name: firstName,
+        last_name: surname,
+        middle_name: middleName,
         firstName,
         surname,
         middleName,
-        gender,
+        gender: gender === 'MALE' ? 'Male' : 'Female',
+        date_of_birth: '1994-08-16',
         birthdate: '1994-08-16',
-        address: '14 ADENIRAN OGUNSANYA STREET',
-        addressLine1: 'SURULERE, IKEJA LGA',
-        state: 'LAGOS STATE',
-        lga: 'SURULERE',
+        phone_number: `080${faker.string.numeric(8)}`,
         phoneNumber: `080${faker.string.numeric(8)}`,
         photo: photoBase64,
+        employment_status: seed % 2 === 0 ? 'employed' : 'unemployed',
+        marital_status: seed % 3 === 0 ? 'married' : 'single',
+        birth_state: 'Lagos',
+        birth_lga: 'Ikeja',
+        birth_country: 'Nigeria',
+        height: '172',
+        title: gender === 'MALE' ? 'Mr' : 'Ms',
+        email: `${firstName.toLowerCase()}.${surname.toLowerCase()}@example.com`,
+        residence_address_line_1: '14 ADENIRAN OGUNSANYA STREET',
+        address: '14 ADENIRAN OGUNSANYA STREET',
+        addressLine1: 'SURULERE, IKEJA LGA',
+        residence_lga: 'SURULERE',
+        lga: 'SURULERE',
+        residence_state: 'LAGOS STATE',
+        state: 'LAGOS STATE',
+        tracking_id: trackid,
+        trackingId: trackid,
         nextOfKin: {
           firstName: 'FOLAKE',
           middleName: 'ESTHER',
@@ -180,15 +219,9 @@ export class MockProvider implements IVerificationProvider {
           lga: 'SURULERE',
           address: '14 ADENIRAN OGUNSANYA STREET',
         },
-        first_name: firstName,
-        last_name: surname,
-        middle_name: middleName,
-        date_of_birth: '1994-08-16',
-        phone_number: `080${faker.string.numeric(8)}`,
-        residence_address_line_1: '14 ADENIRAN OGUNSANYA STREET',
-        residence_lga: 'SURULERE',
-        residence_state: 'LAGOS STATE',
-        ...(data.isSlip ? { nin_id: 'JVBERi0xLjQKJeLjz9MKMSAwIG9iajw...' } : {}),
+        nok_firstname: 'FOLAKE',
+        nok_lastname: surname,
+        ...(data.isSlip ? { nin_id: ninIdPdfBase64 } : {}),
       },
       meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
     };

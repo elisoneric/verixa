@@ -44,6 +44,15 @@ export interface NinAdvanceResult {
   profession?: string;
   educationalLevel?: string;
   nextOfKin?: any;
+  nin_id?: string;
+  employment_status?: string;
+  marital_status?: string;
+  birth_state?: string;
+  residence_address_line_1?: string;
+  residence_lga?: string;
+  residence_state?: string;
+  height?: string;
+  [key: string]: any;
 }
 
 export interface PhoneNumberVerificationData {
