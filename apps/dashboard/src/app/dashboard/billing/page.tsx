@@ -174,15 +174,26 @@ export default function BillingPage() {
             </div>
 
             <div className="mt-4 flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 tracking-tight">
+              <span className={`text-3xl sm:text-4xl font-extrabold font-mono tracking-tight ${currentBalance < 0 ? 'text-rose-600' : 'text-slate-900'}`}>
                 ₦{currentBalance.toLocaleString()}
               </span>
               <span className="text-sm font-semibold text-slate-500">NGX</span>
+              {currentBalance < 0 && (
+                <Badge variant="failed" size="sm">
+                  OVERDRAFT / PENDING DEPOSIT
+                </Badge>
+              )}
             </div>
 
-            <p className="text-xs text-slate-500 mt-2">
-              Metered real-time deduction. Zero fees on failed lookups.
-            </p>
+            {currentBalance < 0 ? (
+              <p className="text-xs text-rose-600 font-medium mt-2">
+                Operating with post-paid overdraft. Any deposit received via bank transfer or checkout will automatically offset this balance.
+              </p>
+            ) : (
+              <p className="text-xs text-slate-500 mt-2">
+                Metered real-time deduction. Zero fees on failed lookups.
+              </p>
+            )}
           </div>
 
           <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">

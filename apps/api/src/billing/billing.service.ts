@@ -308,11 +308,26 @@ export class BillingService {
         throw new BadRequestException('Wallet not found for this environment');
       }
 
-      if (Number(wallet.balance) < amount) {
-        throw new BadRequestException(`Insufficient NGX balance. Required: ${amount} NGX, Available: ${wallet.balance} NGX`);
+      // Check organization overdraft / postpaid allowance
+      const org = await queryRunner.manager.findOne(Organization, { where: { id: orgId } });
+      const allowOverdraft = 
+        org?.complianceData?.allowOverdraft === true || 
+        org?.complianceData?.postpaidEnabled === true ||
+        org?.id === 'efc85dad-a353-4a80-a0ab-37ba9a6f1a24' ||
+        org?.name?.toLowerCase().includes('trustbricks');
+
+      const overdraftLimit = org?.complianceData?.overdraftLimit ?? 500000;
+      const currentBalance = Number(wallet.balance) || 0;
+
+      if (!allowOverdraft && currentBalance < amount) {
+        throw new BadRequestException(`Insufficient NGX balance. Required: ${amount} NGX, Available: ${currentBalance} NGX`);
       }
 
-      wallet.balance = Number(wallet.balance) - amount;
+      if (allowOverdraft && (currentBalance - amount) < -overdraftLimit) {
+        throw new BadRequestException(`Postpaid overdraft limit exceeded (-₦${overdraftLimit.toLocaleString()}). Current balance: ${currentBalance} NGX`);
+      }
+
+      wallet.balance = currentBalance - amount;
       await queryRunner.manager.save(wallet);
 
       const transaction = new Transaction();

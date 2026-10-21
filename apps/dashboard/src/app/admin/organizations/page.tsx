@@ -62,9 +62,9 @@ export default function AdminOrganizationsPage() {
 
   const handleOpenBalance = (org: any) => {
     setSelectedOrg(org)
-    setAdjAmount("5000")
+    setAdjAmount(org.liveBalance < 0 ? String(Math.abs(Number(org.liveBalance))) : "5000")
     setAdjEnv("live")
-    setAdjReason("Operator Manual Credit")
+    setAdjReason(org.liveBalance < 0 ? "Client Bank Deposit (Offset Overdraft)" : "Bank Deposit Settlement")
     setBalanceModalOpen(true)
   }
 
@@ -94,6 +94,21 @@ export default function AdminOrganizationsPage() {
       fetchOrgs()
     } catch (err: any) {
       alert(err.message || "Failed to update status")
+    }
+  }
+
+  const handleToggleOverdraft = async (org: any) => {
+    const newState = !org.allowOverdraft
+    const msg = newState
+      ? `Enable Postpaid Overdraft for ${org.name}? They will be permitted to make live API calls on negative balance pending a deposit.`
+      : `Disable Postpaid Overdraft for ${org.name}? They will be restricted to prepaid balance only.`
+    if (!confirm(msg)) return
+
+    try {
+      await ApiClient.updateAdminOrgOverdraft(org.id, newState)
+      fetchOrgs()
+    } catch (err: any) {
+      alert(err.message || "Failed to update overdraft setting")
     }
   }
 
@@ -262,15 +277,29 @@ export default function AdminOrganizationsPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={isSuspended ? "failed" : "verified"}
-                      size="sm"
-                    >
-                      {isSuspended ? "SUSPENDED" : "ACTIVE"}
-                    </Badge>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <Badge
+                        variant={isSuspended ? "failed" : "verified"}
+                        size="sm"
+                      >
+                        {isSuspended ? "SUSPENDED" : "ACTIVE"}
+                      </Badge>
+                      {org.allowOverdraft && (
+                        <Badge variant="warning" size="sm" title="Postpaid Overdraft Enabled">
+                          OVERDRAFT OK
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
-                  <TableCell className="font-mono text-xs font-bold text-emerald-600">
-                    ₦{Number(org.liveBalance).toLocaleString()}
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className={`font-mono text-xs font-bold ${Number(org.liveBalance) < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        ₦{Number(org.liveBalance).toLocaleString()}
+                      </span>
+                      {Number(org.liveBalance) < 0 && (
+                        <span className="text-[10px] text-rose-500 font-medium">Pending Deposit</span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="font-mono text-xs text-amber-600">
                     {Number(org.sandboxBalance).toLocaleString()} NGX
@@ -288,6 +317,15 @@ export default function AdminOrganizationsPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1.5">
+                      <Button
+                        size="xs"
+                        variant={org.allowOverdraft ? "outline" : "outline"}
+                        onClick={() => handleToggleOverdraft(org)}
+                        className={org.allowOverdraft ? "text-amber-600 border-amber-300 hover:bg-amber-50" : "text-slate-600"}
+                        title={org.allowOverdraft ? "Postpaid Overdraft Active: Operating on negative balance allowed" : "Prepaid Only"}
+                      >
+                        {org.allowOverdraft ? "Overdraft: ON" : "Overdraft: OFF"}
+                      </Button>
                       <Button
                         size="xs"
                         variant="outline"

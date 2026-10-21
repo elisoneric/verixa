@@ -61,6 +61,10 @@ export class Organization {
     };
     status?: 'active' | 'suspended';
     statusUpdatedAt?: string;
+    allowOverdraft?: boolean;
+    postpaidEnabled?: boolean;
+    overdraftLimit?: number;
+    overdraftUpdatedAt?: string;
   };
 
   @OneToMany(() => User, user => user.organization)

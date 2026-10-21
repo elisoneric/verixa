@@ -495,6 +495,13 @@ export class ApiClient {
     })
   }
 
+  static async updateAdminOrgOverdraft(orgId: string, allowOverdraft: boolean, overdraftLimit?: number) {
+    return this.request<any>(`/v1/admin/organizations/${orgId}/overdraft`, {
+      method: "POST",
+      body: JSON.stringify({ allowOverdraft, overdraftLimit }),
+    })
+  }
+
   static async broadcastAdminPromo(discountPercent: number, title: string) {
     return this.request<any>("/v1/admin/pricing/broadcast", {
       method: "POST",

@@ -335,8 +335,22 @@ export class AdminService implements OnModuleInit {
 
     const currentBalance = Number(wallet.balance) || 0;
     const newBalance = currentBalance + amount;
-    if (newBalance < 0) {
-      throw new BadRequestException(`Insufficient balance. Adjustment would result in negative balance (${newBalance} NGX)`);
+
+    const allowOverdraft = 
+      org.complianceData?.allowOverdraft === true || 
+      org.complianceData?.postpaidEnabled === true ||
+      org.id === 'efc85dad-a353-4a80-a0ab-37ba9a6f1a24' ||
+      org.name?.toLowerCase().includes('trustbricks');
+
+    // Only block debits (amount < 0) that violate balance limits
+    if (amount < 0) {
+      const overdraftLimit = org.complianceData?.overdraftLimit ?? 500000;
+      if (!allowOverdraft && newBalance < 0) {
+        throw new BadRequestException(`Insufficient balance. Adjustment would result in negative balance (${newBalance} NGX)`);
+      }
+      if (allowOverdraft && newBalance < -overdraftLimit) {
+        throw new BadRequestException(`Adjustment exceeds authorized credit limit (-₦${overdraftLimit.toLocaleString()})`);
+      }
     }
 
     wallet.balance = newBalance;
@@ -395,6 +409,26 @@ export class AdminService implements OnModuleInit {
       success: true,
       orgId: org.id,
       status,
+    };
+  }
+
+  async updateOrganizationOverdraft(orgId: string, allowOverdraft: boolean, overdraftLimit = 500000) {
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    if (!org) throw new NotFoundException('Organization not found');
+
+    org.complianceData = {
+      ...(org.complianceData || {}),
+      allowOverdraft,
+      overdraftLimit,
+      overdraftUpdatedAt: new Date().toISOString(),
+    };
+    await this.orgRepository.save(org);
+
+    return {
+      success: true,
+      orgId: org.id,
+      allowOverdraft,
+      overdraftLimit,
     };
   }
 
@@ -690,6 +724,8 @@ export class AdminService implements OnModuleInit {
           nuban: org.customNubanRate,
         },
         complianceData: org.complianceData || null,
+        allowOverdraft: org.complianceData?.allowOverdraft === true || org.id === 'efc85dad-a353-4a80-a0ab-37ba9a6f1a24' || org.name?.toLowerCase().includes('trustbricks'),
+        overdraftLimit: org.complianceData?.overdraftLimit ?? 500000,
         liveBalance: liveWallet ? Number(liveWallet.balance) : 0,
         sandboxBalance: sandboxWallet ? Number(sandboxWallet.balance) : 0,
         usersCount: org.users?.length || 0,

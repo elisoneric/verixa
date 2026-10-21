@@ -96,6 +96,15 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('organizations/:id/overdraft')
+  async updateOrgOverdraft(
+    @Param('id') orgId: string,
+    @Body() body: { allowOverdraft: boolean; overdraftLimit?: number }
+  ) {
+    return this.adminService.updateOrganizationOverdraft(orgId, body.allowOverdraft, body.overdraftLimit);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('organizations/:id/tier')
   async upgradeOrgTier(
     @Param('id') orgId: string,
