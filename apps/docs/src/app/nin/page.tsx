@@ -253,7 +253,7 @@ export default function NinDocsPage() {
 
         <CodeBlock
           language="json"
-          title="HTTP 200 OK Response (NIN Slip)"
+          title="HTTP 200 OK Response (NIN Slip & Card)"
           code={`{
   "entity": {
     "nin": "1*****78910",
@@ -264,15 +264,47 @@ export default function NinDocsPage() {
     "phone_number": "081123456798",
     "gender": "Male",
     "photo": "/9j/4AAQSkZJRg…",
-    "employment_status": "unemployed",
-    "marital_status": "single",
-    "birth_state": "Lagos",
-    "residence_address_line_1": "2, ANON STREET",
-    "residence_lga": "Lagos West",
-    "residence_state": "Lagos",
-    "height": "171",
     "nin_id": "JVBERi0xLjQ…",
-    "docxBase64": "UEsDBBQAAAAIA…"
+    "docxBase64": "UEsDBBQAAAAIA…",
+    "cardPdfBase64": "JVBERi0xLjQ…"
+  }
+}`}
+        />
+      </div>
+
+      {/* Code Examples: Digital NIN Card */}
+      <div className="space-y-4 pt-4 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">4. Digital NIN Card Generator (POST /api/v1/slips/nin/card)</h2>
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          Generates the official NIMC Digital NIN Card (ID-1 credit-card format without residential address), featuring citizen portrait photo, names, DOB, gender, 2D QR verification code, and 11-digit NIN.
+        </p>
+        <CodeBlock
+          language="bash"
+          title="cURL Request (Digital NIN Card)"
+          code={`curl -X POST "https://api.verixaid.com/api/v1/slips/nin/card" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "nin": "70123456789",
+    "consent": true
+  }'`}
+        />
+
+        <CodeBlock
+          language="json"
+          title="HTTP 200 OK Response (Digital NIN Card)"
+          code={`{
+  "status": "success",
+  "data": {
+    "nin": "70123456789",
+    "firstName": "JOHN",
+    "surname": "MUSA",
+    "gender": "MALE",
+    "birthdate": "1990-01-01",
+    "nin_id": "JVBERi0xLjQ…",
+    "pdfBase64": "JVBERi0xLjQ…",
+    "cardPdfBase64": "JVBERi0xLjQ…",
+    "cardSvg": "<svg viewBox=\\"0 0 800 507\\">...</svg>"
   }
 }`}
         />
@@ -280,7 +312,7 @@ export default function NinDocsPage() {
 
       {/* Biometric Face Match */}
       <div className="space-y-4 pt-4 border-t border-slate-200">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">4. NIN Face Match Verification (POST /api/v1/kyc/nin/verify)</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">5. NIN Face Match Verification (POST /api/v1/kyc/nin/verify)</h2>
         <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
           Verify an applicant&apos;s identity with biometric certainty by matching their live captured selfie against the NIMC registry photograph.
         </p>

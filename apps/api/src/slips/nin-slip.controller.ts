@@ -43,12 +43,49 @@ export class NinSlipController {
     }
     const nin = String(body.nin || '').trim();
     const format = body.format || 'both';
+    const cardType = body.cardType || body.type || 'slip';
     return this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
       normalizeEnvironment(req.environment),
       nin,
       format,
       req.apiKeyId,
+      cardType,
+    );
+  }
+
+  // 1b. Dedicated Digital NIN Card Endpoint (ID-1 Format without address)
+  @UseGuards(ApiKeyGuard)
+  @Post('slips/nin/card')
+  async generateCardPostApiKey(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const nin = String(body.nin || '').trim();
+    return this.ninSlipService.generateSlipForOrganization(
+      req.organizationId,
+      normalizeEnvironment(req.environment),
+      nin,
+      'pdf',
+      req.apiKeyId,
+      'card',
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Get('slips/nin/card')
+  async generateCardGetApiKey(@Req() req: any, @Query() query: any) {
+    if (query.consent !== true && query.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const nin = String(query.nin || '').trim();
+    return this.ninSlipService.generateSlipForOrganization(
+      req.organizationId,
+      normalizeEnvironment(req.environment),
+      nin,
+      'pdf',
+      req.apiKeyId,
+      'card',
     );
   }
 
@@ -61,37 +98,47 @@ export class NinSlipController {
     }
     const nin = String(body.nin || '').trim();
     const format = body.format || 'both';
+    const cardType = body.cardType || body.type || 'slip';
     return this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
       normalizeEnvironment(req.environment || 'live'),
       nin,
       format,
       'dashboard_ui',
+      cardType,
     );
   }
 
-  // 3. Direct File Download Endpoint (PDF or DOCX)
+  // 3. Direct File Download Endpoint (PDF, DOCX, or CARD)
   @UseGuards(JwtAuthGuard)
   @Get('dashboard/slips/nin/:nin/download')
   async downloadSlip(
     @Req() req: any,
     @Param('nin') nin: string,
-    @Query('format') format: 'pdf' | 'docx' = 'pdf',
+    @Query('format') format: 'pdf' | 'docx' | 'card' = 'pdf',
     @Res() res: Response,
   ) {
     const cleanNin = String(nin || '').replace(/\D/g, '');
+    const isCard = format === 'card';
     const result = await this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
       normalizeEnvironment(req.environment || 'live'),
       cleanNin,
-      format,
+      'both',
       'dashboard_download',
+      isCard ? 'card' : 'slip',
     );
 
     if (format === 'docx' && result.data.docxBuffer) {
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
       res.setHeader('Content-Disposition', `attachment; filename="NIN_Slip_${cleanNin}.docx"`);
       return res.send(result.data.docxBuffer);
+    }
+
+    if (isCard && result.data.cardPdfBuffer) {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="NIN_Digital_Card_${cleanNin}.pdf"`);
+      return res.send(result.data.cardPdfBuffer);
     }
 
     if (result.data.pdfBuffer) {

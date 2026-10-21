@@ -28,7 +28,7 @@ import {
 import { MockProvider } from './mock.provider';
 import { AdminService } from '../../admin/admin.service';
 import { decryptSecret } from '../../common/utils/crypto.util';
-import { generatePdfSlip, generateDocxSlip } from '../../slips/slip-generator.util';
+import { generatePdfSlip, generateDocxSlip, generateDigitalNinCardPdf, generateDigitalNinCardSvg } from '../../slips/slip-generator.util';
 
 @Injectable()
 export class DojahProvider implements IVerificationProvider {
@@ -203,6 +203,35 @@ export class DojahProvider implements IVerificationProvider {
           entity.docxBase64 = docxBuf.toString('base64');
         } catch (e: any) {
           this.logger.warn(`Could not generate slip DOCX: ${e?.message}`);
+        }
+      }
+
+      // Generate corresponding Digital NIN Card (ID-1 Format without address)
+      if (data.tier === 'slip' && (entity.first_name || entity.firstname)) {
+        try {
+          const cardBuf = await generateDigitalNinCardPdf({
+            nin: data.nin,
+            trackingId: entity.tracking_id || entity.trackingId || entity.nin,
+            firstName: entity.first_name || entity.firstname,
+            surname: entity.last_name || entity.surname,
+            middleName: entity.middle_name || entity.middlename,
+            gender: entity.gender,
+            birthdate: entity.date_of_birth || entity.dob || entity.birthdate,
+            photo: entity.photo,
+          });
+          entity.cardPdfBase64 = cardBuf.toString('base64');
+          entity.cardSvg = await generateDigitalNinCardSvg({
+            nin: data.nin,
+            trackingId: entity.tracking_id || entity.trackingId || entity.nin,
+            firstName: entity.first_name || entity.firstname,
+            surname: entity.last_name || entity.surname,
+            middleName: entity.middle_name || entity.middlename,
+            gender: entity.gender,
+            birthdate: entity.date_of_birth || entity.dob || entity.birthdate,
+            photo: entity.photo,
+          });
+        } catch (e: any) {
+          this.logger.warn(`Could not generate Digital NIN Card: ${e?.message}`);
         }
       }
 

@@ -10,7 +10,14 @@ import { Repository } from 'typeorm';
 import { VerificationLog, VerificationStatus } from '../verifications/entities/verification-log.entity';
 import { Environment, normalizeEnvironment } from '../organizations/entities/environment-config.entity';
 import { NinAdvanceResult } from '../verifications/providers/verification.provider.interface';
-import { generateDocxSlip, generatePdfSlip, getSlipAssetPath, resolveSlipPhotoBuffer } from './slip-generator.util';
+import {
+  generateDocxSlip,
+  generatePdfSlip,
+  generateDigitalNinCardPdf,
+  generateDigitalNinCardSvg,
+  getSlipAssetPath,
+  resolveSlipPhotoBuffer,
+} from './slip-generator.util';
 
 @Injectable()
 export class NinSlipService {
@@ -40,12 +47,29 @@ export class NinSlipService {
     }
   }
 
+  async generateCardPdf(data: NinAdvanceResult): Promise<Buffer> {
+    try {
+      return await generateDigitalNinCardPdf(data);
+    } catch (err: any) {
+      throw new InternalServerErrorException(`Card PDF generation error: ${err?.message}`);
+    }
+  }
+
+  async generateCardSvg(data: NinAdvanceResult): Promise<string> {
+    try {
+      return await generateDigitalNinCardSvg(data);
+    } catch (err: any) {
+      throw new InternalServerErrorException(`Card SVG generation error: ${err?.message}`);
+    }
+  }
+
   async generateSlipForOrganization(
     orgId: string,
     environment: Environment,
     nin: string,
     format: 'pdf' | 'docx' | 'both' = 'pdf',
     apiKeyId?: string,
+    cardType: 'slip' | 'card' = 'slip',
   ) {
     const cleanNin = String(nin || '').replace(/\D/g, '');
     if (cleanNin.length !== 11) {
@@ -186,12 +210,21 @@ export class NinSlipService {
     // 2. Generate requested formats
     let pdfBuffer: Buffer | null = null;
     let docxBuffer: Buffer | null = null;
+    let cardPdfBuffer: Buffer | null = null;
+    let cardSvg: string | null = null;
 
     if (format === 'pdf' || format === 'both') {
       pdfBuffer = await this.generatePdf(identityData);
     }
     if (format === 'docx' || format === 'both') {
       docxBuffer = await this.generateDocx(identityData);
+    }
+
+    try {
+      cardPdfBuffer = await this.generateCardPdf(identityData);
+      cardSvg = await this.generateCardSvg(identityData);
+    } catch (e: any) {
+      this.logger.warn(`Could not generate Digital NIN Card PDF/SVG: ${e?.message}`);
     }
 
     const latencyMs = Math.max(85, Date.now() - startTime);
@@ -209,7 +242,7 @@ export class NinSlipService {
       costDeducted: cost,
       latencyMs,
       cacheKey: this.identityCacheService.generateKey(orgId, validEnv, 'nin', cleanNin),
-      requestPayload: { nin: cleanNin, format },
+      requestPayload: { nin: cleanNin, format, cardType },
       responsePayload: {
         trackingId: identityData.trackingId,
         firstName: identityData.firstName,
@@ -218,16 +251,28 @@ export class NinSlipService {
       },
     });
 
+    const isCard = cardType === 'card';
+    const effectivePdfBuffer = isCard ? cardPdfBuffer : (identityData.nin_id ? Buffer.from(identityData.nin_id, 'base64') : pdfBuffer);
+    const effectivePdfBase64 = isCard ? (cardPdfBuffer ? cardPdfBuffer.toString('base64') : null) : (identityData.nin_id || (pdfBuffer ? pdfBuffer.toString('base64') : null));
+
     return {
       status: 'success',
       data: {
         nin: cleanNin,
         trackingId: identityData.trackingId,
-        nin_id: identityData.nin_id || (pdfBuffer ? pdfBuffer.toString('base64') : null),
-        pdfBase64: identityData.nin_id || (pdfBuffer ? pdfBuffer.toString('base64') : null),
+        firstName: identityData.firstName,
+        surname: identityData.surname,
+        middleName: identityData.middleName,
+        gender: identityData.gender,
+        birthdate: identityData.birthdate,
+        nin_id: effectivePdfBase64,
+        pdfBase64: effectivePdfBase64,
         docxBase64: docxBuffer ? docxBuffer.toString('base64') : null,
-        pdfBuffer,
+        cardPdfBase64: cardPdfBuffer ? cardPdfBuffer.toString('base64') : null,
+        cardSvg,
+        pdfBuffer: effectivePdfBuffer,
         docxBuffer,
+        cardPdfBuffer,
       },
       meta: {
         cached: isCacheHit,
