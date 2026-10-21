@@ -86,11 +86,23 @@ export class MockProvider implements IVerificationProvider {
     }
 
     if (data.tier === 'advance' || data.tier === 'premium' || data.tier === 'slip') {
-      return this.verifyNinAdvance({ nin: data.nin });
+      return this.verifyNinAdvance({ nin: data.nin, isSlip: data.tier === 'slip' });
     }
 
     const firstName = data.firstName?.toUpperCase() || faker.person.firstName().toUpperCase();
     const lastName = data.lastName?.toUpperCase() || faker.person.lastName().toUpperCase();
+
+    let photoBase64 = '';
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const photoPath = path.resolve(__dirname, '../../slips/assets/default_mock_photo.jpg');
+      if (fs.existsSync(photoPath)) {
+        photoBase64 = fs.readFileSync(photoPath).toString('base64');
+      }
+    } catch {
+      photoBase64 = '';
+    }
 
     return {
       status: 'success',
@@ -102,6 +114,7 @@ export class MockProvider implements IVerificationProvider {
         gender: 'Male',
         date_of_birth: '1990-08-14',
         phone_number: `080${faker.string.numeric(8)}`,
+        photo: photoBase64,
         employment_status: 'Employed',
         marital_status: 'Single',
       },
@@ -109,7 +122,7 @@ export class MockProvider implements IVerificationProvider {
     };
   }
 
-  async verifyNinAdvance(data: { nin: string }): Promise<VerificationResponse<any>> {
+  async verifyNinAdvance(data: { nin: string; isSlip?: boolean }): Promise<VerificationResponse<any>> {
     await new Promise(resolve => setTimeout(resolve, 400));
 
     if (data.nin === '00000000000') {
@@ -167,6 +180,15 @@ export class MockProvider implements IVerificationProvider {
           lga: 'SURULERE',
           address: '14 ADENIRAN OGUNSANYA STREET',
         },
+        first_name: firstName,
+        last_name: surname,
+        middle_name: middleName,
+        date_of_birth: '1994-08-16',
+        phone_number: `080${faker.string.numeric(8)}`,
+        residence_address_line_1: '14 ADENIRAN OGUNSANYA STREET',
+        residence_lga: 'SURULERE',
+        residence_state: 'LAGOS STATE',
+        ...(data.isSlip ? { nin_id: 'JVBERi0xLjQKJeLjz9MKMSAwIG9iajw...' } : {}),
       },
       meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
     };

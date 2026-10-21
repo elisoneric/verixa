@@ -201,8 +201,10 @@ export class DojahProvider implements IVerificationProvider {
       return {
         status: 'success',
         data: {
+          ...entity,
           nin: data.nin,
           trackingId,
+          tracking_id: trackingId,
           firstName: entity.firstname || entity.first_name || '',
           surname: entity.surname || entity.last_name || '',
           middleName: entity.middlename || entity.middle_name || '',

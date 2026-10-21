@@ -313,7 +313,7 @@ export class ApiController {
       'nin',
       nin,
       query,
-      95,
+      125,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, ...query, tier: 'basic' }) : this.mockProvider.verifyNin({ nin, ...query, tier: 'basic' }))
     );
   }
@@ -331,7 +331,7 @@ export class ApiController {
       'nin',
       nin,
       payload,
-      95,
+      125,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: payload.tier || 'basic' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: payload.tier || 'basic' }))
     );
   }
@@ -349,7 +349,7 @@ export class ApiController {
       'nin_advance',
       nin,
       query,
-      95,
+      125,
       () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin, ...query }) : this.mockProvider.verifyNinAdvance({ nin, ...query }))
     );
   }
@@ -367,12 +367,12 @@ export class ApiController {
       'nin_advance',
       nin,
       payload,
-      95,
+      125,
       () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin, ...payload }) : this.mockProvider.verifyNinAdvance({ nin, ...payload }))
     );
   }
 
-  // GET /api/v1/kyc/nin/premium
+  // GET & POST /api/v1/kyc/nin/premium
   @UseGuards(ApiKeyGuard)
   @Get('v1/kyc/nin/premium')
   @HttpCode(HttpStatus.OK)
@@ -385,12 +385,30 @@ export class ApiController {
       'nin_premium',
       nin,
       query,
-      125,
+      150,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, tier: 'premium' }))
     );
   }
 
-  // GET /api/v1/kyc/nin/nin_slip
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/nin/premium')
+  @HttpCode(HttpStatus.OK)
+  async postKycNinPremium(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const nin = String(payload.nin || payload.id || '').trim();
+    if (!nin) throw new BadRequestException('nin is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_premium',
+      nin,
+      payload,
+      150,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: 'premium' }))
+    );
+  }
+
+  // GET & POST /api/v1/kyc/nin/nin_slip
   @UseGuards(ApiKeyGuard)
   @Get('v1/kyc/nin/nin_slip')
   @HttpCode(HttpStatus.OK)
@@ -403,8 +421,26 @@ export class ApiController {
       'nin_slip',
       nin,
       query,
-      150,
+      250,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, tier: 'slip' }) : this.mockProvider.verifyNin({ nin, tier: 'slip' }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/nin/nin_slip')
+  @HttpCode(HttpStatus.OK)
+  async postKycNinSlip(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const nin = String(payload.nin || payload.id || '').trim();
+    if (!nin) throw new BadRequestException('nin is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_slip',
+      nin,
+      payload,
+      250,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: 'slip' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: 'slip' }))
     );
   }
 
