@@ -24,20 +24,25 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_DOCS_URL || "https://docs.verixaid.com"),
   title: {
-    default: "Documentation & API Reference — Verixa ID",
+    default: "Verixa ID Docs — Low-Cost NIN, BVN & Identity API Reference",
     template: "%s | Verixa ID Docs",
   },
   description:
-    "Comprehensive developer documentation, endpoint reference, curl examples, and architecture guides for BVN, NIN, CAC, NUBAN, and biometric verification APIs.",
+    "Official developer documentation, curl examples, and REST endpoints for low-cost NIN verification (₦125), BVN validation (₦95), automated NIN slips (₦250), free NUBAN resolution, and sub-15ms Smart Identity Cache (₦38).",
   applicationName: "Verixa ID Docs",
   keywords: [
-    "Verixa API documentation",
-    "BVN API integration",
-    "NIN API Nigeria",
-    "NUBAN lookup docs",
-    "KYC API reference",
-    "Universal Identity API",
+    "NIN and BVN API",
+    "NIN and BVN API low cost",
+    "low cost NIN API Nigeria",
+    "cheap BVN verification API Nigeria",
+    "lowest cost identity API Nigeria",
+    "NIN verification API reference",
+    "BVN validation API docs",
+    "free NUBAN API Nigeria",
+    "automated NIN slip API",
+    "KYC API Nigeria",
     "Smart Identity Cache documentation",
+    "Verixa ID Docs",
   ],
   icons: {
     icon: [
@@ -50,22 +55,32 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    title: "Verixa ID Documentation — Developer API Reference",
+    title: "Verixa ID Docs — Low-Cost NIN, BVN & Identity API Reference",
     description:
-      "Interactive endpoint documentation and implementation guides for African identity verification APIs.",
+      "Official developer documentation and curl examples for low-cost NIN, BVN, CAC, and NUBAN APIs in Nigeria.",
     siteName: "Verixa ID Docs",
-    images: [{ url: "/icon.svg", width: 1200, height: 630 }],
+    images: [{ url: "https://docs.verixaid.com/icon.svg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verixa ID Documentation & API Reference",
-    description: "Explore endpoints for identity, KYB, and bank account resolution.",
+    title: "Verixa ID Docs — Low-Cost NIN, BVN & Identity API Reference",
+    description: "Explore low-cost endpoints for NIN, BVN, CAC, and NUBAN resolution.",
     creator: "@verixaid",
-    images: ["/icon.svg"],
+    images: ["https://docs.verixaid.com/icon.svg"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://docs.verixaid.com",
   },
 };
 
@@ -74,6 +89,49 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Google Search Console Site Name & Breadcrumbs Schema
+  const docsJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://docs.verixaid.com/#website",
+        "url": "https://docs.verixaid.com",
+        "name": "Verixa ID Docs",
+        "alternateName": [
+          "Verixa Documentation",
+          "Verixa API Reference",
+          "Verixa Docs"
+        ],
+        "description": "Developer Documentation & API Reference for Low-Cost NIN, BVN, CAC, and Banking APIs",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Verixa ID",
+          "url": "https://verixaid.com",
+          "logo": "https://verixaid.com/icon.svg"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://docs.verixaid.com/#breadcrumbs",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Verixa ID",
+            "item": "https://verixaid.com"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "API Documentation",
+            "item": "https://docs.verixaid.com"
+          }
+        ]
+      }
+    ]
+  };
+
   const sections = [
     {
       title: "GET STARTED",
@@ -135,6 +193,12 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} antialiased`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(docsJsonLd) }}
+        />
+      </head>
       <body className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-emerald-500/20 selection:text-emerald-900">
         {/* Modern Docs Header with Back to Homepage */}
         <DocsHeader />

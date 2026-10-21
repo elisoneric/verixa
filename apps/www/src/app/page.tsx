@@ -321,15 +321,15 @@ export default function HomePage() {
               <div>
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-xs font-medium mb-3">
                   <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Built for fintechs, digital lenders, betting platforms, and businesses that require secure, authorized identity verification.
+                  Nigeria&apos;s Lowest-Cost Identity Verification APIs • 99.9% Registry Uptime SLA
                 </div>
 
                 <h1 className="mt-2 font-display text-4xl sm:text-5xl lg:text-6xl font-[450] leading-[1.08] tracking-tight text-white text-balance">
-                  Identity Verification APIs Built for Business
+                  Low-Cost NIN &amp; BVN Verification APIs
                 </h1>
 
                 <p className="mt-5 text-base sm:text-lg text-zinc-400 max-w-xl leading-relaxed">
-                  Verify identity information, validate customer details, and streamline digital onboarding with reliable NIN, BVN, and bank account verification APIs.
+                  The most reliable, low-cost identity verification APIs in Nigeria. Verify NIN (₦125), BVN (₦95), and free NUBAN bank accounts with sub-15ms Smart Cache (50% discount), automated NIN slip generator, and zero setup fees.
                 </p>
 
                 {/* Pill Action CTAs */}
@@ -650,10 +650,10 @@ export default function HomePage() {
                   TRANSPARENT USAGE PRICING
                 </span>
                 <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-white">
-                  APIs & usage pricing
+                  Low-Cost NIN, BVN &amp; Identity API Pricing
                 </h2>
                 <p className="mt-4 text-zinc-400 max-w-xl text-sm sm:text-base leading-relaxed">
-                  No monthly seat fees or maintenance retainers. Prepaid credits billed per query with built-in Smart Cache repeat discounts up to 50% and wholesale telecom rates.
+                  Nigeria&apos;s lowest verification rates. No monthly seat fees or maintenance retainers. Low-cost NIN (₦125), BVN (₦95), and free NUBAN account validation, with built-in Smart Cache repeat discounts up to 50% (from ₦38).
                 </p>
               </div>
 

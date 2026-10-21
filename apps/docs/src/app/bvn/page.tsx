@@ -1,8 +1,55 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "BVN Verification API (Low-Cost ₦95) — NIBSS Lookup & Demographics",
+  description:
+    "Low-cost BVN verification API for Nigerian fintechs. Verify 11-digit BVN records, validate full demographics, branch codes, and biometric face match from ₦38 with Smart Cache.",
+  keywords: [
+    "BVN verification API",
+    "BVN API Nigeria",
+    "cheap BVN verification API",
+    "low cost BVN lookup",
+    "NIBSS BVN API",
+    "BVN face match API",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/bvn",
+  },
+}
+
 export default function BvnDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "BVN Verification API",
+        "item": "https://docs.verixaid.com/bvn",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">

@@ -1,8 +1,53 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "API Authentication & Security Headers | Verixa ID Docs",
+  description:
+    "Universal REST API authentication guide for Verixa ID. Learn how to pass secret keys with Authorization Bearer and AppId headers with O(1) indexed token verification.",
+  keywords: [
+    "Verixa API authentication",
+    "API key format",
+    "Bearer token headers",
+    "NIN BVN API security",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/authentication",
+  },
+}
+
 export default function AuthenticationDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Authentication & Headers",
+        "item": "https://docs.verixaid.com/authentication",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">SECURITY & HEADERS</Badge>

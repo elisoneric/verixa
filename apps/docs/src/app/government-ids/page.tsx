@@ -1,8 +1,53 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Driver's License, Voter's Card & Passport Verification API | Verixa ID",
+  description:
+    "Low-cost statutory identity verification APIs for FRSC Driver's Licenses, INEC Voter's Cards (VIN), and Nigerian International Passports.",
+  keywords: [
+    "Driver's License verification API Nigeria",
+    "INEC VIN verification API",
+    "Nigerian passport verification API",
+    "government ID API Nigeria",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/government-ids",
+  },
+}
+
 export default function GovernmentIdsDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Secondary Government IDs",
+        "item": "https://docs.verixaid.com/government-ids",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">

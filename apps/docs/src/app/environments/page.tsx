@@ -1,8 +1,53 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Sandbox Testing & Production Environments | Verixa ID Docs",
+  description:
+    "Test NIN and BVN API integrations risk-free with Verixa's Sandbox simulator. Free mock test keys, realistic Nigerian KYC response generation, and zero live charges.",
+  keywords: [
+    "NIN API sandbox",
+    "BVN API test environment",
+    "mock KYC API",
+    "Nigerian identity sandbox test keys",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/environments",
+  },
+}
+
 export default function EnvironmentsDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Environments & Testing",
+        "item": "https://docs.verixaid.com/environments",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="mono">ARCHITECTURE</Badge>

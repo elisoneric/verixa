@@ -1,6 +1,46 @@
+import type { Metadata } from "next"
 import { Badge, Card, CardHeader, CardTitle, CardContent } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "API Roadmap & Upcoming Registry Integrations | Verixa ID Docs",
+  description:
+    "Product roadmap for upcoming identity verification registries, biometric matching features, and enterprise KYB tooling on Verixa ID.",
+  keywords: [
+    "Verixa ID roadmap",
+    "upcoming identity APIs",
+    "KYC API features",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/roadmap",
+  },
+}
+
 export default function RoadmapDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Roadmap",
+        "item": "https://docs.verixaid.com/roadmap",
+      },
+    ],
+  }
+
   const futureApis = [
     {
       name: "CAC Corporate Entity (KYB)",

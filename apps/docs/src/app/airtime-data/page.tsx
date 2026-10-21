@@ -1,8 +1,55 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Airtime & SME Mobile Data API (Nigeria VTU) | Verixa ID",
+  description:
+    "Low-cost, high-speed VTU airtime and SME mobile data vending APIs for MTN, Airtel, Glo, and 9mobile. Multi-aggregator failover with instant webhooks.",
+  keywords: [
+    "airtime API Nigeria",
+    "mobile data API",
+    "VTU API Nigeria",
+    "SME data vending API",
+    "cheap airtime API",
+    "telecom API Nigeria",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/airtime-data",
+  },
+}
+
 export default function AirtimeDataDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Airtime & Mobile Data API",
+        "item": "https://docs.verixaid.com/airtime-data",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">POST</Badge>

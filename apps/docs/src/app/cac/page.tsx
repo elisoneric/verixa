@@ -1,8 +1,54 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "CAC Company Verification API (Low-Cost KYB) — Corporate Affairs Commission",
+  description:
+    "Low-cost CAC company verification API. Validate registered Nigerian RC / BN numbers, directors, share capital, and TIN with instant JSON response.",
+  keywords: [
+    "CAC verification API",
+    "CAC company lookup API",
+    "KYB API Nigeria",
+    "corporate verification API Nigeria",
+    "TIN verification API",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/cac",
+  },
+}
+
 export default function CacDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "CAC Corporate Verification API",
+        "item": "https://docs.verixaid.com/cac",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">

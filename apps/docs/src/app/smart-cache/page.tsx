@@ -1,8 +1,54 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Smart Identity Cache (50% Cost Reduction & Sub-15ms) | Verixa ID",
+  description:
+    "Slash NIN & BVN verification API costs by 50% with Smart Identity Cache. Sub-15ms cached lookups from ₦38 with isolated tenant security.",
+  keywords: [
+    "Smart Identity Cache",
+    "cheap NIN verification API",
+    "discounted BVN lookup",
+    "sub-15ms identity API",
+    "low cost identity verification",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/smart-cache",
+  },
+}
+
 export default function SmartCacheDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Smart Identity Cache",
+        "item": "https://docs.verixaid.com/smart-cache",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">

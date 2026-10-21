@@ -1,8 +1,53 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "API Rate Limits, Burst Quotas & Throughput | Verixa ID Docs",
+  description:
+    "Throughput capacity, burst quotas, and rate limiting headers across Sandbox and Production environments on Verixa ID.",
+  keywords: [
+    "API rate limits",
+    "verification throughput",
+    "burst quotas",
+    "HTTP 429 too many requests",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/rate-limits",
+  },
+}
+
 export default function RateLimitsDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Rate Limits & Quotas",
+        "item": "https://docs.verixaid.com/rate-limits",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="mono">THROTTLING</Badge>

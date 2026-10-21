@@ -1,11 +1,11 @@
 {
   "name": "Verixa ID",
   "short_name": "Verixa",
-  "description": "Enterprise identity verification and KYC infrastructure",
+  "description": "Low-Cost NIN & BVN Verification APIs Nigeria",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#06070a",
-  "theme_color": "#10b981",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
   "icons": [
     {
       "src": "/icon.svg",

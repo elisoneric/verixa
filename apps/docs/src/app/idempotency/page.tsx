@@ -1,8 +1,52 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "API Idempotency & Zero Double-Charge Guarantee | Verixa ID Docs",
+  description:
+    "Prevent accidental double billing during API retries and network timeouts using Redis-backed Idempotency-Key headers with Verixa ID.",
+  keywords: [
+    "API idempotency key",
+    "prevent double billing API",
+    "idempotent verification request",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/idempotency",
+  },
+}
+
 export default function IdempotencyDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Redis Idempotency Keys",
+        "item": "https://docs.verixaid.com/idempotency",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="mono">CACHE</Badge>

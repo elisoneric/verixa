@@ -1,8 +1,53 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Wallet Balance & Virtual Account API (Free ₦0) | Verixa ID Docs",
+  description:
+    "Free, sub-15ms programmatic wallet balance and dedicated virtual account resolution API for Nigerian fintechs and developers using Verixa ID.",
+  keywords: [
+    "wallet balance API",
+    "prepaid credit query API",
+    "virtual account API",
+    "free balance API",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/balance",
+  },
+}
+
 export default function BalanceDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Wallet Balance API",
+        "item": "https://docs.verixaid.com/balance",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">

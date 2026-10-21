@@ -1,8 +1,54 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Free NUBAN Resolution API — Nigerian Bank Account Name Lookup",
+  description:
+    "100% Free NUBAN bank account resolution API for Nigerian fintechs. Instant account holder name verification across all commercial banks and mobile wallets.",
+  keywords: [
+    "free NUBAN API Nigeria",
+    "bank account resolution API",
+    "NUBAN lookup API",
+    "account name verification Nigeria",
+    "free bank validation API",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/nuban",
+  },
+}
+
 export default function NubanDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "NUBAN Resolution API",
+        "item": "https://docs.verixaid.com/nuban",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">

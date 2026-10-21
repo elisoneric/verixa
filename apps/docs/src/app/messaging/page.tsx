@@ -1,8 +1,54 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "SMS & WhatsApp OTP Messaging API (₦5.00) | Verixa ID",
+  description:
+    "Low-cost transactional SMS and WhatsApp OTP messaging API for Nigerian applications. High deliverability across MTN, Airtel, Glo, and 9mobile at ₦5.00/SMS.",
+  keywords: [
+    "SMS OTP API Nigeria",
+    "WhatsApp OTP API",
+    "cheap SMS API Nigeria",
+    "transactional SMS gateway",
+    "bulk SMS API",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/messaging",
+  },
+}
+
 export default function MessagingDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "SMS & WhatsApp Messaging",
+        "item": "https://docs.verixaid.com/messaging",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">POST</Badge>

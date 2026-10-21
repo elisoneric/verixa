@@ -1,8 +1,53 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Client Payment & Wallet Top-Up API | Verixa ID Docs",
+  description:
+    "Integrate payment checkouts, Paystack popup modals, and dedicated Nigerian virtual accounts directly into your applications to fund Verixa NGX credits automatically.",
+  keywords: [
+    "Verixa payment API",
+    "wallet top up API",
+    "dedicated virtual account API Nigeria",
+    "Paystack modal integration",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/billing-api",
+  },
+}
+
 export default function BillingApiDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Billing & Payments API",
+        "item": "https://docs.verixaid.com/billing-api",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">PAYMENT &amp; BILLING API</Badge>

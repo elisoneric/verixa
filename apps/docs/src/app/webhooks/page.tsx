@@ -1,8 +1,53 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Webhooks & HMAC SHA-512 Signatures | Verixa ID Docs",
+  description:
+    "Secure event delivery and webhook payload verification using HMAC SHA-512 signatures for payment events, identity verifications, and telecom top-ups.",
+  keywords: [
+    "Verixa webhooks",
+    "HMAC SHA-512 signature verification",
+    "identity webhook events",
+    "fintech webhook security",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/webhooks",
+  },
+}
+
 export default function WebhooksDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Webhooks & Signatures",
+        "item": "https://docs.verixaid.com/webhooks",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">EVENTS</Badge>

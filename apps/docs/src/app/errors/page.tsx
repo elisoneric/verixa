@@ -1,8 +1,53 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "API Error Codes & RFC 7807 Taxonomy | Verixa ID Docs",
+  description:
+    "Standardized API error taxonomies, HTTP status codes, and recovery strategies for Verixa identity verification and payment APIs.",
+  keywords: [
+    "Verixa API errors",
+    "RFC 7807 error codes",
+    "KYC API troubleshooting",
+    "HTTP status codes API",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/errors",
+  },
+}
+
 export default function ErrorsDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Error Reference & Codes",
+        "item": "https://docs.verixaid.com/errors",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="failed">ERROR TAXONOMY</Badge>

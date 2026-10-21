@@ -1,8 +1,53 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "NUBAN KYC Status & Tier Resolution API (₦25) | Verixa ID",
+  description:
+    "Low-cost CBN KYC compliance tier (Tier 1, 2, or 3) and linked national identity status lookup for Nigerian commercial and microfinance bank accounts.",
+  keywords: [
+    "NUBAN KYC tier API",
+    "CBN account tier resolution",
+    "bank account status API Nigeria",
+    "linked BVN bank account check",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/nuban-kyc",
+  },
+}
+
 export default function NubanKycDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "NUBAN KYC Status",
+        "item": "https://docs.verixaid.com/nuban-kyc",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">

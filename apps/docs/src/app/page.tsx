@@ -1,5 +1,23 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Badge, CodeBlock } from "@verixa/ui"
+
+export const metadata: Metadata = {
+  title: "Verixa ID Docs — Low-Cost NIN, BVN & Identity API Reference",
+  description:
+    "Official developer documentation for Verixa ID. Low-cost NIN (₦125), BVN (₦95), and free NUBAN resolution APIs. Comprehensive REST taxonomy, cURL snippets, and sub-15ms Smart Cache.",
+  keywords: [
+    "NIN API documentation",
+    "BVN API documentation",
+    "low cost NIN API",
+    "cheap BVN verification API",
+    "Nigeria KYC API docs",
+    "NUBAN lookup API",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com",
+  },
+}
 
 export default function DocsHomePage() {
   return (

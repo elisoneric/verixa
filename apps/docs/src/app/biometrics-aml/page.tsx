@@ -1,8 +1,55 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Biometrics Face Match & AML Sanctions API | Verixa ID",
+  description:
+    "Automated facial biometric liveness matching against NIN/BVN portraits, PEP screening, OFAC sanctions, and multi-bureau credit scoring APIs for Nigerian fintechs.",
+  keywords: [
+    "biometric face match API",
+    "NIN selfie verification API",
+    "BVN facial verification",
+    "AML sanctions screening API Nigeria",
+    "PEP screening API",
+    "credit score API Nigeria",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/biometrics-aml",
+  },
+}
+
 export default function BiometricsAmlDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Biometrics & AML Screening",
+        "item": "https://docs.verixaid.com/biometrics-aml",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">

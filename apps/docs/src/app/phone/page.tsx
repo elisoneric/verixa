@@ -1,8 +1,54 @@
+import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
+export const metadata: Metadata = {
+  title: "Phone Number Verification & Carrier KYC API (₦85) | Verixa ID",
+  description:
+    "Low-cost Nigerian phone number verification API. Query subscriber identity, telecom carrier intelligence (MTN, Airtel, Glo, 9mobile), and SIM registration status from ₦30 with Smart Cache.",
+  keywords: [
+    "phone number verification API",
+    "Nigeria phone lookup API",
+    "carrier KYC API",
+    "telco subscriber verification Nigeria",
+    "cheap phone validation API",
+  ],
+  alternates: {
+    canonical: "https://docs.verixaid.com/phone",
+  },
+}
+
 export default function PhoneDocsPage() {
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Verixa ID",
+        "item": "https://verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://docs.verixaid.com",
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Phone Intelligence API",
+        "item": "https://docs.verixaid.com/phone",
+      },
+    ],
+  }
+
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
