@@ -45,10 +45,10 @@ export default function AdminLogsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Cluster Verification Logs</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Cluster Verification Logs</h1>
             <Badge variant="mono" size="sm">{total.toLocaleString()} EVENTS</Badge>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Real-time multi-tenant verification audit trails, latency health, cache splits, and upstream routing.
           </p>
         </div>
@@ -68,10 +68,10 @@ export default function AdminLogsPage() {
       </div>
 
       {/* Filter Toolbar */}
-      <Card className="p-4 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
+      <Card className="p-4 bg-white border border-slate-200 shadow-xs">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label className="text-[11px] font-mono font-medium text-slate-500 dark:text-zinc-400 uppercase block mb-1">
+            <label className="text-[11px] font-mono font-medium text-slate-500 uppercase block mb-1">
               Service Filter
             </label>
             <select
@@ -80,7 +80,7 @@ export default function AdminLogsPage() {
                 setServiceType(e.target.value)
                 setPage(0)
               }}
-              className="w-full text-xs rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-slate-900 dark:text-zinc-100 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
+              className="w-full text-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
             >
               <option value="">All Verification Services</option>
               <option value="nin">NIN Standard Lookup</option>
@@ -94,7 +94,7 @@ export default function AdminLogsPage() {
           </div>
 
           <div>
-            <label className="text-[11px] font-mono font-medium text-slate-500 dark:text-zinc-400 uppercase block mb-1">
+            <label className="text-[11px] font-mono font-medium text-slate-500 uppercase block mb-1">
               Status Filter
             </label>
             <select
@@ -103,7 +103,7 @@ export default function AdminLogsPage() {
                 setStatus(e.target.value)
                 setPage(0)
               }}
-              className="w-full text-xs rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-slate-900 dark:text-zinc-100 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
+              className="w-full text-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
             >
               <option value="">All Statuses</option>
               <option value="Success">Success (200 OK)</option>
@@ -112,7 +112,7 @@ export default function AdminLogsPage() {
           </div>
 
           <div>
-            <label className="text-[11px] font-mono font-medium text-slate-500 dark:text-zinc-400 uppercase block mb-1">
+            <label className="text-[11px] font-mono font-medium text-slate-500 uppercase block mb-1">
               Tenant ID Search
             </label>
             <div className="flex gap-2">
@@ -127,7 +127,7 @@ export default function AdminLogsPage() {
                     fetchLogs()
                   }
                 }}
-                className="w-full text-xs rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-slate-900 dark:text-zinc-100 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
+                className="w-full text-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
               />
               <Button
                 variant="outline"
@@ -167,19 +167,19 @@ export default function AdminLogsPage() {
             <TableBody>
               {logs.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell className="font-mono text-xs text-slate-500 dark:text-zinc-400 whitespace-nowrap">
+                  <TableCell className="font-mono text-xs text-slate-500 whitespace-nowrap">
                     {new Date(log.createdAt).toLocaleString()}
                   </TableCell>
-                  <TableCell className="font-medium text-slate-900 dark:text-white">
+                  <TableCell className="font-medium text-slate-900">
                     <div>
                       <span>{log.orgName}</span>
-                      <span className="block font-mono text-[10px] text-slate-400 dark:text-zinc-500">
+                      <span className="block font-mono text-[10px] text-slate-400">
                         {log.orgId ? `${log.orgId.slice(0, 8)}…` : "—"}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-300 dark:border-zinc-700">
+                    <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-slate-100 text-slate-800 border border-slate-300">
                       {log.serviceType.toUpperCase()}
                     </span>
                   </TableCell>
@@ -193,22 +193,22 @@ export default function AdminLogsPage() {
                   </TableCell>
                   <TableCell>
                     {log.isCached ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-emerald-600">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         REDIS CACHE
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-500 dark:text-zinc-400">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-500">
                         UPSTREAM LIVE
                       </span>
                     )}
                   </TableCell>
                   <TableCell className="font-mono text-xs">
-                    <span className={log.latencyMs < 200 ? "text-emerald-600 dark:text-emerald-400 font-semibold" : "text-slate-600 dark:text-zinc-400"}>
+                    <span className={log.latencyMs < 200 ? "text-emerald-600 font-semibold" : "text-slate-600"}>
                       {log.latencyMs}ms
                     </span>
                   </TableCell>
-                  <TableCell className="font-mono text-xs font-bold text-right text-slate-900 dark:text-white">
+                  <TableCell className="font-mono text-xs font-bold text-right text-slate-900">
                     {log.costDeducted > 0 ? `${log.costDeducted} NGX` : "FREE"}
                   </TableCell>
                 </TableRow>
@@ -217,7 +217,7 @@ export default function AdminLogsPage() {
           </Table>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 px-2">
+          <div className="flex items-center justify-between text-xs text-slate-500 px-2">
             <span>
               Showing {logs.length > 0 ? page * pageSize + 1 : 0} to{" "}
               {Math.min((page + 1) * pageSize, total)} of {total.toLocaleString()} records
@@ -231,7 +231,7 @@ export default function AdminLogsPage() {
               >
                 &larr; Previous
               </Button>
-              <span className="px-2 py-1 font-mono font-semibold text-slate-700 dark:text-zinc-300">
+              <span className="px-2 py-1 font-mono font-semibold text-slate-700">
                 Page {page + 1} of {Math.max(1, totalPages)}
               </span>
               <Button

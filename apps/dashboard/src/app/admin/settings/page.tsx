@@ -181,14 +181,14 @@ export default function AdminSettingsPage() {
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">System Configuration & Secrets</h1>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">System Configuration & Secrets</h1>
+        <p className="text-xs sm:text-sm text-slate-500 mt-1">
           Dynamic runtime provider keys, SMTP mail servers, and platform credentials. Values are encrypted at rest with AES-256 envelope encryption.
         </p>
       </div>
 
       {savedSuccess && (
-        <div className="flex items-center gap-2 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+        <div className="flex items-center gap-2 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 text-xs font-semibold">
           <svg className="w-4 h-4 shrink-0 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
@@ -198,11 +198,11 @@ export default function AdminSettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* SMTP Mail Server Configuration Card */}
-        <Card className="p-6 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 space-y-4 shadow-xs">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+        <Card className="p-6 bg-white border border-slate-200 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">SMTP Email Server (Notifications & Alerts)</h3>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
+              <h3 className="text-sm font-bold text-slate-900">SMTP Email Server (Notifications & Alerts)</h3>
+              <p className="text-xs text-slate-500">
                 Dispatches welcome instructions, login alerts, Paystack top-up receipts, and low-balance warnings.
               </p>
             </div>
@@ -233,9 +233,9 @@ export default function AdminSettingsPage() {
                     type="checkbox"
                     checked={smtpSecure}
                     onChange={(e) => setSmtpSecure(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 dark:border-zinc-700 text-emerald-500 focus:ring-emerald-500"
+                    className="h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500"
                   />
-                  <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">SSL / TLS Secure</span>
+                  <span className="text-xs font-semibold text-slate-800">SSL / TLS Secure</span>
                 </label>
               </div>
             </div>
@@ -274,14 +274,14 @@ export default function AdminSettingsPage() {
           </div>
 
           {/* Diagnostic Test Email Section */}
-          <div className="mt-4 pt-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950/60 p-4 rounded-xl space-y-3">
+          <div className="mt-4 pt-4 border-t border-slate-100 bg-slate-50 p-4 rounded-xl space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+              <span className="text-xs font-mono font-bold text-slate-900 uppercase tracking-wider">
                 SMTP Live Delivery Verification
               </span>
               <Badge variant="mono" size="sm">DIAGNOSTIC TOOL</Badge>
             </div>
-            <p className="text-xs text-slate-500 dark:text-zinc-400">
+            <p className="text-xs text-slate-500">
               Send an authenticated diagnostic test message to verify connectivity, TLS handshake, and mailbox delivery.
             </p>
 
@@ -291,7 +291,7 @@ export default function AdminSettingsPage() {
                 placeholder="dev@verixaid.com"
                 value={testEmailRecipient}
                 onChange={(e) => setTestEmailRecipient(e.target.value)}
-                className="flex-1 text-xs rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 focus:placeholder-transparent focus:outline-hidden focus:ring-1 focus:ring-slate-900"
+                className="flex-1 text-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:placeholder-transparent focus:outline-hidden focus:ring-1 focus:ring-slate-900"
               />
               <Button
                 type="button"
@@ -309,8 +309,8 @@ export default function AdminSettingsPage() {
               <div
                 className={`p-3 rounded-lg text-xs font-mono ${
                   testResult.success
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                    : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20"
+                    ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+                    : "bg-rose-500/10 text-rose-600 border border-rose-500/20"
                 }`}
               >
                 {testResult.success ? "✓ " : "✕ "}
@@ -321,11 +321,11 @@ export default function AdminSettingsPage() {
         </Card>
 
         {/* Upstream Gateways & Secret Keys */}
-        <Card className="p-6 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 space-y-4 shadow-xs">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+        <Card className="p-6 bg-white border border-slate-200 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Provider Secret Keys & Authentication</h3>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
+              <h3 className="text-sm font-bold text-slate-900">Provider Secret Keys & Authentication</h3>
+              <p className="text-xs text-slate-500">
                 Paystack virtual account webhooks, primary upstream registry credentials, and Google OAuth GIS.
               </p>
             </div>
@@ -335,7 +335,7 @@ export default function AdminSettingsPage() {
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Paystack Master Secret Key</span>
+                <span className="text-xs font-semibold text-slate-800">Paystack Master Secret Key</span>
                 {configuredKeys["PAYSTACK_SECRET_KEY"] ? (
                   <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -359,7 +359,7 @@ export default function AdminSettingsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Primary Gateway App ID</span>
+                  <span className="text-xs font-semibold text-slate-800">Primary Gateway App ID</span>
                   {configuredKeys["DOJAH_APP_ID"] ? (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -382,7 +382,7 @@ export default function AdminSettingsPage() {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Primary Gateway Secret Key</span>
+                  <span className="text-xs font-semibold text-slate-800">Primary Gateway Secret Key</span>
                   {configuredKeys["DOJAH_SECRET_KEY"] ? (
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -407,7 +407,7 @@ export default function AdminSettingsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">SmileID API Key</span>
+                  <span className="text-xs font-semibold text-slate-800">SmileID API Key</span>
                   {configuredKeys["SMILE_ID_KEY"] ? (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                       CONFIGURED
@@ -429,7 +429,7 @@ export default function AdminSettingsPage() {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">Google OAuth Web Client ID</span>
+                  <span className="text-xs font-semibold text-slate-800">Google OAuth Web Client ID</span>
                   {configuredKeys["GOOGLE_CLIENT_ID"] ? (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                       CONFIGURED

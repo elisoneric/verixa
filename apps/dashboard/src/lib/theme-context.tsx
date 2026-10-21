@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-type Theme = "light" | "dark"
+type Theme = "light"
 
 interface ThemeContextType {
   theme: Theme
@@ -13,32 +13,23 @@ interface ThemeContextType {
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = React.useState<Theme>("light")
+  const [theme] = React.useState<Theme>("light")
 
   React.useEffect(() => {
-    // Default to light theme
-    const savedTheme = (localStorage.getItem("vrx_theme") as Theme) || "light"
-    setThemeState(savedTheme)
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark")
-    } else {
+    // Pure light mode enforcement
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("vrx_theme")
       document.documentElement.classList.remove("dark")
+      document.documentElement.classList.add("light")
     }
   }, [])
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme)
-    localStorage.setItem("vrx_theme", newTheme)
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
+  const setTheme = () => {
+    // No-op: pure light mode only
   }
 
   const toggleTheme = () => {
-    const next = theme === "light" ? "dark" : "light"
-    setTheme(next)
+    // No-op: pure light mode only
   }
 
   return (

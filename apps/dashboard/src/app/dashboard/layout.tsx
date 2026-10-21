@@ -18,10 +18,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-3 border-emerald-600 border-t-transparent dark:border-emerald-400" />
-          <span className="text-xs font-mono font-medium text-slate-500 dark:text-zinc-400">
+          <div className="h-8 w-8 animate-spin rounded-full border-3 border-emerald-600 border-t-transparent" />
+          <span className="text-xs font-mono font-medium text-slate-500">
             Authenticating session...
           </span>
         </div>

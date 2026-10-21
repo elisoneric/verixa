@@ -93,7 +93,7 @@ export function TableCaption({
 }: React.HTMLAttributes<HTMLTableCaptionElement>) {
   return (
     <caption
-      className={cn("mt-4 text-xs text-zinc-400 dark:text-zinc-500", className)}
+      className={cn("mt-4 text-xs text-slate-400", className)}
       {...props}
     />
   )

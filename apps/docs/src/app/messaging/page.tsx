@@ -6,29 +6,29 @@ export default function MessagingDocsPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">POST</Badge>
-          <span className="font-mono text-xs text-sky-400 font-bold">/v1/messaging/sms</span>
+          <span className="font-mono text-xs text-sky-700 font-bold">/v1/messaging/sms</span>
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           SMS & WhatsApp Messaging
         </h1>
-        <p className="mt-2 text-base text-zinc-400 leading-relaxed">
+        <p className="mt-2 text-base text-slate-600 leading-relaxed">
           Deliver transactional OTPs, identity verification alerts, and customer notifications via high-deliverability SMS or WhatsApp gateways.
         </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
-        <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">COST PER SMS</span>
-          <span className="text-emerald-400 font-bold">5 NGX (₦5.00)</span>
+        <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
+          <span className="text-slate-500 block">COST PER SMS</span>
+          <span className="text-emerald-700 font-bold">5 NGX (₦5.00)</span>
         </div>
-        <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">DELIVERY CHANNELS</span>
-          <span className="text-white font-bold">SMS, WhatsApp, Voice</span>
+        <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
+          <span className="text-slate-500 block">DELIVERY CHANNELS</span>
+          <span className="text-slate-900 font-bold">SMS, WhatsApp, Voice</span>
         </div>
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-lg font-bold text-white tracking-tight">Request Parameters</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Request Parameters</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -40,41 +40,41 @@ export default function MessagingDocsPage() {
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell className="font-mono text-emerald-400 font-bold">destination</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">Recipient mobile number (e.g. 2348012345678).</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">destination</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">Recipient mobile number (e.g. 2348012345678).</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-emerald-400 font-bold">message</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">Text content of the notification message.</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">message</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">Text content of the notification message.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">channel</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Delivery channel: <code className="text-sky-300 font-mono">sms</code> (default), <code className="text-sky-300 font-mono">whatsapp</code>, or <code className="text-sky-300 font-mono">voice</code>.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">channel</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Delivery channel: <code className="text-sky-700 font-mono">sms</code> (default), <code className="text-sky-700 font-mono">whatsapp</code>, or <code className="text-sky-700 font-mono">voice</code>.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">senderId</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Approved alphanumeric Sender ID tag.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">senderId</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Approved alphanumeric Sender ID tag.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">priority</TableCell>
-              <TableCell className="font-mono text-zinc-400">boolean</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Deliver via high-priority priority gateway (default: false).</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">priority</TableCell>
+              <TableCell className="font-mono text-slate-600">boolean</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Deliver via high-priority priority gateway (default: false).</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-lg font-bold text-white tracking-tight">Example Request & Response</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Example Request & Response</h2>
         <CodeBlock
           language="bash"
           title="cURL Request"

@@ -23,40 +23,45 @@ export function CodeBlock({
   const [activeTab, setActiveTab] = React.useState(0)
   const [copied, setCopied] = React.useState(false)
 
-  const currentCode = tabs ? tabs[activeTab].code : code
-  const currentLang = tabs ? tabs[activeTab].language || language : language
+  const currentCode = tabs ? tabs[activeTab]?.code ?? code : code
+  const currentLang = tabs ? tabs[activeTab]?.language || language : language
 
   const handleCopy = () => {
-    if (typeof navigator !== "undefined") {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
       navigator.clipboard.writeText(currentCode)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
   }
 
-  const lines = currentCode.trim().split("\n")
+  const lines = currentCode ? currentCode.replace(/\r\n/g, "\n").split("\n") : []
+  // Trim trailing empty line if code ends with newline
+  if (lines.length > 1 && lines[lines.length - 1].trim() === "") {
+    lines.pop()
+  }
 
   return (
     <div
       className={cn(
-        "rounded-xl border border-zinc-800 bg-zinc-950 shadow-2xl overflow-hidden font-mono text-xs text-left",
+        "group relative rounded-xl border border-slate-800 bg-[#0d1117] shadow-xl overflow-hidden font-mono text-left my-4 transition-all",
         className
       )}
       {...props}
     >
       {/* Header bar */}
-      <div className="flex items-center justify-between border-b border-zinc-800/80 bg-zinc-900/60 px-4 py-2">
-        {tabs ? (
-          <div className="flex items-center gap-1 -ml-1">
+      <div className="flex items-center justify-between border-b border-slate-800/80 bg-[#161b22] px-3.5 py-2 select-none min-h-[40px]">
+        {tabs && tabs.length > 0 ? (
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-0.5">
             {tabs.map((tab, idx) => (
               <button
                 key={tab.label}
+                type="button"
                 onClick={() => setActiveTab(idx)}
                 className={cn(
-                  "px-3 py-1 rounded-md text-xs font-medium transition-colors select-none",
+                  "px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap",
                   activeTab === idx
-                    ? "bg-zinc-800 text-emerald-400 font-semibold border border-zinc-700/80"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "bg-slate-800 text-emerald-400 font-semibold shadow-xs border border-slate-700/70"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
                 )}
               >
                 {tab.label}
@@ -64,19 +69,39 @@ export function CodeBlock({
             ))}
           </div>
         ) : (
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-            <span className="text-zinc-400 font-medium">{title || currentLang}</span>
+          <div className="flex items-center gap-2.5">
+            {/* Terminal window dots */}
+            <div className="flex items-center gap-1.5 opacity-80">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
+            </div>
+            <span className="text-[11px] font-mono font-semibold tracking-wider uppercase text-slate-400 pl-1">
+              {title || currentLang}
+            </span>
           </div>
         )}
 
+        {/* Copy action */}
         <button
+          type="button"
           onClick={handleCopy}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-          title="Copy code"
+          className={cn(
+            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs transition-colors cursor-pointer shrink-0 ml-2 font-sans font-medium",
+            copied
+              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 border border-transparent"
+          )}
+          title="Copy code to clipboard"
+          aria-label="Copy code to clipboard"
         >
           {copied ? (
-            <span className="text-emerald-400 font-semibold text-[11px]">COPIED</span>
+            <>
+              <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-[11px] font-semibold text-emerald-400">Copied</span>
+            </>
           ) : (
             <>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,22 +113,24 @@ export function CodeBlock({
         </button>
       </div>
 
-      {/* Code contents */}
-      <div className="p-4 overflow-x-auto leading-relaxed bg-zinc-950/90 text-zinc-200">
-        <pre className="m-0 font-mono">
-          <code>
+      {/* Code viewport with rock-solid table alignment */}
+      <div className="p-3.5 sm:p-4 overflow-x-auto bg-[#0d1117]">
+        <table className="w-full border-collapse font-mono text-xs sm:text-[13px] leading-relaxed text-left">
+          <tbody>
             {lines.map((line, i) => (
-              <div key={i} className="table-row">
+              <tr key={i} className="hover:bg-white/[0.02]">
                 {showLineNumbers && (
-                  <span className="table-cell select-none pr-4 text-right text-zinc-600 font-mono text-[11px]">
+                  <td className="w-8 select-none pr-3 pl-0 py-0.5 text-right align-top text-slate-600 font-mono text-[11px]">
                     {i + 1}
-                  </span>
+                  </td>
                 )}
-                <span className="table-cell whitespace-pre">{line}</span>
-              </div>
+                <td className="py-0.5 px-0 align-top whitespace-pre text-slate-200 font-mono">
+                  {line || "\u00A0"}
+                </td>
+              </tr>
             ))}
-          </code>
-        </pre>
+          </tbody>
+        </table>
       </div>
     </div>
   )

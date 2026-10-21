@@ -7,31 +7,31 @@ export default function NubanKycDocsPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">UNIVERSAL TAXONOMY</Badge>
-          <span className="font-mono text-xs text-indigo-400 font-bold">/api/v1/kyc/nuban/status</span>
+          <span className="font-mono text-xs text-indigo-700 font-bold">/api/v1/kyc/nuban/status</span>
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           NUBAN KYC Status & Linked Identity Tier
         </h1>
-        <p className="mt-2 text-base text-zinc-400 leading-relaxed">
+        <p className="mt-2 text-base text-slate-600 leading-relaxed">
           Retrieve the CBN KYC compliance tier (Tier 1, 2, or 3) and linked national identity status associated with any Nigerian commercial or microfinance bank account.
         </p>
       </div>
 
       {/* Pricing and SLA Chips */}
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
-        <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">COST</span>
-          <span className="text-emerald-400 font-bold">25 NGX (₦25.00)</span>
+        <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
+          <span className="text-slate-500 block">COST</span>
+          <span className="text-emerald-700 font-bold">25 NGX (₦25.00)</span>
         </div>
-        <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">TARGET SLA</span>
-          <span className="text-white font-bold">&lt; 180ms</span>
+        <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
+          <span className="text-slate-500 block">TARGET SLA</span>
+          <span className="text-slate-900 font-bold">&lt; 180ms</span>
         </div>
       </div>
 
       {/* Query Parameters Table */}
-      <div className="space-y-3 pt-4 border-t border-zinc-800">
-        <h2 className="text-lg font-bold text-white tracking-tight">Query Parameters</h2>
+      <div className="space-y-3 pt-4 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Query Parameters</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -43,24 +43,24 @@ export default function NubanKycDocsPage() {
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell className="font-mono text-emerald-400 font-bold">account_number</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">10-digit NUBAN bank account number.</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">account_number</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">10-digit NUBAN bank account number.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-emerald-400 font-bold">bank_code</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">CBN bank code (e.g. <code className="text-sky-300 font-mono">058</code> for GTBank, <code className="text-sky-300 font-mono">011</code> for First Bank).</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">bank_code</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">CBN bank code (e.g. <code className="text-sky-700 font-mono">058</code> for GTBank, <code className="text-sky-700 font-mono">011</code> for First Bank).</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
 
       {/* Example Request & Response */}
-      <div className="space-y-4 pt-4 border-t border-zinc-800">
-        <h2 className="text-lg font-bold text-white tracking-tight">Example Request & Response (Universal Taxonomy)</h2>
+      <div className="space-y-4 pt-4 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Example Request & Response (Universal Taxonomy)</h2>
         <CodeBlock
           language="bash"
           title="cURL Request"

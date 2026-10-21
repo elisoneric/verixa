@@ -7,31 +7,31 @@ export default function SmartCacheDocsPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">PERFORMANCE & PRICING</Badge>
-          <span className="font-mono text-xs text-zinc-500">SMART IDENTITY CACHE</span>
+          <span className="font-mono text-xs text-slate-500">SMART IDENTITY CACHE</span>
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Smart Identity Cache & Billing
         </h1>
-        <p className="mt-2 text-base text-zinc-400 leading-relaxed">
+        <p className="mt-2 text-base text-slate-600 leading-relaxed">
           Accelerate recurring identity lookups to sub-15ms and slash verification costs by 50% with Verixa's automated identity caching engine.
         </p>
       </div>
 
       {/* How It Works Section */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-white tracking-tight">How Smart Cache Works</h2>
-        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">How Smart Cache Works</h2>
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
           In high-volume applications (e.g., loan repayments, repeat user transactions, or multi-step onboarding), users often trigger multiple verification checks for the same identity record (NIN, BVN, or Bank Account).
         </p>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="p-5 rounded-xl bg-zinc-900/60 border border-zinc-800 space-y-2">
+          <div className="p-5 rounded-xl bg-white shadow-2xs border border-slate-200 space-y-2">
             <div className="flex items-center gap-2">
               <Badge variant="mono" size="sm">STEP 1: FIRST QUERY</Badge>
-              <span className="text-xs text-zinc-400 font-mono">CACHE MISS</span>
+              <span className="text-xs text-slate-600 font-mono">CACHE MISS</span>
             </div>
-            <h4 className="text-sm font-bold text-white">Live Upstream Query</h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">
+            <h4 className="text-sm font-bold text-slate-900">Live Upstream Query</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
               When an identity is verified for the first time, Verixa routes the request to authorized upstream verification registries. The verified payload is stored in Verixa's tenant-isolated in-memory Redis cache with a 30-day retention window. Billed at standard live rate (₦125 NIN / ₦95 BVN).
             </p>
           </div>
@@ -39,10 +39,10 @@ export default function SmartCacheDocsPage() {
           <div className="p-5 rounded-xl bg-gradient-to-br from-zinc-900/80 to-emerald-950/20 border border-emerald-500/30 space-y-2">
             <div className="flex items-center gap-2">
               <Badge variant="verified" size="sm">STEP 2: REPEAT QUERIES</Badge>
-              <span className="text-xs text-emerald-400 font-mono">CACHE HIT</span>
+              <span className="text-xs text-emerald-700 font-mono">CACHE HIT</span>
             </div>
-            <h4 className="text-sm font-bold text-white">Sub-15ms Cache Delivery</h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">
+            <h4 className="text-sm font-bold text-slate-900">Sub-15ms Cache Delivery</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
               Subsequent queries for the same NIN, BVN, or account within 30 days are served instantly from cache memory without querying upstream registries. Billed at 50% automated fee reduction (₦50 for NIN, ₦38 for BVN).
             </p>
           </div>
@@ -51,8 +51,8 @@ export default function SmartCacheDocsPage() {
 
       {/* Pricing Comparison Table */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-white tracking-tight">Live vs Smart Cache Rate Schedule</h2>
-        <p className="text-xs sm:text-sm text-zinc-400">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Live vs Smart Cache Rate Schedule</h2>
+        <p className="text-xs sm:text-sm text-slate-600">
           Smart Cache savings are applied automatically to all Starter, Growth, and Enterprise accounts.
         </p>
 
@@ -68,32 +68,32 @@ export default function SmartCacheDocsPage() {
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell className="font-semibold text-white">BVN Verification</TableCell>
-              <TableCell className="font-mono text-zinc-300">95 NGX (₦95.00)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">38 NGX (₦38.00)</TableCell>
-              <TableCell className="text-emerald-400 font-bold">50% OFF</TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~140ms</TableCell>
+              <TableCell className="font-semibold text-slate-900">BVN Verification</TableCell>
+              <TableCell className="font-mono text-slate-700">95 NGX (₦95.00)</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">38 NGX (₦38.00)</TableCell>
+              <TableCell className="text-emerald-700 font-bold">50% OFF</TableCell>
+              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms (Cache) vs ~140ms</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-semibold text-white">NIN Verification</TableCell>
-              <TableCell className="font-mono text-zinc-300">125 NGX (₦125.00)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">50 NGX (₦50.00)</TableCell>
-              <TableCell className="text-emerald-400 font-bold">50% OFF</TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~160ms</TableCell>
+              <TableCell className="font-semibold text-slate-900">NIN Verification</TableCell>
+              <TableCell className="font-mono text-slate-700">125 NGX (₦125.00)</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">50 NGX (₦50.00)</TableCell>
+              <TableCell className="text-emerald-700 font-bold">50% OFF</TableCell>
+              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms (Cache) vs ~160ms</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-semibold text-white">CAC Company Verification</TableCell>
-              <TableCell className="font-mono text-zinc-300">120 NGX (₦120.00)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">48 NGX (₦48.00)</TableCell>
-              <TableCell className="text-emerald-400 font-bold">50% OFF</TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~220ms</TableCell>
+              <TableCell className="font-semibold text-slate-900">CAC Company Verification</TableCell>
+              <TableCell className="font-mono text-slate-700">120 NGX (₦120.00)</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">48 NGX (₦48.00)</TableCell>
+              <TableCell className="text-emerald-700 font-bold">50% OFF</TableCell>
+              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms (Cache) vs ~220ms</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-semibold text-white">Bank Account (NUBAN)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">Free (₦0.00)</TableCell>
-              <TableCell className="font-mono text-emerald-400 font-bold">Free (₦0.00)</TableCell>
-              <TableCell className="text-emerald-400 font-bold">100% Free</TableCell>
-              <TableCell className="font-mono text-xs text-zinc-400">&lt;15ms (Cache) vs ~80ms</TableCell>
+              <TableCell className="font-semibold text-slate-900">Bank Account (NUBAN)</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">Free (₦0.00)</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">Free (₦0.00)</TableCell>
+              <TableCell className="text-emerald-700 font-bold">100% Free</TableCell>
+              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms (Cache) vs ~80ms</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -101,9 +101,9 @@ export default function SmartCacheDocsPage() {
 
       {/* Response Structure */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-white tracking-tight">Identifying Cached Responses</h2>
-        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-          Verixa returns audit metadata in the standardized response envelope. When a query hits cache, <code className="text-emerald-400">meta.cached</code> is set to <code className="text-emerald-400">true</code>, along with the timestamp of the original verification.
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Identifying Cached Responses</h2>
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          Verixa returns audit metadata in the standardized response envelope. When a query hits cache, <code className="text-emerald-700">meta.cached</code> is set to <code className="text-emerald-700">true</code>, along with the timestamp of the original verification.
         </p>
 
         <CodeBlock
@@ -134,9 +134,9 @@ export default function SmartCacheDocsPage() {
 
       {/* Cache Bypass */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-white tracking-tight">Forcing a Fresh Live Lookup (Cache Bypass)</h2>
-        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-          If you need to guarantee that data is re-queried directly from upstream verification registries (for example, during annual AML re-kyc reviews), include the <code className="text-emerald-400">X-Bypass-Cache: true</code> HTTP header.
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Forcing a Fresh Live Lookup (Cache Bypass)</h2>
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          If you need to guarantee that data is re-queried directly from upstream verification registries (for example, during annual AML re-kyc reviews), include the <code className="text-emerald-700">X-Bypass-Cache: true</code> HTTP header.
         </p>
 
         <CodeBlock
@@ -152,8 +152,8 @@ export default function SmartCacheDocsPage() {
 
       {/* Security & Data Protection */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-white tracking-tight">Data Isolation & NDPR Compliance</h2>
-        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Data Isolation & NDPR Compliance</h2>
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
           Verixa Smart Identity Cache is strictly tenant-isolated. Cache entries are partitioned by organization ID, ensuring that no client ever accesses records queried by another company. In accordance with the Nigeria Data Protection Act (NDPR), identity cache records are encrypted at rest and automatically purged when their TTL expires.
         </p>
       </div>

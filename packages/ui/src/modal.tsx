@@ -32,7 +32,6 @@ export function Modal({
         e.preventDefault()
         onClose()
       } else if (e.key === "Enter" && !e.shiftKey) {
-        // If Enter is pressed, trigger primary submit button in modal if not in textarea
         const activeTag = document.activeElement?.tagName?.toLowerCase()
         if (activeTag !== "textarea") {
           const submitBtn = modalRef.current?.querySelector('button[type="submit"]') as HTMLButtonElement | null
@@ -67,7 +66,7 @@ export function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -79,13 +78,14 @@ export function Modal({
         aria-modal="true"
         style={{ maxWidth: maxWidthPixelMap[effectiveSize] || "480px", width: "100%" }}
         className={cn(
-          "relative z-50 w-full mx-auto my-auto rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 text-slate-900 dark:text-zinc-100 shadow-2xl transition-all duration-200",
+          "relative z-50 w-full mx-auto my-auto rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-2xl transition-all duration-200",
           className
         )}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-md p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-800 transition-colors"
+          className="absolute right-4 top-4 rounded-md p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+          aria-label="Close dialog"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -94,9 +94,9 @@ export function Modal({
 
         {title && (
           <div className="mb-4 pr-6">
-            <h3 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">{title}</h3>
+            <h3 className="text-lg font-semibold tracking-tight text-slate-900">{title}</h3>
             {description && (
-              <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-zinc-400 leading-relaxed">
+              <p className="mt-1 text-xs sm:text-sm text-slate-500 leading-relaxed">
                 {description}
               </p>
             )}

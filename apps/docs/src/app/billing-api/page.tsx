@@ -6,36 +6,36 @@ export default function BillingApiDocsPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">PAYMENT &amp; BILLING API</Badge>
-          <span className="font-mono text-xs text-zinc-500">Dual-Auth · API Keys &amp; JWT</span>
+          <span className="font-mono text-xs text-slate-500">Dual-Auth · API Keys &amp; JWT</span>
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Client Website Payment Integration
         </h1>
-        <p className="mt-2 text-base text-zinc-400 leading-relaxed">
+        <p className="mt-2 text-base text-slate-600 leading-relaxed">
           Collect payments and fund your Verixa NGX balance directly from your own website or application. You can initiate checkouts, trigger in-page Paystack popup modals with zero redirects, or display dedicated bank transfer accounts on your own domain.
         </p>
       </div>
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40">
-          <span className="text-xs font-mono text-emerald-400 font-bold block mb-1">01. ZERO REDIRECT</span>
-          <h4 className="text-sm font-bold text-white mb-1">In-Page Modal</h4>
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            Use the returned <code className="text-emerald-400">accessCode</code> with Paystack Inline to open a secure payment popup on your site.
+        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs">
+          <span className="text-xs font-mono text-emerald-700 font-bold block mb-1">01. ZERO REDIRECT</span>
+          <h4 className="text-sm font-bold text-slate-900 mb-1">In-Page Modal</h4>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Use the returned <code className="text-emerald-700">accessCode</code> with Paystack Inline to open a secure payment popup on your site.
           </p>
         </div>
-        <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40">
-          <span className="text-xs font-mono text-sky-400 font-bold block mb-1">02. HOSTED CHECKOUT</span>
-          <h4 className="text-sm font-bold text-white mb-1">Direct Redirect</h4>
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            Redirect payers to <code className="text-sky-400">checkoutUrl</code> and receive them back at your custom <code className="text-sky-400">callbackUrl</code>.
+        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs">
+          <span className="text-xs font-mono text-sky-700 font-bold block mb-1">02. HOSTED CHECKOUT</span>
+          <h4 className="text-sm font-bold text-slate-900 mb-1">Direct Redirect</h4>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Redirect payers to <code className="text-sky-700">checkoutUrl</code> and receive them back at your custom <code className="text-sky-700">callbackUrl</code>.
           </p>
         </div>
-        <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40">
-          <span className="text-xs font-mono text-amber-400 font-bold block mb-1">03. DIRECT TRANSFER</span>
-          <h4 className="text-sm font-bold text-white mb-1">Dedicated Account</h4>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs">
+          <span className="text-xs font-mono text-amber-700 font-bold block mb-1">03. DIRECT TRANSFER</span>
+          <h4 className="text-sm font-bold text-slate-900 mb-1">Dedicated Account</h4>
+          <p className="text-xs text-slate-600 leading-relaxed">
             Display your organization's Titan Trust Bank virtual account for instant credit via direct bank transfer.
           </p>
         </div>
@@ -44,11 +44,11 @@ export default function BillingApiDocsPage() {
       {/* Step 1: Initialize Checkout */}
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">POST</span>
-          <code className="text-sm font-mono text-zinc-200">/v1/billing/checkout</code>
+          <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">POST</span>
+          <code className="text-sm font-mono text-slate-800">/v1/billing/checkout</code>
         </div>
-        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-          Call this endpoint from your backend server using your Verixa Live API key (<code className="text-zinc-200">Authorization: Bearer vrx_live_...</code>).
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          Call this endpoint from your backend server using your Verixa Live API key (<code className="text-slate-800">Authorization: Bearer vrx_live_...</code>).
         </p>
 
         <CodeBlock
@@ -94,13 +94,13 @@ export default function BillingApiDocsPage() {
 
       {/* Step 2: Client Frontend Integration */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-white tracking-tight">Frontend Implementation Options</h2>
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Frontend Implementation Options</h2>
         
         {/* Option A: Paystack Inline */}
         <div className="space-y-3">
-          <h3 className="text-sm font-bold text-emerald-400">Option A: Seamless In-Page Popup (Zero Redirect)</h3>
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            Load Paystack Inline JS on your website. Once your backend returns the <code className="text-emerald-300">accessCode</code>, trigger the popup modal directly:
+          <h3 className="text-sm font-bold text-emerald-700">Option A: Seamless In-Page Popup (Zero Redirect)</h3>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Load Paystack Inline JS on your website. Once your backend returns the <code className="text-emerald-700">accessCode</code>, trigger the popup modal directly:
           </p>
 
           <CodeBlock
@@ -139,8 +139,8 @@ async function handlePayFromMyWebsite() {
 
         {/* Option B: Standard Redirect */}
         <div className="space-y-3 pt-3">
-          <h3 className="text-sm font-bold text-sky-400">Option B: Standard Hosted Redirect</h3>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+          <h3 className="text-sm font-bold text-sky-700">Option B: Standard Hosted Redirect</h3>
+          <p className="text-xs text-slate-600 leading-relaxed">
             Simply direct your user to the hosted checkout page:
           </p>
           <CodeBlock
@@ -155,10 +155,10 @@ window.location.href = data.checkoutUrl;`}
       {/* Step 3: Verify Payment Status */}
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-sky-500/10 text-sky-400 border border-sky-500/20">GET</span>
-          <code className="text-sm font-mono text-zinc-200">/v1/billing/payments/:reference</code>
+          <span className="px-2 py-0.5 rounded text-xs font-bold font-mono bg-sky-500/10 text-sky-700 border border-sky-500/20">GET</span>
+          <code className="text-sm font-mono text-slate-800">/v1/billing/payments/:reference</code>
         </div>
-        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
           Verify real-time completion status of any payment reference. If the payment was completed on Paystack, calling this endpoint automatically verifies and credits your Live balance immediately.
         </p>
 
@@ -188,9 +188,9 @@ window.location.href = data.checkoutUrl;`}
 
       {/* Step 4: Webhook Event */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-white tracking-tight">Real-time Webhook Notification</h2>
-        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-          Whenever a payment is settled via card checkout or direct DVA bank transfer, Verixa dispatches a signed <code className="text-emerald-400">payment.completed</code> event to your configured webhook URL.
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Real-time Webhook Notification</h2>
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          Whenever a payment is settled via card checkout or direct DVA bank transfer, Verixa dispatches a signed <code className="text-emerald-700">payment.completed</code> event to your configured webhook URL.
         </p>
 
         <CodeBlock

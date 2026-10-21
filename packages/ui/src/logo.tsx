@@ -39,11 +39,11 @@ export function Logo({
   }
 
   const badgeColorClasses = {
-    emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25",
-    rose: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/25",
-    indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/25",
-    sky: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/25",
-    amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25",
+    emerald: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    rose: "bg-rose-50 text-rose-700 border border-rose-200",
+    indigo: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+    sky: "bg-sky-50 text-sky-700 border border-sky-200",
+    amber: "bg-amber-50 text-amber-700 border border-amber-200",
   }
 
   const currentSize = sizeClasses[size]
@@ -69,12 +69,12 @@ export function Logo({
               width="32"
               height="32"
               rx="8"
-              className="fill-gray-900 dark:fill-white"
+              className="fill-slate-900"
             />
             {/* Geometric V shape with verification shield tick */}
             <path
               d="M9 10.5L16 23L23 10.5H19L16 16.5L13 10.5H9Z"
-              className="fill-white dark:fill-gray-950"
+              className="fill-white"
             />
             <path
               d="M17.5 17L21 21L26 15"
@@ -88,7 +88,7 @@ export function Logo({
       )}
 
       <div className="flex items-center gap-1.5">
-        <span className={cn("text-gray-950 dark:text-white font-sans", currentSize.text)}>
+        <span className={cn("text-slate-950 font-sans", currentSize.text)}>
           VERIXA
         </span>
         {badge && (

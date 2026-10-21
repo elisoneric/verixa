@@ -81,39 +81,39 @@ export default function RoadmapDocsPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="mono">API ROADMAP</Badge>
-          <span className="font-mono text-xs text-zinc-500">EXPANDING PRODUCT SUITE</span>
+          <span className="font-mono text-xs text-slate-500">EXPANDING PRODUCT SUITE</span>
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Upcoming Identity & Compliance APIs
         </h1>
-        <p className="mt-2 text-base text-zinc-400 leading-relaxed">
+        <p className="mt-2 text-base text-slate-600 leading-relaxed">
           Verixa ID is expanding beyond BVN, NIN, and Bank Accounts. Explore the roadmap of upcoming African identity, corporate KYB, biometric, and tax verification endpoints.
         </p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         {futureApis.map((api) => (
-          <Card key={api.endpoint} className="p-6 bg-zinc-900/60 border-zinc-800 flex flex-col justify-between">
+          <Card key={api.endpoint} className="p-6 bg-white shadow-2xs border-slate-200 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <Badge variant={api.statusVariant} size="sm">
                   {api.status}
                 </Badge>
-                <span className="text-[10px] font-mono text-zinc-500 uppercase">{api.category}</span>
+                <span className="text-[10px] font-mono text-slate-500 uppercase">{api.category}</span>
               </div>
 
-              <h3 className="text-base font-bold text-white mb-1.5">{api.name}</h3>
-              <p className="font-mono text-xs text-emerald-400 mb-3">{api.endpoint}</p>
-              <p className="text-xs text-zinc-400 leading-relaxed mb-4">
+              <h3 className="text-base font-bold text-slate-900 mb-1.5">{api.name}</h3>
+              <p className="font-mono text-xs text-emerald-700 mb-3">{api.endpoint}</p>
+              <p className="text-xs text-slate-600 leading-relaxed mb-4">
                 {api.description}
               </p>
             </div>
 
-            <div className="pt-4 border-t border-zinc-800/80">
-              <span className="text-[10px] font-mono text-zinc-500 block mb-1.5">RETURNING ATTRIBUTES</span>
+            <div className="pt-4 border-t border-slate-200">
+              <span className="text-[10px] font-mono text-slate-500 block mb-1.5">RETURNING ATTRIBUTES</span>
               <div className="flex flex-wrap gap-1.5">
                 {api.fields.map((f) => (
-                  <span key={f} className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-950 border border-zinc-800 text-zinc-300">
+                  <span key={f} className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-700">
                     {f}
                   </span>
                 ))}

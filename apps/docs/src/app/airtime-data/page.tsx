@@ -6,19 +6,19 @@ export default function AirtimeDataDocsPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">POST</Badge>
-          <span className="font-mono text-xs text-sky-400 font-bold">/v1/purchase/airtime | /v1/purchase/data</span>
+          <span className="font-mono text-xs text-sky-700 font-bold">/v1/purchase/airtime | /v1/purchase/data</span>
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Airtime & Mobile Data APIs
         </h1>
-        <p className="mt-2 text-base text-zinc-400 leading-relaxed">
+        <p className="mt-2 text-base text-slate-600 leading-relaxed">
           Automate instant airtime top-ups and mobile data bundle provisioning across all major Nigerian mobile operators (MTN, Airtel, Glo, 9mobile).
         </p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-3">
-          <h2 className="text-xl font-bold text-white tracking-tight">1. Buy Airtime</h2>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">1. Buy Airtime</h2>
           <Table>
             <TableHeader>
               <TableRow>
@@ -30,16 +30,16 @@ export default function AirtimeDataDocsPage() {
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell className="font-mono text-emerald-400 font-bold">amount</TableCell>
-                <TableCell className="font-mono text-zinc-400">number</TableCell>
-                <TableCell className="text-rose-400 font-bold">Required</TableCell>
-                <TableCell className="text-zinc-300">Amount in NGN (e.g. 500).</TableCell>
+                <TableCell className="font-mono text-emerald-700 font-bold">amount</TableCell>
+                <TableCell className="font-mono text-slate-600">number</TableCell>
+                <TableCell className="text-rose-700 font-bold">Required</TableCell>
+                <TableCell className="text-slate-700">Amount in NGN (e.g. 500).</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="font-mono text-emerald-400 font-bold">destination</TableCell>
-                <TableCell className="font-mono text-zinc-400">string[] | string</TableCell>
-                <TableCell className="text-rose-400 font-bold">Required</TableCell>
-                <TableCell className="text-zinc-300">Recipient number or array of numbers to top up.</TableCell>
+                <TableCell className="font-mono text-emerald-700 font-bold">destination</TableCell>
+                <TableCell className="font-mono text-slate-600">string[] | string</TableCell>
+                <TableCell className="text-rose-700 font-bold">Required</TableCell>
+                <TableCell className="text-slate-700">Recipient number or array of numbers to top up.</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -58,7 +58,7 @@ export default function AirtimeDataDocsPage() {
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-xl font-bold text-white tracking-tight">2. Buy Data Bundle</h2>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">2. Buy Data Bundle</h2>
           <Table>
             <TableHeader>
               <TableRow>
@@ -70,16 +70,16 @@ export default function AirtimeDataDocsPage() {
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell className="font-mono text-emerald-400 font-bold">plan</TableCell>
-                <TableCell className="font-mono text-zinc-400">string</TableCell>
-                <TableCell className="text-rose-400 font-bold">Required</TableCell>
-                <TableCell className="text-zinc-300">Bundle plan code (e.g. MTN_1GB, 9MOBILE_1.5GB).</TableCell>
+                <TableCell className="font-mono text-emerald-700 font-bold">plan</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-rose-700 font-bold">Required</TableCell>
+                <TableCell className="text-slate-700">Bundle plan code (e.g. MTN_1GB, 9MOBILE_1.5GB).</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="font-mono text-emerald-400 font-bold">destination</TableCell>
-                <TableCell className="font-mono text-zinc-400">string | number</TableCell>
-                <TableCell className="text-rose-400 font-bold">Required</TableCell>
-                <TableCell className="text-zinc-300">Recipient phone number.</TableCell>
+                <TableCell className="font-mono text-emerald-700 font-bold">destination</TableCell>
+                <TableCell className="font-mono text-slate-600">string | number</TableCell>
+                <TableCell className="text-rose-700 font-bold">Required</TableCell>
+                <TableCell className="text-slate-700">Recipient phone number.</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -98,8 +98,8 @@ export default function AirtimeDataDocsPage() {
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-xl font-bold text-white tracking-tight">3. Fetch Available Data Plans</h2>
-          <p className="text-sm text-zinc-400">Query all available live network data packages and their exact plan codes:</p>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">3. Fetch Available Data Plans</h2>
+          <p className="text-sm text-slate-600">Query all available live network data packages and their exact plan codes:</p>
           <CodeBlock
             language="bash"
             title="cURL Request (Fetch Plans)"

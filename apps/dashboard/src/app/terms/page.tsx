@@ -5,16 +5,16 @@ import { Logo, Button } from "@verixa/ui"
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#06070a] text-slate-900 dark:text-zinc-100 flex flex-col selection:bg-emerald-500/25 selection:text-emerald-300">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-emerald-500/25 selection:text-emerald-300">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 dark:border-white/[0.08] bg-white/90 dark:bg-[#080a0f]/80 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="hover:opacity-90 transition-opacity">
             <Logo size="md" />
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/privacy">
-              <span className="text-xs text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</span>
+              <span className="text-xs text-slate-600 hover:text-slate-900 transition-colors">Privacy Policy</span>
             </Link>
             <Link href="/register">
               <Button variant="emerald" size="sm" className="font-semibold">
@@ -27,21 +27,21 @@ export default function TermsOfServicePage() {
 
       {/* Main Content */}
       <main className="flex-1 max-w-4xl mx-auto px-6 py-12 sm:py-16">
-        <div className="border-b border-slate-200 dark:border-zinc-800 pb-8 mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 text-xs font-mono mb-4">
+        <div className="border-b border-slate-200 pb-8 mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-600 text-xs font-mono mb-4">
             LEGAL AGREEMENT • B2B TERMS
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
             Terms of Service
           </h1>
-          <p className="mt-2 text-slate-500 dark:text-zinc-400 text-sm">
+          <p className="mt-2 text-slate-500 text-sm">
             Last Updated: August 2026 • Effective Version 1.2
           </p>
         </div>
 
-        <div className="space-y-10 text-slate-700 dark:text-zinc-300 leading-relaxed text-sm sm:text-base">
+        <div className="space-y-10 text-slate-700 leading-relaxed text-sm sm:text-base">
           <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
               1. Agreement to Terms
             </h2>
             <p>
@@ -53,7 +53,7 @@ export default function TermsOfServicePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
               2. Acceptable Use & Compliance Warranties
             </h2>
             <p>
@@ -76,12 +76,12 @@ export default function TermsOfServicePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
               3. The NGX Credit System, Pricing & Billing
             </h2>
-            <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-6 space-y-3 shadow-xs">
-              <h3 className="font-bold text-slate-900 dark:text-white text-base">NGX Credit Architecture</h3>
-              <ul className="list-disc pl-6 space-y-2 text-xs sm:text-sm text-slate-600 dark:text-zinc-400">
+            <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-3 shadow-xs">
+              <h3 className="font-bold text-slate-900 text-base">NGX Credit Architecture</h3>
+              <ul className="list-disc pl-6 space-y-2 text-xs sm:text-sm text-slate-600">
                 <li><strong>1 NGX = ₦1.00 NGN:</strong> NGX points represent prepaid computational credits utilized for metered API queries.</li>
                 <li><strong>Dedicated Virtual Account (DVA) Funding:</strong> Organizations are provisioned a dedicated bank account powered by Paystack. Transfers automatically credit your live NGX balance 24/7.</li>
                 <li><strong>Zero Charges on Failed Requests:</strong> Each verification call checks your balance atomically. If a verification request cannot be resolved, your NGX credit balance is not deducted.</li>
@@ -91,7 +91,7 @@ export default function TermsOfServicePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
               4. Service Availability & Uptime
             </h2>
             <p>
@@ -103,7 +103,7 @@ export default function TermsOfServicePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
               5. Limitation of Liability
             </h2>
             <p>
@@ -112,7 +112,7 @@ export default function TermsOfServicePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
               6. Governing Law & Jurisdiction
             </h2>
             <p>
@@ -121,26 +121,26 @@ export default function TermsOfServicePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
               7. Legal Notices & Contact
             </h2>
-            <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 p-5 space-y-1.5 shadow-xs">
-              <p className="font-bold text-slate-900 dark:text-white text-sm">Verixa ID Legal & Compliance</p>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">Email: <a href="mailto:legal@verixaid.com" className="text-emerald-600 dark:text-emerald-400 hover:underline">legal@verixaid.com</a></p>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">Support: <a href="mailto:support@verixaid.com" className="text-emerald-600 dark:text-emerald-400 hover:underline">support@verixaid.com</a></p>
+            <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-1.5 shadow-xs">
+              <p className="font-bold text-slate-900 text-sm">Verixa ID Legal & Compliance</p>
+              <p className="text-xs text-slate-500">Email: <a href="mailto:legal@verixaid.com" className="text-emerald-600 hover:underline">legal@verixaid.com</a></p>
+              <p className="text-xs text-slate-500">Support: <a href="mailto:support@verixaid.com" className="text-emerald-600 hover:underline">support@verixaid.com</a></p>
             </div>
           </section>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-zinc-800 py-8 bg-slate-100 dark:bg-zinc-950 text-xs text-slate-500">
+      <footer className="border-t border-slate-200 py-8 bg-slate-100 text-xs text-slate-500">
         <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>© {new Date().getFullYear()} Verixa ID. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="/privacy" className="hover:text-slate-900 dark:hover:text-white">Privacy Policy</Link>
-            <Link href="/login" className="hover:text-slate-900 dark:hover:text-white">Sign In</Link>
-            <Link href="/register" className="hover:text-slate-900 dark:hover:text-white">Register</Link>
+            <Link href="/privacy" className="hover:text-slate-900">Privacy Policy</Link>
+            <Link href="/login" className="hover:text-slate-900">Sign In</Link>
+            <Link href="/register" className="hover:text-slate-900">Register</Link>
           </div>
         </div>
       </footer>

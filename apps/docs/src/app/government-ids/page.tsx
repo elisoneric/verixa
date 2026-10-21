@@ -7,45 +7,45 @@ export default function GovernmentIdsDocsPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">UNIVERSAL TAXONOMY</Badge>
-          <span className="font-mono text-xs text-sky-400 font-bold">FRSC / INEC / NIS</span>
+          <span className="font-mono text-xs text-sky-700 font-bold">FRSC / INEC / NIS</span>
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Secondary Government IDs
         </h1>
-        <p className="mt-2 text-base text-zinc-400 leading-relaxed">
+        <p className="mt-2 text-base text-slate-600 leading-relaxed">
           Verify official Nigerian travel, voter, and driving credentials directly against issuing statutory bodies. Built with 100% universal enterprise identity endpoint and parameter compatibility.
         </p>
       </div>
 
       {/* Available ID Services Overview */}
       <div className="grid sm:grid-cols-3 gap-3 text-xs font-mono">
-        <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1.5">
-          <span className="text-emerald-400 font-bold block">1. Driver's License (FRSC)</span>
-          <code className="text-white block text-[11px]">GET /api/v1/kyc/dl</code>
-          <p className="text-zinc-400 font-sans text-xs">Verify Federal Road Safety Corps licenses and validity dates.</p>
-          <span className="text-zinc-500 block text-[11px]">Rate: 120 NGX (₦120.00)</span>
+        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1.5">
+          <span className="text-emerald-700 font-bold block">1. Driver's License (FRSC)</span>
+          <code className="text-slate-900 block text-[11px]">GET /api/v1/kyc/dl</code>
+          <p className="text-slate-600 font-sans text-xs">Verify Federal Road Safety Corps licenses and validity dates.</p>
+          <span className="text-slate-500 block text-[11px]">Rate: 120 NGX (₦120.00)</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1.5">
-          <span className="text-sky-400 font-bold block">2. Voter's Card (VIN / INEC)</span>
-          <code className="text-white block text-[11px]">GET /api/v1/kyc/vin</code>
-          <p className="text-zinc-400 font-sans text-xs">Verify voter cards against the INEC national electoral register.</p>
-          <span className="text-zinc-500 block text-[11px]">Rate: 100 NGX (₦100.00)</span>
+        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1.5">
+          <span className="text-sky-700 font-bold block">2. Voter's Card (VIN / INEC)</span>
+          <code className="text-slate-900 block text-[11px]">GET /api/v1/kyc/vin</code>
+          <p className="text-slate-600 font-sans text-xs">Verify voter cards against the INEC national electoral register.</p>
+          <span className="text-slate-500 block text-[11px]">Rate: 100 NGX (₦100.00)</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1.5">
-          <span className="text-amber-400 font-bold block">3. Passport (NIS)</span>
-          <code className="text-white block text-[11px]">GET /api/v1/kyc/passport</code>
-          <p className="text-zinc-400 font-sans text-xs">Verify Nigerian International Passports against Immigration Service records.</p>
-          <span className="text-zinc-500 block text-[11px]">Rate: 150 NGX (₦150.00)</span>
+        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1.5">
+          <span className="text-amber-700 font-bold block">3. Passport (NIS)</span>
+          <code className="text-slate-900 block text-[11px]">GET /api/v1/kyc/passport</code>
+          <p className="text-slate-600 font-sans text-xs">Verify Nigerian International Passports against Immigration Service records.</p>
+          <span className="text-slate-500 block text-[11px]">Rate: 150 NGX (₦150.00)</span>
         </div>
       </div>
 
       {/* 1. Driver's License Details */}
-      <div className="space-y-3 pt-6 border-t border-zinc-800">
+      <div className="space-y-3 pt-6 border-t border-slate-200">
         <div className="flex items-center gap-2">
           <Badge variant="verified">FRSC</Badge>
-          <h2 className="text-lg font-bold text-white tracking-tight">Driver&apos;s License (GET /api/v1/kyc/dl)</h2>
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">Driver&apos;s License (GET /api/v1/kyc/dl)</h2>
         </div>
         <Table>
           <TableHeader>
@@ -58,16 +58,16 @@ export default function GovernmentIdsDocsPage() {
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell className="font-mono text-emerald-400 font-bold">license_number</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">FRSC license number (e.g. <code className="text-sky-300 font-mono">AAA12345AA01</code>).</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">license_number</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">FRSC license number (e.g. <code className="text-sky-700 font-mono">AAA12345AA01</code>).</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">dob</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Date of birth in <code className="text-sky-300 font-mono">YYYY-MM-DD</code> format.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">dob</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Date of birth in <code className="text-sky-700 font-mono">YYYY-MM-DD</code> format.</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -82,10 +82,10 @@ export default function GovernmentIdsDocsPage() {
       </div>
 
       {/* 2. Voter's Card Details */}
-      <div className="space-y-3 pt-6 border-t border-zinc-800">
+      <div className="space-y-3 pt-6 border-t border-slate-200">
         <div className="flex items-center gap-2">
           <Badge variant="verified">INEC</Badge>
-          <h2 className="text-lg font-bold text-white tracking-tight">Voter&apos;s Card (GET /api/v1/kyc/vin)</h2>
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">Voter&apos;s Card (GET /api/v1/kyc/vin)</h2>
         </div>
         <Table>
           <TableHeader>
@@ -98,22 +98,22 @@ export default function GovernmentIdsDocsPage() {
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell className="font-mono text-emerald-400 font-bold">vin</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">19-digit Voter Identification Number.</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">vin</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">19-digit Voter Identification Number.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">state</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">State where voter registration was recorded.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">state</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">State where voter registration was recorded.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">last_name</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Voter surname for fuzzy verification matching.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">last_name</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Voter surname for fuzzy verification matching.</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -128,10 +128,10 @@ export default function GovernmentIdsDocsPage() {
       </div>
 
       {/* 3. Passport Details */}
-      <div className="space-y-3 pt-6 border-t border-zinc-800">
+      <div className="space-y-3 pt-6 border-t border-slate-200">
         <div className="flex items-center gap-2">
           <Badge variant="verified">NIS</Badge>
-          <h2 className="text-lg font-bold text-white tracking-tight">International Passport (GET /api/v1/kyc/passport)</h2>
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">International Passport (GET /api/v1/kyc/passport)</h2>
         </div>
         <Table>
           <TableHeader>
@@ -144,22 +144,22 @@ export default function GovernmentIdsDocsPage() {
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell className="font-mono text-emerald-400 font-bold">passport_number</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">Nigerian Passport booklet number (e.g. <code className="text-sky-300 font-mono">A12345678</code>).</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">passport_number</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">Nigerian Passport booklet number (e.g. <code className="text-sky-700 font-mono">A12345678</code>).</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">last_name</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Passport holder surname.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">last_name</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Passport holder surname.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">dob</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Date of birth in <code className="text-sky-300 font-mono">YYYY-MM-DD</code> format.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">dob</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Date of birth in <code className="text-sky-700 font-mono">YYYY-MM-DD</code> format.</TableCell>
             </TableRow>
           </TableBody>
         </Table>

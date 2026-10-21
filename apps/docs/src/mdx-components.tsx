@@ -2,18 +2,21 @@ import type { MDXComponents } from 'mdx/types'
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    h1: ({ children }) => <h1 className="text-3xl font-bold tracking-tight mb-6">{children}</h1>,
-    h2: ({ children }) => <h2 className="text-2xl font-semibold tracking-tight mt-10 mb-4">{children}</h2>,
-    h3: ({ children }) => <h3 className="text-xl font-semibold tracking-tight mt-8 mb-3">{children}</h3>,
-    p: ({ children }) => <p className="leading-7 [&:not(:first-child)]:mt-6 mb-6 text-gray-700 dark:text-gray-300">{children}</p>,
+    h1: ({ children }) => <h1 className="text-3xl font-bold tracking-tight mb-6 text-slate-900">{children}</h1>,
+    h2: ({ children }) => <h2 className="text-2xl font-semibold tracking-tight mt-10 mb-4 text-slate-900">{children}</h2>,
+    h3: ({ children }) => <h3 className="text-xl font-semibold tracking-tight mt-8 mb-3 text-slate-900">{children}</h3>,
+    p: ({ children }) => <p className="leading-7 [&:not(:first-child)]:mt-6 mb-6 text-slate-700">{children}</p>,
     code: ({ children, className }) => {
-      // Very simple code block formatting for demonstration
-      const isInline = !className;
+      const isInline = !className
       if (isInline) {
-        return <code className="bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 font-mono text-sm">{children}</code>
+        return (
+          <code className="bg-slate-100 text-slate-800 border border-slate-200 rounded px-1.5 py-0.5 font-mono text-xs">
+            {children}
+          </code>
+        )
       }
       return (
-        <pre className="bg-gray-950 text-gray-50 p-4 rounded-lg overflow-x-auto my-6 font-mono text-sm">
+        <pre className="bg-[#0d1117] text-slate-200 border border-slate-800 p-4 rounded-xl overflow-x-auto my-6 font-mono text-xs sm:text-[13px] leading-relaxed shadow-lg">
           <code className={className}>{children}</code>
         </pre>
       )

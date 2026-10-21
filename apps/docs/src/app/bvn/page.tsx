@@ -7,66 +7,66 @@ export default function BvnDocsPage() {
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="verified">UNIVERSAL TAXONOMY</Badge>
-          <span className="font-mono text-xs text-sky-400 font-bold">/api/v1/kyc/bvn</span>
+          <span className="font-mono text-xs text-sky-700 font-bold">/api/v1/kyc/bvn</span>
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Bank Verification Number (BVN)
         </h1>
-        <p className="mt-2 text-base text-zinc-400 leading-relaxed">
+        <p className="mt-2 text-base text-slate-600 leading-relaxed">
           Verify an 11-digit BVN against the national database. Verixa provides universal REST endpoint compatibility across validation matching, full demographics, advance branch tier lookups, and biometric selfie face verification.
         </p>
       </div>
 
       {/* Pricing and SLA Chips */}
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
-        <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">STANDARD LOOKUP</span>
-          <span className="text-emerald-400 font-bold">95 NGX (₦95.00)</span>
+        <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
+          <span className="text-slate-500 block">STANDARD LOOKUP</span>
+          <span className="text-emerald-700 font-bold">95 NGX (₦95.00)</span>
         </div>
-        <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">ADVANCE / BIOMETRIC</span>
-          <span className="text-emerald-400 font-bold">125 - 150 NGX</span>
+        <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
+          <span className="text-slate-500 block">ADVANCE / BIOMETRIC</span>
+          <span className="text-emerald-700 font-bold">125 - 150 NGX</span>
         </div>
-        <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">SMART CACHE HIT (50% OFF)</span>
-          <span className="text-cyan-400 font-bold">38 NGX (₦38.00)</span>
+        <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
+          <span className="text-slate-500 block">SMART CACHE HIT (50% OFF)</span>
+          <span className="text-cyan-700 font-bold">38 NGX (₦38.00)</span>
         </div>
-        <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800">
-          <span className="text-zinc-500 block">LATENCY (CACHE / LIVE)</span>
-          <span className="text-white font-bold">&lt;15ms / ~140ms</span>
+        <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
+          <span className="text-slate-500 block">LATENCY (CACHE / LIVE)</span>
+          <span className="text-slate-900 font-bold">&lt;15ms / ~140ms</span>
         </div>
       </div>
 
       {/* Available Tiers Overview */}
       <div className="space-y-4 pt-2">
-        <h2 className="text-lg font-bold text-white tracking-tight">Available Endpoints & Tiers</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Available Endpoints & Tiers</h2>
         <div className="grid sm:grid-cols-2 gap-3 text-xs font-mono">
-          <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
-            <span className="text-sky-400 font-bold block">1. Field Validation & Match</span>
-            <code className="text-white block text-[11px]">POST /api/v1/kyc/bvn or GET ?bvn=...</code>
-            <p className="text-zinc-400 font-sans text-xs">Validates if user-supplied name and DOB match BVN records.</p>
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+            <span className="text-sky-700 font-bold block">1. Field Validation & Match</span>
+            <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/bvn or GET ?bvn=...</code>
+            <p className="text-slate-600 font-sans text-xs">Validates if user-supplied name and DOB match BVN records.</p>
           </div>
-          <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
-            <span className="text-sky-400 font-bold block">2. Full Profile Lookup</span>
-            <code className="text-white block text-[11px]">POST /api/v1/kyc/bvn/full or GET ?bvn=...</code>
-            <p className="text-zinc-400 font-sans text-xs">Returns customer names, verified phone number, gender, and DOB.</p>
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+            <span className="text-sky-700 font-bold block">2. Full Profile Lookup</span>
+            <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/bvn/full or GET ?bvn=...</code>
+            <p className="text-slate-600 font-sans text-xs">Returns customer names, verified phone number, gender, and DOB.</p>
           </div>
-          <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
-            <span className="text-sky-400 font-bold block">3. Advance Profile</span>
-            <code className="text-white block text-[11px]">POST /api/v1/kyc/bvn/advance or GET ?bvn=...</code>
-            <p className="text-zinc-400 font-sans text-xs">Includes enrollment branch, bank code, and account level tier.</p>
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+            <span className="text-sky-700 font-bold block">3. Advance Profile</span>
+            <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/bvn/advance or GET ?bvn=...</code>
+            <p className="text-slate-600 font-sans text-xs">Includes enrollment branch, bank code, and account level tier.</p>
           </div>
-          <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-1">
-            <span className="text-emerald-400 font-bold block">4. Selfie Face Verification</span>
-            <code className="text-white block text-[11px]">POST /api/v1/kyc/bvn/verify</code>
-            <p className="text-zinc-400 font-sans text-xs">Performs facial matching between live selfie and government photo.</p>
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+            <span className="text-emerald-700 font-bold block">4. Selfie Face Verification</span>
+            <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/bvn/verify</code>
+            <p className="text-slate-600 font-sans text-xs">Performs facial matching between live selfie and government photo.</p>
           </div>
         </div>
       </div>
 
       {/* Request Parameters Table */}
-      <div className="space-y-3 pt-4 border-t border-zinc-800">
-        <h2 className="text-lg font-bold text-white tracking-tight">Request Parameters (POST /api/v1/kyc/bvn)</h2>
+      <div className="space-y-3 pt-4 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Request Parameters (POST /api/v1/kyc/bvn)</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -78,42 +78,42 @@ export default function BvnDocsPage() {
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell className="font-mono text-emerald-400 font-bold">bvn</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">The 11-digit Bank Verification Number.</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">bvn</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">The 11-digit Bank Verification Number.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-emerald-400 font-bold">consent</TableCell>
-              <TableCell className="font-mono text-zinc-400">boolean</TableCell>
-              <TableCell className="text-rose-400 font-bold">Required</TableCell>
-              <TableCell className="text-zinc-300">Mandatory NDPA user consent flag. Must be <code className="text-emerald-300 font-mono">true</code>.</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">consent</TableCell>
+              <TableCell className="font-mono text-slate-600">boolean</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">Mandatory NDPA user consent flag. Must be <code className="text-emerald-700 font-mono">true</code>.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">first_name</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Customer first name for verification matching.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">first_name</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Customer first name for verification matching.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">last_name</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Customer surname / last name for match scoring.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">last_name</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Customer surname / last name for match scoring.</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-mono text-zinc-300 font-bold">dob</TableCell>
-              <TableCell className="font-mono text-zinc-400">string</TableCell>
-              <TableCell className="text-zinc-500">Optional</TableCell>
-              <TableCell className="text-zinc-300">Date of birth in <code className="text-sky-300 font-mono">YYYY-MM-DD</code> format.</TableCell>
+              <TableCell className="font-mono text-slate-700 font-bold">dob</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500">Optional</TableCell>
+              <TableCell className="text-slate-700">Date of birth in <code className="text-sky-700 font-mono">YYYY-MM-DD</code> format.</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
 
       {/* Code Examples */}
-      <div className="space-y-4 pt-4 border-t border-zinc-800">
-        <h2 className="text-lg font-bold text-white tracking-tight">Example Request & Response (Universal Taxonomy)</h2>
+      <div className="space-y-4 pt-4 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Example Request & Response (Universal Taxonomy)</h2>
         <CodeBlock
           language="bash"
           title="cURL Request (Full Profile)"
@@ -155,9 +155,9 @@ export default function BvnDocsPage() {
       </div>
 
       {/* Biometric Verification */}
-      <div className="space-y-4 pt-4 border-t border-zinc-800">
-        <h2 className="text-lg font-bold text-white tracking-tight">BVN Face Match Verification (POST /api/v1/kyc/bvn/verify)</h2>
-        <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+      <div className="space-y-4 pt-4 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">BVN Face Match Verification (POST /api/v1/kyc/bvn/verify)</h2>
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
           Pass the user&apos;s live camera selfie base64 image along with their BVN to cross-reference facial landmarks against the NIBSS facial database with liveness detection.
         </p>
 

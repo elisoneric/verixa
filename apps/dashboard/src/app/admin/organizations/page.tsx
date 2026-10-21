@@ -160,12 +160,12 @@ export default function AdminOrganizationsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Tenant Organizations</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Tenant Organizations</h1>
             <Badge variant="failed" size="sm">
               {orgs.length} TENANTS
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Manage customer subscription tiers, direct wallet balance adjustments, user rosters, and access control.
           </p>
         </div>
@@ -184,10 +184,10 @@ export default function AdminOrganizationsPage() {
       </div>
 
       {/* Search and Filters */}
-      <Card className="p-4 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
+      <Card className="p-4 bg-white border border-slate-200 shadow-xs">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="text-[11px] font-mono font-medium text-slate-500 dark:text-zinc-400 uppercase block mb-1">
+            <label className="text-[11px] font-mono font-medium text-slate-500 uppercase block mb-1">
               Search by Tenant Name or UUID
             </label>
             <input
@@ -195,18 +195,18 @@ export default function AdminOrganizationsPage() {
               placeholder="Search organizations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-xs rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-slate-900 dark:text-zinc-100 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
+              className="w-full text-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-mono font-medium text-slate-500 dark:text-zinc-400 uppercase block mb-1">
+            <label className="text-[11px] font-mono font-medium text-slate-500 uppercase block mb-1">
               Filter by Subscription Tier
             </label>
             <select
               value={tierFilter}
               onChange={(e) => setTierFilter(e.target.value)}
-              className="w-full text-xs rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-slate-900 dark:text-zinc-100 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
+              className="w-full text-xs rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
             >
               <option value="ALL">All Subscription Tiers</option>
               <option value="STARTER">Starter Plan</option>
@@ -241,10 +241,10 @@ export default function AdminOrganizationsPage() {
             {filteredOrgs.map((org) => {
               const isSuspended = org.status === "suspended"
               return (
-                <TableRow key={org.id} className="hover:bg-slate-50 dark:hover:bg-zinc-900/60">
-                  <TableCell className="font-semibold text-slate-900 dark:text-white">
+                <TableRow key={org.id} className="hover:bg-slate-50">
+                  <TableCell className="font-semibold text-slate-900">
                     <div>{org.name}</div>
-                    <div className="font-mono text-[10px] text-slate-400 dark:text-zinc-500">{org.id.slice(0, 13)}...</div>
+                    <div className="font-mono text-[10px] text-slate-400">{org.id.slice(0, 13)}...</div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -255,7 +255,7 @@ export default function AdminOrganizationsPage() {
                         {org.tier || "STARTER"}
                       </Badge>
                       {(org.customRates?.bvn || org.customRates?.nin) && (
-                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">
+                        <span className="text-[10px] text-emerald-600 font-mono">
                           (Custom: BVN ₦{org.customRates.bvn || 50})
                         </span>
                       )}
@@ -269,16 +269,16 @@ export default function AdminOrganizationsPage() {
                       {isSuspended ? "SUSPENDED" : "ACTIVE"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  <TableCell className="font-mono text-xs font-bold text-emerald-600">
                     ₦{Number(org.liveBalance).toLocaleString()}
                   </TableCell>
-                  <TableCell className="font-mono text-xs text-amber-600 dark:text-amber-400">
+                  <TableCell className="font-mono text-xs text-amber-600">
                     {Number(org.sandboxBalance).toLocaleString()} NGX
                   </TableCell>
                   <TableCell>
                     <button
                       onClick={() => handleOpenUsers(org)}
-                      className="text-xs font-medium text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1"
+                      className="text-xs font-medium text-rose-600 hover:underline flex items-center gap-1"
                     >
                       <span>{org.usersCount} users</span>
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -292,7 +292,7 @@ export default function AdminOrganizationsPage() {
                         size="xs"
                         variant="outline"
                         onClick={() => handleOpenBalance(org)}
-                        className="text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+                        className="text-emerald-600 hover:bg-emerald-50"
                       >
                         ± Balance
                       </Button>
@@ -307,7 +307,7 @@ export default function AdminOrganizationsPage() {
                         size="xs"
                         variant={isSuspended ? "emerald" : "outline"}
                         onClick={() => handleToggleStatus(org)}
-                        className={isSuspended ? "" : "text-rose-600 dark:text-rose-400"}
+                        className={isSuspended ? "" : "text-rose-600"}
                       >
                         {isSuspended ? "Reactivate" : "Suspend"}
                       </Button>
@@ -329,23 +329,23 @@ export default function AdminOrganizationsPage() {
         size="md"
       >
         <form onSubmit={handleSaveBalance} className="space-y-4 pt-2">
-          <div className="p-3 bg-slate-50 dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-800 flex justify-between items-center text-xs">
-            <span className="text-slate-500 dark:text-zinc-400 font-mono">Current Live Balance:</span>
-            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center text-xs">
+            <span className="text-slate-500 font-mono">Current Live Balance:</span>
+            <span className="font-mono font-bold text-emerald-600 text-sm">
               ₦{Number(selectedOrg?.liveBalance || 0).toLocaleString()}.00
             </span>
           </div>
 
           <div>
-            <label className="text-xs font-medium text-slate-700 dark:text-zinc-300 block mb-1">Target Environment</label>
+            <label className="text-xs font-medium text-slate-700 block mb-1">Target Environment</label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setAdjEnv("live")}
                 className={`py-2 text-xs font-semibold rounded-lg border transition-all ${
                   adjEnv === "live"
-                    ? "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-600"
-                    : "bg-white dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800"
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                    : "bg-white text-slate-600 border-slate-200"
                 }`}
               >
                 Live Production Wallet
@@ -355,8 +355,8 @@ export default function AdminOrganizationsPage() {
                 onClick={() => setAdjEnv("sandbox")}
                 className={`py-2 text-xs font-semibold rounded-lg border transition-all ${
                   adjEnv === "sandbox"
-                    ? "bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-600"
-                    : "bg-white dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800"
+                    ? "bg-amber-50 text-amber-700 border-amber-300"
+                    : "bg-white text-slate-600 border-slate-200"
                 }`}
               >
                 Sandbox Test Wallet
@@ -387,14 +387,14 @@ export default function AdminOrganizationsPage() {
               type="checkbox"
               checked={adjNotify}
               onChange={(e) => setAdjNotify(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 dark:border-zinc-700 text-emerald-500 focus:ring-emerald-500"
+              className="h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500"
             />
-            <span className="text-xs text-slate-700 dark:text-zinc-300">
+            <span className="text-xs text-slate-700">
               Send balance adjustment confirmation email to organization members
             </span>
           </label>
 
-          <div className="flex gap-3 justify-end pt-3 border-t border-slate-200 dark:border-zinc-800">
+          <div className="flex gap-3 justify-end pt-3 border-t border-slate-200">
             <Button
               type="button"
               variant="outline"
@@ -425,20 +425,20 @@ export default function AdminOrganizationsPage() {
       >
         <div className="space-y-3 pt-2">
           {isLoadingUsers ? (
-            <div className="p-8 text-center text-xs text-slate-500 dark:text-zinc-400">
+            <div className="p-8 text-center text-xs text-slate-500">
               Loading organization users...
             </div>
           ) : orgUsers.length === 0 ? (
-            <div className="p-6 text-center text-xs text-slate-500 dark:text-zinc-400">
+            <div className="p-6 text-center text-xs text-slate-500">
               No registered user accounts found for this organization.
             </div>
           ) : (
-            <div className="divide-y divide-slate-100 dark:divide-zinc-800 max-h-80 overflow-y-auto">
+            <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto">
               {orgUsers.map((u) => (
                 <div key={u.id} className="py-2.5 flex items-center justify-between text-xs">
                   <div>
-                    <span className="font-semibold text-slate-900 dark:text-white block">{u.email}</span>
-                    <span className="font-mono text-[10px] text-slate-400 dark:text-zinc-500">
+                    <span className="font-semibold text-slate-900 block">{u.email}</span>
+                    <span className="font-mono text-[10px] text-slate-400">
                       Joined {new Date(u.createdAt).toLocaleDateString()}
                     </span>
                   </div>
@@ -450,7 +450,7 @@ export default function AdminOrganizationsPage() {
             </div>
           )}
 
-          <div className="flex justify-end pt-3 border-t border-slate-200 dark:border-zinc-800">
+          <div className="flex justify-end pt-3 border-t border-slate-200">
             <Button size="sm" variant="outline" onClick={() => setUsersModalOpen(false)}>
               Close Roster
             </Button>
@@ -474,11 +474,11 @@ export default function AdminOrganizationsPage() {
           )}
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700 dark:text-zinc-300">Account Subscription Tier</label>
+            <label className="text-xs font-medium text-slate-700">Account Subscription Tier</label>
             <select
               value={tier}
               onChange={(e) => setTier(e.target.value)}
-              className="w-full bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-emerald-500 focus:outline-hidden"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-emerald-500 focus:outline-hidden"
             >
               <option value="STARTER">Starter Plan (Standard volume rates: ₦50 BVN/NIN, ₦0 NUBAN)</option>
               <option value="GROWTH">Growth Plan (10% volume discount: ₦45 BVN/NIN, ₦0 NUBAN)</option>
@@ -487,8 +487,8 @@ export default function AdminOrganizationsPage() {
             </select>
           </div>
 
-          <div className="border-t border-slate-200 dark:border-zinc-800 pt-3">
-            <h4 className="text-xs font-bold text-slate-900 dark:text-white mb-2">Custom Override Rates (Leave blank to use Tier default)</h4>
+          <div className="border-t border-slate-200 pt-3">
+            <h4 className="text-xs font-bold text-slate-900 mb-2">Custom Override Rates (Leave blank to use Tier default)</h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Input
                 label="BVN Rate (NGX / ₦)"
@@ -519,14 +519,14 @@ export default function AdminOrganizationsPage() {
               type="checkbox"
               checked={notifyEmail}
               onChange={(e) => setNotifyEmail(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 dark:border-zinc-700 text-emerald-500 focus:ring-emerald-500"
+              className="h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500"
             />
-            <span className="text-xs text-slate-700 dark:text-zinc-300">
+            <span className="text-xs text-slate-700">
               Send automated transactional email notification with new rate schedule to customer
             </span>
           </label>
 
-          <div className="flex gap-3 justify-end pt-3 border-t border-slate-200 dark:border-zinc-800">
+          <div className="flex gap-3 justify-end pt-3 border-t border-slate-200">
             <Button
               type="button"
               variant="outline"

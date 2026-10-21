@@ -33,10 +33,10 @@ export default function AdminRevenuePage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Revenue & Platform Ledger</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Revenue & Platform Ledger</h1>
             <Badge variant="verified" size="sm">SETTLEMENT ENGINE</Badge>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Real-time financial audits, 1:1 Paystack virtual account settlements, credit revenue, and balance reserves.
           </p>
         </div>
@@ -57,50 +57,50 @@ export default function AdminRevenuePage() {
 
       {/* KPI Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
-          <span className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 uppercase tracking-wider block">
+        <Card className="p-5 bg-white border border-slate-200 shadow-xs">
+          <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
             All-Time Deposits (NGN)
           </span>
-          <div className="mt-2 text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+          <div className="mt-2 text-2xl font-bold font-mono text-emerald-600">
             ₦{Number(data?.totalDepositedNgx || 0).toLocaleString()}.00
           </div>
-          <span className="mt-2 block text-[11px] text-slate-400 dark:text-zinc-500 font-mono">
+          <span className="mt-2 block text-[11px] text-slate-400 font-mono">
             Direct Paystack DVA settlements
           </span>
         </Card>
 
-        <Card className="p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
-          <span className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 uppercase tracking-wider block">
+        <Card className="p-5 bg-white border border-slate-200 shadow-xs">
+          <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
             This Month Deposits
           </span>
-          <div className="mt-2 text-2xl font-bold font-mono text-slate-900 dark:text-white">
+          <div className="mt-2 text-2xl font-bold font-mono text-slate-900">
             ₦{Number(data?.depositsThisMonth || 0).toLocaleString()}.00
           </div>
-          <span className="mt-2 block text-[11px] text-slate-400 dark:text-zinc-500 font-mono">
+          <span className="mt-2 block text-[11px] text-slate-400 font-mono">
             Today: ₦{Number(data?.depositsToday || 0).toLocaleString()}
           </span>
         </Card>
 
-        <Card className="p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
-          <span className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 uppercase tracking-wider block">
+        <Card className="p-5 bg-white border border-slate-200 shadow-xs">
+          <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
             API Usage Revenue (Burn)
           </span>
-          <div className="mt-2 text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
+          <div className="mt-2 text-2xl font-bold font-mono text-rose-600">
             {Number(data?.totalConsumedNgx || 0).toLocaleString()} NGX
           </div>
-          <span className="mt-2 block text-[11px] text-slate-400 dark:text-zinc-500 font-mono">
+          <span className="mt-2 block text-[11px] text-slate-400 font-mono">
             Earned from verification charges
           </span>
         </Card>
 
-        <Card className="p-5 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 shadow-xs">
-          <span className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 uppercase tracking-wider block">
+        <Card className="p-5 bg-white border border-slate-200 shadow-xs">
+          <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
             Net Unspent Balance Reserve
           </span>
-          <div className="mt-2 text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
+          <div className="mt-2 text-2xl font-bold font-mono text-blue-600">
             {Number(data?.netReserveNgx || 0).toLocaleString()} NGX
           </div>
-          <span className="mt-2 block text-[11px] text-slate-400 dark:text-zinc-500 font-mono">
+          <span className="mt-2 block text-[11px] text-slate-400 font-mono">
             Customer pre-paid float
           </span>
         </Card>
@@ -109,15 +109,15 @@ export default function AdminRevenuePage() {
       {/* Transactions Section */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h2 className="text-base font-bold text-slate-900 dark:text-white">Recent Multi-Tenant Transactions</h2>
+          <h2 className="text-base font-bold text-slate-900">Recent Multi-Tenant Transactions</h2>
           
           <div className="flex gap-2">
             <button
               onClick={() => setFilterType("ALL")}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                 filterType === "ALL"
-                  ? "bg-rose-50 text-rose-700 border border-rose-200 dark:bg-zinc-800 dark:text-rose-400 dark:border-zinc-700"
-                  : "bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 hover:bg-slate-200"
+                  ? "bg-rose-50 text-rose-700 border border-rose-200"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
               All Records ({data?.recentTransactions?.length || 0})
@@ -126,8 +126,8 @@ export default function AdminRevenuePage() {
               onClick={() => setFilterType("TOPUP")}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                 filterType === "TOPUP"
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
-                  : "bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 hover:bg-slate-200"
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
               Deposits Only
@@ -136,8 +136,8 @@ export default function AdminRevenuePage() {
               onClick={() => setFilterType("DEDUCTION")}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                 filterType === "DEDUCTION"
-                  ? "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800"
-                  : "bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-zinc-400 hover:bg-slate-200"
+                  ? "bg-amber-50 text-amber-700 border border-amber-200"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
               Usage Deductions
@@ -167,16 +167,16 @@ export default function AdminRevenuePage() {
                 const isCredit = Number(tx.amount) > 0
                 return (
                   <TableRow key={tx.id}>
-                    <TableCell className="font-mono text-xs text-slate-500 dark:text-zinc-400 whitespace-nowrap">
+                    <TableCell className="font-mono text-xs text-slate-500 whitespace-nowrap">
                       {new Date(tx.createdAt).toLocaleString()}
                     </TableCell>
-                    <TableCell className="font-medium text-slate-900 dark:text-white">
+                    <TableCell className="font-medium text-slate-900">
                       {tx.orgName}
                     </TableCell>
-                    <TableCell className="text-xs text-slate-600 dark:text-zinc-300">
+                    <TableCell className="text-xs text-slate-600">
                       {tx.description}
                     </TableCell>
-                    <TableCell className="font-mono text-[11px] text-slate-400 dark:text-zinc-500">
+                    <TableCell className="font-mono text-[11px] text-slate-400">
                       {tx.referenceId ? `${tx.referenceId.slice(0, 16)}…` : "—"}
                     </TableCell>
                     <TableCell>
@@ -187,7 +187,7 @@ export default function AdminRevenuePage() {
                         {tx.environment?.toUpperCase() || "LIVE"}
                       </Badge>
                     </TableCell>
-                    <TableCell className={`font-mono text-xs font-bold text-right ${isCredit ? "text-emerald-600 dark:text-emerald-400" : "text-slate-900 dark:text-white"}`}>
+                    <TableCell className={`font-mono text-xs font-bold text-right ${isCredit ? "text-emerald-600" : "text-slate-900"}`}>
                       {isCredit ? `+₦${Number(tx.amount).toLocaleString()}` : `${Number(tx.amount).toLocaleString()} NGX`}
                     </TableCell>
                   </TableRow>

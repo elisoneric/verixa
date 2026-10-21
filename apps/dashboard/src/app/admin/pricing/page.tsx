@@ -152,28 +152,28 @@ export default function AdminPricingPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Pricing & Promotions Matrix</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Pricing & Promotions Matrix</h1>
             <Badge variant="verified" size="sm">LIVE CLUSTER SYNC</Badge>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Update base live query fees, Smart Cache hit splits, and scheduled developer discount campaigns. Changes propagate across www, docs, and billing ledger in real time.
           </p>
         </div>
       </div>
 
       {message && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 text-xs font-semibold">
           {message}
         </div>
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* 1. Base Rates */}
-        <Card className="p-6 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 space-y-4 shadow-xs">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+        <Card className="p-6 bg-white border border-slate-200 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Live Query Base Rates (Naira / NGX)</h3>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">Standard Starter pricing applied when upstream registry lookups are performed.</p>
+              <h3 className="text-sm font-bold text-slate-900">Live Query Base Rates (Naira / NGX)</h3>
+              <p className="text-xs text-slate-500">Standard Starter pricing applied when upstream registry lookups are performed.</p>
             </div>
             <Badge variant="mono" size="sm">UPSTREAM REGISTRY</Badge>
           </div>
@@ -246,11 +246,11 @@ export default function AdminPricingPage() {
         </Card>
 
         {/* 2. Smart Cache Rates */}
-        <Card className="p-6 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 space-y-4 shadow-xs">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+        <Card className="p-6 bg-white border border-slate-200 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Smart Cache Hit Split (Sub-15ms)</h3>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">Discounted rate billed when a customer queries an identity previously verified within the retention window.</p>
+              <h3 className="text-sm font-bold text-slate-900">Smart Cache Hit Split (Sub-15ms)</h3>
+              <p className="text-xs text-slate-500">Discounted rate billed when a customer queries an identity previously verified within the retention window.</p>
             </div>
             <Badge variant="verified" size="sm">REDIS L2 CACHE</Badge>
           </div>
@@ -294,15 +294,15 @@ export default function AdminPricingPage() {
             />
           </div>
 
-          <div className="pt-2 flex items-center justify-between text-xs text-slate-600 dark:text-zinc-400">
+          <div className="pt-2 flex items-center justify-between text-xs text-slate-600">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={cacheEnabled}
                 onChange={(e) => setCacheEnabled(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 dark:border-zinc-700 text-emerald-500 focus:ring-emerald-500"
+                className="h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500"
               />
-              <span className="font-semibold text-slate-900 dark:text-white">Enable Tenant L2 Smart Cache Engine</span>
+              <span className="font-semibold text-slate-900">Enable Tenant L2 Smart Cache Engine</span>
             </label>
 
             <div className="flex items-center gap-2">
@@ -311,7 +311,7 @@ export default function AdminPricingPage() {
                 type="number"
                 value={cacheTtlDays}
                 onChange={(e) => setCacheTtlDays(e.target.value)}
-                className="w-16 px-2 py-1 text-xs rounded border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white font-mono"
+                className="w-16 px-2 py-1 text-xs rounded border border-slate-300 bg-white text-slate-900 font-mono"
               />
               <span>Days</span>
             </div>
@@ -319,11 +319,11 @@ export default function AdminPricingPage() {
         </Card>
 
         {/* 3. Promotional Bonus Days & Rate Slash */}
-        <Card className="p-6 bg-white dark:bg-zinc-900/60 border border-slate-200 dark:border-zinc-800 space-y-4 shadow-xs">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+        <Card className="p-6 bg-white border border-slate-200 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Promotional Bonus Days & Rate Slash</h3>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
+              <h3 className="text-sm font-bold text-slate-900">Promotional Bonus Days & Rate Slash</h3>
+              <p className="text-xs text-slate-500">
                 Instantly slashes live rates across all endpoints and triggers announcement banners on the landing page and developer consoles.
               </p>
             </div>
@@ -338,9 +338,9 @@ export default function AdminPricingPage() {
                 type="checkbox"
                 checked={bonusActive}
                 onChange={(e) => setBonusActive(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 dark:border-zinc-700 text-emerald-500 focus:ring-emerald-500"
+                className="h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500"
               />
-              <span className="font-semibold text-slate-900 dark:text-white text-xs">
+              <span className="font-semibold text-slate-900 text-xs">
                 Activate Promotional Rate Slash Across Cluster
               </span>
             </label>
@@ -370,8 +370,8 @@ export default function AdminPricingPage() {
               />
             </div>
 
-            <div className="pt-2 flex justify-between items-center border-t border-slate-100 dark:border-zinc-800">
-              <p className="text-xs text-slate-500 dark:text-zinc-400">
+            <div className="pt-2 flex justify-between items-center border-t border-slate-100">
+              <p className="text-xs text-slate-500">
                 Announce this promotional window directly to all registered tenant accounts via email.
               </p>
               <Button
@@ -380,7 +380,7 @@ export default function AdminPricingPage() {
                 size="sm"
                 onClick={handleBroadcastPromo}
                 isLoading={isBroadcasting}
-                className="text-rose-600 dark:text-rose-400"
+                className="text-rose-600"
               >
                 Broadcast Promo Email
               </Button>
@@ -389,14 +389,14 @@ export default function AdminPricingPage() {
         </Card>
 
         {/* 4. Tier Savings Preview */}
-        <Card className="p-6 bg-slate-50 dark:bg-zinc-900/40 border border-slate-200 dark:border-zinc-800 space-y-3">
-          <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase font-mono tracking-wider">
+        <Card className="p-6 bg-slate-50 border border-slate-200 space-y-3">
+          <h4 className="text-xs font-bold text-slate-900 uppercase font-mono tracking-wider">
             Effective Rates by Customer Tier Preview
           </h4>
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-mono">
+                <tr className="border-b border-slate-200 text-slate-500 font-mono">
                   <th className="py-2">Tier</th>
                   <th className="py-2">BVN Live</th>
                   <th className="py-2">NIN Live</th>
@@ -405,9 +405,9 @@ export default function AdminPricingPage() {
                   <th className="py-2">NUBAN</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-zinc-800/60 font-mono">
+              <tbody className="divide-y divide-slate-200 font-mono">
                 <tr>
-                  <td className="py-2.5 font-bold text-slate-900 dark:text-white">STARTER (Standard)</td>
+                  <td className="py-2.5 font-bold text-slate-900">STARTER (Standard)</td>
                   <td>₦{baseBvn}</td>
                   <td>₦{baseNin}</td>
                   <td>₦{baseNinAdvance}</td>
@@ -415,7 +415,7 @@ export default function AdminPricingPage() {
                   <td className="text-emerald-500 font-bold">Free</td>
                 </tr>
                 <tr>
-                  <td className="py-2.5 font-bold text-blue-600 dark:text-blue-400">GROWTH (10% Off)</td>
+                  <td className="py-2.5 font-bold text-blue-600">GROWTH (10% Off)</td>
                   <td>₦{Math.round(parseInt(baseBvn || "95") * 0.9)}</td>
                   <td>₦{Math.round(parseInt(baseNin || "95") * 0.9)}</td>
                   <td>₦{Math.round(parseInt(baseNinAdvance || "95") * 0.9)}</td>
@@ -423,7 +423,7 @@ export default function AdminPricingPage() {
                   <td className="text-emerald-500 font-bold">Free</td>
                 </tr>
                 <tr>
-                  <td className="py-2.5 font-bold text-emerald-600 dark:text-emerald-400">ENTERPRISE (30% Off)</td>
+                  <td className="py-2.5 font-bold text-emerald-600">ENTERPRISE (30% Off)</td>
                   <td>₦{Math.round(parseInt(baseBvn || "95") * 0.7)}</td>
                   <td>₦{Math.round(parseInt(baseNin || "95") * 0.7)}</td>
                   <td>₦{Math.round(parseInt(baseNinAdvance || "95") * 0.7)}</td>
