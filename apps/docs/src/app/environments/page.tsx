@@ -1,4 +1,4 @@
-import { Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
+import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
 export default function EnvironmentsDocsPage() {
   return (
@@ -47,6 +47,34 @@ export default function EnvironmentsDocsPage() {
           </TableRow>
         </TableBody>
       </Table>
+
+      <div className="space-y-4 pt-4 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Environment Base URLs</h2>
+        <div className="space-y-3">
+          <CodeBlock
+            language="bash"
+            title="Sandbox Base URL (Free Test Credits)"
+            code={`# Base URL for sandbox development and integration testing
+https://sandbox.verixaid.com/api/v1
+
+# Example Sandbox Request with test key
+curl -X GET "https://sandbox.verixaid.com/api/v1/kyc/bvn?bvn=22123456789" \\
+  -H "Authorization: Bearer vrx_test_sandbox_secret_key" \\
+  -H "Content-Type: application/json"`}
+          />
+          <CodeBlock
+            language="bash"
+            title="Production Base URL (Live Metered Registries)"
+            code={`# Base URL for production live traffic
+https://api.verixaid.com/api/v1
+
+# Example Production Request with live key
+curl -X GET "https://api.verixaid.com/api/v1/kyc/bvn?bvn=22123456789" \\
+  -H "Authorization: Bearer vrx_live_production_secret_key" \\
+  -H "Content-Type: application/json"`}
+          />
+        </div>
+      </div>
     </div>
   )
 }

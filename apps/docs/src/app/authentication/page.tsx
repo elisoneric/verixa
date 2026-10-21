@@ -51,15 +51,17 @@ export default function AuthenticationDocsPage() {
           Verixa API keys follow an O(1) indexed token format containing an environment prefix, database UUID, and 32-character high-entropy secret.
         </p>
 
-        <div className="space-y-2 font-mono text-xs">
-          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs">
-            <span className="text-amber-700 font-bold block mb-1">Sandbox Key Format (Mock Upstream & Free Credits)</span>
-            <code>vrx_test_&#123;key_uuid&#125;_&#123;32_hex_secret&#125;</code>
-          </div>
-          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs">
-            <span className="text-emerald-700 font-bold block mb-1">Production Live Key Format (Real Gateways & Wallet Metering)</span>
-            <code>vrx_live_&#123;key_uuid&#125;_&#123;32_hex_secret&#125;</code>
-          </div>
+        <div className="space-y-3">
+          <CodeBlock
+            language="bash"
+            title="Sandbox Key Format (Mock Upstream & Free Credits)"
+            code="vrx_test_{key_uuid}_{32_hex_secret}"
+          />
+          <CodeBlock
+            language="bash"
+            title="Production Live Key Format (Real Gateways & Wallet Metering)"
+            code="vrx_live_{key_uuid}_{32_hex_secret}"
+          />
         </div>
       </div>
 

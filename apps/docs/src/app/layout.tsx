@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import Link from "next/link";
-import { Logo, AppLink, GlassyHeader } from "@verixa/ui";
+import { DocsHeader } from "../components/docs-header";
 import "./globals.css";
 
 const inter = Inter({
@@ -136,55 +136,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} antialiased`}>
       <body className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-emerald-500/20 selection:text-emerald-900">
-        {/* Floating Header */}
-        <GlassyHeader
-          logoBadge="DOCS"
-          logoBadgeColor="emerald"
-          customCenter={
-            <div className="flex items-center gap-1">
-              <Link
-                href="/"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-900 bg-slate-100 transition-colors"
-              >
-                API Reference
-              </Link>
-              <Link
-                href="/environments"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              >
-                Environments
-              </Link>
-              <Link
-                href="/smart-cache"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              >
-                Smart Cache
-              </Link>
-              <Link
-                href="/airtime-data"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              >
-                Airtime & Data
-              </Link>
-              <Link
-                href="/roadmap"
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-              >
-                Roadmap
-              </Link>
-            </div>
-          }
-          secondaryCta={{
-            label: "Main Site",
-            app: "www",
-            path: "/",
-          }}
-          primaryCta={{
-            label: "Get API Key",
-            app: "dashboard",
-            path: "/dashboard/api-keys",
-          }}
-        />
+        {/* Modern Docs Header with Back to Homepage */}
+        <DocsHeader />
 
         {/* Two-Panel Layout with Top Offset for Fixed Header */}
         <div className="pt-16 flex-1 flex max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">

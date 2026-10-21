@@ -1,4 +1,4 @@
-import { Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
+import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
 export default function RateLimitsDocsPage() {
   return (
@@ -40,6 +40,35 @@ export default function RateLimitsDocsPage() {
           </TableRow>
         </TableBody>
       </Table>
+
+      <div className="space-y-4 pt-4 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Rate Limit Headers Example</h2>
+        <div className="space-y-3">
+          <CodeBlock
+            language="bash"
+            title="HTTP Response Headers (Status 200 OK)"
+            code={`HTTP/1.1 200 OK
+Content-Type: application/json
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 984
+X-RateLimit-Reset: 1729501860`}
+          />
+          <CodeBlock
+            language="json"
+            title="HTTP 429 Too Many Requests Response"
+            code={`{
+  "status": "error",
+  "error_code": "RATE_LIMIT_EXCEEDED",
+  "message": "Too many requests. You have exceeded your 1,000 req/min quota.",
+  "retry_after_seconds": 24,
+  "meta": {
+    "request_id": "vx_req_rate_limit_8f2",
+    "timestamp": "2026-10-21T10:00:00.000Z"
+  }
+}`}
+          />
+        </div>
+      </div>
     </div>
   )
 }
