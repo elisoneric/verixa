@@ -85,7 +85,7 @@ export class BillingService {
       defaultLive = 95;
       defaultCache = 38;
     } else if (serviceType === 'nin' || serviceType === 'nin_advance') {
-      defaultLive = 125;
+      defaultLive = 120;
       defaultCache = 50;
     } else if (serviceType === 'nin_slip') {
       defaultLive = 250;

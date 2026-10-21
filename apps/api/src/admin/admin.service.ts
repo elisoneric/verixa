@@ -211,8 +211,8 @@ export class AdminService implements OnModuleInit {
     };
 
     const sellingRates = {
-      nin: parseInt(map['BASE_NIN_PRICE'] || '125', 10),
-      ninAdvance: parseInt(map['BASE_NIN_ADVANCE_PRICE'] || '125', 10),
+      nin: parseInt(map['BASE_NIN_PRICE'] || '120', 10),
+      ninAdvance: parseInt(map['BASE_NIN_ADVANCE_PRICE'] || '120', 10),
       ninPremium: parseInt(map['BASE_NIN_PREMIUM_PRICE'] || '150', 10),
       ninSlip: parseInt(map['BASE_NIN_SLIP_PRICE'] || '250', 10),
       bvn: parseInt(map['BASE_BVN_PRICE'] || '95', 10),

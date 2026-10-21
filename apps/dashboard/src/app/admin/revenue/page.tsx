@@ -87,8 +87,8 @@ export default function AdminRevenuePage() {
 
   // Services pricing metadata for margin calculation
   const servicesMeta = [
-    { key: "nin", label: "Basic NIN Lookup", sellPrice: 125, buyRate: upstreamRates.nin },
-    { key: "ninAdvance", label: "Advance NIN Lookup", sellPrice: 125, buyRate: upstreamRates.ninAdvance },
+    { key: "nin", label: "Basic NIN Lookup", sellPrice: 120, buyRate: upstreamRates.nin },
+    { key: "ninAdvance", label: "Advance NIN Lookup", sellPrice: 120, buyRate: upstreamRates.ninAdvance },
     { key: "ninPremium", label: "Premium NIN Lookup", sellPrice: 150, buyRate: upstreamRates.ninPremium },
     { key: "ninSlip", label: "Official NIN Slip (PDF)", sellPrice: 250, buyRate: upstreamRates.ninSlip },
     { key: "bvn", label: "BVN Lookup & Match", sellPrice: 95, buyRate: upstreamRates.bvn },
