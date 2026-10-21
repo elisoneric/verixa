@@ -505,7 +505,7 @@ export default function DashboardOverviewPage() {
               step="500"
               value={topupAmount}
               onChange={(e) => setTopupAmount(e.target.value)}
-              placeholder="e.g. 5000"
+              placeholder="5000"
               className="font-mono"
             />
             <p className="text-[11px] text-slate-500 mt-1">Minimum top-up is ₦1,000.</p>

@@ -369,7 +369,7 @@ export default function AdminOrganizationsPage() {
             type="number"
             value={adjAmount}
             onChange={(e) => setAdjAmount(e.target.value)}
-            hint="Positive to credit (e.g. 5000), negative to debit (e.g. -2000)"
+            hint="Positive to credit (+5000), negative to debit (-2000)"
             required
           />
 
@@ -493,21 +493,21 @@ export default function AdminOrganizationsPage() {
               <Input
                 label="BVN Rate (NGX / ₦)"
                 type="number"
-                placeholder="e.g. 35"
+                placeholder="35"
                 value={customBvn}
                 onChange={(e) => setCustomBvn(e.target.value)}
               />
               <Input
                 label="NIN Rate (NGX / ₦)"
                 type="number"
-                placeholder="e.g. 35"
+                placeholder="35"
                 value={customNin}
                 onChange={(e) => setCustomNin(e.target.value)}
               />
               <Input
                 label="NUBAN Rate (NGX / ₦)"
                 type="number"
-                placeholder="e.g. 0"
+                placeholder="0"
                 value={customNuban}
                 onChange={(e) => setCustomNuban(e.target.value)}
               />

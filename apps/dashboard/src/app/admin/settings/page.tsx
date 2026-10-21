@@ -288,10 +288,10 @@ export default function AdminSettingsPage() {
             <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="email"
-                placeholder="Enter recipient email (e.g. dev@verixaid.com)..."
+                placeholder="dev@verixaid.com"
                 value={testEmailRecipient}
                 onChange={(e) => setTestEmailRecipient(e.target.value)}
-                className="flex-1 text-xs rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-slate-900 dark:text-zinc-100 focus:outline-hidden focus:ring-1 focus:ring-emerald-500"
+                className="flex-1 text-xs rounded-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 focus:placeholder-transparent focus:outline-hidden focus:ring-1 focus:ring-slate-900"
               />
               <Button
                 type="button"

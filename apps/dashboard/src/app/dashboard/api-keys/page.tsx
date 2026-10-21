@@ -187,7 +187,7 @@ export default function ApiKeysPage() {
               Key Name / Identifier
             </label>
             <Input
-              placeholder="e.g. Production Backend"
+              placeholder="Production Backend"
               value={keyName}
               onChange={(e) => setKeyName(e.target.value)}
               required

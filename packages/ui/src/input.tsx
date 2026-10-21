@@ -67,7 +67,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             value={value}
             defaultValue={defaultValue}
             className={cn(
-              "flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 shadow-2xs transition-all focus-visible:outline-none focus-visible:border-slate-900 focus-visible:ring-2 focus-visible:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-50",
+              "flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:placeholder-transparent shadow-2xs transition-all focus-visible:outline-none focus-visible:border-slate-900 focus-visible:ring-2 focus-visible:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-50",
               prefixIcon && "pl-10",
               (suffixIcon || copyable) && "pr-10",
               error &&
@@ -82,11 +82,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <button
               type="button"
               onClick={handleCopy}
-              className="absolute right-2 p-1.5 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80 transition-colors"
+              className="absolute right-2 p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               title="Copy to clipboard"
             >
               {copied ? (
-                <span className="text-[10px] font-mono text-emerald-400 font-semibold px-1">
+                <span className="text-[10px] font-mono text-emerald-600 font-semibold px-1">
                   COPIED
                 </span>
               ) : (
@@ -108,16 +108,16 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
 
           {!copyable && suffixIcon && (
-            <div className="absolute right-3 flex items-center text-zinc-500">
+            <div className="absolute right-3 flex items-center text-slate-400">
               {suffixIcon}
             </div>
           )}
         </div>
 
         {error ? (
-          <p className="text-xs text-rose-400 font-medium">{error}</p>
+          <p className="text-xs text-rose-500 font-medium">{error}</p>
         ) : hint ? (
-          <p className="text-xs text-zinc-500">{hint}</p>
+          <p className="text-xs text-slate-500">{hint}</p>
         ) : null}
       </div>
     )

@@ -243,7 +243,6 @@ function RegisterForm() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Acme Technologies"
                 required
               />
             </div>
@@ -256,7 +255,6 @@ function RegisterForm() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@company.com"
                 required
               />
             </div>
@@ -269,7 +267,6 @@ function RegisterForm() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
                 required
               />
               <p className="text-[11px] text-slate-500 mt-1">Must be at least 8 characters.</p>

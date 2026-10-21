@@ -351,19 +351,19 @@ export default function AdminPricingPage() {
                 type="number"
                 value={bonusPercent}
                 onChange={(e) => setBonusPercent(e.target.value)}
-                hint="e.g. 20 for 20% off all queries"
+                hint="20 for 20% off all queries"
               />
               <Input
                 label="Campaign Banner Title"
                 type="text"
                 value={bonusTitle}
                 onChange={(e) => setBonusTitle(e.target.value)}
-                hint="e.g. Flash Developer Bonus Week"
+                hint="Flash Developer Bonus Week"
               />
               <Input
                 label="Expiration Date (Optional)"
                 type="text"
-                placeholder="e.g. Oct 31, 2026"
+                placeholder="Oct 31, 2026"
                 value={bonusExpiry}
                 onChange={(e) => setBonusExpiry(e.target.value)}
                 hint="Display date for banner countdown"

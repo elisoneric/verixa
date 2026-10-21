@@ -434,7 +434,6 @@ export default function BillingPage() {
               Nigerian Phone Number
             </label>
             <Input
-              placeholder="e.g. 08012345678"
               type="tel"
               value={phoneInput}
               onChange={(e) => setPhoneInput(e.target.value)}
@@ -540,7 +539,7 @@ export default function BillingPage() {
                 step="500"
                 value={topupAmount}
                 onChange={(e) => setTopupAmount(e.target.value)}
-                placeholder="e.g. 5000"
+                placeholder="5000"
                 required
               />
               <p className="text-[11px] text-slate-500 mt-1">Minimum top-up is ₦1,000.</p>

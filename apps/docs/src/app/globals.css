@@ -47,6 +47,14 @@ code, pre, .font-mono {
   font-feature-settings: "zero" 0;
 }
 
+/* Auto-clear placeholders on focus across all system text boxes */
+input:focus::placeholder,
+textarea:focus::placeholder {
+  color: transparent !important;
+  opacity: 0 !important;
+  transition: opacity 0.1s ease-out;
+}
+
 /* Light UI System */
 .glass-header {
   background: rgba(255, 255, 255, 0.95);
