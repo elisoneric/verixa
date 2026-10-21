@@ -82,9 +82,19 @@ export class ApiController {
 
     const orgId = req.organizationId;
     const env = normalizeEnvironment(req.environment);
-    const isLive = env === Environment.LIVE;
     const startTime = Date.now();
-    const finalPrice = exactPrice !== undefined ? exactPrice : baseRate;
+
+    // Map service string to BillingService serviceType
+    let rateKey: any = 'nin';
+    if (service === 'nin_advance') rateKey = 'nin_advance';
+    else if (service === 'nin_slip') rateKey = 'nin_slip';
+    else if (service === 'bvn' || service === 'bvn_advance' || service === 'bvn_face_match') rateKey = 'bvn';
+    else if (service === 'cac') rateKey = 'cac';
+    else if (service === 'phone') rateKey = 'phone';
+    else if (service === 'nuban' || service === 'nuban_kyc') rateKey = 'nuban';
+    else if (service === 'sms') rateKey = 'sms';
+    else if (service === 'airtime') rateKey = 'airtime';
+    else if (service === 'data') rateKey = 'data';
 
     // 1. Check Smart Identity Cache
     if (identifier) {
@@ -96,15 +106,13 @@ export class ApiController {
       );
 
       if (cached) {
-        const cacheCost = Math.max(10, Math.round(finalPrice * 0.5));
+        const cacheRateInfo = await this.billingService.getEffectiveRate(orgId, rateKey, true);
+        const cacheCost = exactPrice !== undefined ? Math.round(exactPrice * 0.5) : cacheRateInfo.effectiveRate;
         const reference = `vx_cache_${uuidv4().slice(0, 12)}`;
 
+        // Strict pre-debit: If balance is insufficient, rejects immediately with 400!
         if (orgId) {
-          try {
-            await this.billingService.deductCredits(orgId, env, cacheCost, reference);
-          } catch {
-            // allow continue
-          }
+          await this.billingService.deductCredits(orgId, env, cacheCost, reference);
         }
 
         const latencyMs = Math.max(11, Date.now() - startTime);
@@ -126,42 +134,70 @@ export class ApiController {
           responsePayload: cached.data,
         });
 
+        const cleanEntity = cached.data?.entity !== undefined ? cached.data.entity : cached.data;
+
+        if (req.res && typeof req.res.setHeader === 'function') {
+          try {
+            req.res.setHeader('X-Request-Id', reference);
+            req.res.setHeader('X-Cached', 'true');
+            req.res.setHeader('X-Billed-Amount', String(cacheCost));
+            req.res.setHeader('X-Latency-Ms', String(latencyMs));
+          } catch {
+            // ignore header errors
+          }
+        }
+
+        if (req.query?.verbose === 'true' || req.headers?.['x-verixa-verbose'] === 'true') {
+          return {
+            status: 'success',
+            entity: cleanEntity,
+            data: cleanEntity,
+            billed_amount: cacheCost,
+            cached: true,
+            meta: {
+              request_id: reference,
+              service,
+              latency_ms: latencyMs,
+              environment: env,
+            },
+          };
+        }
+
         return {
-          status: 'success',
-          entity: cached.data,
-          data: cached.data,
-          billed_amount: cacheCost,
-          cached: true,
-          meta: {
-            request_id: reference,
-            service,
-            latency_ms: latencyMs,
-            environment: env,
-          },
+          entity: cleanEntity,
         };
       }
     }
 
-    // 2. Query Primary Gateway
+    // 2. Resolve Dynamic Live Rate (System Config & Org Custom Overrides)
+    const liveRateInfo = await this.billingService.getEffectiveRate(orgId, rateKey, false);
+    const finalPrice = exactPrice !== undefined ? exactPrice : liveRateInfo.effectiveRate;
+    const reference = `vx_live_${uuidv4().slice(0, 12)}`;
+
+    // 3. MANDATORY PRE-DEBIT: Deduct usage fee BEFORE querying upstream gateway!
+    // If balance is 0 or insufficient, throws BadRequestException immediately.
+    // The upstream gateway is NEVER called if wallet has insufficient balance!
+    if (orgId) {
+      await this.billingService.deductCredits(orgId, env, finalPrice, reference);
+    }
+
+    // 4. Query Primary Gateway
     let result: any;
     try {
       result = await queryFn();
     } catch (err: any) {
+      // Auto-refund deducted credits immediately if upstream gateway failed
+      if (orgId) {
+        try {
+          await this.billingService.refundCredits(orgId, env, finalPrice, reference);
+        } catch {
+          // ignore refund error
+        }
+      }
       throw new BadRequestException(err.message || `Failed to verify ${service}`);
     }
 
-    const reference = `vx_live_${uuidv4().slice(0, 12)}`;
-
-    // 3. Deduct standard usage fee
-    if (orgId) {
-      try {
-        await this.billingService.deductCredits(orgId, env, finalPrice, reference);
-      } catch {
-        // proceed
-      }
-    }
-
-    // 4. Cache verified record
+    // 5. Cache verified record
     if (identifier && result?.data) {
       await this.identityCacheService.setCachedRecord(orgId, env, service, identifier, result.data, 'direct');
     }
@@ -185,19 +221,38 @@ export class ApiController {
       responsePayload: result?.data || result,
     });
 
-    const payloadData = result?.data || result;
+    const rawData = result?.data || result;
+    const cleanEntity = rawData?.entity !== undefined ? rawData.entity : rawData;
+
+    if (req.res && typeof req.res.setHeader === 'function') {
+      try {
+        req.res.setHeader('X-Request-Id', reference);
+        req.res.setHeader('X-Cached', 'false');
+        req.res.setHeader('X-Billed-Amount', String(finalPrice));
+        req.res.setHeader('X-Latency-Ms', String(latencyMs));
+      } catch {
+        // ignore header errors
+      }
+    }
+
+    if (req.query?.verbose === 'true' || req.headers?.['x-verixa-verbose'] === 'true') {
+      return {
+        status: 'success',
+        entity: cleanEntity,
+        data: cleanEntity,
+        billed_amount: finalPrice,
+        cached: false,
+        meta: {
+          request_id: reference,
+          service,
+          latency_ms: latencyMs,
+          environment: env,
+        },
+      };
+    }
+
     return {
-      status: 'success',
-      entity: payloadData,
-      data: payloadData,
-      billed_amount: finalPrice,
-      cached: false,
-      meta: {
-        request_id: reference,
-        service,
-        latency_ms: latencyMs,
-        environment: env,
-      },
+      entity: cleanEntity,
     };
   }
 

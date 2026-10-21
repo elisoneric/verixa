@@ -232,10 +232,23 @@ export class ApiClient {
   }
 
   // Direct Verification Endpoints
-  static async executeDirectApi(endpoint: string, method: "POST" | "GET", payload?: any) {
-    return this.request<any>(endpoint, {
+  static async executeDirectApi(path: string, method: "POST" | "GET" | string, payload?: any) {
+    const isGet = method.toUpperCase() === "GET"
+    let url = path
+    if (isGet && payload) {
+      const q = new URLSearchParams()
+      for (const [k, v] of Object.entries(payload)) {
+        if (v !== undefined && v !== null && v !== "") {
+          q.set(k, String(v))
+        }
+      }
+      if (q.toString()) {
+        url += (url.includes("?") ? "&" : "?") + q.toString()
+      }
+    }
+    return this.request<any>(url, {
       method,
-      ...(method === "POST" && payload ? { body: JSON.stringify(payload) } : {}),
+      ...(isGet ? {} : { body: payload ? JSON.stringify(payload) : undefined }),
     })
   }
 
@@ -393,10 +406,18 @@ export class ApiClient {
     return this.request<{
       totalDepositedNgx: number
       totalConsumedNgx: number
+      realCostSpentNgx?: number
+      netProfitNgx?: number
+      profitMarginPercent?: number
+      cacheSavingsNgx?: number
       depositsToday: number
       depositsThisWeek: number
       depositsThisMonth: number
       netReserveNgx: number
+      dojahRates?: Record<string, number>
+      upstreamRates?: Record<string, number>
+      margins?: Record<string, any>
+      breakdownByService?: Record<string, any>
       recentTransactions: Array<{
         id: string
         amount: number
@@ -485,6 +506,30 @@ export class ApiClient {
     return this.request<{ success: boolean; message: string; messageId?: string }>("/v1/admin/notifications/test", {
       method: "POST",
       body: JSON.stringify({ to, customConfig }),
+    })
+  }
+
+  static async getDojahPricing() {
+    return this.request<{
+      rates: {
+        nin: number
+        ninAdvance: number
+        ninPremium: number
+        ninSlip: number
+        bvn: number
+        bvnAdvance: number
+        cac: number
+        phone: number
+        nuban: number
+      }
+      margins: Record<string, { buyCost: number; sellPrice: number; margin: number; marginPercent: number }>
+    }>("/v1/admin/dojah-pricing")
+  }
+
+  static async updateDojahPricing(rates: Record<string, number>) {
+    return this.request<any>("/v1/admin/dojah-pricing", {
+      method: "POST",
+      body: JSON.stringify({ rates }),
     })
   }
 }

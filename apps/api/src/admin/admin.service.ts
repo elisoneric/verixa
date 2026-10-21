@@ -193,6 +193,63 @@ export class AdminService implements OnModuleInit {
     return this.getPricingConfig();
   }
 
+  async getDojahPricing() {
+    const configs = await this.configRepository.find();
+    const map: Record<string, string> = {};
+    configs.forEach((c) => (map[c.key] = c.value));
+
+    const rates = {
+      nin: parseInt(map['DOJAH_COST_NIN'] || '90', 10),
+      ninAdvance: parseInt(map['DOJAH_COST_NIN_ADVANCE'] || '90', 10),
+      ninPremium: parseInt(map['DOJAH_COST_NIN_PREMIUM'] || '110', 10),
+      ninSlip: parseInt(map['DOJAH_COST_NIN_SLIP'] || '180', 10),
+      bvn: parseInt(map['DOJAH_COST_BVN'] || '70', 10),
+      bvnAdvance: parseInt(map['DOJAH_COST_BVN_ADVANCE'] || '90', 10),
+      cac: parseInt(map['DOJAH_COST_CAC'] || '85', 10),
+      phone: parseInt(map['DOJAH_COST_PHONE'] || '35', 10),
+      nuban: parseInt(map['DOJAH_COST_NUBAN'] || '0', 10),
+    };
+
+    const sellingRates = {
+      nin: parseInt(map['BASE_NIN_PRICE'] || '125', 10),
+      ninAdvance: parseInt(map['BASE_NIN_ADVANCE_PRICE'] || '125', 10),
+      ninPremium: parseInt(map['BASE_NIN_PREMIUM_PRICE'] || '150', 10),
+      ninSlip: parseInt(map['BASE_NIN_SLIP_PRICE'] || '250', 10),
+      bvn: parseInt(map['BASE_BVN_PRICE'] || '95', 10),
+      bvnAdvance: parseInt(map['BASE_BVN_ADVANCE_PRICE'] || '125', 10),
+      cac: parseInt(map['BASE_CAC_PRICE'] || '120', 10),
+      phone: parseInt(map['BASE_PHONE_PRICE'] || '50', 10),
+      nuban: parseInt(map['BASE_NUBAN_PRICE'] || '0', 10),
+    };
+
+    const margins: Record<string, { buyCost: number; sellPrice: number; margin: number; marginPercent: number }> = {};
+    for (const [key, buyCost] of Object.entries(rates)) {
+      const sellPrice = (sellingRates as any)[key] || 0;
+      const margin = sellPrice - buyCost;
+      const marginPercent = sellPrice > 0 ? Math.round((margin / sellPrice) * 100) : 0;
+      margins[key] = { buyCost, sellPrice, margin, marginPercent };
+    }
+
+    return {
+      rates,
+      margins,
+    };
+  }
+
+  async updateDojahPricing(rates: Record<string, number>) {
+    if (rates.nin != null) await this.updateConfig('DOJAH_COST_NIN', String(rates.nin), false, 'Dojah Real Buy Cost - NIN Basic');
+    if (rates.ninAdvance != null) await this.updateConfig('DOJAH_COST_NIN_ADVANCE', String(rates.ninAdvance), false, 'Dojah Real Buy Cost - NIN Advance');
+    if (rates.ninPremium != null) await this.updateConfig('DOJAH_COST_NIN_PREMIUM', String(rates.ninPremium), false, 'Dojah Real Buy Cost - NIN Premium');
+    if (rates.ninSlip != null) await this.updateConfig('DOJAH_COST_NIN_SLIP', String(rates.ninSlip), false, 'Dojah Real Buy Cost - NIN Slip');
+    if (rates.bvn != null) await this.updateConfig('DOJAH_COST_BVN', String(rates.bvn), false, 'Dojah Real Buy Cost - BVN');
+    if (rates.bvnAdvance != null) await this.updateConfig('DOJAH_COST_BVN_ADVANCE', String(rates.bvnAdvance), false, 'Dojah Real Buy Cost - BVN Advance');
+    if (rates.cac != null) await this.updateConfig('DOJAH_COST_CAC', String(rates.cac), false, 'Dojah Real Buy Cost - CAC');
+    if (rates.phone != null) await this.updateConfig('DOJAH_COST_PHONE', String(rates.phone), false, 'Dojah Real Buy Cost - Phone');
+    if (rates.nuban != null) await this.updateConfig('DOJAH_COST_NUBAN', String(rates.nuban), false, 'Dojah Real Buy Cost - NUBAN');
+
+    return this.getDojahPricing();
+  }
+
   async upgradeOrganization(
     orgId: string,
     tier: OrganizationTier,
@@ -453,6 +510,73 @@ export class AdminService implements OnModuleInit {
     const depositsThisWeek = Number(depositsThisWeekRes?.sum) || 0;
     const depositsThisMonth = Number(depositsThisMonthRes?.sum) || 0;
 
+    // 4. Real Upstream Cost & Net Profit from Verification Logs
+    const dojahPricingInfo = await this.getDojahPricing();
+    const dojahCostMap: Record<string, number> = {
+      nin: dojahPricingInfo.rates.nin,
+      nin_advance: dojahPricingInfo.rates.ninAdvance,
+      nin_premium: dojahPricingInfo.rates.ninPremium,
+      nin_slip: dojahPricingInfo.rates.ninSlip,
+      bvn: dojahPricingInfo.rates.bvn,
+      bvn_advance: dojahPricingInfo.rates.bvnAdvance,
+      bvn_match: dojahPricingInfo.rates.bvn,
+      cac: dojahPricingInfo.rates.cac,
+      phone: dojahPricingInfo.rates.phone,
+      nuban: dojahPricingInfo.rates.nuban,
+    };
+
+    let realCostSpentNgx = 0;
+    let cacheSavingsNgx = 0;
+    let totalClientRevenue = 0;
+    const breakdownByService: Record<string, { count: number; revenue: number; realCost: number; profit: number }> = {};
+
+    try {
+      const logAggregates = await this.verifyLogRepository
+        .createQueryBuilder('log')
+        .select('log.serviceType', 'serviceType')
+        .addSelect('log.source', 'source')
+        .addSelect('log.isCached', 'isCached')
+        .addSelect('COUNT(*)', 'count')
+        .addSelect('SUM(log.costDeducted)', 'totalRevenue')
+        .where('log.status = :status', { status: VerificationStatus.SUCCESS })
+        .groupBy('log.serviceType')
+        .addGroupBy('log.source')
+        .addGroupBy('log.isCached')
+        .getRawMany();
+
+      for (const row of logAggregates) {
+        const sType = String(row.serviceType || '').toLowerCase();
+        const count = parseInt(row.count, 10) || 0;
+        const rev = parseFloat(row.totalRevenue) || 0;
+        const isCached = row.isCached === true || row.source === 'CACHE';
+        const unitDojahCost = dojahCostMap[sType] || 0;
+
+        totalClientRevenue += rev;
+
+        if (isCached) {
+          cacheSavingsNgx += count * unitDojahCost;
+        } else {
+          realCostSpentNgx += count * unitDojahCost;
+        }
+
+        if (!breakdownByService[sType]) {
+          breakdownByService[sType] = { count: 0, revenue: 0, realCost: 0, profit: 0 };
+        }
+        breakdownByService[sType].count += count;
+        breakdownByService[sType].revenue += rev;
+        if (!isCached) {
+          breakdownByService[sType].realCost += count * unitDojahCost;
+        }
+        breakdownByService[sType].profit = breakdownByService[sType].revenue - breakdownByService[sType].realCost;
+      }
+    } catch (logErr) {
+      // Graceful fallback if query fails
+    }
+
+    const finalRevenue = Math.max(totalConsumedNgx, totalClientRevenue);
+    const netProfitNgx = finalRevenue - realCostSpentNgx;
+    const profitMarginPercent = finalRevenue > 0 ? Math.round((netProfitNgx / finalRevenue) * 100) : 0;
+
     // Get recent 50 transactions with org details
     const recentTx = await this.txRepository.find({
       relations: { wallet: { organization: true } },
@@ -462,11 +586,18 @@ export class AdminService implements OnModuleInit {
 
     return {
       totalDepositedNgx,
-      totalConsumedNgx,
+      totalConsumedNgx: finalRevenue,
+      realCostSpentNgx,
+      netProfitNgx,
+      profitMarginPercent,
+      cacheSavingsNgx,
       depositsToday,
       depositsThisWeek,
       depositsThisMonth,
-      netReserveNgx: totalDepositedNgx - totalConsumedNgx,
+      netReserveNgx: totalDepositedNgx - finalRevenue,
+      dojahRates: dojahPricingInfo.rates,
+      margins: dojahPricingInfo.margins,
+      breakdownByService,
       recentTransactions: recentTx.map(t => ({
         id: t.id,
         amount: Number(t.amount),

@@ -97,28 +97,28 @@ export default function NinDocsPage() {
             <span className="text-sky-700 font-bold block">1. Basic NIN Lookup</span>
             <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/nin or GET /api/v1/kyc/nin?nin=...</code>
             <p className="text-slate-600 font-sans text-xs">
-              Direct upstream to Dojah Basic (<code className="text-slate-800">GET /api/v1/kyc/nin</code>). Returns full name, gender, date of birth, phone number, and photo.
+              Direct connection to National Identity Database Basic (<code>GET /api/v1/kyc/nin</code>). Returns full name, gender, date of birth, phone number, and photo.
             </p>
           </div>
           <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
             <span className="text-sky-700 font-bold block">2. Advance NIN Lookup</span>
             <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/nin/advance or GET ?nin=...</code>
             <p className="text-slate-600 font-sans text-xs">
-              Direct upstream to Dojah Advance (<code className="text-slate-800">GET /api/v1/kyc/nin/advance</code>). Adds birth details, full residence address, state and LGA of origin, next-of-kin, and tracking ID.
+              Direct connection to National Identity Database Advance (<code>GET /api/v1/kyc/nin/advance</code>). Adds birth details, full residence address, state and LGA of origin, next-of-kin, and tracking ID.
             </p>
           </div>
           <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
             <span className="text-sky-700 font-bold block">3. Premium NIN Lookup</span>
             <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/nin/premium or GET ?nin=...</code>
             <p className="text-slate-600 font-sans text-xs">
-              Direct upstream to Dojah Premium (<code className="text-slate-800">GET /api/v1/kyc/nin/premium</code>). Everything in Advanced, plus demographics, profession, previous name/address, height, title, and digital signature records.
+              Direct connection to National Identity Database Premium (<code>GET /api/v1/kyc/nin/premium</code>). Everything in Advanced, plus demographics, profession, previous name/address, height, title, and digital signature records.
             </p>
           </div>
           <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
             <span className="text-sky-700 font-bold block">4. NIN Slip Record</span>
             <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/nin/nin_slip or GET ?nin=...</code>
             <p className="text-slate-600 font-sans text-xs">
-              Direct upstream to Dojah NIN Slip (<code className="text-slate-800">GET /api/v1/kyc/nin/nin_slip</code>). Resolves official printable NIMC slip data, tracking ID, and <code className="text-slate-800 font-mono">nin_id</code> (base64 PDF).
+              Direct connection to National Identity Database NIN Slip (<code>GET /api/v1/kyc/nin/nin_slip</code>). Resolves official printable NIMC slip data, tracking ID, and <code className="text-slate-800 font-mono">nin_id</code> (base64 PDF).
             </p>
           </div>
           <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1 sm:col-span-2">
@@ -175,25 +175,16 @@ export default function NinDocsPage() {
           language="json"
           title="HTTP 200 OK Response (Basic NIN)"
           code={`{
-  "status": "success",
   "entity": {
-    "nin": "70123456789",
-    "first_name": "JOHN",
-    "last_name": "MUSA",
-    "middle_name": "DOE",
+    "first_name": "John",
+    "last_name": "Musa",
     "gender": "Male",
-    "date_of_birth": "1990-01-11",
-    "phone_number": "081123456798",
-    "photo": "/9j/4AAQSkZJRgABAQEASABIAAD/2wBD...",
-    "employment_status": "employed",
-    "marital_status": "single"
-  },
-  "billed_amount": 125,
-  "cached": false,
-  "meta": {
-    "request_id": "vx_req_7a18f2d9",
-    "service": "nin",
-    "latency_ms": 154
+    "middle_name": "Doe",
+    "photo": "/9j/4AAQSkZJRgABAgAAAQABAAD/2wBD…",
+    "date_of_birth": "1982-01-01",
+    "phone_number": "08012345678",
+    "employment_status": "unemployment",
+    "marital_status": "Single"
   }
 }`}
         />
@@ -201,50 +192,47 @@ export default function NinDocsPage() {
 
       {/* Code Examples: Advance NIN */}
       <div className="space-y-4 pt-4 border-t border-slate-200">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">2. Advance NIN Lookup (POST /api/v1/kyc/nin/advance)</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">2. Advance NIN Lookup (GET or POST /api/v1/kyc/nin/advance)</h2>
         <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
           Adds comprehensive residence address, state of origin, tracking ID, and next-of-kin information.
         </p>
         <CodeBlock
           language="bash"
           title="cURL Request (Advance Profile)"
-          code={`curl -X POST "https://api.verixaid.com/api/v1/kyc/nin/advance" \\
-  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "nin": "70123456789",
-    "consent": true
-  }'`}
+          code={`curl -X GET "https://api.verixaid.com/api/v1/kyc/nin/advance?nin=70123456789" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..."`}
         />
 
         <CodeBlock
           language="json"
           title="HTTP 200 OK Response (Advance NIN)"
           code={`{
-  "status": "success",
   "entity": {
     "nin": "70123456789",
-    "tracking_id": "T09281729481",
     "first_name": "JOHN",
-    "last_name": "MUSA",
+    "last_name": "ADAMU",
     "middle_name": "DOE",
-    "gender": "MALE",
-    "date_of_birth": "1990-01-11",
-    "phone_number": "081123456798",
-    "photo": "/9j/4AAQSkZJRg...",
-    "signature": "data:image/png;base64,...",
-    "residence_state": "Lagos",
+    "date_of_birth": "1990-01-01",
+    "phone_number": "08012345678",
+    "photo": "/9j/4AAQSkZJRgABAgAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL....",
+    "gender": "Male",
+    "birth_country": "nigeria",
+    "birth_lga": "Ikeja",
+    "birth_state": "Lagos",
+    "residence_address_line_1": "1, EXAMPLE STREET",
+    "residence_status": "birth",
+    "residence_town": "IKEJA",
     "residence_lga": "Ikeja",
-    "residence_address_line_1": "2, ANON STREET",
-    "nok_firstname": "JANE",
-    "nok_lastname": "MUSA"
-  },
-  "billed_amount": 125,
-  "cached": false,
-  "meta": {
-    "request_id": "vx_req_4f92a10c",
-    "service": "nin_advance",
-    "latency_ms": 168
+    "residence_state": "Lagos",
+    "origin_lga": "Ikeja",
+    "origin_place": "IKEJA",
+    "origin_state": "Lagos",
+    "nok_first_name": "JANE",
+    "nok_middle_name": "AMINA",
+    "nok_last_name": "ADAMU",
+    "nok_town": "IKEJA",
+    "nok_lga": "Ikeja",
+    "nok_address_line_1": "1, EXAMPLE STREET"
   }
 }`}
         />
@@ -267,16 +255,15 @@ export default function NinDocsPage() {
           language="json"
           title="HTTP 200 OK Response (NIN Slip)"
           code={`{
-  "status": "success",
   "entity": {
-    "nin": "70123456789",
+    "nin": "1*****78910",
     "first_name": "John",
     "last_name": "Musa",
     "middle_name": "Doe",
-    "date_of_birth": "1990-01-11",
+    "date_of_birth": "1909-01-11",
     "phone_number": "081123456798",
     "gender": "Male",
-    "photo": "/9j/4AAQSkZJRg...",
+    "photo": "/9j/4AAQSkZJRg…",
     "employment_status": "unemployed",
     "marital_status": "single",
     "birth_state": "Lagos",
@@ -284,14 +271,7 @@ export default function NinDocsPage() {
     "residence_lga": "Lagos West",
     "residence_state": "Lagos",
     "height": "171",
-    "nin_id": "JVBERi0xLjQKJeLjz9MKMSAwIG9iajw..."
-  },
-  "billed_amount": 250,
-  "cached": false,
-  "meta": {
-    "request_id": "vx_req_slip_92b810",
-    "service": "nin_slip",
-    "latency_ms": 182
+    "nin_id": "JVBERi0xLjQ…"
   }
 }`}
         />
