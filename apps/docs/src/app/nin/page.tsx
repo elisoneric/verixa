@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
 export const metadata: Metadata = {
-  title: "NIN Verification API (Low-Cost ₦125) & Automated Slip Generator",
+  title: "NIN Verification API (Low-Cost ₦120) & Automated Slip Generator",
   description:
     "Low-cost NIN verification API in Nigeria. Verify 11-digit NIN with NIMC, retrieve portrait photos, residential demography, automated PDF slips (₦250), and Smart Cache lookups from ₦38.",
   keywords: [
@@ -69,7 +69,7 @@ export default function NinDocsPage() {
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
           <span className="text-slate-500 block">BASIC & ADVANCE NIN</span>
-          <span className="text-emerald-700 font-bold">125 NGX (₦125.00)</span>
+          <span className="text-emerald-700 font-bold">120 NGX (₦120.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
           <span className="text-slate-500 block">PREMIUM / BIOMETRIC</span>
