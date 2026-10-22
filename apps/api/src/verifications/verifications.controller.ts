@@ -26,7 +26,7 @@ import { IdempotencyInterceptor } from '../common/interceptors/idempotency.inter
 import { maskPii } from '../common/utils/pii-masker.util';
 import { Environment, normalizeEnvironment } from '../organizations/entities/environment-config.entity';
 
-@Controller('v1/verify')
+@Controller(['v1/verify', 'api/v1/verify'])
 export class VerificationsController {
   constructor(
     private mockProvider: MockProvider,

@@ -51,6 +51,7 @@ async function bootstrap() {
         origin.endsWith('.esam.com.ng') ||
         origin.includes('localhost') ||
         origin.includes('127.0.0.1') ||
+        origin.includes('129.121.118.93') ||
         process.env.NODE_ENV !== 'production'
       ) {
         callback(null, true);
@@ -68,6 +69,18 @@ async function bootstrap() {
       'Idempotency-Key',
       'idempotency-key',
       'x-verixa-environment',
+      'x-environment',
+      'X-Environment',
+      'environment',
+      'x-mode',
+      'X-Mode',
+      'x-verixa-verbose',
+      'x-app-id',
+      'app-id',
+      'appid',
+      'Accept',
+      'Origin',
+      'X-Requested-With',
       'x-paystack-signature',
     ],
   });

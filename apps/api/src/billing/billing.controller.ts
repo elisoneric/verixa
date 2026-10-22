@@ -16,7 +16,7 @@ import { DualAuthGuard } from '../auth/guards/dual-auth.guard';
 import { FundSandboxDto, ProvisionDedicatedAccountDto, VerifyPaymentDto } from './dto/billing.dto';
 import * as crypto from 'crypto';
 
-@Controller('v1/billing')
+@Controller(['v1/billing', 'api/v1/billing'])
 export class BillingController {
   constructor(
     private billingService: BillingService,

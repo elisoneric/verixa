@@ -24,7 +24,7 @@ import { VerificationLog, VerificationStatus } from '../verifications/entities/v
 import { normalizeEnvironment, Environment } from '../organizations/entities/environment-config.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-@Controller('v1')
+@Controller(['v1', 'api/v1'])
 export class NinSlipController {
   constructor(
     private ninSlipService: NinSlipService,

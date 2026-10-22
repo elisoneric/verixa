@@ -22,7 +22,7 @@ import { VerificationLog, VerificationStatus } from './entities/verification-log
 import { Wallet } from '../billing/entities/wallet.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-@Controller('api')
+@Controller(['api', ''])
 export class ApiController {
   constructor(
     private mockProvider: MockProvider,

@@ -98,6 +98,7 @@ export class ApiClient {
         headers,
       })
     } catch (netErr: any) {
+      console.error("Network request failed to:", `${baseUrl}${path}`, netErr)
       throw new Error(
         "Unable to connect to the Verixa server. Please verify your network connection or ensure the API gateway is online."
       )
@@ -251,10 +252,14 @@ export class ApiClient {
         url += (url.includes("?") ? "&" : "?") + q.toString()
       }
     }
+    // Redundant fail-safe: pass environment query params for reverse proxies & extensions
+    url += (url.includes("?") ? "&" : "?") + `env=${environment}&mode=${environment}`
+
     return this.request<any>(url, {
       method,
       headers: {
         "x-environment": environment,
+        "x-mode": environment,
       },
       ...(isGet ? {} : { body: payload ? JSON.stringify(payload) : undefined }),
     })
