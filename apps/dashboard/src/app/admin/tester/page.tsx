@@ -20,9 +20,9 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
     name: "NIN Slip Record (Official Printable NIMC Slip)",
     path: "/api/v1/kyc/nin/nin_slip",
     method: "GET",
-    description: "Queries Live Registry GET /api/v1/kyc/nin/nin_slip. Returns complete citizen identity plus base64-encoded PDF (nin_id).",
+    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin/nin_slip. Returns complete citizen identity plus base64-encoded PDF (nin_id).",
     defaultParams: {
-      nin: "30882411172",
+      nin: "70123456789",
       consent: true,
     },
   },
@@ -31,7 +31,7 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
     name: "Basic NIN Lookup (Names, DOB, Phone & Photo)",
     path: "/api/v1/kyc/nin",
     method: "GET",
-    description: "Queries Live Registry GET /api/v1/kyc/nin. Core citizen demographic records and portrait photo.",
+    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin. Core citizen demographic records and portrait photo.",
     defaultParams: {
       nin: "70123456789",
       consent: true,
@@ -42,7 +42,7 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
     name: "Advance NIN Lookup (Address, NOK & Origin)",
     path: "/api/v1/kyc/nin/advance",
     method: "GET",
-    description: "Queries Live Registry GET /api/v1/kyc/nin/advance. Adds residential address, next of kin, and tracking ID.",
+    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin/advance. Adds residential address, next of kin, and tracking ID.",
     defaultParams: {
       nin: "70123456789",
       consent: true,
@@ -53,7 +53,7 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
     name: "Premium NIN Lookup (Demographics & Signature)",
     path: "/api/v1/kyc/nin/premium",
     method: "GET",
-    description: "Queries Live Registry GET /api/v1/kyc/nin/premium. Comprehensive record with profession, religion, and signature.",
+    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin/premium. Comprehensive record with profession, religion, and signature.",
     defaultParams: {
       nin: "70123456789",
       consent: true,
@@ -66,7 +66,7 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
     method: "POST",
     description: "Generates high-resolution printable PDF and Word DOCX from official NIMC template.",
     defaultParams: {
-      nin: "30882411172",
+      nin: "70123456789",
       format: "both",
       consent: true,
     },
@@ -78,7 +78,7 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
     method: "POST",
     description: "Generates official NIMC Digital NIN Card (Credit Card size) featuring Photo, Names, DOB, Gender, QR Code, and formatted NIN without address.",
     defaultParams: {
-      nin: "30882411172",
+      nin: "70123456789",
       cardType: "card",
       format: "pdf",
       consent: true,
@@ -89,9 +89,9 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
     name: "BVN Lookup & Name Match",
     path: "/api/v1/kyc/bvn",
     method: "GET",
-    description: "Queries Live Registry GET /api/v1/kyc/bvn against the NIBSS central banking registry.",
+    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/bvn against the NIBSS central banking registry.",
     defaultParams: {
-      bvn: "22123456789",
+      bvn: "22222222222",
       consent: true,
     },
   },
@@ -100,9 +100,31 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
     name: "BVN Advance Profile",
     path: "/api/v1/kyc/bvn/advance",
     method: "GET",
-    description: "Queries Live Registry GET /api/v1/kyc/bvn/advance. Full banking demographic and portrait records.",
+    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/bvn/advance. Full banking demographic and portrait records.",
     defaultParams: {
-      bvn: "22123456789",
+      bvn: "22222222222",
+      consent: true,
+    },
+  },
+  {
+    id: "phone-basic",
+    name: "Phone Number Basic Lookup",
+    path: "/api/v1/kyc/phone_number/basic",
+    method: "GET",
+    description: "Queries telecommunications subscriber registry by registered phone number.",
+    defaultParams: {
+      phone_number: "09011111111",
+      consent: true,
+    },
+  },
+  {
+    id: "phone-advance",
+    name: "Phone Number Advance Profile",
+    path: "/api/v1/kyc/phone_number",
+    method: "GET",
+    description: "Queries comprehensive phone subscriber identity, demographics, and registration details.",
+    defaultParams: {
+      phone_number: "09011111111",
       consent: true,
     },
   },
@@ -122,7 +144,7 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
 
 export default function AdminTesterPage() {
   const [selectedId, setSelectedId] = React.useState<string>("nin-slip")
-  const [mode, setMode] = React.useState<"live" | "sandbox">("live")
+  const [mode, setMode] = React.useState<"live" | "sandbox">("sandbox")
   const [params, setParams] = React.useState<string>("")
   const [isLoading, setIsLoading] = React.useState(false)
   const [response, setResponse] = React.useState<any | null>(null)
@@ -302,12 +324,12 @@ export default function AdminTesterPage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               Upstream API Tester & Live Slip Viewer
             </h1>
-            <Badge variant="verified" size="sm">
-              LIVE DIRECT
+            <Badge variant={mode === "sandbox" ? "info" : "failed"} size="sm">
+              {mode === "sandbox" ? "SANDBOX FREE (0 COST)" : "LIVE DIRECT (METERED)"}
             </Badge>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Test upstream verification endpoints and inspect live raw responses, tracking IDs, and decoded NIMC PDF slips.
+            Test upstream identity verification endpoints and inspect authentic raw responses, tracking IDs, and decoded NIMC PDF slips & cards.
           </p>
         </div>
 
@@ -316,21 +338,52 @@ export default function AdminTesterPage() {
           <button
             onClick={() => setMode("sandbox")}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-              mode === "sandbox" ? "bg-slate-900 text-white" : "text-slate-600 hover:text-slate-900"
+              mode === "sandbox" ? "bg-emerald-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            Sandbox Mock
+            🟢 Sandbox Mock (Free)
           </button>
           <button
             onClick={() => setMode("live")}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-              mode === "live" ? "bg-emerald-600 text-white" : "text-slate-600 hover:text-slate-900"
+              mode === "live" ? "bg-rose-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            Live Upstream Registry
+            🔴 Live Upstream (Charges Credits)
           </button>
         </div>
       </div>
+
+      {/* Mode Banner */}
+      {mode === "sandbox" ? (
+        <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs">
+          <div className="flex items-center gap-2">
+            <span className="font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">
+              🟢 Free Sandbox Active
+            </span>
+            <span>
+              Calls are simulated with official Dojah sandbox credentials. Real high-resolution PDF slips & ID-1 cards are generated with zero upstream cost.
+            </span>
+          </div>
+          <div className="text-[11px] font-mono text-emerald-800 shrink-0">
+            Dojah Sandbox: NIN <strong>70123456789</strong> • BVN <strong>22222222222</strong> • Phone <strong>09011111111</strong>
+          </div>
+        </div>
+      ) : (
+        <div className="p-3.5 rounded-xl border border-rose-300 bg-rose-50 text-rose-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs animate-pulse">
+          <div className="flex items-center gap-2">
+            <span className="font-bold uppercase tracking-wider text-rose-950 bg-rose-200 px-2 py-0.5 rounded text-[11px]">
+              ⚠️ Caution: Live Upstream Registry
+            </span>
+            <span>
+              Every query calls live Dojah & federal registries, deducting real wallet credits/money. Only query authentic citizen records.
+            </span>
+          </div>
+          <div className="text-[11px] font-mono text-rose-800 shrink-0 font-bold">
+            Real Credits Billed Per Call
+          </div>
+        </div>
+      )}
 
       {/* Endpoint Selector Pills */}
       <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-3 shadow-2xs">
@@ -375,38 +428,98 @@ export default function AdminTesterPage() {
               <p className="text-xs text-slate-600 mt-1">{currentEndpoint.description}</p>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-slate-700 uppercase">
                   Parameters ({currentEndpoint.method === "GET" ? "Query Params" : "JSON Body"})
                 </label>
                 <button
                   onClick={() => setParams(JSON.stringify(currentEndpoint.defaultParams, null, 2))}
-                  className="text-[11px] text-slate-500 hover:text-slate-900 font-mono cursor-pointer"
+                  className="text-[11px] text-slate-500 hover:text-slate-900 font-mono cursor-pointer font-bold underline"
                 >
                   Reset Sample
                 </button>
               </div>
+
+              {/* Quick-Insert Sandbox Values Bar */}
+              <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-slate-100 border border-slate-200 text-[11px] font-mono">
+                <span className="text-slate-500 font-bold text-[10px] uppercase">Dojah Sandbox:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      const cur = JSON.parse(params)
+                      cur.nin = "70123456789"
+                      setParams(JSON.stringify(cur, null, 2))
+                    } catch {
+                      setParams(JSON.stringify({ nin: "70123456789", consent: true }, null, 2))
+                    }
+                  }}
+                  className="px-2 py-0.5 rounded bg-white hover:bg-slate-200 text-slate-800 font-semibold cursor-pointer border border-slate-300 transition-colors shadow-2xs"
+                >
+                  NIN: 70123456789
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      const cur = JSON.parse(params)
+                      cur.bvn = "22222222222"
+                      setParams(JSON.stringify(cur, null, 2))
+                    } catch {
+                      setParams(JSON.stringify({ bvn: "22222222222", consent: true }, null, 2))
+                    }
+                  }}
+                  className="px-2 py-0.5 rounded bg-white hover:bg-slate-200 text-slate-800 font-semibold cursor-pointer border border-slate-300 transition-colors shadow-2xs"
+                >
+                  BVN: 22222222222
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      const cur = JSON.parse(params)
+                      cur.phone_number = "09011111111"
+                      if (cur.phone) cur.phone = "09011111111"
+                      setParams(JSON.stringify(cur, null, 2))
+                    } catch {
+                      setParams(JSON.stringify({ phone_number: "09011111111", consent: true }, null, 2))
+                    }
+                  }}
+                  className="px-2 py-0.5 rounded bg-white hover:bg-slate-200 text-slate-800 font-semibold cursor-pointer border border-slate-300 transition-colors shadow-2xs"
+                >
+                  Phone: 09011111111
+                </button>
+              </div>
+
               <textarea
                 value={params}
                 onChange={(e) => setParams(e.target.value)}
-                rows={9}
+                rows={8}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3.5 font-mono text-xs text-slate-900 focus:border-slate-900 focus:bg-white focus:outline-none transition-all shadow-inner"
               />
             </div>
 
             <div className="text-[11px] text-slate-500 font-mono space-y-1">
-              <div>• Live mode queries official primary identity registry credentials.</div>
-              <div>• Sandbox mode returns mock government records with real generated PDF.</div>
+              <div>• Live mode queries official primary identity registry credentials and bills wallet credits.</div>
+              <div>• Sandbox mode returns mock government records with real generated PDF and Digital Card for free.</div>
             </div>
           </div>
 
           <Button
             onClick={handleExecute}
             disabled={isLoading}
-            className="w-full mt-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5"
+            className={`w-full mt-4 font-semibold py-2.5 transition-colors cursor-pointer ${
+              mode === "live"
+                ? "bg-rose-600 hover:bg-rose-700 text-white"
+                : "bg-slate-900 hover:bg-slate-800 text-white"
+            }`}
           >
-            {isLoading ? "Querying Upstream..." : `Send Upstream Test (${currentEndpoint.method})`}
+            {isLoading
+              ? "Querying Gateway..."
+              : mode === "live"
+              ? `Send Upstream Test (${currentEndpoint.method}) - Live (Charges Credits)`
+              : `Send Upstream Test (${currentEndpoint.method}) - Sandbox (Free 0 Cost)`}
           </Button>
         </div>
 
@@ -635,7 +748,11 @@ export default function AdminTesterPage() {
             /* Tab: Raw JSON */
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500">
-                <span>Live Registry JSON Response Body</span>
+                <span>
+                  {mode === "sandbox"
+                    ? "Sandbox Mock JSON Response Body (Free Test Registry)"
+                    : "Live Registry JSON Response Body (Official Production)"}
+                </span>
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(JSON.stringify(response, null, 2))

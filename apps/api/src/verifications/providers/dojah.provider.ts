@@ -79,6 +79,12 @@ export class DojahProvider implements IVerificationProvider {
   // --- 1. BVN Lookups ---
 
   async verifyBvn(data: BvnVerificationData): Promise<VerificationResponse<any>> {
+    const cleanBvn = String(data.bvn || '').trim();
+    if (cleanBvn === '22222222222' || cleanBvn === '00000000000' || cleanBvn === '22123456789') {
+      this.logger.log(`DojahProvider: Sandbox test BVN ${cleanBvn} detected; routing to mock provider to prevent live upstream charges.`);
+      return this.mockProvider.verifyBvn(data);
+    }
+
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!this.isConfigured()) {
       this.logger.log('Dojah credentials not live, falling back to mock provider for BVN');
@@ -140,6 +146,12 @@ export class DojahProvider implements IVerificationProvider {
   // --- 2. NIN Lookups ---
 
   async verifyNin(data: NinVerificationData): Promise<VerificationResponse<any>> {
+    const cleanNin = String(data.nin || '').trim();
+    if (cleanNin === '70123456789' || cleanNin === '00000000000' || cleanNin === '11234567890') {
+      this.logger.log(`DojahProvider: Sandbox test NIN ${cleanNin} detected; routing to mock provider to prevent live upstream charges.`);
+      return this.mockProvider.verifyNin(data);
+    }
+
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!this.isConfigured()) {
       this.logger.log('Dojah credentials not live, falling back to mock provider for NIN');
@@ -250,6 +262,12 @@ export class DojahProvider implements IVerificationProvider {
   }
 
   async verifyNinAdvance(data: NinAdvanceVerificationData): Promise<VerificationResponse<NinAdvanceResult>> {
+    const cleanNin = String(data.nin || '').trim();
+    if (cleanNin === '70123456789' || cleanNin === '00000000000' || cleanNin === '11234567890') {
+      this.logger.log(`DojahProvider: Sandbox test NIN ${cleanNin} detected in advance query; routing to mock provider.`);
+      return this.mockProvider.verifyNinAdvance(data);
+    }
+
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!this.isConfigured()) {
       this.logger.log('Dojah credentials not live, falling back to mock provider for NIN Advance');
@@ -409,6 +427,12 @@ export class DojahProvider implements IVerificationProvider {
   // --- 4. Phone Number Lookup ---
 
   async verifyPhoneNumber(data: PhoneNumberVerificationData): Promise<VerificationResponse<any>> {
+    const cleanPhone = String(data.phoneNumber || '').trim();
+    if (cleanPhone === '09011111111' || cleanPhone === '2349011111111' || cleanPhone.endsWith('011111111')) {
+      this.logger.log(`DojahProvider: Sandbox test Phone ${cleanPhone} detected; routing to mock provider.`);
+      return this.mockProvider.verifyPhoneNumber!(data);
+    }
+
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!this.isConfigured()) {
       return this.mockProvider.verifyPhoneNumber!(data);

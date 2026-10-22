@@ -15,12 +15,13 @@ import { ApiKeyGuard } from '../auth/guards/api-key.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { NinSlipService } from './nin-slip.service';
 import { DojahProvider } from '../verifications/providers/dojah.provider';
+import { MockProvider } from '../verifications/providers/mock.provider';
 import { BillingService } from '../billing/billing.service';
 import { IdentityCacheService } from '../verifications/identity-cache.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VerificationLog, VerificationStatus } from '../verifications/entities/verification-log.entity';
-import { normalizeEnvironment } from '../organizations/entities/environment-config.entity';
+import { normalizeEnvironment, Environment } from '../organizations/entities/environment-config.entity';
 import { v4 as uuidv4 } from 'uuid';
 
 @Controller('v1')
@@ -28,6 +29,7 @@ export class NinSlipController {
   constructor(
     private ninSlipService: NinSlipService,
     private dojahProvider: DojahProvider,
+    private mockProvider: MockProvider,
     private billingService: BillingService,
     private identityCacheService: IdentityCacheService,
     @InjectRepository(VerificationLog)
@@ -171,7 +173,9 @@ export class NinSlipController {
     await this.billingService.deductCredits(req.organizationId, env, cost, reference);
 
     try {
-      const result = await this.dojahProvider.verifyNinAdvance({ nin });
+      const isLive = env === Environment.LIVE && nin !== '70123456789' && nin !== '11234567890';
+      const provider = isLive ? this.dojahProvider : this.mockProvider;
+      const result = await provider.verifyNinAdvance({ nin });
       const latencyMs = Math.max(90, Date.now() - startTime);
 
       await this.logRepository.save({
@@ -180,9 +184,9 @@ export class NinSlipController {
         api_key_id: req.apiKeyId || 'sdk_key',
         serviceType: 'nin_advance',
         status: result.status === 'success' ? VerificationStatus.SUCCESS : VerificationStatus.FAILED,
-        upstreamProvider: result.meta?.provider || 'direct',
+        upstreamProvider: result.meta?.provider || (isLive ? 'direct' : 'verixa_mock'),
         isCached: false,
-        source: 'LIVE',
+        source: isLive ? 'LIVE' : 'SANDBOX',
         costDeducted: cost,
         latencyMs,
         requestPayload: { nin },

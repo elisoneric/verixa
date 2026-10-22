@@ -23,7 +23,12 @@ import {
 } from './verification.provider.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { faker } from '@faker-js/faker/locale/en_NG';
-import { generatePdfSlip } from '../../slips/slip-generator.util';
+import {
+  generatePdfSlip,
+  generateDocxSlip,
+  generateDigitalNinCardPdf,
+  generateDigitalNinCardSvg,
+} from '../../slips/slip-generator.util';
 
 @Injectable()
 export class MockProvider implements IVerificationProvider {
@@ -39,11 +44,13 @@ export class MockProvider implements IVerificationProvider {
       };
     }
 
+    const isSandboxDojahBvn = data.bvn === '22222222222';
+
     if (data.variant === 'match') {
       return {
         status: 'success',
         data: {
-          bvn: { value: `${data.bvn.slice(0, 1)}*****${data.bvn.slice(-5)}`, status: true },
+          bvn: { value: isSandboxDojahBvn ? '22222222222' : `${data.bvn.slice(0, 1)}*****${data.bvn.slice(-5)}`, status: true },
           first_name: { confidence_value: 100, status: true },
           last_name: { confidence_value: 100, status: true },
         },
@@ -51,21 +58,24 @@ export class MockProvider implements IVerificationProvider {
       };
     }
 
-    const firstName = data.firstName?.toUpperCase() || faker.person.firstName().toUpperCase();
-    const lastName = data.lastName?.toUpperCase() || faker.person.lastName().toUpperCase();
-    const phoneNumber = `0${faker.string.numeric(10)}`;
+    const firstName = isSandboxDojahBvn ? 'JOHN' : (data.firstName?.toUpperCase() || faker.person.firstName().toUpperCase());
+    const lastName = isSandboxDojahBvn ? 'MUSA' : (data.lastName?.toUpperCase() || faker.person.lastName().toUpperCase());
+    const middleName = isSandboxDojahBvn ? 'DOE' : 'CHUKWUEMEKA';
+    const dob = isSandboxDojahBvn ? '1990-01-11' : (data.dob || '1992-05-16');
+    const phoneNumber = isSandboxDojahBvn ? '09011111111' : `0${faker.string.numeric(10)}`;
 
     return {
       status: 'success',
       data: {
-        bvn: `${data.bvn.slice(0, 1)}*****${data.bvn.slice(-5)}`,
+        bvn: isSandboxDojahBvn ? '22222222222' : `${data.bvn.slice(0, 1)}*****${data.bvn.slice(-5)}`,
         first_name: firstName,
         last_name: lastName,
-        middle_name: 'CHUKWUEMEKA',
-        date_of_birth: data.dob || '1992-05-16',
+        middle_name: middleName,
+        date_of_birth: dob,
         phone_number1: phoneNumber,
+        phone_number: phoneNumber,
         gender: 'Male',
-        enrollment_bank: 'GTB',
+        enrollment_bank: '058',
         enrollment_branch: 'IKEJA',
         level_of_account: 'LEVEL 3',
         nationality: 'NIGERIAN',
@@ -87,11 +97,15 @@ export class MockProvider implements IVerificationProvider {
     }
 
     if (data.tier === 'advance' || data.tier === 'premium' || data.tier === 'slip') {
-      return this.verifyNinAdvance({ nin: data.nin, isSlip: data.tier === 'slip' });
+      return this.verifyNinAdvance({ nin: data.nin, isSlip: true });
     }
 
-    const firstName = data.firstName?.toUpperCase() || faker.person.firstName().toUpperCase();
-    const lastName = data.lastName?.toUpperCase() || faker.person.lastName().toUpperCase();
+    const isSandboxDojahNin = data.nin === '70123456789';
+    const firstName = isSandboxDojahNin ? 'JOHN' : (data.firstName?.toUpperCase() || faker.person.firstName().toUpperCase());
+    const lastName = isSandboxDojahNin ? 'MUSA' : (data.lastName?.toUpperCase() || faker.person.lastName().toUpperCase());
+    const middleName = isSandboxDojahNin ? 'DOE' : 'CHUKWUEMEKA';
+    const phone = isSandboxDojahNin ? '09011111111' : `080${faker.string.numeric(8)}`;
+    const dob = isSandboxDojahNin ? '1990-01-11' : '1982-01-01';
 
     let photoBase64 = '';
     try {
@@ -108,15 +122,16 @@ export class MockProvider implements IVerificationProvider {
     return {
       status: 'success',
       data: {
+        nin: data.nin,
         first_name: firstName,
         last_name: lastName,
         gender: 'Male',
-        middle_name: 'DOE',
+        middle_name: middleName,
         photo: photoBase64,
-        date_of_birth: '1982-01-01',
-        phone_number: `080${faker.string.numeric(8)}`,
-        employment_status: 'unemployment',
-        marital_status: 'Single',
+        date_of_birth: dob,
+        phone_number: phone,
+        employment_status: 'unemployed',
+        marital_status: 'single',
       },
       meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
     };
@@ -137,12 +152,17 @@ export class MockProvider implements IVerificationProvider {
     const middleNames = ['OLUWASEUN', 'SOMTOCHUKWU', 'AYOMIDE', 'IFEANYI', 'DAUDA', 'CHIDIEBERE', 'ENIOLA', 'YAKUBU', 'OLATUNJI'];
 
     const seed = data.nin.split('').reduce((acc, c) => acc + parseInt(c, 10) || 0, 0);
-    const firstName = firstNames[seed % firstNames.length];
-    const surname = surnames[(seed + 3) % surnames.length];
-    const middleName = middleNames[(seed + 5) % middleNames.length];
-    const gender = seed % 2 === 0 ? 'MALE' : 'FEMALE';
-
-    const trackid = `VNX-${faker.string.numeric(4)}-${faker.string.numeric(4)}-${faker.string.numeric(4)}`;
+    const isSandboxDojah = data.nin === '70123456789';
+    const firstName = isSandboxDojah ? 'JOHN' : firstNames[seed % firstNames.length];
+    const surname = isSandboxDojah ? 'MUSA' : surnames[(seed + 3) % surnames.length];
+    const middleName = isSandboxDojah ? 'DOE' : middleNames[(seed + 5) % middleNames.length];
+    const gender = 'MALE';
+    const dob = isSandboxDojah ? '1990-01-11' : '1990-01-01';
+    const phone = isSandboxDojah ? '09011111111' : `080${faker.string.numeric(8)}`;
+    const address = isSandboxDojah ? '2, ANON STREET' : '1, EXAMPLE STREET';
+    const lga = isSandboxDojah ? 'Lagos West' : 'Ikeja';
+    const state = 'Lagos';
+    const trackingId = isSandboxDojah ? 'VNX-7012-3456-7890' : `VNX-${faker.string.numeric(4)}-${faker.string.numeric(4)}-${faker.string.numeric(4)}`;
 
     let photoBase64 = '';
     try {
@@ -157,68 +177,118 @@ export class MockProvider implements IVerificationProvider {
     }
 
     let ninIdPdfBase64 = '';
-    if (data.isSlip) {
-      try {
-        const pdfBuf = await generatePdfSlip({
-          nin: data.nin,
-          trackingId: trackid,
-          firstName,
-          surname,
-          middleName,
-          gender: gender === 'MALE' ? 'M' : 'F',
-          address: '14 ADENIRAN OGUNSANYA STREET',
-          addressLine1: 'SURULERE, IKEJA LGA',
-          state: 'LAGOS STATE',
-          photo: photoBase64,
-        });
-        ninIdPdfBase64 = pdfBuf.toString('base64');
-      } catch {
-        ninIdPdfBase64 = '';
-      }
+    let docxBase64 = '';
+    let cardPdfBase64 = '';
+    let cardSvg = '';
+
+    try {
+      const pdfBuf = await generatePdfSlip({
+        nin: data.nin,
+        trackingId,
+        firstName,
+        surname,
+        middleName,
+        gender: gender === 'MALE' ? 'M' : 'F',
+        address,
+        addressLine1: `${lga}, ${state}`,
+        state: `${state} STATE`,
+        photo: photoBase64,
+      });
+      ninIdPdfBase64 = pdfBuf.toString('base64');
+    } catch {
+      ninIdPdfBase64 = '';
+    }
+
+    try {
+      const docxBuf = await generateDocxSlip({
+        nin: data.nin,
+        trackingId,
+        firstName,
+        surname,
+        middleName,
+        gender,
+        address,
+        addressLine1: lga,
+        state,
+        photo: photoBase64,
+      });
+      docxBase64 = docxBuf.toString('base64');
+    } catch {
+      docxBase64 = '';
+    }
+
+    try {
+      const cardBuf = await generateDigitalNinCardPdf({
+        nin: data.nin,
+        trackingId,
+        firstName,
+        surname,
+        middleName,
+        gender,
+        birthdate: dob,
+        photo: photoBase64,
+      });
+      cardPdfBase64 = cardBuf.toString('base64');
+      cardSvg = await generateDigitalNinCardSvg({
+        nin: data.nin,
+        trackingId,
+        firstName,
+        surname,
+        middleName,
+        gender,
+        birthdate: dob,
+        photo: photoBase64,
+      });
+    } catch {
+      cardPdfBase64 = '';
     }
 
     return {
       status: 'success',
       data: {
-        nin: data.isSlip ? `${data.nin.slice(0, 1)}*****${data.nin.slice(-5)}` : data.nin,
+        nin: data.nin,
         first_name: firstName,
         last_name: surname,
         middle_name: middleName,
-        date_of_birth: '1990-01-01',
-        phone_number: `080${faker.string.numeric(8)}`,
+        date_of_birth: dob,
+        phone_number: phone,
         photo: photoBase64,
-        gender: gender === 'MALE' ? 'Male' : 'Female',
+        gender: 'Male',
         birth_country: 'nigeria',
-        birth_lga: 'Ikeja',
-        birth_state: 'Lagos',
-        residence_address_line_1: '1, EXAMPLE STREET',
+        birth_lga: lga,
+        birth_state: state,
+        residence_address_line_1: address,
         residence_status: 'birth',
-        residence_town: 'IKEJA',
-        residence_lga: 'Ikeja',
-        residence_state: 'Lagos',
-        origin_lga: 'Ikeja',
-        origin_place: 'IKEJA',
-        origin_state: 'Lagos',
+        residence_town: lga,
+        residence_lga: lga,
+        residence_state: state,
+        origin_lga: lga,
+        origin_place: lga,
+        origin_state: state,
         nok_first_name: 'JANE',
         nok_middle_name: 'AMINA',
         nok_last_name: surname,
-        nok_town: 'IKEJA',
-        nok_lga: 'Ikeja',
-        nok_address_line_1: '1, EXAMPLE STREET',
-        employment_status: seed % 2 === 0 ? 'employed' : 'unemployed',
-        marital_status: seed % 3 === 0 ? 'married' : 'single',
+        nok_town: lga,
+        nok_lga: lga,
+        nok_address_line_1: address,
+        employment_status: 'unemployed',
+        marital_status: 'single',
         height: '171',
-        tracking_id: trackid,
-        trackingId: trackid,
+        tracking_id: trackingId,
+        trackingId,
         firstName,
         surname,
         middleName,
-        address: '1, EXAMPLE STREET',
-        addressLine1: 'IKEJA',
-        state: 'Lagos',
+        address,
+        addressLine1: lga,
+        state,
         nok_firstname: 'JANE',
         nok_lastname: surname,
-        ...(data.isSlip ? { nin_id: ninIdPdfBase64 } : {}),
+        nin_id: ninIdPdfBase64,
+        pdfBase64: ninIdPdfBase64,
+        docxBase64,
+        cardPdfBase64,
+        cardSvg,
       },
       meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
     };
@@ -272,17 +342,36 @@ export class MockProvider implements IVerificationProvider {
   async verifyPhoneNumber(data: PhoneNumberVerificationData): Promise<VerificationResponse<any>> {
     await new Promise(resolve => setTimeout(resolve, 300));
 
+    const isSandboxDojah = data.phoneNumber === '09011111111' || data.phoneNumber === '2349011111111' || data.phoneNumber.endsWith('011111111');
+    const firstName = isSandboxDojah ? 'JOHN' : 'OLUWATOBI';
+    const middleName = isSandboxDojah ? 'DOE' : 'SAMUEL';
+    const lastName = isSandboxDojah ? 'MUSA' : 'ADELEKE';
+    const dob = isSandboxDojah ? '1990-01-11' : '1991-04-12';
+
+    let photoBase64 = '';
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const photoPath = path.resolve(__dirname, '../../slips/assets/default_mock_photo.jpg');
+      if (fs.existsSync(photoPath)) {
+        photoBase64 = fs.readFileSync(photoPath).toString('base64');
+      }
+    } catch {
+      photoBase64 = '';
+    }
+
     return {
       status: 'success',
       data: {
-        first_name: 'OLUWATOBI',
-        middle_name: 'SAMUEL',
-        last_name: 'ADELEKE',
+        first_name: firstName,
+        middle_name: middleName,
+        last_name: lastName,
         gender: 'Male',
         nationality: 'NGA',
-        date_of_birth: '1991-04-12',
+        date_of_birth: dob,
+        phone_number: '09011111111',
         msisdn: data.phoneNumber.startsWith('234') ? data.phoneNumber : `234${data.phoneNumber.replace(/^0/, '')}`,
-        photo: data.variant === 'advance' ? 'data:image/jpeg;base64,mockphoto' : undefined,
+        photo: photoBase64,
       },
       meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
     };

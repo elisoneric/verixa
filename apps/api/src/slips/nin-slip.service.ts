@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { DojahProvider } from '../verifications/providers/dojah.provider';
+import { MockProvider } from '../verifications/providers/mock.provider';
 import { IdentityCacheService } from '../verifications/identity-cache.service';
 import { BillingService } from '../billing/billing.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,6 +26,7 @@ export class NinSlipService {
 
   constructor(
     private dojahProvider: DojahProvider,
+    private mockProvider: MockProvider,
     private identityCacheService: IdentityCacheService,
     private billingService: BillingService,
     @InjectRepository(VerificationLog)
@@ -77,6 +79,8 @@ export class NinSlipService {
     }
 
     const validEnv = normalizeEnvironment(environment);
+    const isSandbox = validEnv === Environment.SANDBOX || cleanNin === '70123456789' || cleanNin === '11234567890';
+    const provider = isSandbox ? this.mockProvider : this.dojahProvider;
     const startTime = Date.now();
 
     // 1. Check Smart Identity Cache for existing NIN record
@@ -100,17 +104,17 @@ export class NinSlipService {
       await this.billingService.deductCredits(orgId, validEnv, cost, reference);
       identityData = cached.data;
     } else {
-      // CACHE MISS: Live NIN Query
+      // CACHE MISS: Live or Sandbox NIN Query
       const rateInfo = await this.billingService.getEffectiveRate(orgId, 'nin_slip' as any, false);
       cost = rateInfo.effectiveRate;
       await this.billingService.deductCredits(orgId, validEnv, cost, reference);
 
       try {
-        let upstreamProviderName = 'direct';
+        let upstreamProviderName = isSandbox ? 'verixa_mock' : 'direct';
 
-        // 1. Try Live NIN Slip lookup (full NDPC dataset + photo + tracking ID)
+        // 1. Try NIN Slip lookup (full NDPC dataset + photo + tracking ID)
         try {
-          const slipRes = await this.dojahProvider.verifyNin({ nin: cleanNin, tier: 'slip' });
+          const slipRes = await provider.verifyNin({ nin: cleanNin, tier: 'slip' });
           if (slipRes.status === 'success' && slipRes.data) {
             const s = slipRes.data;
             let photoStr = s.photo || '';
@@ -137,7 +141,7 @@ export class NinSlipService {
               height: s.height,
               nin_id: s.nin_id,
             };
-            upstreamProviderName = slipRes.meta?.provider || 'direct';
+            upstreamProviderName = slipRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
           }
         } catch (slipErr: any) {
           this.logger.warn(`verifyNin slip attempt failed: ${slipErr?.message}, falling back to verifyNinAdvance`);
@@ -146,10 +150,10 @@ export class NinSlipService {
         // 2. Fall back to Advance NIN lookup
         if (!identityData) {
           try {
-            const upstreamRes = await this.dojahProvider.verifyNinAdvance({ nin: cleanNin });
+            const upstreamRes = await provider.verifyNinAdvance({ nin: cleanNin });
             if (upstreamRes.status === 'success' && upstreamRes.data) {
               identityData = upstreamRes.data;
-              upstreamProviderName = upstreamRes.meta?.provider || 'direct';
+              upstreamProviderName = upstreamRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
             }
           } catch (advErr: any) {
             this.logger.warn(`verifyNinAdvance attempt failed: ${advErr?.message}, falling back to verifyNin basic`);
@@ -158,7 +162,7 @@ export class NinSlipService {
 
         // 3. Fall back to Basic NIN lookup if Advance did not populate
         if (!identityData) {
-          const basicRes = await this.dojahProvider.verifyNin({ nin: cleanNin });
+          const basicRes = await provider.verifyNin({ nin: cleanNin });
           if (basicRes.status !== 'success' || !basicRes.data) {
             throw new BadRequestException('NIN verification failed or NIN record not found');
           }
@@ -184,7 +188,7 @@ export class NinSlipService {
             photo: photoStr,
             signature: b.signature || '',
           };
-          upstreamProviderName = basicRes.meta?.provider || 'direct';
+          upstreamProviderName = basicRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
         }
 
         // Store into Smart Cache
@@ -236,9 +240,9 @@ export class NinSlipService {
       api_key_id: apiKeyId || 'dashboard_slip',
       serviceType: 'nin_slip',
       status: VerificationStatus.SUCCESS,
-      upstreamProvider: isCacheHit ? 'verixa_smart_cache' : 'direct',
+      upstreamProvider: isCacheHit ? 'verixa_smart_cache' : (isSandbox ? 'verixa_mock' : 'direct'),
       isCached: isCacheHit,
-      source: isCacheHit ? 'CACHE' : 'LIVE',
+      source: isCacheHit ? 'CACHE' : (isSandbox ? 'SANDBOX' : 'LIVE'),
       costDeducted: cost,
       latencyMs,
       cacheKey: this.identityCacheService.generateKey(orgId, validEnv, 'nin', cleanNin),

@@ -45,7 +45,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     verixaRate: "₦95",
     description: "Bank Verification Number verification against NIBSS registry.",
     defaultPayload: {
-      bvn: "22123456789",
+      bvn: "22222222222",
       consent: true,
     },
   },
@@ -59,7 +59,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     verixaRate: "₦50",
     description: "Lookup linked National Identity Number via registered phone line.",
     defaultPayload: {
-      phone: "08012345678",
+      phone: "09011111111",
       consent: true,
     },
   },
@@ -73,7 +73,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     verixaRate: "₦50",
     description: "Query bank customer records by registered telephone number.",
     defaultPayload: {
-      phone: "08012345678",
+      phone: "09011111111",
       consent: true,
     },
   },
@@ -87,7 +87,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     verixaRate: "₦125",
     description: "Full demographic profile including residential address and name details.",
     defaultPayload: {
-      nin: "11234567890",
+      nin: "70123456789",
       consent: true,
     },
   },
@@ -115,7 +115,7 @@ const ENDPOINTS: ApiEndpointConfig[] = [
     verixaRate: "₦250",
     description: "High-resolution PDF and Word identity slip output.",
     defaultPayload: {
-      nin: "11234567890",
+      nin: "70123456789",
       format: "both",
       consent: true,
     },
