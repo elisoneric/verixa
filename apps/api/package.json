@@ -89,6 +89,11 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "^uuid$": "<rootDir>/../test/__mocks__/uuid.js",
+      "^@faker-js/faker/(.*)$": "<rootDir>/../test/__mocks__/faker.js",
+      "^@faker-js/faker$": "<rootDir>/../test/__mocks__/faker.js"
+    },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],

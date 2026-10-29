@@ -205,7 +205,7 @@ export default function AdminPricingPage() {
               type="number"
               value={baseNinSlip}
               onChange={(e) => setBaseNinSlip(e.target.value)}
-              hint="A4 dual-slip PDF and DOCX"
+              hint="Official A4 PDF and ID-1 NIMC Card"
             />
             <Input
               label="NUBAN Account Resolution (₦)"

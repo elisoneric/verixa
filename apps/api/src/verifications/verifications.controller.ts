@@ -25,6 +25,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { IdempotencyInterceptor } from '../common/interceptors/idempotency.interceptor';
 import { maskPii } from '../common/utils/pii-masker.util';
 import { Environment, normalizeEnvironment } from '../organizations/entities/environment-config.entity';
+import { encryptPayload, decryptPayload, sanitizeIdentityRetention } from '../common/utils/crypto.util';
+
 
 @Controller(['v1/verify', 'api/v1/verify'])
 export class VerificationsController {
@@ -154,6 +156,98 @@ export class VerificationsController {
   }
 
   @UseGuards(ApiKeyGuard)
+  @UseInterceptors(IdempotencyInterceptor)
+  @Post('tin')
+  async verifyTin(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const identifier = String(body.tin || '').trim();
+    if (!identifier) {
+      throw new BadRequestException('Tax Identification Number (TIN) is required.');
+    }
+    const isLive = req.environment === Environment.LIVE;
+    const provider: any = isLive ? this.dojahProvider : this.mockProvider;
+    return this.processVerification(
+      req,
+      'tin',
+      identifier,
+      body,
+      () => provider.verifyTin({ tin: identifier, consent: true })
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @UseInterceptors(IdempotencyInterceptor)
+  @Post('dl')
+  async verifyDl(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const identifier = String(body.licenseNumber || body.license_number || body.dlNumber || '').trim();
+    if (!identifier) {
+      throw new BadRequestException("Driver's License number is required.");
+    }
+    const isLive = req.environment === Environment.LIVE;
+    const provider: any = isLive ? this.dojahProvider : this.mockProvider;
+    return this.processVerification(
+      req,
+      'dl',
+      identifier,
+      body,
+      () => (typeof provider.verifyDriversLicense === 'function'
+        ? provider.verifyDriversLicense({ licenseNumber: identifier, dob: body.dob, consent: true })
+        : provider.verifyDl({ licenseNumber: identifier, dob: body.dob, consent: true }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @UseInterceptors(IdempotencyInterceptor)
+  @Post('vin')
+  async verifyVin(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const identifier = String(body.vin || '').trim();
+    if (!identifier) {
+      throw new BadRequestException("Voter's Identification Number (VIN) is required.");
+    }
+    const isLive = req.environment === Environment.LIVE;
+    const provider: any = isLive ? this.dojahProvider : this.mockProvider;
+    return this.processVerification(
+      req,
+      'vin',
+      identifier,
+      body,
+      () => (typeof provider.verifyVotersCard === 'function'
+        ? provider.verifyVotersCard({ vin: identifier, state: body.state, lastName: body.lastName, consent: true })
+        : provider.verifyVin({ vin: identifier, state: body.state, lastName: body.lastName, consent: true }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @UseInterceptors(IdempotencyInterceptor)
+  @Post('passport')
+  async verifyPassport(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const identifier = String(body.passportNumber || body.passport_number || '').trim();
+    if (!identifier) {
+      throw new BadRequestException('International Passport number is required.');
+    }
+    const isLive = req.environment === Environment.LIVE;
+    const provider: any = isLive ? this.dojahProvider : this.mockProvider;
+    return this.processVerification(
+      req,
+      'passport',
+      identifier,
+      body,
+      () => provider.verifyPassport({ passportNumber: identifier, lastName: body.lastName, dob: body.dob, consent: true })
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
   @Post('messaging/sms')
   async sendSms(@Req() req: any, @Body() body: any) {
     if (!body.destination || !body.message) {
@@ -279,6 +373,9 @@ export class VerificationsController {
       cacheKey: log.cacheKey,
       idempotencyKey: log.idempotencyKey,
       createdAt: log.createdAt,
+      requestPayload: log.requestPayload,
+      responsePayload: decryptPayload(log.responsePayload),
+      data: decryptPayload(log.responsePayload),
       metadata: {
         latency_ms: log.latencyMs || (log.isCached ? 14 : 142),
         cost_ngx: log.costDeducted ? Number(log.costDeducted) : (log.isCached ? 20 : (log.serviceType === 'nuban' ? 10 : 50)),
@@ -359,19 +456,29 @@ export class VerificationsController {
   @Post('manual')
   async manualVerify(
     @Req() req: any,
-    @Body() body: { service: 'bvn' | 'nin' | 'nuban' | 'phone' | 'cac' | 'nuban_kyc'; environment: Environment; payload: any }
+    @Body()
+    body: {
+      service: 'bvn' | 'nin' | 'nuban' | 'phone' | 'cac' | 'nuban_kyc' | 'tin' | 'dl' | 'vin' | 'passport' | string;
+      environment: Environment;
+      payload: any;
+    }
   ) {
     if (body.payload?.consent !== true && body.payload?.consent !== 'true') {
       throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
     }
 
     const targetEnv = String(body.environment).toLowerCase() === 'live' ? Environment.LIVE : Environment.SANDBOX;
+    const service = String(body.service || '').toLowerCase();
     let identifier = '';
-    if (body.service === 'bvn') identifier = String(body.payload?.bvn || '').trim();
-    else if (body.service === 'nin') identifier = String(body.payload?.nin || '').trim();
-    else if (body.service === 'phone') identifier = String(body.payload?.phoneNumber || body.payload?.phone_number || '').trim();
-    else if (body.service === 'cac') identifier = String(body.payload?.rcNumber || body.payload?.rc_number || '').trim();
-    else if (body.service === 'nuban' || body.service === 'nuban_kyc') identifier = `${body.payload?.bankCode || ''}_${body.payload?.accountNumber || ''}`.trim();
+    if (service === 'bvn') identifier = String(body.payload?.bvn || '').trim();
+    else if (service === 'nin') identifier = String(body.payload?.nin || '').trim();
+    else if (service === 'phone') identifier = String(body.payload?.phoneNumber || body.payload?.phone_number || '').trim();
+    else if (service === 'cac') identifier = String(body.payload?.rcNumber || body.payload?.rc_number || '').trim();
+    else if (service === 'nuban' || service === 'nuban_kyc') identifier = `${body.payload?.bankCode || ''}_${body.payload?.accountNumber || ''}`.trim();
+    else if (service === 'tin') identifier = String(body.payload?.tin || '').trim();
+    else if (service === 'dl') identifier = String(body.payload?.licenseNumber || body.payload?.license_number || body.payload?.dlNumber || '').trim();
+    else if (service === 'vin') identifier = String(body.payload?.vin || '').trim();
+    else if (service === 'passport') identifier = String(body.payload?.passportNumber || body.payload?.passport_number || '').trim();
 
     const mockReq = {
       organizationId: req.organizationId,
@@ -381,39 +488,110 @@ export class VerificationsController {
     };
 
     const isLive = targetEnv === Environment.LIVE;
+    const provider: any = isLive ? this.dojahProvider : this.mockProvider;
 
-    return this.processVerification(
+    const rawResult = await this.processVerification(
       mockReq,
-      body.service,
+      service,
       identifier,
       body.payload,
       async () => {
-        if (body.service === 'bvn') {
+        if (service === 'bvn') {
           return isLive ? this.dojahProvider.verifyBvn(body.payload) : this.mockProvider.verifyBvn(body.payload);
         }
-        if (body.service === 'nin') {
+        if (service === 'nin') {
           return isLive ? this.dojahProvider.verifyNin(body.payload) : this.mockProvider.verifyNin(body.payload);
         }
-        if (body.service === 'phone') {
-          return isLive ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: identifier, variant: body.payload?.variant }) : this.mockProvider.verifyPhoneNumber({ phoneNumber: identifier, variant: body.payload?.variant });
+        if (service === 'phone') {
+          return isLive
+            ? this.dojahProvider.verifyPhoneNumber({ phoneNumber: identifier, variant: body.payload?.variant })
+            : this.mockProvider.verifyPhoneNumber({ phoneNumber: identifier, variant: body.payload?.variant });
         }
-        if (body.service === 'cac') {
-          return isLive ? this.dojahProvider.verifyCac({ rcNumber: identifier, companyType: body.payload?.companyType, variant: body.payload?.variant }) : this.mockProvider.verifyCac({ rcNumber: identifier, companyType: body.payload?.companyType, variant: body.payload?.variant });
+        if (service === 'cac') {
+          return isLive
+            ? this.dojahProvider.verifyCac({ rcNumber: identifier, companyType: body.payload?.companyType, variant: body.payload?.variant })
+            : this.mockProvider.verifyCac({ rcNumber: identifier, companyType: body.payload?.companyType, variant: body.payload?.variant });
         }
-        if (body.service === 'nuban_kyc') {
+        if (service === 'nuban_kyc') {
           return isLive ? this.dojahProvider.verifyNubanKycStatus(body.payload) : this.mockProvider.verifyNubanKycStatus(body.payload);
         }
-        if (body.service === 'nuban') {
+        if (service === 'nuban') {
           return isLive ? this.dojahProvider.verifyBankAccount(body.payload) : this.mockProvider.verifyBankAccount(body.payload);
+        }
+        if (service === 'tin') {
+          if (typeof provider.verifyTin === 'function') {
+            return provider.verifyTin({ tin: identifier, consent: true });
+          }
+        }
+        if (service === 'dl') {
+          if (typeof provider.verifyDriversLicense === 'function') {
+            return provider.verifyDriversLicense({
+              licenseNumber: identifier,
+              dob: body.payload?.dob,
+              consent: true,
+            });
+          }
+          if (typeof provider.verifyDl === 'function') {
+            return provider.verifyDl({
+              licenseNumber: identifier,
+              dob: body.payload?.dob,
+              consent: true,
+            });
+          }
+        }
+        if (service === 'vin') {
+          if (typeof provider.verifyVotersCard === 'function') {
+            return provider.verifyVotersCard({
+              vin: identifier,
+              state: body.payload?.state,
+              lastName: body.payload?.lastName,
+              consent: true,
+            });
+          }
+          if (typeof provider.verifyVin === 'function') {
+            return provider.verifyVin({
+              vin: identifier,
+              state: body.payload?.state,
+              lastName: body.payload?.lastName,
+              consent: true,
+            });
+          }
+        }
+        if (service === 'passport') {
+          if (typeof provider.verifyPassport === 'function') {
+            return provider.verifyPassport({
+              passportNumber: identifier,
+              lastName: body.payload?.lastName,
+              dob: body.payload?.dob,
+              consent: true,
+            });
+          }
         }
         throw new BadRequestException(`Unsupported verification service: ${body.service}`);
       }
     );
+
+    const reference = rawResult?.meta?.referenceId || rawResult?.meta?.reference || `vx_${uuidv4().slice(0, 12)}`;
+    const verifiedAt = new Date().toISOString();
+
+    return {
+      success: rawResult?.status === 'success' || rawResult?.success === true,
+      status: rawResult?.status || 'success',
+      service,
+      reference,
+      verifiedAt,
+      data: rawResult?.data !== undefined ? rawResult.data : rawResult,
+      meta: {
+        ...rawResult?.meta,
+        referenceId: reference,
+        verifiedAt,
+      },
+    };
   }
 
   private async processVerification(
     req: any,
-    serviceType: 'bvn' | 'nin' | 'nuban' | 'phone' | 'cac' | 'nuban_kyc',
+    serviceType: 'bvn' | 'nin' | 'nuban' | 'phone' | 'cac' | 'nuban_kyc' | 'tin' | 'dl' | 'vin' | 'passport' | string,
     identifier: string,
     payload: any,
     providerCall: () => Promise<any>
@@ -437,7 +615,7 @@ export class VerificationsController {
 
       if (cached) {
         // Cache HIT!
-        const cacheRate = await this.billingService.getEffectiveRate(req.organizationId, serviceType, true);
+        const cacheRate = await this.billingService.getEffectiveRate(req.organizationId, serviceType as any, true);
         const cost = cacheRate.effectiveRate;
         const reference = `vx_cache_${uuidv4().slice(0, 12)}`;
 
@@ -461,7 +639,7 @@ export class VerificationsController {
           cacheKey: this.identityCacheService.generateKey(req.organizationId, validEnv, serviceType, identifier),
           idempotencyKey: req.headers['idempotency-key'] || undefined,
           requestPayload: maskPii(payload),
-          responsePayload: maskPii(cached.data),
+          responsePayload: encryptPayload(this.sanitizeIdentityRetention(cached.data)),
         });
 
         return {
@@ -482,7 +660,7 @@ export class VerificationsController {
     }
 
     // 2. Cache MISS: Live Upstream Registry Query (e.g. Primary Registry / NIMC / NIBSS)
-    const liveRate = await this.billingService.getEffectiveRate(req.organizationId, serviceType, false);
+    const liveRate = await this.billingService.getEffectiveRate(req.organizationId, serviceType as any, false);
     const cost = liveRate.effectiveRate;
     const reference = uuidv4();
 
@@ -524,7 +702,7 @@ export class VerificationsController {
         cacheKey: identifier ? this.identityCacheService.generateKey(req.organizationId, validEnv, serviceType, identifier) : undefined,
         idempotencyKey: req.headers['idempotency-key'] || undefined,
         requestPayload: maskPii(payload),
-        responsePayload: maskPii(result.data || null),
+        responsePayload: result.data ? encryptPayload(this.sanitizeIdentityRetention(result.data)) : null,
       });
 
       return {
@@ -544,4 +722,9 @@ export class VerificationsController {
       throw new InternalServerErrorException('Upstream provider failed');
     }
   }
+
+  private sanitizeIdentityRetention(data: any): any {
+    return sanitizeIdentityRetention(data);
+  }
 }
+

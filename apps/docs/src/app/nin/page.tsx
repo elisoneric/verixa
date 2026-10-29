@@ -265,7 +265,6 @@ export default function NinDocsPage() {
     "gender": "Male",
     "photo": "/9j/4AAQSkZJRg…",
     "nin_id": "JVBERi0xLjQ…",
-    "docxBase64": "UEsDBBQAAAAIA…",
     "cardPdfBase64": "JVBERi0xLjQ…"
   }
 }`}

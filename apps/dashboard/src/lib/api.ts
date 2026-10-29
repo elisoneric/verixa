@@ -34,6 +34,36 @@ export interface VerificationLogItem {
   createdAt: string
 }
 
+export type VerificationServiceType =
+  | "nin"
+  | "bvn"
+  | "nuban"
+  | "phone"
+  | "cac"
+  | "nuban_kyc"
+  | "tin"
+  | "dl"
+  | "vin"
+  | "passport"
+
+export interface VerificationResultPayload<T = Record<string, any>> {
+  success: boolean
+  status?: string
+  service: string
+  reference: string
+  verifiedAt: string
+  data: T
+  meta?: {
+    cached?: boolean
+    cost_ngx?: number
+    latency_ms?: number
+    environment?: string
+    provider?: string
+    referenceId?: string
+    [key: string]: any
+  }
+}
+
 export interface BalanceData {
   live: { balance: number; currency: string }
   sandbox: { balance: number; currency: string }
@@ -222,14 +252,22 @@ export class ApiClient {
   }
 
   static async manualVerify(
-    service: "bvn" | "nin" | "nuban" | "phone" | "cac" | "nuban_kyc", 
+    service: VerificationServiceType | string, 
     environment: "sandbox" | "live", 
     payload: any
-  ) {
-    return this.request<any>("/v1/verify/manual", {
+  ): Promise<VerificationResultPayload> {
+    return this.request<VerificationResultPayload>("/v1/verify/manual", {
       method: "POST",
       body: JSON.stringify({ service, environment, payload }),
     })
+  }
+
+  static async verifyManual(
+    service: VerificationServiceType | string, 
+    environment: "sandbox" | "live", 
+    payload: any
+  ): Promise<VerificationResultPayload> {
+    return this.manualVerify(service, environment, payload)
   }
 
   // Direct Verification Endpoints
@@ -306,14 +344,80 @@ export class ApiClient {
   }
 
   // NIN Slip Generator
-  static async generateNinSlip(nin: string, format: "pdf" | "docx" | "both" = "both", consent = true) {
+  static async lookupNinIdentity(nin: string, consent = true) {
     return this.request<{
+      success: boolean
       status: string
+      trackingId: string
+      fullName: string
+      firstName: string
+      surname: string
+      middleName?: string
+      gender?: string
+      birthdate?: string
+      nin: string
+      photoBase64?: string
       data: {
         nin: string
         trackingId: string
         fullName: string
+        firstName: string
+        surname: string
+        middleName?: string
+        gender?: string
+        birthdate?: string
+        photoBase64?: string
+      }
+      meta: {
+        cached: boolean
+        cost_ngx: number
+        referenceId: string
+        latency_ms: number
+      }
+    }>("/v1/dashboard/slips/nin/lookup", {
+      method: "POST",
+      body: JSON.stringify({ nin, consent }),
+    })
+  }
+
+  static async generateNinSlip(
+    nin: string,
+    format: "pdf" | "card" | "slip" | "both" | "docx" | string = "both",
+    consent = true,
+    options?: { cardType?: "card" | "slip"; fileType?: "pdf" | "docx" | "both" }
+  ) {
+    const cardType = options?.cardType || (format === "card" ? "card" : (format === "slip" ? "slip" : undefined))
+    const fileType = options?.fileType
+
+    return this.request<{
+      success: boolean
+      status: string
+      trackingId: string
+      fullName: string
+      nin: string
+      photoBase64?: string
+      slipType: "card" | "slip"
+      pdfBase64?: string
+      docxBase64?: string
+      svgContent?: string
+      cardPdfBase64?: string
+      cardSvg?: string
+      slipSvg?: string
+      data: {
+        nin: string
+        trackingId: string
+        fullName: string
+        firstName?: string
+        surname?: string
+        middleName?: string
+        photoBase64?: string
+        slipType?: "card" | "slip"
         pdfBase64?: string
+        nin_id?: string
+        slipSvg?: string
+        cardPdfBase64?: string
+        cardSvg?: string
+        svgContent?: string
         docxBase64?: string
       }
       meta: {
@@ -324,9 +428,68 @@ export class ApiClient {
       }
     }>("/v1/dashboard/slips/nin", {
       method: "POST",
-      body: JSON.stringify({ nin, format, consent }),
+      body: JSON.stringify({ nin, format, consent, cardType, fileType }),
     })
   }
+
+  static getSlipDownloadUrl(nin: string, format: "pdf" | "docx" | "card" = "pdf", type?: "card" | "slip") {
+    const baseUrl = getApiUrl()
+    const typeParam = type ? `&type=${type}` : ""
+    return `${baseUrl}/v1/dashboard/slips/nin/${nin}/download?format=${format}${typeParam}`
+  }
+
+  static async downloadSlipBlob(nin: string, format: "pdf" | "docx" | "card" = "pdf", type?: "card" | "slip"): Promise<Blob> {
+    const baseUrl = getApiUrl()
+    const token = this.getToken()
+    const typeParam = type ? `&type=${type}` : ""
+    const res = await fetch(`${baseUrl}/v1/dashboard/slips/nin/${nin}/download?format=${format}${typeParam}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) throw new Error("Failed to download document from server")
+    return res.blob()
+  }
+
+  static async downloadOnDemandSlip(
+    logId: string,
+    format: "card" | "slip",
+    fileType: "pdf" | "docx"
+  ): Promise<{ blob: Blob; filename: string }> {
+    const baseUrl = getApiUrl()
+    const token = this.getToken()
+    const res = await fetch(`${baseUrl}/v1/slips/on-demand`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ logId, format, fileType }),
+    })
+
+    if (!res.ok) {
+      let errMsg = "Failed to generate on-demand document"
+      try {
+        const errJson = await res.json()
+        if (errJson?.message) {
+          errMsg = Array.isArray(errJson.message) ? errJson.message.join(", ") : errJson.message
+        }
+      } catch {
+        // fallback to default
+      }
+      throw new Error(errMsg)
+    }
+
+    const contentDisposition = res.headers.get("content-disposition") || ""
+    let filename = `NIN_${format === "card" ? "Card" : "Slip"}_${logId.slice(0, 8)}.${fileType}`
+    const match = contentDisposition.match(/filename="?([^";]+)"?/i)
+    if (match && match[1]) {
+      filename = match[1].replace(/["']/g, "").trim()
+    }
+
+    const blob = await res.blob()
+    return { blob, filename }
+  }
+
+
 
   // Platform Admin
   static async getAdminMetrics() {
@@ -529,7 +692,7 @@ export class ApiClient {
     })
   }
 
-  static async getDojahPricing() {
+  static async getUpstreamPricing() {
     return this.request<{
       rates: {
         nin: number
@@ -543,13 +706,21 @@ export class ApiClient {
         nuban: number
       }
       margins: Record<string, { buyCost: number; sellPrice: number; margin: number; marginPercent: number }>
-    }>("/v1/admin/dojah-pricing")
+    }>("/v1/admin/pricing/upstream")
   }
 
-  static async updateDojahPricing(rates: Record<string, number>) {
-    return this.request<any>("/v1/admin/dojah-pricing", {
+  static async updateUpstreamPricing(rates: Record<string, number>) {
+    return this.request<any>("/v1/admin/pricing/upstream", {
       method: "POST",
       body: JSON.stringify({ rates }),
     })
+  }
+
+  static async getDojahPricing() {
+    return this.getUpstreamPricing()
+  }
+
+  static async updateDojahPricing(rates: Record<string, number>) {
+    return this.updateUpstreamPricing(rates)
   }
 }

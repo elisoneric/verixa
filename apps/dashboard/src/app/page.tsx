@@ -115,7 +115,7 @@ export default function PublicLandingPage() {
               </div>
               <h3 className="text-base font-bold text-slate-900">Automated NIN Slip Engine</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Generate high-resolution A4 dual-slip PDF and editable Word (.docx) slips adhering to standard paper specifications.
+                Generate high-resolution A4 dual-slip PDF and official ISO ID-1 NIMC cards adhering to statutory specifications.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-sky-600">
                 ₦250 / slip

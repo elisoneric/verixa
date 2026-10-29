@@ -202,6 +202,40 @@ export default function DocsHomePage() {
             </div>
           </div>
 
+          {/* 8. NIMC Direct Card & Slip Generation */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                POST
+              </span>
+              <div>
+                <span className="text-slate-900 font-semibold font-sans">NIMC Direct Card &amp; Slip Generator (Dual Format)</span>
+                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/slips/nin</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-slate-900 font-bold font-sans text-sm">₦250.00</span>
+              <span className="text-slate-400 font-sans text-xs">/ &lt;150ms SVG</span>
+            </div>
+          </div>
+
+          {/* 9. On-Demand Document Reconstruction */}
+          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                POST
+              </span>
+              <div>
+                <span className="text-slate-900 font-semibold font-sans">On-Demand Dynamic Document Reconstruction</span>
+                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/slips/on-demand</code>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-emerald-700 font-bold font-sans text-sm">Included</span>
+              <span className="text-slate-400 font-sans text-xs">/ NDPC Compliant</span>
+            </div>
+          </div>
+
           {/* Banking & NUBAN Group Header */}
           <div className="bg-slate-50 px-4 py-2.5 text-[11px] uppercase tracking-wider text-slate-700 font-bold font-sans border-t border-b border-slate-200">
             2. Banking Intelligence & NUBAN

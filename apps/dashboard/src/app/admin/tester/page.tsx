@@ -61,13 +61,13 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
   },
   {
     id: "nin-slip-generator",
-    name: "Verixa Hybrid Slip Generator (PDF & Word DOCX)",
+    name: "NIMC Official NIN Slip Generator (PDF)",
     path: "/api/v1/slips/nin",
     method: "POST",
-    description: "Generates high-resolution printable PDF and Word DOCX from official NIMC template.",
+    description: "Generates high-resolution printable PDF and instantaneous vector preview from official NIMC template.",
     defaultParams: {
       nin: "70123456789",
-      format: "both",
+      format: "pdf",
       consent: true,
     },
   },
@@ -151,6 +151,7 @@ export default function AdminTesterPage() {
   const [latencyMs, setLatencyMs] = React.useState<number | null>(null)
   const [httpStatus, setHttpStatus] = React.useState<number | null>(null)
   const [activeTab, setActiveTab] = React.useState<"json" | "slip" | "card" | "attributes">("slip")
+  const [slipViewMode, setSlipViewMode] = React.useState<"visual" | "pdf">("visual")
 
   const currentEndpoint = React.useMemo(() => {
     return TEST_ENDPOINTS.find((e) => e.id === selectedId) || TEST_ENDPOINTS[0]
@@ -264,31 +265,6 @@ export default function AdminTesterPage() {
     }
   }
 
-  const downloadDocx = () => {
-    const docxBase64 = entity?.docxBase64
-    if (!docxBase64) return
-    try {
-      const byteCharacters = atob(docxBase64)
-      const byteNumbers = new Array(byteCharacters.length)
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
-      }
-      const byteArray = new Uint8Array(byteNumbers)
-      const blob = new Blob([byteArray], {
-        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.href = url
-      link.download = `NIN_Slip_${entity?.nin || "official"}.docx`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-    } catch (e: any) {
-      alert(`DOCX download failed: ${e.message}`)
-    }
-  }
 
   const downloadCardPdf = () => {
     const cardB64 = entity?.cardPdfBase64 || (selectedId === "nin-card-generator" ? ninIdBase64 : null)
@@ -362,11 +338,11 @@ export default function AdminTesterPage() {
               🟢 Free Sandbox Active
             </span>
             <span>
-              Calls are simulated with official Dojah sandbox credentials. Real high-resolution PDF slips & ID-1 cards are generated with zero upstream cost.
+              Calls are simulated with official NIMC Direct sandbox credentials. Real high-resolution PDF slips & ID-1 cards are generated with zero upstream cost.
             </span>
           </div>
           <div className="text-[11px] font-mono text-emerald-800 shrink-0">
-            Dojah Sandbox: NIN <strong>70123456789</strong> • BVN <strong>22222222222</strong> • Phone <strong>09011111111</strong>
+            NIMC Direct Sandbox: NIN <strong>70123456789</strong> • BVN <strong>22222222222</strong> • Phone <strong>09011111111</strong>
           </div>
         </div>
       ) : (
@@ -376,7 +352,7 @@ export default function AdminTesterPage() {
               ⚠️ Caution: Live Upstream Registry
             </span>
             <span>
-              Every query calls live Dojah & federal registries, deducting real wallet credits/money. Only query authentic citizen records.
+              Every query calls live NIMC Direct & federal registries, deducting real wallet credits/money. Only query authentic citizen records.
             </span>
           </div>
           <div className="text-[11px] font-mono text-rose-800 shrink-0 font-bold">
@@ -443,7 +419,7 @@ export default function AdminTesterPage() {
 
               {/* Quick-Insert Sandbox Values Bar */}
               <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-slate-100 border border-slate-200 text-[11px] font-mono">
-                <span className="text-slate-500 font-bold text-[10px] uppercase">Dojah Sandbox:</span>
+                <span className="text-slate-500 font-bold text-[10px] uppercase">Direct Sandbox:</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -637,41 +613,77 @@ export default function AdminTesterPage() {
             <div className="space-y-4">
               {/* Slip Card */}
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <span className="text-xs font-bold text-slate-900 block">Printable NIMC Slip Preview</span>
+                    <span className="text-xs font-bold text-slate-900 block">Printable NIMC Official Slip</span>
                     <span className="text-[11px] font-mono text-slate-500">
                       NIN: {entity?.nin || "70123456789"} • Tracking ID: {entity?.tracking_id || entity?.trackingId || "VNX796745906418"}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
+                    {/* View Switcher */}
+                    {entity?.slipSvg && pdfBlobUrl && (
+                      <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200 text-xs font-mono">
+                        <button
+                          type="button"
+                          onClick={() => setSlipViewMode("visual")}
+                          className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                            slipViewMode === "visual"
+                              ? "bg-slate-900 text-white shadow-2xs"
+                              : "text-slate-600 hover:text-slate-900"
+                          }`}
+                        >
+                          ⚡ Instant View
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSlipViewMode("pdf")}
+                          className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                            slipViewMode === "pdf"
+                              ? "bg-slate-900 text-white shadow-2xs"
+                              : "text-slate-600 hover:text-slate-900"
+                          }`}
+                        >
+                          📄 PDF Viewer
+                        </button>
+                      </div>
+                    )}
                     {ninIdBase64 && (
-                      <Button onClick={downloadPdf} size="sm" variant="outline" className="text-xs font-semibold">
+                      <Button onClick={downloadPdf} size="sm" variant="outline" className="text-xs font-semibold cursor-pointer">
                         <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Download PDF
                       </Button>
                     )}
-                    {entity?.docxBase64 && (
-                      <Button onClick={downloadDocx} size="sm" variant="outline" className="text-xs font-semibold">
-                        Download Word
-                      </Button>
-                    )}
                   </div>
                 </div>
 
-                {/* Authentic Upstream / Generated PDF Slip Viewer */}
-                <div className="rounded-lg overflow-hidden border border-slate-200 bg-slate-900 shadow-xs relative">
-                  {pdfBlobUrl ? (
+                {/* Instant SVG / Native PDF Slip Viewer */}
+                <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-900/5 shadow-xs relative p-3">
+                  {slipViewMode === "visual" && entity?.slipSvg ? (
+                    <div className="flex justify-center p-1 sm:p-2">
+                      <div
+                        className="w-full max-w-[820px] rounded-xl overflow-hidden shadow-md"
+                        dangerouslySetInnerHTML={{ __html: entity.slipSvg }}
+                      />
+                    </div>
+                  ) : pdfBlobUrl ? (
                     <iframe
                       src={`${pdfBlobUrl}#toolbar=0&navpanes=0`}
                       title="Official Government NIN Slip Preview"
-                      className="w-full h-[680px] border-0 rounded-lg bg-white block"
+                      className="w-full h-[680px] border-0 rounded-lg bg-white block shadow-xs"
                     />
+                  ) : entity?.slipSvg ? (
+                    <div className="flex justify-center p-1 sm:p-2">
+                      <div
+                        className="w-full max-w-[820px] rounded-xl overflow-hidden shadow-md"
+                        dangerouslySetInnerHTML={{ __html: entity.slipSvg }}
+                      />
+                    </div>
                   ) : (
-                    <div className="py-16 text-center text-slate-400 text-xs">
-                      No PDF payload received in nin_id or pdfBase64.
+                    <div className="py-16 text-center text-slate-400 text-xs font-mono">
+                      No official slip payload received in nin_id or slipSvg.
                     </div>
                   )}
                 </div>

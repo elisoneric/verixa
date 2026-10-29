@@ -8,6 +8,11 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "test": {
+      "dependsOn": [],
+      "outputs": ["coverage/**"],
+      "cache": true
+    },
     "dev": {
       "cache": false,
       "persistent": true

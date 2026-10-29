@@ -211,14 +211,14 @@ export default function DashboardOverviewPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white border border-slate-200 rounded-lg p-3">
-                  <div>
-                    <span className="text-[11px] text-slate-500 uppercase block font-medium">
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[11px] text-slate-500 uppercase block font-medium truncate">
                       {dva.bankName}
                     </span>
-                    <span className="text-xl font-bold font-mono text-slate-900 tracking-wider">
+                    <span className="text-xl font-bold font-mono text-slate-900 tracking-wider block break-all">
                       {dva.accountNumber}
                     </span>
-                    <span className="text-xs text-slate-600 block mt-0.5">
+                    <span className="text-xs text-slate-600 block mt-0.5 truncate">
                       {dva.accountName}
                     </span>
                   </div>
@@ -226,7 +226,7 @@ export default function DashboardOverviewPage() {
                   <button
                     type="button"
                     onClick={() => handleCopyAccount(dva.accountNumber)}
-                    className="self-start sm:self-center px-3.5 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    className="self-start sm:self-center px-3.5 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
                   >
                     <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
@@ -341,50 +341,103 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      {/* Quick Services Navigation */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Link
-          href="/dashboard/verify"
-          className="rounded-xl border border-slate-200 bg-white p-4 hover:border-slate-300 hover:shadow-2xs transition-all text-left block"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-900">Manual Lookup</span>
-            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-          <p className="text-xs text-slate-500 mt-1">Single NIN, BVN, and NUBAN search workspace.</p>
-        </Link>
+      {/* Responsive Mobile-First Quick-Action Cards */}
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">
+            Quick Actions
+          </h2>
+          <span className="text-[11px] text-slate-400 font-medium">Core Fintech Actions</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* 1. Verify Identity */}
+          <Link
+            href="/dashboard/verify"
+            className="group relative rounded-2xl border border-slate-200 bg-white p-4.5 hover:border-emerald-500/50 hover:shadow-md hover:shadow-emerald-500/5 transition-all duration-200 text-left block active:scale-[0.99] cursor-pointer overflow-hidden min-h-[44px]"
+          >
+            <div className="flex items-start justify-between">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-emerald-100 transition-all">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold">
+                Instant KYC
+              </span>
+            </div>
+            <div className="mt-3">
+              <span className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors block">
+                Verify Identity
+              </span>
+              <p className="text-xs text-slate-500 mt-0.5 leading-snug">
+                Perform real-time NIN, BVN, CAC, and bank KYC checks.
+              </p>
+            </div>
+          </Link>
 
-        <Link
-          href="/dashboard/slips"
-          className="rounded-xl border border-slate-200 bg-white p-4 hover:border-slate-300 hover:shadow-2xs transition-all text-left block"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-900">Slip Generator</span>
-            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-          <p className="text-xs text-slate-500 mt-1">Generate standard dual-slip PDF and Word documents.</p>
-        </Link>
+          {/* 2. Generate NIMC Card */}
+          <Link
+            href="/dashboard/slips"
+            className="group relative rounded-2xl border border-slate-200 bg-white p-4.5 hover:border-sky-500/50 hover:shadow-md hover:shadow-sky-500/5 transition-all duration-200 text-left block active:scale-[0.99] cursor-pointer overflow-hidden min-h-[44px]"
+          >
+            <div className="flex items-start justify-between">
+              <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200/80 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-sky-100 transition-all">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                </svg>
+              </div>
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 font-bold">
+                ID-1 & Slips
+              </span>
+            </div>
+            <div className="mt-3">
+              <span className="text-sm font-bold text-slate-900 group-hover:text-sky-700 transition-colors block">
+                Generate NIMC Card
+              </span>
+              <p className="text-xs text-slate-500 mt-0.5 leading-snug">
+                Produce premium ID-1 plastic cards & official NIN slips.
+              </p>
+            </div>
+          </Link>
 
-        <Link
-          href="/dashboard/api-keys"
-          className="rounded-xl border border-slate-200 bg-white p-4 hover:border-slate-300 hover:shadow-2xs transition-all text-left block"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-900">API Credentials</span>
-            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-          <p className="text-xs text-slate-500 mt-1">Manage secret keys, permissions, and IP restrictions.</p>
-        </Link>
+          {/* 3. Fund Wallet */}
+          <button
+            type="button"
+            onClick={() => {
+              if (environment === "live") {
+                setTopupModalOpen(true)
+              } else {
+                handleSandboxFaucet()
+              }
+            }}
+            className="group relative rounded-2xl border border-slate-200 bg-white p-4.5 hover:border-amber-500/50 hover:shadow-md hover:shadow-amber-500/5 transition-all duration-200 text-left block active:scale-[0.99] cursor-pointer overflow-hidden w-full min-h-[44px]"
+          >
+            <div className="flex items-start justify-between">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-amber-100 transition-all">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+              </div>
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 font-bold">
+                {environment === "live" ? "Instant Top-Up" : "Test Faucet"}
+              </span>
+            </div>
+            <div className="mt-3">
+              <span className="text-sm font-bold text-slate-900 group-hover:text-amber-700 transition-colors block">
+                Fund Wallet
+              </span>
+              <p className="text-xs text-slate-500 mt-0.5 leading-snug">
+                {environment === "live"
+                  ? "Deposit NGX credits via bank transfer or card checkout."
+                  : "Add 10,000 complimentary Sandbox test credits."}
+              </p>
+            </div>
+          </button>
+        </div>
       </div>
 
-      {/* Recent Verification Activity Table */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4 shadow-xs">
+      {/* Recent Verification Activity (Mobile Card Tiles + Desktop Data Table) */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 space-y-4 shadow-xs overflow-hidden">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-bold text-slate-900 font-heading">Recent Lookups</h2>
@@ -403,64 +456,114 @@ export default function DashboardOverviewPage() {
             onAction={() => (window.location.href = "/dashboard/explorer")}
           />
         ) : (
-          <div className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-slate-200 bg-slate-50/70 text-slate-600">
-                  <TableHead>Request ID</TableHead>
-                  <TableHead>Service</TableHead>
-                  <TableHead>Routing</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Latency</TableHead>
-                  <TableHead>Charge</TableHead>
-                  <TableHead className="text-right">Time</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentLogs.map((log) => {
-                  const isCache = log.isCached || log.source === "CACHE"
-                  const cost = log.costDeducted ?? (log.service === "NUBAN" ? 0 : isCache ? 20 : 50)
-                  const latency = log.latencyMs ?? (isCache ? 12 : 142)
+          <>
+            {/* Mobile Touch-Friendly Card Feed (Zero Horizontal Overflow on < 768px screens) */}
+            <div className="md:hidden space-y-2.5">
+              {recentLogs.map((log) => {
+                const isCache = log.isCached || log.source === "CACHE"
+                const cost = log.costDeducted ?? (log.service === "NUBAN" ? 0 : isCache ? 20 : 50)
+                const latency = log.latencyMs ?? (isCache ? 12 : 142)
 
-                  return (
-                    <TableRow key={log.id} className="hover:bg-slate-50 transition-colors">
-                      <TableCell className="font-mono text-xs text-slate-800 font-semibold">
-                        {log.id.slice(0, 14)}...
-                      </TableCell>
-                      <TableCell className="font-medium text-slate-900 text-xs">
-                        {log.service}
-                      </TableCell>
-                      <TableCell>
+                return (
+                  <div
+                    key={log.id}
+                    className="rounded-xl border border-slate-200/90 bg-slate-50/60 p-3 space-y-2 hover:bg-slate-100/60 transition-colors"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-bold text-xs text-slate-900 uppercase">
+                          {log.service}
+                        </span>
                         {isCache ? (
-                          <Badge variant="verified" size="sm">
-                            CACHE
-                          </Badge>
+                          <Badge variant="verified" size="sm">CACHE</Badge>
                         ) : (
-                          <Badge variant="neutral" size="sm">
-                            LIVE
-                          </Badge>
+                          <Badge variant="neutral" size="sm">LIVE</Badge>
                         )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={log.status === "Verified" ? "verified" : "failed"} size="sm">
-                          {log.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-mono text-xs text-slate-600">
-                        {latency}ms
-                      </TableCell>
-                      <TableCell className="font-mono text-xs text-slate-800 font-medium">
-                        {cost === 0 ? "Free" : `₦${cost}`}
-                      </TableCell>
-                      <TableCell className="text-right text-xs text-slate-500 font-mono">
-                        {new Date(log.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </div>
+                      </div>
+                      <Badge variant={log.status === "Verified" ? "verified" : "failed"} size="sm">
+                        {log.status}
+                      </Badge>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-200/60 font-mono text-slate-600">
+                      <span className="text-slate-500 truncate max-w-[130px]">
+                        {log.id.slice(0, 14)}...
+                      </span>
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <span className="text-slate-400">{latency}ms</span>
+                        <span className="font-semibold text-slate-900">
+                          {cost === 0 ? "Free" : `₦${cost}`}
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          {new Date(log.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Desktop Data Table (Hidden on mobile) */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b border-slate-200 bg-slate-50/70 text-slate-600">
+                    <TableHead>Request ID</TableHead>
+                    <TableHead>Service</TableHead>
+                    <TableHead>Routing</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Latency</TableHead>
+                    <TableHead>Charge</TableHead>
+                    <TableHead className="text-right">Time</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentLogs.map((log) => {
+                    const isCache = log.isCached || log.source === "CACHE"
+                    const cost = log.costDeducted ?? (log.service === "NUBAN" ? 0 : isCache ? 20 : 50)
+                    const latency = log.latencyMs ?? (isCache ? 12 : 142)
+
+                    return (
+                      <TableRow key={log.id} className="hover:bg-slate-50 transition-colors">
+                        <TableCell className="font-mono text-xs text-slate-800 font-semibold">
+                          {log.id.slice(0, 14)}...
+                        </TableCell>
+                        <TableCell className="font-medium text-slate-900 text-xs">
+                          {log.service}
+                        </TableCell>
+                        <TableCell>
+                          {isCache ? (
+                            <Badge variant="verified" size="sm">
+                              CACHE
+                            </Badge>
+                          ) : (
+                            <Badge variant="neutral" size="sm">
+                              LIVE
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={log.status === "Verified" ? "verified" : "failed"} size="sm">
+                            {log.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-mono text-xs text-slate-600">
+                          {latency}ms
+                        </TableCell>
+                        <TableCell className="font-mono text-xs text-slate-800 font-medium">
+                          {cost === 0 ? "Free" : `₦${cost}`}
+                        </TableCell>
+                        <TableCell className="text-right text-xs text-slate-500 font-mono">
+                          {new Date(log.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </div>
 

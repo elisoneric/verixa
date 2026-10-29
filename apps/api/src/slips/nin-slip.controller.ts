@@ -23,6 +23,7 @@ import { Repository } from 'typeorm';
 import { VerificationLog, VerificationStatus } from '../verifications/entities/verification-log.entity';
 import { normalizeEnvironment, Environment } from '../organizations/entities/environment-config.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { encryptPayload, sanitizeIdentityRetention } from '../common/utils/crypto.util';
 
 @Controller(['v1', 'api/v1'])
 export class NinSlipController {
@@ -44,15 +45,32 @@ export class NinSlipController {
       throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
     }
     const nin = String(body.nin || '').trim();
-    const format = body.format || 'both';
-    const cardType = body.cardType || body.type || 'slip';
+    const requestedFormat = String(body.format || '').toLowerCase();
+    const cardType: 'card' | 'slip' = body.cardType || body.type || (requestedFormat === 'card' ? 'card' : 'slip');
+    const fileType = body.fileType || (requestedFormat === 'docx' ? 'docx' : (requestedFormat === 'pdf' ? 'pdf' : 'both'));
+
     return this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
       normalizeEnvironment(req.environment),
       nin,
-      format,
+      fileType,
       req.apiKeyId,
       cardType,
+    );
+  }
+
+  // 1a. Fast Identity Lookup Endpoint (API Key - instant optimistic demographic fetch)
+  @UseGuards(ApiKeyGuard)
+  @Post('slips/nin/lookup')
+  async lookupSlipApiKey(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const nin = String(body.nin || '').trim();
+    return this.ninSlipService.lookupIdentity(
+      req.organizationId,
+      normalizeEnvironment(req.environment),
+      nin,
     );
   }
 
@@ -91,7 +109,22 @@ export class NinSlipController {
     );
   }
 
-  // 2. JWT Authenticated Endpoint (for Dashboard UI generator)
+  // 2a. Fast Identity Lookup Endpoint (JWT - instant optimistic demographic fetch for dashboard UI)
+  @UseGuards(JwtAuthGuard)
+  @Post('dashboard/slips/nin/lookup')
+  async lookupSlipDashboard(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const nin = String(body.nin || '').trim();
+    return this.ninSlipService.lookupIdentity(
+      req.organizationId,
+      normalizeEnvironment(req.environment || 'live'),
+      nin,
+    );
+  }
+
+  // 2b. JWT Authenticated Endpoint (for Dashboard UI generator)
   @UseGuards(JwtAuthGuard)
   @Post('dashboard/slips/nin')
   async generateSlipDashboard(@Req() req: any, @Body() body: any) {
@@ -99,13 +132,15 @@ export class NinSlipController {
       throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
     }
     const nin = String(body.nin || '').trim();
-    const format = body.format || 'both';
-    const cardType = body.cardType || body.type || 'slip';
+    const requestedFormat = String(body.format || '').toLowerCase();
+    const cardType: 'card' | 'slip' = body.cardType || body.type || (requestedFormat === 'card' ? 'card' : 'slip');
+    const fileType = body.fileType || (requestedFormat === 'docx' ? 'docx' : (requestedFormat === 'pdf' ? 'pdf' : 'both'));
+
     return this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
       normalizeEnvironment(req.environment || 'live'),
       nin,
-      format,
+      fileType,
       'dashboard_ui',
       cardType,
     );
@@ -118,10 +153,11 @@ export class NinSlipController {
     @Req() req: any,
     @Param('nin') nin: string,
     @Query('format') format: 'pdf' | 'docx' | 'card' = 'pdf',
-    @Res() res: Response,
+    @Query('type') type?: 'card' | 'slip',
+    @Res() res?: Response,
   ) {
     const cleanNin = String(nin || '').replace(/\D/g, '');
-    const isCard = format === 'card';
+    const isCard = format === 'card' || type === 'card';
     const result = await this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
       normalizeEnvironment(req.environment || 'live'),
@@ -132,25 +168,26 @@ export class NinSlipController {
     );
 
     if (format === 'docx' && result.data.docxBuffer) {
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-      res.setHeader('Content-Disposition', `attachment; filename="NIN_Slip_${cleanNin}.docx"`);
-      return res.send(result.data.docxBuffer);
+      res!.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res!.setHeader('Content-Disposition', `attachment; filename="NIN_Slip_${cleanNin}.docx"`);
+      return res!.send(result.data.docxBuffer);
     }
 
     if (isCard && result.data.cardPdfBuffer) {
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="NIN_Digital_Card_${cleanNin}.pdf"`);
-      return res.send(result.data.cardPdfBuffer);
+      res!.setHeader('Content-Type', 'application/pdf');
+      res!.setHeader('Content-Disposition', `attachment; filename="NIN_Digital_Card_${cleanNin}.pdf"`);
+      return res!.send(result.data.cardPdfBuffer);
     }
 
     if (result.data.pdfBuffer) {
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="NIN_Slip_${cleanNin}.pdf"`);
-      return res.send(result.data.pdfBuffer);
+      res!.setHeader('Content-Type', 'application/pdf');
+      res!.setHeader('Content-Disposition', `attachment; filename="NIN_Slip_${cleanNin}.pdf"`);
+      return res!.send(result.data.pdfBuffer);
     }
 
     throw new BadRequestException('Requested format could not be generated');
   }
+
 
   // 4. NIN Advance Verification Endpoint (API Key - ₦95)
   @UseGuards(ApiKeyGuard)
@@ -190,7 +227,7 @@ export class NinSlipController {
         costDeducted: cost,
         latencyMs,
         requestPayload: { nin },
-        responsePayload: result.data || null,
+        responsePayload: result.data ? encryptPayload(sanitizeIdentityRetention(result.data)) : null,
       });
 
       return {
@@ -206,5 +243,49 @@ export class NinSlipController {
       await this.billingService.refundCredits(req.organizationId, req.environment, cost, reference);
       throw err;
     }
+  }
+
+  // 5. On-Demand Document Synthesis Endpoint (F17)
+  @UseGuards(ApiKeyGuard)
+  @Post('slips/on-demand')
+  async generateOnDemandSlip(
+    @Req() req: any,
+    @Res() res: Response,
+    @Body() body: any,
+  ) {
+    if (!body || !body.logId) {
+      throw new BadRequestException('logId is required in request body');
+    }
+
+    const format = (body.format || 'slip').toLowerCase();
+    const fileType = (body.fileType || 'pdf').toLowerCase();
+
+    const result = await this.ninSlipService.generateOnDemandSlip({
+      logId: body.logId,
+      format,
+      fileType,
+      organizationId: req.organizationId,
+      environment: req.environment,
+    });
+
+    const isJsonRequested =
+      body.json === true ||
+      body.json === 'true' ||
+      (req.headers.accept && req.headers.accept.includes('application/json'));
+
+    if (isJsonRequested) {
+      return res.status(200).json({
+        success: true,
+        filename: result.filename,
+        contentType: result.contentType,
+        sizeBytes: result.sizeBytes,
+        base64: result.buffer.toString('base64'),
+      });
+    }
+
+    res.setHeader('Content-Type', result.contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.setHeader('Content-Length', result.sizeBytes);
+    return res.status(200).send(result.buffer);
   }
 }

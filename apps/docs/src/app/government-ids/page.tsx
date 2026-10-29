@@ -63,7 +63,7 @@ export default function GovernmentIdsDocsPage() {
       </div>
 
       {/* Available ID Services Overview */}
-      <div className="grid sm:grid-cols-3 gap-3 text-xs font-mono">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs font-mono">
         <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1.5">
           <span className="text-emerald-700 font-bold block">1. Driver's License (FRSC)</span>
           <code className="text-slate-900 block text-[11px]">GET /api/v1/kyc/dl</code>
@@ -83,6 +83,13 @@ export default function GovernmentIdsDocsPage() {
           <code className="text-slate-900 block text-[11px]">GET /api/v1/kyc/passport</code>
           <p className="text-slate-600 font-sans text-xs">Verify Nigerian International Passports against Immigration Service records.</p>
           <span className="text-slate-500 block text-[11px]">Rate: 150 NGX (₦150.00)</span>
+        </div>
+
+        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1.5">
+          <span className="text-purple-700 font-bold block">4. Tax ID (TIN / FIRS)</span>
+          <code className="text-slate-900 block text-[11px]">GET /api/v1/kyc/tin</code>
+          <p className="text-slate-600 font-sans text-xs">Validate corporate and individual tax numbers with FIRS & Joint Tax Board.</p>
+          <span className="text-slate-500 block text-[11px]">Rate: 100 NGX (₦100.00)</span>
         </div>
       </div>
 
@@ -216,6 +223,67 @@ export default function GovernmentIdsDocsPage() {
   -H "Authorization: vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
   -H "AppId: app_6a7b8c9d0e1f"`}
         />
+      </div>
+
+      {/* 4. Tax Identification Number (TIN) */}
+      <div className="space-y-3 pt-6 border-t border-slate-200">
+        <div className="flex items-center gap-2">
+          <Badge variant="verified">FIRS / JTB</Badge>
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">Tax ID (TIN) (GET /api/v1/kyc/tin)</h2>
+        </div>
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          Verify individual and corporate Tax Identification Numbers directly with the Federal Inland Revenue Service (FIRS) and Joint Tax Board (JTB).
+        </p>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Field</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Required</TableHead>
+              <TableHead>Description</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-mono text-emerald-700 font-bold">tin</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-rose-700 font-bold">Required</TableCell>
+              <TableCell className="text-slate-700">Tax Identification Number.</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+
+        <CodeBlock
+          language="bash"
+          title="cURL Request (Tax ID)"
+          code={`curl -X GET "https://api.verixaid.com/api/v1/kyc/tin?tin=12345678-0001" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..."`}
+        />
+      </div>
+
+      {/* Universal Printable Verification Certificate Export */}
+      <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 shadow-2xs space-y-3 pt-4">
+        <h3 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <Badge variant="verified">UNIVERSAL CERTIFICATE</Badge>
+          Instant Printable PDF Verification Certificate Export
+        </h3>
+        <p className="text-xs text-slate-600 leading-relaxed font-sans">
+          All statutory identity verification checks across FRSC, INEC, NIS, and FIRS support instant client-side and API PDF certificate generation. Every certificate is tamper-evident and generated with:
+        </p>
+        <div className="grid sm:grid-cols-3 gap-3 text-xs font-mono pt-1">
+          <div className="p-3 rounded-lg bg-white border border-slate-200">
+            <span className="text-emerald-700 font-bold block mb-1">Official Badges</span>
+            <span className="text-slate-600 font-sans text-[11px]">Includes verified government crests, issuing authority metadata, and match status.</span>
+          </div>
+          <div className="p-3 rounded-lg bg-white border border-slate-200">
+            <span className="text-sky-700 font-bold block mb-1">Audit Reference</span>
+            <span className="text-slate-600 font-sans text-[11px]">Embedded ISO timestamp, reference tracking UUID, and tenant environment tag.</span>
+          </div>
+          <div className="p-3 rounded-lg bg-white border border-slate-200">
+            <span className="text-purple-700 font-bold block mb-1">SHA-256 Seal</span>
+            <span className="text-slate-600 font-sans text-[11px]">Cryptographic payload hash ensuring the downloaded certificate has not been altered.</span>
+          </div>
+        </div>
       </div>
     </div>
   )

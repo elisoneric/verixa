@@ -142,13 +142,13 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('dojah-pricing')
+  @Get(['pricing/upstream', 'dojah-pricing'])
   async getDojahPricing() {
     return this.adminService.getDojahPricing();
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('dojah-pricing')
+  @Post(['pricing/upstream', 'dojah-pricing'])
   async updateDojahPricing(@Body() body: { rates: Record<string, number> }) {
     return this.adminService.updateDojahPricing(body.rates);
   }

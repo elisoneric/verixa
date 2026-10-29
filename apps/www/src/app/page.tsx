@@ -319,40 +319,41 @@ export default function HomePage() {
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
               {/* Left Column: Editorial Display Typography */}
               <div>
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-xs font-medium mb-3">
-                  <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Nigeria&apos;s Lowest-Cost Identity Verification APIs • 99.9% Registry Uptime SLA
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-[11px] sm:text-xs font-medium mb-3 max-w-full text-balance">
+                  <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  <span>Nigeria&apos;s Lowest-Cost Identity Verification APIs • 99.9% Registry Uptime SLA</span>
                 </div>
 
-                <h1 className="mt-2 font-display text-4xl sm:text-5xl lg:text-6xl font-[450] leading-[1.08] tracking-tight text-white text-balance">
+                <h1 className="mt-2 font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold sm:font-[450] leading-[1.12] sm:leading-[1.08] tracking-tight text-white text-balance">
                   Low-Cost NIN &amp; BVN Verification APIs
                 </h1>
 
-                <p className="mt-5 text-base sm:text-lg text-zinc-400 max-w-xl leading-relaxed">
-                  The most reliable, low-cost identity verification APIs in Nigeria. Verify NIN (₦125), BVN (₦95), and free NUBAN bank accounts with sub-15ms Smart Cache (50% discount), automated NIN slip generator, and zero setup fees.
+                <p className="mt-4 sm:mt-5 text-sm sm:text-base lg:text-lg text-zinc-400 max-w-xl leading-relaxed">
+                  The most reliable, low-cost identity verification APIs in Nigeria. Verify NIN (₦125), BVN (₦95), and free NUBAN bank accounts with sub-15ms Smart Cache (50% discount), automated NIMC card &amp; slip generator, and zero setup fees.
                 </p>
 
-                {/* Pill Action CTAs */}
-                <div className="mt-8 flex flex-wrap items-center gap-3">
+                {/* Pill Action CTAs (Touch-friendly on mobile) */}
+                <div className="mt-6 sm:mt-8 flex flex-col xs:flex-row items-stretch xs:items-center gap-3 w-full sm:w-auto">
                   <AppLink
                     app="dashboard"
                     path="/register"
-                    className="btn-pill-primary !px-7 !py-3.5 text-sm flex items-center gap-2 shadow-[0_0_25px_rgba(255,255,255,0.25)]"
+                    className="btn-pill-primary !px-7 !py-3.5 min-h-[44px] text-sm flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(255,255,255,0.25)] text-center cursor-pointer"
                   >
-                    Get your API key &rarr;
+                    <span>Get your API key</span>
+                    <span>&rarr;</span>
                   </AppLink>
 
                   <AppLink
                     app="docs"
                     path="/"
-                    className="btn-pill-secondary !px-6 !py-3.5 text-sm flex items-center gap-2"
+                    className="btn-pill-secondary !px-6 !py-3.5 min-h-[44px] text-sm flex items-center justify-center gap-2 text-center cursor-pointer"
                   >
                     Read the docs
                   </AppLink>
                 </div>
 
                 {/* Value Proposition Checklist */}
-                <ul className="mt-8 flex flex-col gap-2.5 text-xs sm:text-sm text-zinc-400">
+                <ul className="mt-7 sm:mt-8 flex flex-col gap-2.5 text-xs sm:text-sm text-zinc-400">
                   <li className="flex items-center gap-2.5">
                     <svg className="size-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none">
                       <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -369,13 +370,13 @@ export default function HomePage() {
                     <svg className="size-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none">
                       <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span>Strict NDPA & NDPR regulatory compliance with applicant consent verification</span>
+                    <span>Strict NDPA &amp; NDPR regulatory compliance with applicant consent verification</span>
                   </li>
                 </ul>
               </div>
 
               {/* Right Column: High-Fidelity Identity Verification Console Preview */}
-              <div className="relative w-full">
+              <div className="relative w-full max-w-full">
                 {/* Aurora Mesh Glow Backdrop */}
                 <div
                   aria-hidden="true"
@@ -387,7 +388,7 @@ export default function HomePage() {
                 />
 
                 {/* Cyber Notch Frame Wrapper */}
-                <div className="relative p-5 sm:p-7 rounded-2xl bg-[#090b10]/95 border border-white/[0.1] shadow-[0_24px_64px_-16px_rgba(0,0,0,0.85)] backdrop-blur-xl">
+                <div className="relative p-4 sm:p-7 rounded-2xl bg-[#090b10]/95 border border-white/[0.1] shadow-[0_24px_64px_-16px_rgba(0,0,0,0.85)] backdrop-blur-xl overflow-hidden">
                   {/* Stepped Corner Notches (14px Geometric Accents) */}
                   <span className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-emerald-500/80 pointer-events-none rounded-tl-sm" />
                   <span className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-emerald-500/80 pointer-events-none rounded-tr-sm" />
@@ -395,29 +396,29 @@ export default function HomePage() {
                   <span className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-emerald-500/80 pointer-events-none rounded-br-sm" />
 
                   {/* Header */}
-                  <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
-                    <div>
+                  <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-white/[0.08] gap-2">
+                    <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-                        <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                        <span className="size-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                        <h2 className="text-sm sm:text-lg font-bold text-white tracking-tight truncate">
                           Identity Verification
                         </h2>
                       </div>
-                      <p className="text-xs text-zinc-400 mt-0.5">
-                        Perform individual KYC identity and bank account checks.
+                      <p className="text-[11px] sm:text-xs text-zinc-400 mt-0.5 truncate">
+                        Perform KYC identity and bank account checks.
                       </p>
                     </div>
-                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold tracking-wider">
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold tracking-wider shrink-0">
                       LIVE REGISTER
                     </span>
                   </div>
 
-                  {/* Verification Service Selector */}
-                  <div className="mt-4 space-y-2">
+                  {/* Verification Service Selector (Touch targets >= 44px on mobile) */}
+                  <div className="mt-3.5 sm:mt-4 space-y-2">
                     <span className="text-[11px] font-mono text-zinc-400 font-medium uppercase tracking-wider block">
                       Verification Service
                     </span>
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+                    <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-1.5 sm:gap-2">
                       {(
                         [
                           { id: "bvn", label: "BVN" },
@@ -431,7 +432,7 @@ export default function HomePage() {
                           key={item.id}
                           type="button"
                           onClick={() => setPreviewService(item.id)}
-                          className={`h-9 px-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer flex items-center justify-center text-center ${
+                          className={`min-h-[44px] sm:min-h-[36px] h-11 sm:h-9 px-2 text-xs font-semibold rounded-xl sm:rounded-lg border transition-all cursor-pointer flex items-center justify-center text-center active:scale-[0.98] ${
                             previewService === item.id
                               ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] font-bold"
                               : "bg-[#11141e] border-white/[0.08] text-zinc-400 hover:text-white hover:border-white/[0.2]"
@@ -444,12 +445,12 @@ export default function HomePage() {
                   </div>
 
                   {/* Simulated Input Query Bar */}
-                  <div className="mt-3.5 p-2.5 rounded-xl bg-[#11141e] border border-white/[0.08] flex items-center justify-between">
-                    <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="mt-3 sm:mt-3.5 p-2.5 sm:p-3 rounded-xl bg-[#11141e] border border-white/[0.08] flex items-center justify-between min-h-[44px] gap-2 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
                       <span className="text-[11px] font-mono text-zinc-500 uppercase shrink-0">
                         QUERY:
                       </span>
-                      <span className="font-mono text-xs text-emerald-300 font-bold truncate">
+                      <span className="font-mono text-xs sm:text-sm text-emerald-300 font-bold truncate">
                         {previewRecords[previewService].identifierValue}
                       </span>
                     </div>
@@ -458,11 +459,11 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  {/* Registry Result Display Card */}
-                  <div className="mt-4 rounded-xl border border-white/[0.08] bg-[#0c0e14]/90 p-4 space-y-3">
+                  {/* Registry Result Display Card (Smooth Touch Scrolling & Fintech Polish) */}
+                  <div className="mt-3.5 sm:mt-4 rounded-xl border border-white/[0.08] bg-[#0c0e14]/90 p-3 sm:p-4 space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
                       <div className="flex items-center gap-2">
-                        <span className="size-2 rounded-full bg-emerald-400" />
+                        <span className="size-2 rounded-full bg-emerald-400 shrink-0" />
                         <span className="text-xs font-bold text-white tracking-wide">
                           Registry Result
                         </span>
@@ -472,23 +473,23 @@ export default function HomePage() {
                       </span>
                     </div>
 
-                    {/* Result Key-Value Monospace Lines */}
-                    <div className="space-y-1.5 font-mono text-[11px] max-h-[220px] overflow-y-auto pr-1">
+                    {/* Result Key-Value Monospace Lines with smooth touch scrolling */}
+                    <div className="space-y-1.5 font-mono text-[11px] max-h-[220px] overflow-y-auto pr-1 overscroll-contain touch-pan-y [scrollbar-width:thin] scroll-smooth">
                       {Object.entries(previewRecords[previewService].results).map(([key, val]) => (
                         <div
                           key={key}
-                          className="flex items-start justify-between py-1 border-b border-white/[0.04] gap-2"
+                          className="flex items-start justify-between py-1 border-b border-white/[0.04] gap-2 hover:bg-white/[0.02] px-1 rounded transition-colors"
                         >
-                          <span className="text-zinc-400 lowercase">{key}:</span>
+                          <span className="text-zinc-400 lowercase shrink-0">{key}:</span>
                           <span className="text-zinc-200 font-medium text-right break-all">
-                            {val}
+                            {key === "photo" && val.includes("text") ? "[Biometric Photo Verified]" : val}
                           </span>
                         </div>
                       ))}
                     </div>
 
                     {/* Footer Latency & Reference Audit Stamp */}
-                    <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between text-[11px] font-mono">
+                    <div className="pt-2 border-t border-white/[0.08] flex flex-col xs:flex-row xs:items-center justify-between text-[11px] font-mono gap-1">
                       <span className="text-emerald-400 font-bold">
                         LATENCY: {previewRecords[previewService].latency}
                       </span>
@@ -693,9 +694,9 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* Desktop Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full divide-y divide-white/[0.08] text-left">
+            {/* Desktop Table (Smooth touch scrolling on mobile) */}
+            <div className="overflow-x-auto [scrollbar-width:thin] touch-pan-x">
+              <table className="w-full min-w-[640px] divide-y divide-white/[0.08] text-left">
                 <thead className="text-xs font-mono uppercase tracking-wider text-zinc-500">
                   <tr className="[&>th]:py-4 [&>th]:px-4">
                     <th className="w-[28%]">Endpoint / Service</th>
@@ -793,7 +794,7 @@ export default function HomePage() {
                       <div className="text-zinc-400 text-xs mt-0.5">/api/nin-slip</div>
                     </td>
                     <td className="py-4 px-4 text-zinc-400">
-                      High-resolution A4 dual-slip PDF and editable Word (.docx) document generator
+                      High-resolution A4 dual-slip PDF and official ISO ID-1 NIMC card generator
                     </td>
                     <td className="py-4 px-4 font-sans text-zinc-300">sub-280ms · 99.9%</td>
                     <td className="py-4 px-4 font-sans">

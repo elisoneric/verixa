@@ -325,6 +325,50 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     }
   }, [mobileMenuOpen])
 
+  // Mobile Bottom Navigation items (5 primary items)
+  const mobileNavItems = [
+    {
+      label: "Overview",
+      href: "/dashboard",
+      icon: (
+        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      ),
+      isActive: pathname === "/dashboard",
+    },
+    {
+      label: "Verify",
+      href: "/dashboard/verify",
+      icon: (
+        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      ),
+      isActive: pathname.startsWith("/dashboard/verify"),
+    },
+    {
+      label: "Slips",
+      href: "/dashboard/slips",
+      icon: (
+        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+        </svg>
+      ),
+      isActive: pathname.startsWith("/dashboard/slips"),
+    },
+    {
+      label: "Billing",
+      href: "/dashboard/billing",
+      icon: (
+        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+      ),
+      isActive: pathname.startsWith("/dashboard/billing") || pathname.startsWith("/dashboard/transactions"),
+    },
+  ]
+
   return (
     <div className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500/20 selection:text-emerald-900 relative">
       {/* Global Cmd+K Palette */}
@@ -372,7 +416,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 -ml-1 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors shrink-0"
+              className="lg:hidden p-2 -ml-1 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors shrink-0 cursor-pointer"
               aria-label="Open navigation menu"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -409,7 +453,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => setCmdOpen(true)}
-              className="sm:hidden p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="sm:hidden p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
               aria-label="Search"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -436,11 +480,61 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Page Body Viewport */}
-        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto min-w-0 overflow-x-hidden">
+        {/* Page Body Viewport (pb-24 on mobile prevents overlap with fixed bottom nav, md:pb-8 on desktop) */}
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 pb-24 md:pb-8 max-w-7xl w-full mx-auto min-w-0 overflow-x-hidden">
           {children}
         </main>
       </div>
+
+      {/* Fixed Thumb-Friendly Mobile Bottom Navigation Bar (< 768px viewports, hidden on md+) */}
+      <nav
+        aria-label="Mobile Bottom Navigation"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 py-1.5"
+      >
+        <div className="flex items-center justify-around max-w-md mx-auto">
+          {mobileNavItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`min-h-[46px] min-w-[46px] flex-1 flex flex-col items-center justify-center gap-1 rounded-xl py-1 text-[11px] font-medium transition-all active:scale-95 cursor-pointer relative ${
+                item.isActive
+                  ? "text-emerald-700 font-bold bg-emerald-50/80"
+                  : "text-slate-600 hover:text-slate-900 active:bg-slate-100"
+              }`}
+            >
+              {item.isActive && (
+                <span className="absolute top-1 w-1.5 h-1.5 rounded-full bg-emerald-600" />
+              )}
+              <div className={item.isActive ? "text-emerald-600 mt-1" : "text-slate-500"}>
+                {item.icon}
+              </div>
+              <span className="tracking-tight leading-none">{item.label}</span>
+            </Link>
+          ))}
+
+          {/* 5. More / Menu Item (Opens existing mobile slide-out drawer) */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open navigation drawer"
+            className={`min-h-[46px] min-w-[46px] flex-1 flex flex-col items-center justify-center gap-1 rounded-xl py-1 text-[11px] font-medium transition-all active:scale-95 cursor-pointer relative ${
+              mobileMenuOpen
+                ? "text-emerald-700 font-bold bg-emerald-50/80"
+                : "text-slate-600 hover:text-slate-900 active:bg-slate-100"
+            }`}
+          >
+            <div className="relative text-slate-500">
+              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              {isPlatformSuperAdmin && (
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+              )}
+            </div>
+            <span className="tracking-tight leading-none">Menu</span>
+          </button>
+        </div>
+      </nav>
     </div>
   )
 }

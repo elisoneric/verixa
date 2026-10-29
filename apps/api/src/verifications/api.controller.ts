@@ -21,6 +21,7 @@ import { Repository } from 'typeorm';
 import { VerificationLog, VerificationStatus } from './entities/verification-log.entity';
 import { Wallet } from '../billing/entities/wallet.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { encryptPayload, sanitizeIdentityRetention } from '../common/utils/crypto.util';
 
 @Controller(['api', ''])
 export class ApiController {
@@ -131,7 +132,7 @@ export class ApiController {
           cacheKey: this.identityCacheService.generateKey(orgId, env, service, identifier),
           idempotencyKey: req.headers?.['idempotency-key'] || undefined,
           requestPayload: payload,
-          responsePayload: cached.data,
+          responsePayload: cached.data ? encryptPayload(sanitizeIdentityRetention(cached.data)) : null,
         });
 
         const cleanEntity = cached.data?.entity !== undefined ? cached.data.entity : cached.data;
@@ -203,6 +204,7 @@ export class ApiController {
     }
 
     const latencyMs = Math.max(35, Date.now() - startTime);
+    const rawData = result?.data || result;
 
     await this.logRepository.save({
       org_id: orgId,
@@ -218,10 +220,9 @@ export class ApiController {
       cacheKey: this.identityCacheService.generateKey(orgId, env, service, identifier),
       idempotencyKey: req.headers?.['idempotency-key'] || undefined,
       requestPayload: payload,
-      responsePayload: result?.data || result,
+      responsePayload: rawData ? encryptPayload(sanitizeIdentityRetention(rawData)) : null,
     });
 
-    const rawData = result?.data || result;
     const cleanEntity = rawData?.entity !== undefined ? rawData.entity : rawData;
 
     if (req.res && typeof req.res.setHeader === 'function') {
@@ -866,7 +867,7 @@ export class ApiController {
   @UseGuards(ApiKeyGuard)
   @Post('v1/aml/screening')
   @HttpCode(HttpStatus.OK)
-  async screenAmlDojah(@Req() req: any, @Body() body: any) {
+  async screenAmlDirect(@Req() req: any, @Body() body: any) {
     const name = String(body.name || body.full_name || '').trim();
     if (!name) throw new BadRequestException('name is required for AML screening');
     const isLive = req.environment === Environment.LIVE;
@@ -884,7 +885,7 @@ export class ApiController {
   @UseGuards(ApiKeyGuard)
   @Get('v1/credit/bvn')
   @HttpCode(HttpStatus.OK)
-  async getCreditScoreDojah(@Req() req: any, @Query() query: any) {
+  async getCreditScoreDirect(@Req() req: any, @Query() query: any) {
     const bvn = String(query.bvn || query.id || '').trim();
     if (!bvn) throw new BadRequestException('bvn query parameter is required');
     const isLive = req.environment === Environment.LIVE;
@@ -901,7 +902,7 @@ export class ApiController {
   @UseGuards(ApiKeyGuard)
   @Post('v1/credit/bvn')
   @HttpCode(HttpStatus.OK)
-  async postCreditScoreDojah(@Req() req: any, @Body() body: any, @Query() query: any) {
+  async postCreditScoreDirect(@Req() req: any, @Body() body: any, @Query() query: any) {
     const payload = { ...query, ...body };
     const bvn = String(payload.bvn || payload.id || '').trim();
     if (!bvn) throw new BadRequestException('bvn is required');
@@ -920,7 +921,7 @@ export class ApiController {
   @UseGuards(ApiKeyGuard)
   @Get('v1/kyc/email')
   @HttpCode(HttpStatus.OK)
-  async getEmailRiskDojah(@Req() req: any, @Query() query: any) {
+  async getEmailRiskDirect(@Req() req: any, @Query() query: any) {
     const email = String(query.email || '').trim();
     if (!email) throw new BadRequestException('email query parameter is required');
     const isLive = req.environment === Environment.LIVE;
@@ -937,7 +938,7 @@ export class ApiController {
   @UseGuards(ApiKeyGuard)
   @Post('v1/kyc/email')
   @HttpCode(HttpStatus.OK)
-  async postEmailRiskDojah(@Req() req: any, @Body() body: any, @Query() query: any) {
+  async postEmailRiskDirect(@Req() req: any, @Body() body: any, @Query() query: any) {
     const payload = { ...query, ...body };
     const email = String(payload.email || '').trim();
     if (!email) throw new BadRequestException('email is required');

@@ -29,7 +29,7 @@ export default function AdminRevenuePage() {
     ApiClient.getAdminRevenue()
       .then((res) => {
         setData(res)
-        const incoming = res?.dojahRates || res?.upstreamRates
+        const incoming = res?.upstreamRates || res?.dojahRates
         if (incoming) {
           setUpstreamRates({
             nin: String(incoming.nin ?? 90),
@@ -58,7 +58,7 @@ export default function AdminRevenuePage() {
     setSaveSuccessMsg(null)
 
     try {
-      await ApiClient.updateDojahPricing({
+      await ApiClient.updateUpstreamPricing({
         nin: parseInt(upstreamRates.nin, 10) || 0,
         ninAdvance: parseInt(upstreamRates.ninAdvance, 10) || 0,
         ninPremium: parseInt(upstreamRates.ninPremium, 10) || 0,
@@ -146,7 +146,7 @@ export default function AdminRevenuePage() {
           </span>
         </Card>
 
-        {/* Real Upstream Dojah Cost */}
+        {/* Real Upstream Direct Cost */}
         <Card className="p-5 bg-white border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">

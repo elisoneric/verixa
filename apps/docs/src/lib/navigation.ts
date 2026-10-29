@@ -23,6 +23,7 @@ export const DOCS_SECTIONS: NavSection[] = [
     links: [
       { label: "BVN Verification", href: "/bvn", badge: "₦95" },
       { label: "NIN Verification", href: "/nin", badge: "₦125" },
+      { label: "NIN Slips & NIMC Card", href: "/slips", badge: "₦250" },
       { label: "Phone Number Intelligence", href: "/phone", badge: "₦85" },
       { label: "Secondary Government IDs", href: "/government-ids" },
     ],
