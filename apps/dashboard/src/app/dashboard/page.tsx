@@ -341,98 +341,298 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      {/* Responsive Mobile-First Quick-Action Cards */}
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono">
-            Quick Actions
-          </h2>
-          <span className="text-[11px] text-slate-400 font-medium">Core Fintech Actions</span>
+      {/* Enterprise Fintech Verification Launchpad */}
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 font-mono">
+              Verification Launchpad
+            </h2>
+            <p className="text-xs text-slate-500">
+              Direct in-app access to all Nigerian identity registries & slip generation services.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard/verify"
+              className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+            >
+              <span>Full Verification Console</span>
+              <span>&rarr;</span>
+            </Link>
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {/* 1. Verify Identity */}
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {/* NIN */}
           <Link
-            href="/dashboard/verify"
-            className="group relative rounded-2xl border border-slate-200 bg-white p-4.5 hover:border-emerald-500/50 hover:shadow-md hover:shadow-emerald-500/5 transition-all duration-200 text-left block active:scale-[0.99] cursor-pointer overflow-hidden min-h-[44px]"
+            href="/dashboard/verify?service=nin"
+            className="group p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-emerald-100 transition-all">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-mono font-bold text-xs">
+                  NIN
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
+                  ₦65
+                </span>
               </div>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold">
-                Instant KYC
-              </span>
-            </div>
-            <div className="mt-3">
-              <span className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors block">
-                Verify Identity
-              </span>
-              <p className="text-xs text-slate-500 mt-0.5 leading-snug">
-                Perform real-time NIN, BVN, CAC, and bank KYC checks.
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                National Identity
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                NIMC Citizen Registry
               </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>⚡ &lt;200ms</span>
+              <span className="font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">Verify &rarr;</span>
             </div>
           </Link>
 
-          {/* 2. Generate NIMC Card */}
+          {/* BVN */}
+          <Link
+            href="/dashboard/verify?service=bvn"
+            className="group p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-mono font-bold text-xs">
+                  BVN
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
+                  ₦65
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                Bank Verification
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                NIBSS Biometrics
+              </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>⚡ &lt;250ms</span>
+              <span className="font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">Verify &rarr;</span>
+            </div>
+          </Link>
+
+          {/* CAC */}
+          <Link
+            href="/dashboard/verify?service=cac"
+            className="group p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-mono font-bold text-xs">
+                  CAC
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
+                  ₦150
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                Corporate Registry
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                Companies & Trustees
+              </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>⚡ &lt;400ms</span>
+              <span className="font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">Verify &rarr;</span>
+            </div>
+          </Link>
+
+          {/* NUBAN */}
+          <Link
+            href="/dashboard/verify?service=nuban"
+            className="group p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-mono font-bold text-xs">
+                  NUBAN
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
+                  ₦10
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                Bank Account
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                CBN Settlement Lookup
+              </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>⚡ &lt;150ms</span>
+              <span className="font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">Verify &rarr;</span>
+            </div>
+          </Link>
+
+          {/* NIMC Card & Slip Generator */}
           <Link
             href="/dashboard/slips"
-            className="group relative rounded-2xl border border-slate-200 bg-white p-4.5 hover:border-sky-500/50 hover:shadow-md hover:shadow-sky-500/5 transition-all duration-200 text-left block active:scale-[0.99] cursor-pointer overflow-hidden min-h-[44px]"
+            className="group p-3.5 rounded-xl border border-emerald-300 bg-emerald-50/40 hover:border-emerald-600 hover:shadow-md transition-all flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200/80 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-sky-100 transition-all">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                </svg>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-mono font-bold text-xs">
+                  CARD
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-600 text-white font-semibold">
+                  ₦250
+                </span>
               </div>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 font-bold">
-                ID-1 & Slips
-              </span>
-            </div>
-            <div className="mt-3">
-              <span className="text-sm font-bold text-slate-900 group-hover:text-sky-700 transition-colors block">
-                Generate NIMC Card
-              </span>
-              <p className="text-xs text-slate-500 mt-0.5 leading-snug">
-                Produce premium ID-1 plastic cards & official NIN slips.
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                NIMC Card & Slip
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                ID-1 & A4 Vector PDF
               </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-emerald-200 flex items-center justify-between text-[10px] text-emerald-800 font-mono">
+              <span>⚡ Vector</span>
+              <span className="font-semibold text-emerald-700 group-hover:translate-x-0.5 transition-transform">Generate &rarr;</span>
             </div>
           </Link>
 
-          {/* 3. Fund Wallet */}
-          <button
-            type="button"
-            onClick={() => {
-              if (environment === "live") {
-                setTopupModalOpen(true)
-              } else {
-                handleSandboxFaucet()
-              }
-            }}
-            className="group relative rounded-2xl border border-slate-200 bg-white p-4.5 hover:border-amber-500/50 hover:shadow-md hover:shadow-amber-500/5 transition-all duration-200 text-left block active:scale-[0.99] cursor-pointer overflow-hidden w-full min-h-[44px]"
+          {/* DL */}
+          <Link
+            href="/dashboard/verify?service=dl"
+            className="group p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-amber-100 transition-all">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-mono font-bold text-xs">
+                  FRSC
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
+                  ₦120
+                </span>
               </div>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 font-bold">
-                {environment === "live" ? "Instant Top-Up" : "Test Faucet"}
-              </span>
-            </div>
-            <div className="mt-3">
-              <span className="text-sm font-bold text-slate-900 group-hover:text-amber-700 transition-colors block">
-                Fund Wallet
-              </span>
-              <p className="text-xs text-slate-500 mt-0.5 leading-snug">
-                {environment === "live"
-                  ? "Deposit NGX credits via bank transfer or card checkout."
-                  : "Add 10,000 complimentary Sandbox test credits."}
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                Driver's License
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                FRSC Permit Database
               </p>
             </div>
-          </button>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>⚡ &lt;300ms</span>
+              <span className="font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">Verify &rarr;</span>
+            </div>
+          </Link>
+
+          {/* VIN */}
+          <Link
+            href="/dashboard/verify?service=vin"
+            className="group p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-mono font-bold text-xs">
+                  INEC
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
+                  ₦120
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                Voter's Card
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                Electoral Roll Lookup
+              </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>⚡ &lt;350ms</span>
+              <span className="font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">Verify &rarr;</span>
+            </div>
+          </Link>
+
+          {/* Passport */}
+          <Link
+            href="/dashboard/verify?service=passport"
+            className="group p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-mono font-bold text-xs">
+                  NIS
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
+                  ₦250
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                Passport Check
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                Immigration Registry
+              </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>⚡ &lt;450ms</span>
+              <span className="font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">Verify &rarr;</span>
+            </div>
+          </Link>
+
+          {/* TIN */}
+          <Link
+            href="/dashboard/verify?service=tin"
+            className="group p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-mono font-bold text-xs">
+                  TIN
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
+                  ₦80
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                Tax Identifier
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                JTB / FIRS Database
+              </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>⚡ &lt;300ms</span>
+              <span className="font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">Verify &rarr;</span>
+            </div>
+          </Link>
+
+          {/* Phone KYC */}
+          <Link
+            href="/dashboard/verify?service=phone"
+            className="group p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-mono font-bold text-xs">
+                  TEL
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
+                  ₦65
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                Phone & SIM KYC
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                NCC Telco Intelligence
+              </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+              <span>⚡ &lt;200ms</span>
+              <span className="font-semibold text-emerald-600 group-hover:translate-x-0.5 transition-transform">Verify &rarr;</span>
+            </div>
+          </Link>
         </div>
       </div>
 

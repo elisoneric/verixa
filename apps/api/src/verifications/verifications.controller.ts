@@ -343,6 +343,8 @@ export class VerificationsController {
         costDeducted: log.costDeducted ? Number(log.costDeducted) : (log.isCached ? 20 : (log.serviceType === 'nuban' ? 10 : 50)),
         latencyMs: log.latencyMs || (log.isCached ? 14 : 142),
         idempotencyKey: log.idempotencyKey,
+        identifier: log.requestPayload?.nin ? ('***' + String(log.requestPayload.nin).slice(-4)) : (log.requestPayload?.bvn ? ('***' + String(log.requestPayload.bvn).slice(-4)) : (log.requestPayload?.accountNumber || log.requestPayload?.rcNumber || log.requestPayload?.phone || ('Ref: ' + log.id.slice(0, 8)))),
+        format: log.requestPayload?.format || 'slip',
         createdAt: log.createdAt,
       })),
       total,

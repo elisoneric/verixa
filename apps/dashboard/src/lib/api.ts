@@ -31,6 +31,8 @@ export interface VerificationLogItem {
   costDeducted?: number
   latencyMs?: number
   idempotencyKey?: string
+  identifier?: string
+  format?: string
   createdAt: string
 }
 
@@ -449,6 +451,14 @@ export class ApiClient {
     return res.blob()
   }
 
+  static async downloadHistoricalSlip(
+    logId: string,
+    format: "card" | "slip" = "slip",
+    fileType: "pdf" = "pdf"
+  ): Promise<{ blob: Blob; filename: string }> {
+    return this.downloadOnDemandSlip(logId, format, fileType)
+  }
+
   static async downloadOnDemandSlip(
     logId: string,
     format: "card" | "slip",
@@ -456,7 +466,8 @@ export class ApiClient {
   ): Promise<{ blob: Blob; filename: string }> {
     const baseUrl = getApiUrl()
     const token = this.getToken()
-    const res = await fetch(`${baseUrl}/v1/slips/on-demand`, {
+    const endpoint = token ? `${baseUrl}/v1/dashboard/slips/on-demand` : `${baseUrl}/v1/slips/on-demand`
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

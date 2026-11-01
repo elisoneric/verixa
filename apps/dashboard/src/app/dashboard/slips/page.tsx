@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Badge } from "@verixa/ui"
-import { ApiClient } from "../../../lib/api"
+import { ApiClient, VerificationLogItem } from "../../../lib/api"
 import { useAuth } from "../../../lib/auth-context"
 
 interface GeneratedSlip {
@@ -12,7 +12,6 @@ interface GeneratedSlip {
   photoBase64?: string
   slipType: "card" | "slip"
   pdfBase64?: string
-  docxBase64?: string
   cardPdfBase64?: string
   cardSvg?: string
   slipSvg?: string
@@ -44,8 +43,29 @@ export default function NinSlipGeneratorPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [optimisticRecord, setOptimisticRecord] = React.useState<OptimisticIdentity | null>(null)
   const [currentSlip, setCurrentSlip] = React.useState<GeneratedSlip | null>(null)
-  const [history, setHistory] = React.useState<GeneratedSlip[]>([])
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
+
+  // Persistent History from Database
+  const [historyLogs, setHistoryLogs] = React.useState<VerificationLogItem[]>([])
+  const [isLoadingHistory, setIsLoadingHistory] = React.useState(true)
+  const [downloadingLogId, setDownloadingLogId] = React.useState<string | null>(null)
+
+  const loadHistory = React.useCallback(async () => {
+    try {
+      const res = await ApiClient.getLogs({ service: "nin_slip", limit: 10 })
+      if (res && res.items) {
+        setHistoryLogs(res.items)
+      }
+    } catch (err) {
+      console.warn("Could not load slip history", err)
+    } finally {
+      setIsLoadingHistory(false)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    loadHistory()
+  }, [loadHistory, environment])
 
   // Keep preview tab in sync with format type when user switches
   const handleFormatChange = (newFormat: "card" | "slip") => {
@@ -70,7 +90,6 @@ export default function NinSlipGeneratorPage() {
     setIsSubmitting(true)
 
     // STAGE 1: Fast Optimistic Lookup (<300ms)
-    // Instantly retrieves citizen identity attributes from registry / cache
     try {
       const lookupPromise = ApiClient.lookupNinIdentity(cleanNin, consent)
       const docGenPromise = ApiClient.generateNinSlip(cleanNin, formatType, consent, {
@@ -115,7 +134,6 @@ export default function NinSlipGeneratorPage() {
           photoBase64,
           slipType: formatType,
           pdfBase64: d.pdfBase64 || docRes.pdfBase64,
-          docxBase64: d.docxBase64 || docRes.docxBase64,
           cardPdfBase64: d.cardPdfBase64 || docRes.cardPdfBase64,
           cardSvg: d.cardSvg || docRes.cardSvg,
           slipSvg: d.slipSvg || docRes.slipSvg,
@@ -137,8 +155,8 @@ export default function NinSlipGeneratorPage() {
           isCompiling: false,
           latencyMs: docRes.meta?.latency_ms || 140,
         })
-        setHistory((prev) => [slipRecord, ...prev.filter((h) => h.nin !== cleanNin)])
         refreshBalance()
+        loadHistory()
       } else {
         throw new Error((docRes as any)?.message || "Failed to generate NIN slip")
       }
@@ -169,9 +187,35 @@ export default function NinSlipGeneratorPage() {
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
-    } catch (err) {
+    } catch {
       alert("Download failed. Please try again.")
     }
+  }
+
+  // On-demand historical PDF download
+  const handleDownloadHistorical = async (logItem: VerificationLogItem) => {
+    setDownloadingLogId(logItem.id)
+    try {
+      const format = (logItem.format === "card" ? "card" : "slip") as "card" | "slip"
+      const { blob, filename } = await ApiClient.downloadHistoricalSlip(logItem.id, format)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (err: any) {
+      alert(err.message || "Failed to download historical document.")
+    } finally {
+      setDownloadingLogId(null)
+    }
+  }
+
+  // Print current preview
+  const handlePrint = () => {
+    window.print()
   }
 
   // Active SVG content based on selected preview tab
@@ -185,101 +229,69 @@ export default function NinSlipGeneratorPage() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
+      {/* Page Header - Clean & Minimal */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 font-heading">
-            NIMC Card & NIN Slip Generator
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 font-heading">
+            NIN Slips & NIMC Cards
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Generate official NIMC Direct ID-1 Cards and Standard Government NIN Slips with instant vector previews and download triggers.
+          <p className="text-xs text-slate-500 mt-0.5">
+            Instant official NIMC ID-1 wallet cards and standard paper slips.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200/80 text-xs shadow-2xs self-start sm:self-center">
-          <span className="text-emerald-700 font-mono font-medium">RATE:</span>
-          <span className="font-semibold text-emerald-900 font-mono">₦250 / slip</span>
+        <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200/80 text-xs self-start sm:self-center">
+          <span className="text-emerald-700 font-mono font-medium text-[11px]">RATE:</span>
+          <span className="font-semibold text-emerald-900 font-mono text-xs">₦250 / document</span>
         </div>
       </div>
 
-      {/* Slip Type Format Selector (Dual Toggle) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* Segmented Format Selector (Zero wordy copy) */}
+      <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
         <button
           type="button"
           onClick={() => handleFormatChange("card")}
-          className={`flex items-start gap-3.5 p-4 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
             formatType === "card"
-              ? "bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-slate-900/10"
-              : "bg-white text-slate-800 border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 shadow-xs"
+              ? "bg-white text-slate-900 shadow-xs border border-slate-200"
+              : "text-slate-600 hover:text-slate-900"
           }`}
         >
-          <div
-            className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-              formatType === "card" ? "bg-white/10 text-emerald-400" : "bg-emerald-50 text-emerald-700"
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth={1.75} />
-              <line x1="2" y1="10" x2="22" y2="10" strokeWidth={1.75} />
-              <rect x="5" y="13" width="3" height="3" rx="0.5" fill="currentColor" />
-            </svg>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold tracking-tight">NIMC Direct (NIMC Card)</span>
-              {formatType === "card" && (
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              )}
-            </div>
-            <p className={`text-xs mt-1 leading-relaxed ${formatType === "card" ? "text-slate-300" : "text-slate-500"}`}>
-              Premium ID-1 wallet card with Nigerian green guilloche, biometric portrait, gold accents & 2D QR Code.
-            </p>
-          </div>
+          <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth={1.8} />
+            <line x1="2" y1="10" x2="22" y2="10" strokeWidth={1.8} />
+            <rect x="5" y="13" width="3" height="3" rx="0.5" fill="currentColor" />
+          </svg>
+          <span>NIMC Card (ID-1)</span>
         </button>
 
         <button
           type="button"
           onClick={() => handleFormatChange("slip")}
-          className={`flex items-start gap-3.5 p-4 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
             formatType === "slip"
-              ? "bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-slate-900/10"
-              : "bg-white text-slate-800 border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 shadow-xs"
+              ? "bg-white text-slate-900 shadow-xs border border-slate-200"
+              : "text-slate-600 hover:text-slate-900"
           }`}
         >
-          <div
-            className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-              formatType === "slip" ? "bg-white/10 text-emerald-400" : "bg-emerald-50 text-emerald-700"
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold tracking-tight">Standard NIN Slip</span>
-              {formatType === "slip" && (
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              )}
-            </div>
-            <p className={`text-xs mt-1 leading-relaxed ${formatType === "slip" ? "text-slate-300" : "text-slate-500"}`}>
-              Official government paper slip format with residential address, tracking ID, and official tamper-proof PDF export.
-            </p>
-          </div>
+          <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>Standard Slip (A4)</span>
         </button>
       </div>
 
       {/* Main Generator Form */}
-      <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white shadow-xs">
-        <form onSubmit={handleGenerate} className="space-y-4">
+      <div className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white shadow-xs">
+        <form onSubmit={handleGenerate} className="space-y-3">
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold uppercase tracking-wider text-slate-700 block">
-                National Identification Number (NIN)
+                National Identification Number
               </label>
               {/* Quick Sandbox Fillers */}
               <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                <span className="text-slate-400">Sandbox Test:</span>
+                <span className="text-slate-400">Sample:</span>
                 <button
                   type="button"
                   onClick={() => setNinInput("70123456789")}
@@ -298,18 +310,18 @@ export default function NinSlipGeneratorPage() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2.5">
               <div className="relative flex-1">
                 <input
                   type="text"
                   maxLength={11}
-                  placeholder="Enter 11-digit NIN (e.g. 70123456789)"
+                  placeholder="Enter 11-digit NIN"
                   value={ninInput}
                   onChange={(e) => setNinInput(e.target.value.replace(/\D/g, ""))}
-                  className="w-full h-11 px-4 rounded-lg bg-white border border-slate-200 text-slate-900 font-mono text-sm tracking-wider placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all shadow-2xs"
+                  className="w-full h-10 px-3.5 rounded-lg bg-white border border-slate-200 text-slate-900 font-mono text-sm tracking-wider placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all shadow-2xs"
                   required
                 />
-                <span className="absolute right-3.5 top-3 text-xs font-mono text-slate-400">
+                <span className="absolute right-3 top-2.5 text-xs font-mono text-slate-400">
                   {ninInput.length}/11
                 </span>
               </div>
@@ -317,7 +329,7 @@ export default function NinSlipGeneratorPage() {
               <button
                 type="submit"
                 disabled={isSubmitting || ninInput.length !== 11 || !consent}
-                className="shrink-0 min-h-[44px] px-6 py-2.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center justify-center gap-2"
+                className="shrink-0 min-h-[40px] px-5 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -325,31 +337,31 @@ export default function NinSlipGeneratorPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    <span>Generating {formatType === "card" ? "Card" : "Slip"}...</span>
+                    <span>Generating...</span>
                   </>
                 ) : (
-                  <span>Generate {formatType === "card" ? "NIMC Card" : "NIN Slip"} (₦250)</span>
+                  <span>Generate · ₦250</span>
                 )}
               </button>
             </div>
           </div>
 
           {/* Consent Checkbox */}
-          <div className="flex items-center gap-2.5 pt-1">
+          <div className="flex items-center gap-2 pt-0.5">
             <input
               type="checkbox"
               id="consentCheckbox"
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+              className="h-3.5 w-3.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
             />
-            <label htmlFor="consentCheckbox" className="text-xs text-slate-600 select-none cursor-pointer">
-              I confirm applicant consent has been obtained for regulatory identity verification and official slip generation.
+            <label htmlFor="consentCheckbox" className="text-[11px] text-slate-600 select-none cursor-pointer">
+              I confirm applicant consent has been obtained for regulatory verification and official slip generation.
             </label>
           </div>
 
           {errorMsg && (
-            <div className="flex items-center gap-2 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
               <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -359,23 +371,22 @@ export default function NinSlipGeneratorPage() {
         </form>
       </div>
 
-      {/* STAGE 1: Optimistic UI Rendering (Instant Verified Identity Banner) */}
+      {/* Optimistic UI Rendering & Preview Card */}
       {optimisticRecord && (
-        <div className="p-5 sm:p-6 rounded-2xl border border-emerald-300/80 bg-linear-to-b from-emerald-50/60 to-white shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              {/* Biometric Portrait Thumbnail */}
+        <div className="p-4 sm:p-5 rounded-2xl border border-emerald-300/80 bg-white shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
               {optimisticRecord.photoBase64 ? (
-                <div className="w-14 h-16 rounded-lg overflow-hidden border-2 border-emerald-600 bg-slate-100 shrink-0 shadow-xs">
+                <div className="w-12 h-14 rounded-lg overflow-hidden border border-emerald-500 bg-slate-100 shrink-0 shadow-2xs">
                   <img
                     src={optimisticRecord.photoBase64.startsWith("data:") ? optimisticRecord.photoBase64 : `data:image/jpeg;base64,${optimisticRecord.photoBase64}`}
-                    alt="Citizen Biometric Portrait"
+                    alt="Portrait"
                     className="w-full h-full object-cover"
                   />
                 </div>
               ) : (
-                <div className="w-14 h-16 rounded-lg border-2 border-emerald-600 bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-700">
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-14 rounded-lg border border-emerald-500 bg-emerald-50 flex items-center justify-center shrink-0 text-emerald-700">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
@@ -383,74 +394,85 @@ export default function NinSlipGeneratorPage() {
 
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                  <h2 className="text-base font-bold text-slate-900 tracking-tight">
                     {optimisticRecord.fullName}
                   </h2>
                   <Badge variant="verified" size="sm" dot>
-                    Registry Confirmed
+                    Verified
                   </Badge>
                   {optimisticRecord.cached && (
                     <Badge variant="neutral" size="sm">
-                      Smart Cache
+                      Cached
                     </Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-3 mt-1 text-xs font-mono text-slate-600">
+                <div className="flex items-center gap-2 mt-0.5 text-xs font-mono text-slate-500">
                   <span>NIN: {optimisticRecord.nin}</span>
                   {optimisticRecord.trackingId && (
-                    <span>• TRACKING: {optimisticRecord.trackingId}</span>
+                    <span>• {optimisticRecord.trackingId}</span>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Instant Download Triggers */}
-            <div className="flex items-center gap-2">
+            {/* Action Buttons & Micro Status Pill */}
+            <div className="flex items-center gap-2 self-start sm:self-center">
+              {optimisticRecord.isCompiling ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-mono font-medium">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  Compiling PDF...
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-mono font-medium">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  Ready ({optimisticRecord.latencyMs}ms)
+                </span>
+              )}
+
               {currentSlip?.pdfBase64 && (
-                <button
-                  type="button"
-                  onClick={() => downloadFile(
-                    activePdfBase64 || currentSlip.pdfBase64!,
-                    `${previewTab === "card" ? "NIMC_Digital_Card" : "NIN_Slip"}_${currentSlip.nin}.pdf`,
-                    "application/pdf"
-                  )}
-                  className="min-h-[40px] px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  <span>Download PDF ⚡</span>
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => downloadFile(
+                      activePdfBase64 || currentSlip.pdfBase64!,
+                      `${previewTab === "card" ? "NIMC_Digital_Card" : "NIN_Slip"}_${currentSlip.nin}.pdf`,
+                      "application/pdf"
+                    )}
+                    className="h-8 px-3 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-xs flex items-center gap-1"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>Download PDF</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handlePrint}
+                    className="h-8 px-2.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer shadow-2xs flex items-center gap-1"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Print</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
 
-          {/* Optimistic Background Compilation Status Notice */}
-          {optimisticRecord.isCompiling && (
-            <div className="flex items-center gap-2.5 p-3 rounded-lg bg-emerald-100/70 text-emerald-900 text-xs font-medium border border-emerald-200">
-              <svg className="w-4 h-4 animate-spin text-emerald-700 shrink-0" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-              <span>
-                Verified identity rendered optimistically in {optimisticRecord.latencyMs}ms. Background service is synthesizing high-resolution vector security patterns and compiling PDF downloads...
-              </span>
-            </div>
-          )}
-
-          {/* STAGE 2: Interactive Vector SVG Preview */}
+          {/* Interactive Vector SVG Preview */}
           {currentSlip && (
-            <div className="space-y-3 pt-2">
-              {/* Preview Format Switcher */}
-              <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Vector Preview ({previewTab === "card" ? "NIMC Direct ID-1 Card" : "Standard NIN Slip"})
+            <div className="space-y-2.5 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 font-mono">
+                  Preview: {previewTab === "card" ? "ID-1 Wallet Card" : "Standard A4 Slip"}
                 </span>
-                <div className="flex items-center gap-1.5 p-0.5 rounded-lg bg-slate-100 border border-slate-200 text-xs">
+                <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-100 border border-slate-200 text-xs">
                   <button
                     type="button"
                     onClick={() => setPreviewTab("card")}
-                    className={`px-3 py-1 rounded-md font-medium transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
                       previewTab === "card"
                         ? "bg-white text-slate-900 shadow-2xs font-semibold"
                         : "text-slate-600 hover:text-slate-900"
@@ -461,7 +483,7 @@ export default function NinSlipGeneratorPage() {
                   <button
                     type="button"
                     onClick={() => setPreviewTab("slip")}
-                    className={`px-3 py-1 rounded-md font-medium transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
                       previewTab === "slip"
                         ? "bg-white text-slate-900 shadow-2xs font-semibold"
                         : "text-slate-600 hover:text-slate-900"
@@ -472,17 +494,16 @@ export default function NinSlipGeneratorPage() {
                 </div>
               </div>
 
-              {/* Vector SVG Rendered Document Container */}
               {activeSvg ? (
                 <div
-                  className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 p-2 sm:p-4 flex items-center justify-center shadow-xs"
+                  className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-2 sm:p-4 flex items-center justify-center shadow-2xs"
                   dangerouslySetInnerHTML={{ __html: activeSvg }}
                 />
               ) : activePdfBase64 ? (
                 <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
                   <iframe
                     src={`data:application/pdf;base64,${activePdfBase64}#toolbar=0&navpanes=0`}
-                    className="w-full h-[480px] border-none"
+                    className="w-full h-[450px] border-none"
                     title="Document Preview"
                   />
                 </div>
@@ -492,49 +513,94 @@ export default function NinSlipGeneratorPage() {
         </div>
       )}
 
-      {/* Session History */}
-      {history.length > 0 && (
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-xs">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Recent Session Records
+      {/* Persistent History (From Database) */}
+      <div className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-xs space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 font-mono">
+              Generated Documents History
             </h3>
-            <span className="text-xs font-mono text-slate-400">
-              {history.length} {history.length === 1 ? "document" : "documents"} generated
-            </span>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Encrypted audit records with instant on-demand vector PDF regeneration.
+            </p>
           </div>
+          <button
+            type="button"
+            onClick={loadHistory}
+            className="text-[11px] text-slate-600 hover:text-slate-900 font-medium hover:underline cursor-pointer flex items-center gap-1"
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        {isLoadingHistory ? (
+          <div className="py-6 text-center text-xs text-slate-400">Loading history...</div>
+        ) : historyLogs.length === 0 ? (
+          <div className="py-6 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl">
+            No NIN slips generated yet. Generate a card or slip above to see persistent records.
+          </div>
+        ) : (
           <div className="divide-y divide-slate-100">
-            {history.map((item, idx) => (
-              <div key={`${item.nin}-${idx}`} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center text-slate-600 shrink-0 font-mono text-[11px] font-bold">
-                    {item.slipType === "card" ? "ID" : "A4"}
+            {historyLogs.map((item) => (
+              <div
+                key={item.id}
+                className="py-2.5 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center text-slate-700 shrink-0 font-mono text-[10px] font-bold">
+                    {item.format === "card" ? "ID" : "A4"}
                   </div>
-                  <div>
-                    <span className="font-semibold text-slate-900 mr-2">{item.fullName}</span>
-                    <span className="font-mono text-slate-500">{item.nin}</span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-slate-900">
+                        {item.format === "card" ? "NIMC Card (ID-1)" : "Standard NIN Slip"}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-500">
+                        {item.identifier || item.id.slice(0, 8)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                      <span>{new Date(item.createdAt).toLocaleString()}</span>
+                      <span>•</span>
+                      <span className="text-emerald-700 font-medium">₦{item.costDeducted || 250}</span>
+                      {item.isCached && <span>• Cached</span>}
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 self-end sm:self-auto">
-                  {item.pdfBase64 && (
-                    <button
-                      type="button"
-                      onClick={() => downloadFile(
-                        item.cardPdfBase64 || item.pdfBase64!,
-                        `${item.slipType === "card" ? "NIMC_Digital_Card" : "NIN_Slip"}_${item.nin}.pdf`,
-                        "application/pdf"
-                      )}
-                      className="px-2.5 py-1 text-[11px] font-medium rounded-md bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors cursor-pointer"
-                    >
-                      PDF
-                    </button>
-                  )}
+
+                <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadHistorical(item)}
+                    disabled={downloadingLogId === item.id}
+                    className="px-2.5 py-1 text-[11px] font-medium rounded-md bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    {downloadingLogId === item.id ? (
+                      <>
+                        <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <span>Synthesizing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span>Download PDF</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

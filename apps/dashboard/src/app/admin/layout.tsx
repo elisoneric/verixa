@@ -52,7 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 selection:bg-rose-500/20 selection:text-rose-800">
       {/* Admin Sidebar */}
-      <aside className="w-64 flex flex-col h-screen sticky top-0 border-r border-slate-200 bg-white shrink-0 overflow-hidden">
+      <aside className="w-64 flex flex-col fixed inset-y-0 left-0 z-30 border-r border-slate-200 bg-white overflow-hidden shadow-xs">
         <div className="h-16 px-6 flex items-center justify-between border-b border-slate-200 shrink-0">
           <Link href="/admin" className="hover:opacity-90 transition-opacity">
             <Logo size="md" badge="ADMIN" badgeColor="rose" />
@@ -108,7 +108,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Admin Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 pl-64">
         <header className="h-16 border-b border-slate-200 bg-white px-8 flex items-center justify-between">
           <span className="text-xs font-mono text-slate-500">Verixa Internal Operations</span>
           <Badge variant="failed" size="sm">SUPER ADMIN PRIVILEGES</Badge>

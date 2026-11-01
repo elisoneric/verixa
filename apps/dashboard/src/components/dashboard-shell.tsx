@@ -127,56 +127,56 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const navSections = isIndividual
     ? [
-        {
-          title: "Services",
-          items: [
-            { label: "Overview", href: "/dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
-            { label: "Slip Generator", href: "/dashboard/slips", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-            { label: "Verification", href: "/dashboard/verify", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
-            { label: "History Logs", href: "/dashboard/logs", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
-          ],
-        },
-        {
-          title: "Wallet & Billing",
-          items: [
-            { label: "Dedicated Account / Top Up", href: "/dashboard/billing", icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" },
-            { label: "Transactions", href: "/dashboard/transactions", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
-          ],
-        },
-      ]
+      {
+        title: "Services",
+        items: [
+          { label: "Overview", href: "/dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
+          { label: "Slip Generator", href: "/dashboard/slips", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
+          { label: "Verification", href: "/dashboard/verify", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
+          { label: "History Logs", href: "/dashboard/logs", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
+        ],
+      },
+      {
+        title: "Wallet & Billing",
+        items: [
+          { label: "Dedicated Account / Top Up", href: "/dashboard/billing", icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" },
+          { label: "Transactions", href: "/dashboard/transactions", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+        ],
+      },
+    ]
     : [
-        {
-          title: "Develop",
-          items: [
-            { label: "Overview", href: "/dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
-            { label: "API Keys", href: "/dashboard/api-keys", icon: "M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" },
-            { label: "API Explorer", href: "/dashboard/explorer", icon: "M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" },
-            { label: "Webhooks", href: "/dashboard/webhooks", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
-          ],
-        },
-        {
-          title: "Verify",
-          items: [
-            { label: "Verification", href: "/dashboard/verify", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
-            { label: "Slip Generator", href: "/dashboard/slips", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-            { label: "Audit Logs", href: "/dashboard/logs", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
-          ],
-        },
-        {
-          title: "Wallet & Billing",
-          items: [
-            { label: "Credits & Top-up", href: "/dashboard/billing", icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" },
-            { label: "Transactions", href: "/dashboard/transactions", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
-          ],
-        },
-        {
-          title: "Settings",
-          items: [
-            { label: "Team Members", href: "/dashboard/team", icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" },
-            { label: "Organization", href: "/dashboard/settings", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" },
-          ],
-        },
-      ]
+      {
+        title: "Develop",
+        items: [
+          { label: "Overview", href: "/dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
+          { label: "API Keys", href: "/dashboard/api-keys", icon: "M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" },
+          { label: "API Explorer", href: "/dashboard/explorer", icon: "M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" },
+          { label: "Webhooks", href: "/dashboard/webhooks", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
+        ],
+      },
+      {
+        title: "Verify",
+        items: [
+          { label: "Verification", href: "/dashboard/verify", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
+          { label: "Slip Generator", href: "/dashboard/slips", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
+          { label: "Audit Logs", href: "/dashboard/logs", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
+        ],
+      },
+      {
+        title: "Wallet & Billing",
+        items: [
+          { label: "Credits & Top-up", href: "/dashboard/billing", icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" },
+          { label: "Transactions", href: "/dashboard/transactions", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+        ],
+      },
+      {
+        title: "Settings",
+        items: [
+          { label: "Team Members", href: "/dashboard/team", icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" },
+          { label: "Organization", href: "/dashboard/settings", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" },
+        ],
+      },
+    ]
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-white text-slate-800">
@@ -196,22 +196,20 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setEnvironment("sandbox")}
-            className={`flex-1 py-1 text-xs font-mono font-medium rounded-md transition-all cursor-pointer ${
-              environment === "sandbox"
+            className={`flex-1 py-1 text-xs font-mono font-medium rounded-md transition-all cursor-pointer ${environment === "sandbox"
                 ? "bg-white text-amber-700 font-bold border border-amber-200 shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
-            }`}
+              }`}
           >
             Sandbox
           </button>
           <button
             type="button"
             onClick={() => setEnvironment("live")}
-            className={`flex-1 py-1 text-xs font-mono font-medium rounded-md transition-all cursor-pointer ${
-              environment === "live"
+            className={`flex-1 py-1 text-xs font-mono font-medium rounded-md transition-all cursor-pointer ${environment === "live"
                 ? "bg-emerald-600 text-white font-bold shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
-            }`}
+              }`}
           >
             Live
           </button>
@@ -231,11 +229,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    isActive
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${isActive
                       ? "bg-slate-900 text-white font-medium shadow-xs"
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  }`}
+                    }`}
                 >
                   <svg
                     className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-white" : "text-slate-500"}`}
@@ -375,7 +372,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <CommandPalette isOpen={cmdOpen} onClose={() => setCmdOpen(false)} items={commandItems} />
 
       {/* Desktop Fixed Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col h-screen sticky top-0 border-r border-slate-200 bg-white shrink-0 overflow-hidden shadow-xs">
+      <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 left-0 z-30 border-r border-slate-200 bg-white overflow-hidden shadow-xs">
         <SidebarContent />
       </aside>
 
@@ -408,7 +405,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Main Content Viewport */}
-      <div className="flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-hidden">
+      <div className="flex-1 flex flex-col min-w-0 w-full max-w-full lg:pl-64 overflow-x-hidden">
         {/* Pinned Top Header (Never moves off screen on mobile) */}
         <header className="sticky top-0 z-30 h-16 w-full max-w-full border-b border-slate-200 bg-white/95 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between gap-2 shadow-2xs shrink-0">
           {/* Mobile hamburger & brand */}
@@ -496,11 +493,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`min-h-[46px] min-w-[46px] flex-1 flex flex-col items-center justify-center gap-1 rounded-xl py-1 text-[11px] font-medium transition-all active:scale-95 cursor-pointer relative ${
-                item.isActive
+              className={`min-h-[46px] min-w-[46px] flex-1 flex flex-col items-center justify-center gap-1 rounded-xl py-1 text-[11px] font-medium transition-all active:scale-95 cursor-pointer relative ${item.isActive
                   ? "text-emerald-700 font-bold bg-emerald-50/80"
                   : "text-slate-600 hover:text-slate-900 active:bg-slate-100"
-              }`}
+                }`}
             >
               {item.isActive && (
                 <span className="absolute top-1 w-1.5 h-1.5 rounded-full bg-emerald-600" />
@@ -517,11 +513,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             type="button"
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open navigation drawer"
-            className={`min-h-[46px] min-w-[46px] flex-1 flex flex-col items-center justify-center gap-1 rounded-xl py-1 text-[11px] font-medium transition-all active:scale-95 cursor-pointer relative ${
-              mobileMenuOpen
+            className={`min-h-[46px] min-w-[46px] flex-1 flex flex-col items-center justify-center gap-1 rounded-xl py-1 text-[11px] font-medium transition-all active:scale-95 cursor-pointer relative ${mobileMenuOpen
                 ? "text-emerald-700 font-bold bg-emerald-50/80"
                 : "text-slate-600 hover:text-slate-900 active:bg-slate-100"
-            }`}
+              }`}
           >
             <div className="relative text-slate-500">
               <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

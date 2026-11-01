@@ -288,4 +288,71 @@ export class NinSlipController {
     res.setHeader('Content-Length', result.sizeBytes);
     return res.status(200).send(result.buffer);
   }
+
+  // 6. JWT Authenticated On-Demand Document Synthesis (Dashboard UI)
+  @UseGuards(JwtAuthGuard)
+  @Post('dashboard/slips/on-demand')
+  async generateOnDemandSlipDashboard(
+    @Req() req: any,
+    @Res() res: Response,
+    @Body() body: any,
+  ) {
+    if (!body || !body.logId) {
+      throw new BadRequestException('logId is required in request body');
+    }
+
+    const format = (body.format || 'slip').toLowerCase();
+    const fileType = (body.fileType || 'pdf').toLowerCase();
+
+    const result = await this.ninSlipService.generateOnDemandSlip({
+      logId: body.logId,
+      format,
+      fileType,
+      organizationId: req.organizationId,
+      environment: normalizeEnvironment(req.headers['x-environment'] || req.environment || 'live'),
+    });
+
+    const isJsonRequested =
+      body.json === true ||
+      body.json === 'true' ||
+      (req.headers.accept && req.headers.accept.includes('application/json'));
+
+    if (isJsonRequested) {
+      return res.status(200).json({
+        success: true,
+        filename: result.filename,
+        contentType: result.contentType,
+        sizeBytes: result.sizeBytes,
+        base64: result.buffer.toString('base64'),
+      });
+    }
+
+    res.setHeader('Content-Type', result.contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.setHeader('Content-Length', result.sizeBytes);
+    return res.status(200).send(result.buffer);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('dashboard/slips/on-demand/:logId')
+  async downloadOnDemandSlipDashboard(
+    @Req() req: any,
+    @Param('logId') logId: string,
+    @Query('format') format: string = 'slip',
+    @Query('fileType') fileType: string = 'pdf',
+    @Res() res: Response,
+  ) {
+    const result = await this.ninSlipService.generateOnDemandSlip({
+      logId,
+      format: (format || 'slip').toLowerCase(),
+      fileType: (fileType || 'pdf').toLowerCase(),
+      organizationId: req.organizationId,
+      environment: normalizeEnvironment(req.headers['x-environment'] || req.environment || 'live'),
+    });
+
+    res.setHeader('Content-Type', result.contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.setHeader('Content-Length', result.sizeBytes);
+    return res.status(200).send(result.buffer);
+  }
 }
