@@ -218,11 +218,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Navigation Groups */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+      {/* Navigation Groups - Static, non-scrollable desktop layout */}
+      <div className="flex-1 overflow-hidden px-3 py-2.5 space-y-3">
         {navSections.map((section) => (
-          <div key={section.title} className="space-y-1">
-            <span className="px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          <div key={section.title} className="space-y-0.5">
+            <span className="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
               {section.title}
             </span>
             {section.items.map((item) => {
@@ -231,14 +231,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     isActive
                       ? "bg-slate-900 text-white font-medium shadow-xs"
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
                   <svg
-                    className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-500"}`}
+                    className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-white" : "text-slate-500"}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

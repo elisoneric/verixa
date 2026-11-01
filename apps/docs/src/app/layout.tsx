@@ -3,6 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import Link from "next/link";
 import { DocsHeader } from "../components/docs-header";
 import { DocsMobileNav } from "../components/docs-mobile-nav";
+import { DocsSidebar } from "../components/docs-sidebar";
 import { DOCS_SECTIONS } from "../lib/navigation";
 import "./globals.css";
 
@@ -158,33 +159,9 @@ export default function RootLayout({
 
         {/* Two-Panel Layout with Top Offset for Fixed Header */}
         <div className="md:pt-16 flex-1 flex max-w-7xl mx-auto w-full px-3.5 sm:px-6 lg:px-8 overflow-x-hidden">
-          {/* Left Navigation Sidebar */}
-          <aside className="hidden md:block w-64 shrink-0 border-r border-slate-200 py-8 pr-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
-            <nav className="space-y-6">
-              {DOCS_SECTIONS.map((sec) => (
-                <div key={sec.title} className="space-y-1.5">
-                  <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 block px-2.5">
-                    {sec.title}
-                  </span>
-                  <div className="space-y-0.5">
-                    {sec.links.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-                      >
-                        <span className="truncate">{link.label}</span>
-                        {link.badge && (
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0 ml-1">
-                            {link.badge}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </nav>
+          {/* Left Navigation Sidebar - Fixed and Non-Scrollable */}
+          <aside className="hidden md:block w-64 shrink-0 border-r border-slate-200 py-6 pr-4 sticky top-16 h-[calc(100vh-4rem)] overflow-hidden">
+            <DocsSidebar />
           </aside>
 
           {/* Main Documentation Body */}

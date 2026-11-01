@@ -8,13 +8,16 @@ COPY apps/dashboard/package*.json ./apps/dashboard/
 COPY packages ./packages
 
 # Install dependencies
-RUN npm ci --workspace=apps/dashboard --include-workspace-root
+RUN npm ci --workspace=apps/dashboard --include-workspace-root || npm install --workspace=apps/dashboard --include-workspace-root
 
 # Copy dashboard source
 COPY apps/dashboard ./apps/dashboard
 
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
 
 # Build dashboard
 RUN npm run build --workspace=apps/dashboard
