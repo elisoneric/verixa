@@ -490,7 +490,7 @@ export default function DashboardOverviewPage() {
                 NIMC Card & Slip
               </h3>
               <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
-                ID-1 & A4 Vector PDF
+                Official NIMC & A4 Slips
               </p>
             </div>
             <div className="mt-3 pt-2 border-t border-emerald-200 flex items-center justify-between text-[10px] text-emerald-800 font-mono">

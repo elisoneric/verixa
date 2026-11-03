@@ -12,9 +12,6 @@ interface GeneratedSlip {
   photoBase64?: string
   slipType: "card" | "slip"
   pdfBase64?: string
-  cardPdfBase64?: string
-  cardSvg?: string
-  slipSvg?: string
   svgContent?: string
   cached: boolean
   cost: number
@@ -39,7 +36,6 @@ export default function NinSlipGeneratorPage() {
   const [ninInput, setNinInput] = React.useState("")
   const [consent, setConsent] = React.useState(true)
   const [formatType, setFormatType] = React.useState<"card" | "slip">("card")
-  const [previewTab, setPreviewTab] = React.useState<"card" | "slip">("card")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [optimisticRecord, setOptimisticRecord] = React.useState<OptimisticIdentity | null>(null)
   const [currentSlip, setCurrentSlip] = React.useState<GeneratedSlip | null>(null)
@@ -67,10 +63,8 @@ export default function NinSlipGeneratorPage() {
     loadHistory()
   }, [loadHistory, environment])
 
-  // Keep preview tab in sync with format type when user switches
   const handleFormatChange = (newFormat: "card" | "slip") => {
     setFormatType(newFormat)
-    setPreviewTab(newFormat)
   }
 
   const handleGenerate = async (e: React.FormEvent) => {
@@ -126,6 +120,7 @@ export default function NinSlipGeneratorPage() {
         const fullName = d.fullName || docRes.fullName || "VERIFIED CITIZEN"
         const trackingId = d.trackingId || docRes.trackingId || ""
         const photoBase64 = d.photoBase64 || docRes.photoBase64
+        const resolvedPdf = d.pdfBase64 || docRes.pdfBase64 || d.nin_id || (docRes as any).nin_id
 
         const slipRecord: GeneratedSlip = {
           nin: cleanNin,
@@ -133,10 +128,7 @@ export default function NinSlipGeneratorPage() {
           fullName,
           photoBase64,
           slipType: formatType,
-          pdfBase64: d.pdfBase64 || docRes.pdfBase64,
-          cardPdfBase64: d.cardPdfBase64 || docRes.cardPdfBase64,
-          cardSvg: d.cardSvg || docRes.cardSvg,
-          slipSvg: d.slipSvg || docRes.slipSvg,
+          pdfBase64: resolvedPdf,
           svgContent: d.svgContent || docRes.svgContent,
           cached: docRes.meta?.cached || false,
           cost: docRes.meta?.cost_ngx || 250,
@@ -145,7 +137,6 @@ export default function NinSlipGeneratorPage() {
         }
 
         setCurrentSlip(slipRecord)
-        setPreviewTab(formatType)
         setOptimisticRecord({
           nin: cleanNin,
           trackingId,
@@ -218,15 +209,6 @@ export default function NinSlipGeneratorPage() {
     window.print()
   }
 
-  // Active SVG content based on selected preview tab
-  const activeSvg = previewTab === "card" 
-    ? (currentSlip?.cardSvg || currentSlip?.svgContent) 
-    : (currentSlip?.slipSvg || currentSlip?.svgContent)
-
-  const activePdfBase64 = previewTab === "card"
-    ? (currentSlip?.cardPdfBase64 || currentSlip?.pdfBase64)
-    : currentSlip?.pdfBase64
-
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Page Header - Clean & Minimal */}
@@ -236,7 +218,7 @@ export default function NinSlipGeneratorPage() {
             NIN Slips & NIMC Cards
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Instant official NIMC ID-1 wallet cards and standard paper slips.
+            Instant official NIMC government slips and standard verification documents.
           </p>
         </div>
 
@@ -246,7 +228,7 @@ export default function NinSlipGeneratorPage() {
         </div>
       </div>
 
-      {/* Segmented Format Selector (Zero wordy copy) */}
+      {/* Segmented Format Selector (NIMC Card ID-1 vs Standard Slip A4) */}
       <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
         <button
           type="button"
@@ -371,7 +353,7 @@ export default function NinSlipGeneratorPage() {
         </form>
       </div>
 
-      {/* Optimistic UI Rendering & Preview Card */}
+      {/* Identity Demographic Preview & Document Container */}
       {optimisticRecord && (
         <div className="p-4 sm:p-5 rounded-2xl border border-emerald-300/80 bg-white shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -434,8 +416,8 @@ export default function NinSlipGeneratorPage() {
                   <button
                     type="button"
                     onClick={() => downloadFile(
-                      activePdfBase64 || currentSlip.pdfBase64!,
-                      `${previewTab === "card" ? "NIMC_Digital_Card" : "NIN_Slip"}_${currentSlip.nin}.pdf`,
+                      currentSlip.pdfBase64!,
+                      `${currentSlip.slipType === "card" ? "NIMC_Direct_Slip" : "NIN_Standard_Slip"}_${currentSlip.nin}.pdf`,
                       "application/pdf"
                     )}
                     className="h-8 px-3 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-xs flex items-center gap-1"
@@ -461,52 +443,31 @@ export default function NinSlipGeneratorPage() {
             </div>
           </div>
 
-          {/* Interactive Vector SVG Preview */}
+          {/* Document Preview (Displays strictly the selected format with NO switcher tabs) */}
           {currentSlip && (
             <div className="space-y-2.5 pt-2 border-t border-slate-100">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 font-mono">
-                  Preview: {previewTab === "card" ? "ID-1 Wallet Card" : "Standard A4 Slip"}
+                  Preview: {currentSlip.slipType === "card" ? "NIMC Card (Official Slip)" : "Standard Slip (A4)"}
                 </span>
-                <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-100 border border-slate-200 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setPreviewTab("card")}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
-                      previewTab === "card"
-                        ? "bg-white text-slate-900 shadow-2xs font-semibold"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    NIMC Card
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPreviewTab("slip")}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
-                      previewTab === "slip"
-                        ? "bg-white text-slate-900 shadow-2xs font-semibold"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    Standard Slip
-                  </button>
-                </div>
+                <span className="text-[11px] font-mono text-slate-400">
+                  {currentSlip.slipType === "card" ? "NIMC Official Document" : "Word DOCX to PDF"}
+                </span>
               </div>
 
-              {activeSvg ? (
-                <div
-                  className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-2 sm:p-4 flex items-center justify-center shadow-2xs"
-                  dangerouslySetInnerHTML={{ __html: activeSvg }}
-                />
-              ) : activePdfBase64 ? (
+              {currentSlip.pdfBase64 ? (
                 <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
                   <iframe
-                    src={`data:application/pdf;base64,${activePdfBase64}#toolbar=0&navpanes=0`}
-                    className="w-full h-[450px] border-none"
+                    src={`data:application/pdf;base64,${currentSlip.pdfBase64}#toolbar=0&navpanes=0`}
+                    className="w-full h-[520px] border-none"
                     title="Document Preview"
                   />
                 </div>
+              ) : currentSlip.svgContent ? (
+                <div
+                  className="rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-2 sm:p-4 flex items-center justify-center shadow-2xs"
+                  dangerouslySetInnerHTML={{ __html: currentSlip.svgContent }}
+                />
               ) : null}
             </div>
           )}

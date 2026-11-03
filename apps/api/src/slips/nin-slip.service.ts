@@ -389,36 +389,37 @@ export class NinSlipService {
       throw new BadRequestException('Failed to retrieve verified NIN data');
     }
 
-    const isCard = cardType === 'card' || format === 'card';
-    const effectiveCardType: 'card' | 'slip' = isCard ? 'card' : 'slip';
+    const isDojahSlipSelected = cardType === 'card' || format === 'card';
+    const effectiveCardType: 'card' | 'slip' = isDojahSlipSelected ? 'card' : 'slip';
 
-    // 2. Generate requested formats
+    // 2. Generate requested format:
+    // - "card": Output is the authentic Dojah official NIMC slip (entity.nin_id)
+    // - "slip": Output is the standard government slip compiled from Word DOCX to PDF
     let pdfBuffer: Buffer | null = null;
     let docxBuffer: Buffer | null = null;
-    let cardPdfBuffer: Buffer | null = null;
-    let cardSvg: string | null = null;
     let slipSvg: string | null = null;
 
-    if (format === 'pdf' || format === 'both' || format === 'slip' || !isCard) {
+    if (isDojahSlipSelected) {
+      if (identityData.nin_id) {
+        pdfBuffer = Buffer.from(identityData.nin_id, 'base64');
+      } else {
+        try {
+          pdfBuffer = await this.generatePdf(identityData);
+        } catch (e: any) {
+          this.logger.warn(`Could not generate fallback PDF Slip: ${e?.message}`);
+        }
+      }
+    } else {
       try {
         pdfBuffer = await this.generatePdf(identityData);
       } catch (e: any) {
-        this.logger.warn(`Could not generate PDF Slip: ${e?.message}`);
+        this.logger.warn(`Could not generate DOCX-to-PDF Slip: ${e?.message}`);
       }
-    }
-    if (format === 'docx' || format === 'both' || format === 'slip') {
       try {
         docxBuffer = await this.generateDocx(identityData);
       } catch (e: any) {
         this.logger.warn(`Could not generate DOCX Slip: ${e?.message}`);
       }
-    }
-
-    try {
-      cardPdfBuffer = await this.generateCardPdf(identityData);
-      cardSvg = await this.generateCardSvg(identityData);
-    } catch (e: any) {
-      this.logger.warn(`Could not generate Digital NIN Card PDF/SVG: ${e?.message}`);
     }
 
     try {
@@ -444,6 +445,7 @@ export class NinSlipService {
       state: identityData.state || (identityData as any).residence_state || '',
       photo: identityData.photo || null,
       photoBase64: identityData.photo || null,
+      nin_id: identityData.nin_id || null,
     });
 
     await this.logRepository.save({
@@ -463,50 +465,94 @@ export class NinSlipService {
     });
 
     const fullName = [identityData.surname, identityData.firstName, identityData.middleName].filter(Boolean).join(' ');
-    const effectivePdfBuffer = isCard ? (cardPdfBuffer || pdfBuffer) : (identityData.nin_id ? Buffer.from(identityData.nin_id, 'base64') : pdfBuffer);
-    const effectivePdfBase64 = isCard
-      ? (cardPdfBuffer ? cardPdfBuffer.toString('base64') : null)
-      : (identityData.nin_id || (pdfBuffer ? pdfBuffer.toString('base64') : null));
-    const effectiveSvg = isCard ? cardSvg : (slipSvg || cardSvg);
+    const effectivePdfBase64 = pdfBuffer
+      ? pdfBuffer.toString('base64')
+      : (identityData.nin_id || null);
+    const effectivePdfBuffer = pdfBuffer || (effectivePdfBase64 ? Buffer.from(effectivePdfBase64, 'base64') : null);
 
     const resultData = {
+      // 1. Identity Identifiers
       nin: cleanNin,
+      tracking_id: identityData.trackingId,
       trackingId: identityData.trackingId,
-      fullName,
+
+      // 2. Names
+      first_name: identityData.firstName,
       firstName: identityData.firstName,
+      last_name: identityData.surname,
       surname: identityData.surname,
+      middle_name: identityData.middleName,
       middleName: identityData.middleName,
-      gender: identityData.gender,
+      full_name: fullName,
+      fullName: fullName,
+
+      // 3. Demographics
+      date_of_birth: identityData.birthdate,
       birthdate: identityData.birthdate,
+      gender: identityData.gender,
+      phone_number: identityData.phoneNumber,
+      phoneNumber: identityData.phoneNumber,
+      employment_status: identityData.employment_status,
+      marital_status: identityData.marital_status,
+      height: identityData.height,
+
+      // 4. Address & Geography
+      residence_address_line_1: identityData.address,
+      address: identityData.address,
+      residence_lga: identityData.lga,
+      lga: identityData.lga,
+      residence_state: identityData.state,
+      state: identityData.state,
+      birth_state: identityData.birth_state || identityData.state,
+
+      // 5. Biometrics
+      photo: identityData.photo || null,
       photoBase64: identityData.photo || null,
+      signature: identityData.signature || null,
+
+      // 6. Slip Document Output
       slipType: effectiveCardType,
       nin_id: effectivePdfBase64,
       pdfBase64: effectivePdfBase64,
-      docxBase64: docxBuffer ? docxBuffer.toString('base64') : null,
-      cardPdfBase64: cardPdfBuffer ? cardPdfBuffer.toString('base64') : null,
-      cardSvg,
-      slipSvg,
-      svgContent: effectiveSvg,
       pdfBuffer: effectivePdfBuffer,
-      docxBuffer,
-      cardPdfBuffer,
+      docxBase64: (!isDojahSlipSelected && docxBuffer) ? docxBuffer.toString('base64') : null,
+      docxBuffer: !isDojahSlipSelected ? docxBuffer : null,
+      svgContent: slipSvg,
+      slipSvg,
     };
 
     return {
       success: true,
       status: 'success',
-      trackingId: identityData.trackingId,
-      fullName,
       nin: cleanNin,
+      trackingId: identityData.trackingId,
+      tracking_id: identityData.trackingId,
+      fullName,
+      full_name: fullName,
+      firstName: identityData.firstName,
+      first_name: identityData.firstName,
+      surname: identityData.surname,
+      last_name: identityData.surname,
+      middleName: identityData.middleName,
+      middle_name: identityData.middleName,
+      date_of_birth: identityData.birthdate,
+      gender: identityData.gender,
+      phone_number: identityData.phoneNumber,
+      residence_address_line_1: identityData.address,
+      residence_lga: identityData.lga,
+      residence_state: identityData.state,
+      birth_state: identityData.birth_state || identityData.state,
+      employment_status: identityData.employment_status,
+      marital_status: identityData.marital_status,
+      height: identityData.height,
       photoBase64: identityData.photo || null,
+      photo: identityData.photo || null,
       slipType: effectiveCardType,
+      nin_id: effectivePdfBase64,
       pdfBase64: effectivePdfBase64,
-      docxBase64: docxBuffer ? docxBuffer.toString('base64') : null,
-      svgContent: effectiveSvg,
-      cardPdfBase64: cardPdfBuffer ? cardPdfBuffer.toString('base64') : null,
-      cardSvg,
-      slipSvg,
+      svgContent: slipSvg,
       data: resultData,
+      entity: resultData,
       meta: {
         cached: isCacheHit,
         cost_ngx: cost,
@@ -614,9 +660,13 @@ export class NinSlipService {
     const fileId = cleanNin || log.id.slice(0, 8);
 
     if (normalizedFormat === 'card' && normalizedFileType === 'pdf') {
-      buffer = await generateNimcCard(slipData);
+      if (identityData.nin_id) {
+        buffer = Buffer.from(identityData.nin_id, 'base64');
+      } else {
+        buffer = await generateStandardNinSlip(slipData);
+      }
       contentType = 'application/pdf';
-      filename = `NIN_Digital_Card_${fileId}.pdf`;
+      filename = `NIMC_Direct_Slip_${fileId}.pdf`;
     } else if (normalizedFormat === 'slip' && normalizedFileType === 'pdf') {
       buffer = await generateStandardNinSlip(slipData);
       contentType = 'application/pdf';

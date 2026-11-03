@@ -173,10 +173,10 @@ export class NinSlipController {
       return res!.send(result.data.docxBuffer);
     }
 
-    if (isCard && result.data.cardPdfBuffer) {
+    if (isCard && result.data.pdfBuffer) {
       res!.setHeader('Content-Type', 'application/pdf');
       res!.setHeader('Content-Disposition', `attachment; filename="NIN_Digital_Card_${cleanNin}.pdf"`);
-      return res!.send(result.data.cardPdfBuffer);
+      return res!.send(result.data.pdfBuffer);
     }
 
     if (result.data.pdfBuffer) {

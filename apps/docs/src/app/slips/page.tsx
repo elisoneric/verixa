@@ -4,14 +4,14 @@ import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, T
 export const metadata: Metadata = {
   title: "NIN Slips & NIMC Card API — Official Digital ID Generation | Verixa Docs",
   description:
-    "Generate authentic NIMC Direct ID-1 plastic cards and standard A4 paper slips via high-speed REST API. Instant sub-150ms optimistic preview, tamper-proof PDF generation, and on-demand dynamic synthesis.",
+    "Generate authentic NIMC Direct government slips and standard verification A4 slips via high-speed REST API. Returns full verified demographic fields (name, gender, DOB, phone, address, photo) and complete base64 PDF documents.",
   keywords: [
     "NIN slip API",
     "NIMC card API",
-    "digital NIN card generator",
+    "digital NIN slip generator",
     "NIN slip PDF API Nigeria",
-    "NIMC identity card",
-    "automated NIN card API",
+    "NIMC identity slip",
+    "automated NIN verification API",
   ],
   alternates: {
     canonical: "https://docs.verixaid.com/slips",
@@ -22,7 +22,7 @@ export default function SlipsDocsPage() {
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [
+    itemListElement: [
       {
         "@type": "ListItem",
         "position": 1,
@@ -58,10 +58,10 @@ export default function SlipsDocsPage() {
           <span className="font-mono text-xs text-sky-700 font-bold">POST /api/v1/slips/nin</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
-          NIN Slips &amp; NIMC Digital Cards
+          NIN Slips &amp; NIMC Cards API
         </h1>
         <p className="mt-2 text-base text-slate-600 leading-relaxed">
-          Produce official, print-ready National Identification Number documents via high-speed API. Verixa provides dual document pipelines: the compact <strong>NIMC Direct (ID-1 Digital Card)</strong> and the comprehensive <strong>Standard NIN Slip (A4 PDF)</strong>, backed by sub-150ms optimistic rendering and secure encrypted on-demand reconstruction.
+          Produce official, print-ready National Identification Number slips and digital ID documents via high-speed REST API. Verixa returns the complete verified demographic dataset (names, date of birth, gender, phone, residential address, biometric portrait) alongside print-ready base64 PDF payloads for instant developer integration.
         </p>
       </div>
 
@@ -72,12 +72,12 @@ export default function SlipsDocsPage() {
           <span className="text-emerald-700 font-bold">250 NGX (₦250.00)</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">OPTIMISTIC PREVIEW</span>
-          <span className="text-sky-700 font-bold">&lt;150ms Vector SVG</span>
+          <span className="text-slate-500 block">DEMOGRAPHIC DATA</span>
+          <span className="text-sky-700 font-bold">Full Profile Returned</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">OUTPUT FORMATS</span>
-          <span className="text-slate-900 font-bold">Tamper-Proof PDF</span>
+          <span className="text-slate-500 block">DOCUMENT FORMATS</span>
+          <span className="text-slate-900 font-bold">Authentic NIMC Slip / A4 DOCX to PDF</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
           <span className="text-slate-500 block">DATA RETENTION</span>
@@ -85,41 +85,41 @@ export default function SlipsDocsPage() {
         </div>
       </div>
 
-      {/* Two Document Formats Overview */}
+      {/* Two Document Pipelines Overview */}
       <div className="space-y-4 pt-2">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Available Document Formats</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Available Document Pipelines</h2>
         <div className="grid sm:grid-cols-2 gap-4 text-xs">
-          {/* Format 1: NIMC Direct Card */}
+          {/* Format 1: NIMC Direct Official Slip */}
           <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 shadow-2xs space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-emerald-800 font-bold font-mono text-sm">1. NIMC Direct (ID-1 Card)</span>
-              <Badge variant="verified">PREMIUM DESIGN</Badge>
+              <span className="text-emerald-800 font-bold font-mono text-sm">1. NIMC Card (Option: &quot;card&quot;)</span>
+              <Badge variant="verified">OFFICIAL UPSTREAM SLIP</Badge>
             </div>
             <p className="text-slate-700 leading-relaxed font-sans text-xs">
-              Complies with international <strong>ISO ID-1 physical card specifications</strong> (242.65 × 153.01 pt). Designed for citizen identity wallets and card-printing machines with authentic security features:
+              Outputs the authentic, government-issued NIMC slip delivered directly from upstream identity infrastructure:
             </p>
             <ul className="list-disc list-inside space-y-1 text-slate-600 font-sans text-xs">
-              <li>High-resolution Nigerian green guilloche anti-tamper wave patterns</li>
-              <li>Official Coat of Arms watermark and micro-text</li>
-              <li>High-contrast 4-3-4 formatted NIN security pill (<code className="text-emerald-800">1234 • 567 • 8901</code>)</li>
-              <li>Scannable 2D QR verification code linking to registry validation</li>
+              <li>Official NIMC watermark and tamper-evident government layout</li>
+              <li>Embedded citizen photo and official tracking ID</li>
+              <li>Delivered as authentic base64 PDF in <code className="text-emerald-800">pdfBase64</code> and <code className="text-emerald-800">nin_id</code></li>
+              <li>Accepted across tier-1 banks, embassies, and regulatory compliance agencies</li>
             </ul>
           </div>
 
-          {/* Format 2: Standard NIN Slip */}
+          {/* Format 2: Standard NIN Slip (DOCX to PDF) */}
           <div className="p-4 rounded-xl border border-sky-200 bg-sky-50/40 shadow-2xs space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sky-800 font-bold font-mono text-sm">2. Standard NIN Slip (PDF)</span>
-              <Badge variant="info">OFFICIAL A4</Badge>
+              <span className="text-sky-800 font-bold font-mono text-sm">2. Standard Slip (Option: &quot;slip&quot;)</span>
+              <Badge variant="info">WORD DOCX TO PDF</Badge>
             </div>
             <p className="text-slate-700 leading-relaxed font-sans text-xs">
-              The full statutory paper slip format mandated for government submissions, bank onboarding, and embassy visa verifications:
+              The full statutory paper slip compiled directly from Word DOCX templates into high-resolution vector PDF:
             </p>
             <ul className="list-disc list-inside space-y-1 text-slate-600 font-sans text-xs">
               <li>Complete demographic record: full name, DOB, gender, phone number</li>
               <li>Permanent residential address, LGA, and State of Origin</li>
-              <li>NIMC Registry Tracking ID and issuance timestamp</li>
               <li>Tamper-proof vector PDF layout optimized for desktop and mobile printing</li>
+              <li>Direct DOCX buffer availability for enterprise document automation pipelines</li>
             </ul>
           </div>
         </div>
@@ -133,10 +133,12 @@ export default function SlipsDocsPage() {
             <h2 className="text-lg font-bold text-slate-900 tracking-tight">1. Generate NIN Slip or Card (/api/v1/slips/nin)</h2>
           </div>
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            Requests real-time document synthesis. Returns citizen demographic attributes, instant vector preview SVG, and base64-encoded PDF download payload.
+            Performs regulatory identity verification and document synthesis. Returns the citizen&apos;s verified demographic data alongside the base64-encoded PDF document.
           </p>
         </div>
 
+        {/* Request Parameters */}
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 font-mono">Request Body Parameters</h3>
         <Table>
           <TableHeader>
             <TableRow>
@@ -158,7 +160,15 @@ export default function SlipsDocsPage() {
               <TableCell className="font-mono text-slate-600">string</TableCell>
               <TableCell className="text-slate-500 font-medium">Optional</TableCell>
               <TableCell className="text-slate-700">
-                Document type: <code className="text-emerald-700 font-mono">&quot;card&quot;</code> (ID-1 Digital NIMC Card) or <code className="text-emerald-700 font-mono">&quot;slip&quot;</code> (Standard A4 Paper Slip). Defaults to <code className="text-emerald-700 font-mono">&quot;card&quot;</code>.
+                Document type: <code className="text-emerald-700 font-mono">&quot;card&quot;</code> (Official NIMC Upstream Slip) or <code className="text-emerald-700 font-mono">&quot;slip&quot;</code> (Standard DOCX to PDF Slip). Defaults to <code className="text-emerald-700 font-mono">&quot;card&quot;</code>.
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-mono text-emerald-700 font-bold">cardType</TableCell>
+              <TableCell className="font-mono text-slate-600">string</TableCell>
+              <TableCell className="text-slate-500 font-medium">Optional</TableCell>
+              <TableCell className="text-slate-700">
+                Explicit alias for <code className="text-emerald-700 font-mono">format</code>: <code className="text-emerald-700 font-mono">&quot;card&quot;</code> or <code className="text-emerald-700 font-mono">&quot;slip&quot;</code>.
               </TableCell>
             </TableRow>
             <TableRow>
@@ -170,14 +180,105 @@ export default function SlipsDocsPage() {
           </TableBody>
         </Table>
 
+        {/* Response Demographic Attributes */}
+        <div className="pt-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 font-mono mb-2">
+            Returned Demographic Attributes (Trust Bricks &amp; Developer Integration)
+          </h3>
+          <p className="text-xs text-slate-600 mb-3">
+            API clients can extract these fields directly from the response root or within the <code className="text-emerald-700 font-mono">data</code> / <code className="text-emerald-700 font-mono">entity</code> payload to populate customer onboarding forms and databases:
+          </p>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Field</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Description / Sample Value</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">nin</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">11-digit verified National Identification Number (e.g. <code className="font-mono">&quot;30882411172&quot;</code>).</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">first_name</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Applicant given name (e.g. <code className="font-mono">&quot;ELISON&quot;</code>).</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">last_name</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Applicant surname (e.g. <code className="font-mono">&quot;ERIC&quot;</code>).</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">middle_name</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Applicant middle name (e.g. <code className="font-mono">&quot;EDWARD&quot;</code>).</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">full_name</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Concatenated full legal name (e.g. <code className="font-mono">&quot;ERIC ELISON EDWARD&quot;</code>).</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">date_of_birth</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">ISO date of birth formatted as <code className="font-mono">YYYY-MM-DD</code>.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">gender</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Gender classification: <code className="font-mono">&quot;MALE&quot;</code> or <code className="font-mono">&quot;FEMALE&quot;</code>.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">phone_number</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Registered applicant telephone number (e.g. <code className="font-mono">&quot;0803894606&quot;</code>).</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">residence_address_line_1</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Primary residential address on record with NIMC.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">residence_lga</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Local Government Area of residence.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">residence_state</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">State of residence.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">birth_state</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">State of origin / birth state.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">photo / photoBase64</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Clean Base64-encoded JPEG citizen biometric portrait.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-mono text-emerald-700 font-bold">pdfBase64 / nin_id</TableCell>
+                <TableCell className="font-mono text-slate-600">string</TableCell>
+                <TableCell className="text-slate-700">Complete Base64-encoded PDF document ready for streaming, storage, or iframe rendering.</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+
         <CodeBlock
           language="bash"
-          title="cURL Request (NIMC Card Generation)"
+          title="cURL Request (NIMC Official Slip Generation)"
           code={`curl -X POST "https://api.verixaid.com/api/v1/slips/nin" \\
   -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8..." \\
   -H "Content-Type: application/json" \\
   -d '{
-    "nin": "70123456789",
+    "nin": "30882411172",
     "format": "card",
     "consent": true
   }'`}
@@ -188,14 +289,30 @@ export default function SlipsDocsPage() {
           title="HTTP 200 OK Response"
           code={`{
   "success": true,
-  "trackingId": "VRX-SLIP-7012-9842",
-  "fullName": "JOHN ADAMU MUSA",
-  "nin": "70123456789",
-  "photoBase64": "/9j/4AAQSkZJRg...",
+  "status": "success",
+  "nin": "30882411172",
+  "tracking_id": "VNX-3088-2411-1172",
+  "first_name": "ELISON",
+  "last_name": "ERIC",
+  "middle_name": "EDWARD",
+  "full_name": "ERIC ELISON EDWARD",
+  "date_of_birth": "2005-01-03",
+  "gender": "MALE",
+  "phone_number": "0803894606",
+  "residence_address_line_1": "ARMY BARRACK ROAD BEHIND HOMTEL",
+  "residence_lga": "Jalingo",
+  "residence_state": "Taraba",
+  "birth_state": "Taraba",
+  "photo": "/9j/4AAQSkZJRgABAQEASABIAAD/2wBD...",
   "slipType": "card",
-  "pdfBase64": "JVBERi0xLjQ...",
-  "svgContent": "<svg viewBox=\\"0 0 242.65 153.01\\">...</svg>",
-  "latencyMs": 142
+  "nin_id": "JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZw...",
+  "pdfBase64": "JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZw...",
+  "meta": {
+    "cached": false,
+    "cost_ngx": 250,
+    "referenceId": "vx_slip_8e079a45b1",
+    "latency_ms": 138
+  }
 }`}
         />
       </div>
@@ -246,7 +363,7 @@ export default function SlipsDocsPage() {
   -d '{
     "logId": "550e8400-e29b-41d4-a716-446655440000",
     "format": "card"
-  }' --output NIMC_Card_Reconstructed.pdf`}
+  }' --output NIMC_Slip_Reconstructed.pdf`}
         />
       </div>
 
@@ -277,4 +394,3 @@ export default function SlipsDocsPage() {
     </div>
   )
 }
-
