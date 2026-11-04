@@ -98,7 +98,7 @@ export interface TransactionItem {
   status: string
   referenceId: string
   description: string
-  type?: 'deposit' | 'deduction'
+  type?: 'deposit' | 'deduction' | 'refund'
   channel?: string
   createdAt: string
 }

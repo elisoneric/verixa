@@ -94,8 +94,22 @@ export default function TransactionsPage() {
     }
   }
 
-  // Calculate deposit metrics
-  const depositList = transactions.filter((t) => t.amount > 0)
+  // Exclude system refunds/reversals from deposits
+  const depositList = React.useMemo(() => {
+    return transactions.filter((t) => {
+      const desc = (t.description || "").toLowerCase()
+      const ref = (t.referenceId || "").toLowerCase()
+      const isRefund = desc.startsWith("refund") || ref.startsWith("ref_") || t.type === "refund"
+      return t.amount > 0 && !isRefund
+    })
+  }, [transactions])
+
+  const displayItems = React.useMemo(() => {
+    if (activeTab === "deposits") return depositList
+    if (activeTab === "deductions") return transactions.filter((t) => t.amount < 0)
+    return transactions
+  }, [activeTab, depositList, transactions])
+
   const totalDeposited = depositList.reduce((acc, t) => acc + t.amount, 0)
   const currentLiveBalance = balance?.live?.balance ?? 0
   const dva = balance?.dedicatedVirtualAccount
@@ -304,7 +318,7 @@ export default function TransactionsPage() {
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
         {isLoading ? (
           <div className="p-8 text-center text-xs text-slate-400">Loading transactions...</div>
-        ) : transactions.length === 0 ? (
+        ) : displayItems.length === 0 ? (
           <EmptyState
             title={activeTab === "deposits" ? "No deposits recorded yet" : "No transactions recorded yet"}
             description={
@@ -329,8 +343,10 @@ export default function TransactionsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((tx) => {
-                  const isCredit = tx.amount > 0
+                {displayItems.map((tx) => {
+                  const desc = (tx.description || "").toLowerCase()
+                  const isRefund = desc.startsWith("refund") || (tx.referenceId || "").toLowerCase().startsWith("ref_") || tx.type === "refund"
+                  const isCredit = tx.amount > 0 && !isRefund
                   return (
                     <TableRow key={tx.id} className="hover:bg-slate-50/80 transition-colors">
                       <TableCell className="font-mono text-xs text-slate-500 whitespace-nowrap">
@@ -353,8 +369,8 @@ export default function TransactionsPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={isCredit ? "verified" : "neutral"} size="sm">
-                          {isCredit ? "DEPOSIT" : "USAGE"}
+                        <Badge variant={isCredit ? "verified" : isRefund ? "warning" : "neutral"} size="sm">
+                          {isCredit ? "DEPOSIT" : isRefund ? "REFUND" : "USAGE"}
                         </Badge>
                       </TableCell>
                       <TableCell className={`font-mono text-xs font-bold whitespace-nowrap ${isCredit ? "text-emerald-700 font-extrabold text-sm" : "text-slate-800"}`}>

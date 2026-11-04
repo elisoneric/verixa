@@ -220,4 +220,64 @@ export class PaystackService {
       return [];
     }
   }
+
+  async fetchRecentTransactions(perPage = 50): Promise<Array<{
+    reference: string;
+    amount: number;
+    status: string;
+    channel: string;
+    customerEmail?: string;
+    customerCode?: string;
+    dvaAccountNumber?: string;
+    paidAt?: string;
+  }>> {
+    const key = await this.getSecretKey();
+    if (!key || key.startsWith('sk_test_mock')) {
+      return [];
+    }
+
+    try {
+      const res = await axios.get(
+        `https://api.paystack.co/transaction?perPage=${perPage}`,
+        { headers: { Authorization: `Bearer ${key}` } }
+      );
+      const items = res.data?.data || [];
+      return items.map((d: any) => ({
+        reference: d.reference,
+        amount: (d.amount || 0) / 100,
+        status: d.status,
+        channel: d.channel,
+        customerEmail: d.customer?.email,
+        customerCode: d.customer?.customer_code,
+        dvaAccountNumber: d.dedicated_account?.account_number,
+        paidAt: d.paid_at,
+      }));
+    } catch (err: any) {
+      this.logger.warn(`Could not fetch recent transactions: ${err?.response?.data?.message || err.message}`);
+      return [];
+    }
+  }
+
+  async getCustomerDetails(emailOrCode: string): Promise<{ customerCode: string; email: string } | null> {
+    const key = await this.getSecretKey();
+    if (!key || key.startsWith('sk_test_mock')) {
+      return null;
+    }
+
+    try {
+      const res = await axios.get(
+        `https://api.paystack.co/customer/${encodeURIComponent(emailOrCode)}`,
+        { headers: { Authorization: `Bearer ${key}` } }
+      );
+      if (res.data?.data) {
+        return {
+          customerCode: res.data.data.customer_code,
+          email: res.data.data.email,
+        };
+      }
+    } catch {
+      // not found
+    }
+    return null;
+  }
 }

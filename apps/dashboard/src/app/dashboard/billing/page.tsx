@@ -40,6 +40,16 @@ export default function BillingPage() {
     loadDeposits()
   }, [loadDeposits, environment])
 
+  // Filter out any system refunds/reversals so only real funding events appear in deposit history
+  const validDeposits = React.useMemo(() => {
+    return deposits.filter((dep) => {
+      const desc = (dep.description || "").toLowerCase()
+      const ref = (dep.referenceId || "").toLowerCase()
+      const isRefund = desc.startsWith("refund") || ref.startsWith("ref_") || dep.type === "refund"
+      return dep.amount > 0 && !isRefund
+    })
+  }, [deposits])
+
   const handleSyncDva = async () => {
     setIsSyncingDva(true)
     setSyncStatusBanner(null)
@@ -371,7 +381,7 @@ export default function BillingPage() {
                 Recent Deposits &amp; Funding
               </h2>
               <Badge variant="verified" size="sm">
-                {deposits.length} DEPOSIT(S)
+                {validDeposits.length} DEPOSIT(S)
               </Badge>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -403,7 +413,7 @@ export default function BillingPage() {
 
         {isLoadingDeposits ? (
           <div className="p-6 text-center text-xs text-slate-400">Loading deposits...</div>
-        ) : deposits.length === 0 ? (
+        ) : validDeposits.length === 0 ? (
           <div className="p-6 text-center text-xs text-slate-500 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
             No deposits recorded yet. Transfer funds to your Dedicated Virtual Account above or deposit online to fund your wallet.
           </div>
@@ -420,7 +430,7 @@ export default function BillingPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {deposits.slice(0, 10).map((dep) => (
+                {validDeposits.slice(0, 10).map((dep) => (
                   <TableRow key={dep.id} className="hover:bg-slate-50/80 transition-colors">
                     <TableCell className="font-mono text-xs text-slate-500 whitespace-nowrap">
                       {new Date(dep.createdAt).toLocaleString()}

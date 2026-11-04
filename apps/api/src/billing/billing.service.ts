@@ -239,6 +239,8 @@ export class BillingService {
 
     if (filter === 'deposits') {
       qb.andWhere('tx.amount > 0');
+      qb.andWhere("tx.description NOT ILIKE 'refund%'");
+      qb.andWhere("tx.referenceId NOT ILIKE 'ref_%'");
     } else if (filter === 'deductions') {
       qb.andWhere('tx.amount < 0');
     }
@@ -247,10 +249,13 @@ export class BillingService {
 
     return transactions.map((t) => {
       const amount = Number(t.amount);
-      const isDeposit = amount > 0;
+      const desc = (t.description || '').toLowerCase();
+      const isRefund = desc.startsWith('refund') || (t.referenceId || '').toLowerCase().startsWith('ref_');
+      const isDeposit = amount > 0 && !isRefund;
       let channel = 'API Query';
-      if (isDeposit) {
-        const desc = (t.description || '').toLowerCase();
+      if (isRefund) {
+        channel = 'System Reversal';
+      } else if (isDeposit) {
         if (desc.includes('dva') || desc.includes('bank') || desc.includes('transfer')) {
           channel = 'Bank Transfer (DVA)';
         } else if (desc.includes('faucet') || desc.includes('sandbox')) {
@@ -265,7 +270,7 @@ export class BillingService {
         status: t.status,
         referenceId: t.referenceId,
         description: t.description,
-        type: isDeposit ? 'deposit' : 'deduction',
+        type: isRefund ? 'refund' : isDeposit ? 'deposit' : 'deduction',
         channel,
         createdAt: t.createdAt,
       };
@@ -572,26 +577,53 @@ export class BillingService {
     currentBalance: number;
     message: string;
   }> {
-    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    const org = await this.orgRepository.findOne({ where: { id: orgId }, relations: { users: true } });
     if (!org) {
       throw new BadRequestException('Organization not found');
     }
 
     const dva = (org.complianceData as any)?.dva;
-    const customerCode = dva?.customerCode;
+    let customerCode = dva?.customerCode;
     const orgPrefixEmail = `org-${org.id.slice(0, 8)}@verixaid.com`;
+    const userEmails = (org.users || []).map((u) => u.email).filter(Boolean);
+
+    // If customerCode wasn't stored previously, attempt to fetch it from Paystack
+    if (!customerCode) {
+      const custInfo = await this.paystackService.getCustomerDetails(orgPrefixEmail);
+      if (custInfo?.customerCode) {
+        customerCode = custInfo.customerCode;
+        org.complianceData = {
+          ...(org.complianceData || {}),
+          dva: {
+            ...(dva || {}),
+            customerCode,
+          },
+        };
+        await this.orgRepository.save(org);
+      }
+    }
 
     let allTxs: any[] = [];
     if (customerCode) {
       const txs = await this.paystackService.fetchCustomerTransactions(customerCode);
       allTxs.push(...txs);
     }
-    const emailTxs = await this.paystackService.fetchCustomerTransactions(orgPrefixEmail);
+
+    // Also fetch transactions via recent transactions list (matches by account number or customer email)
+    const recentTxs = await this.paystackService.fetchRecentTransactions(50);
     const seenRefs = new Set(allTxs.map((t) => t.reference));
-    for (const et of emailTxs) {
-      if (!seenRefs.has(et.reference)) {
-        allTxs.push(et);
-        seenRefs.add(et.reference);
+
+    for (const r of recentTxs) {
+      const isAccountMatch = dva?.accountNumber && r.dvaAccountNumber === dva.accountNumber;
+      const isEmailMatch = r.customerEmail && (
+        r.customerEmail.toLowerCase() === orgPrefixEmail.toLowerCase() ||
+        userEmails.some((ue) => ue.toLowerCase() === r.customerEmail?.toLowerCase())
+      );
+      const isCodeMatch = customerCode && r.customerCode === customerCode;
+
+      if ((isAccountMatch || isEmailMatch || isCodeMatch) && !seenRefs.has(r.reference)) {
+        allTxs.push(r);
+        seenRefs.add(r.reference);
       }
     }
 
@@ -609,7 +641,7 @@ export class BillingService {
             orgId,
             {
               dvaAccountNumber: dva?.accountNumber,
-              customerCode: dva?.customerCode,
+              customerCode: customerCode || dva?.customerCode,
               channel: tx.channel || 'dedicated_nuban',
               description: 'Dedicated Bank Transfer (DVA Sync)',
             }
