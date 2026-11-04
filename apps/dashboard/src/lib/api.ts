@@ -98,6 +98,8 @@ export interface TransactionItem {
   status: string
   referenceId: string
   description: string
+  type?: 'deposit' | 'deduction'
+  channel?: string
   createdAt: string
 }
 
@@ -310,8 +312,40 @@ export class ApiClient {
     return this.request<BalanceData>("/v1/billing/balance")
   }
 
-  static async getTransactions() {
-    return this.request<TransactionItem[]>("/v1/billing/transactions")
+  static async getTransactions(type?: 'all' | 'deposits' | 'deductions') {
+    const query = type && type !== 'all' ? `?type=${type}` : ""
+    return this.request<TransactionItem[]>(`/v1/billing/transactions${query}`)
+  }
+
+  static async getDeposits() {
+    return this.request<TransactionItem[]>("/v1/billing/deposits")
+  }
+
+  static async syncDvaDeposits() {
+    return this.request<{
+      success: boolean
+      syncedCount: number
+      creditedAmount: number
+      currentBalance: number
+      message: string
+    }>("/v1/billing/sync-dva-deposits", {
+      method: "POST",
+    })
+  }
+
+  static async verifyPaymentReference(reference: string) {
+    return this.request<{
+      status: string
+      reference: string
+      paymentStatus: string
+      amount: number
+      currency: string
+      description: string
+      paidAt?: string
+    }>("/v1/billing/payments/verify", {
+      method: "POST",
+      body: JSON.stringify({ reference }),
+    })
   }
 
   static async fundSandbox(amount = 10000) {

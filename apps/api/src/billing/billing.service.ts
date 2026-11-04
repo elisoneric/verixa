@@ -227,25 +227,49 @@ export class BillingService {
     };
   }
 
-  async getTransactions(orgId: string) {
+  async getTransactions(orgId: string, filter?: 'all' | 'deposits' | 'deductions') {
     const wallets = await this.walletRepository.find({ where: { org_id: orgId } });
     if (!wallets.length) return [];
 
     const walletIds = wallets.map((w) => w.id);
-    const transactions = await this.transactionRepository.find({
-      where: { wallet_id: In(walletIds) },
-      order: { createdAt: 'DESC' },
-      take: 50,
-    });
+    const qb = this.transactionRepository.createQueryBuilder('tx')
+      .where('tx.wallet_id IN (:...walletIds)', { walletIds })
+      .orderBy('tx.createdAt', 'DESC')
+      .take(100);
 
-    return transactions.map((t) => ({
-      id: t.id,
-      amount: Number(t.amount),
-      status: t.status,
-      referenceId: t.referenceId,
-      description: t.description,
-      createdAt: t.createdAt,
-    }));
+    if (filter === 'deposits') {
+      qb.andWhere('tx.amount > 0');
+    } else if (filter === 'deductions') {
+      qb.andWhere('tx.amount < 0');
+    }
+
+    const transactions = await qb.getMany();
+
+    return transactions.map((t) => {
+      const amount = Number(t.amount);
+      const isDeposit = amount > 0;
+      let channel = 'API Query';
+      if (isDeposit) {
+        const desc = (t.description || '').toLowerCase();
+        if (desc.includes('dva') || desc.includes('bank') || desc.includes('transfer')) {
+          channel = 'Bank Transfer (DVA)';
+        } else if (desc.includes('faucet') || desc.includes('sandbox')) {
+          channel = 'Sandbox Faucet';
+        } else {
+          channel = 'Card Checkout';
+        }
+      }
+      return {
+        id: t.id,
+        amount,
+        status: t.status,
+        referenceId: t.referenceId,
+        description: t.description,
+        type: isDeposit ? 'deposit' : 'deduction',
+        channel,
+        createdAt: t.createdAt,
+      };
+    });
   }
 
   async provisionDedicatedAccount(orgId: string, nin: string, phone: string) {
@@ -274,6 +298,7 @@ export class BillingService {
         bankName: account.bank,
         accountNumber: account.accountNumber,
         accountName: account.accountName,
+        customerCode,
         provisionedAt: new Date().toISOString(),
       },
     };
@@ -407,7 +432,18 @@ export class BillingService {
     return { balance: wallet.balance };
   }
 
-  async handleSuccessfulTopup(email: string, amountNgx: number, reference: string, orgId?: string): Promise<void> {
+  async handleSuccessfulTopup(
+    email: string,
+    amountNgx: number,
+    reference: string,
+    orgId?: string,
+    options?: {
+      dvaAccountNumber?: string;
+      customerCode?: string;
+      channel?: string;
+      description?: string;
+    }
+  ): Promise<{ credited: boolean; orgId: string; balance: number }> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -416,6 +452,45 @@ export class BillingService {
     let targetEmail = email;
 
     try {
+      // 1. If explicit orgId passed, verify it exists
+      if (targetOrgId) {
+        const found = await queryRunner.manager.findOne(Organization, { where: { id: targetOrgId } });
+        if (!found) targetOrgId = undefined;
+      }
+
+      // 2. If DVA account number passed, match organization's DVA
+      if (!targetOrgId && options?.dvaAccountNumber) {
+        const orgs = await queryRunner.manager.find(Organization);
+        const match = orgs.find(
+          (o) => (o.complianceData as any)?.dva?.accountNumber === options.dvaAccountNumber
+        );
+        if (match) {
+          targetOrgId = match.id;
+        }
+      }
+
+      // 3. If customerCode passed, match organization's DVA customerCode
+      if (!targetOrgId && options?.customerCode) {
+        const orgs = await queryRunner.manager.find(Organization);
+        const match = orgs.find(
+          (o) => (o.complianceData as any)?.dva?.customerCode === options.customerCode
+        );
+        if (match) {
+          targetOrgId = match.id;
+        }
+      }
+
+      // 4. If email starts with org- prefix (e.g. org-36a77080@verixaid.com)
+      if (!targetOrgId && email && email.toLowerCase().startsWith('org-')) {
+        const prefix = email.split('@')[0].replace(/^org-/i, '').toLowerCase();
+        const orgs = await queryRunner.manager.find(Organization);
+        const match = orgs.find((o) => o.id.toLowerCase().startsWith(prefix));
+        if (match) {
+          targetOrgId = match.id;
+        }
+      }
+
+      // 5. If email matches a user in User table
       if (!targetOrgId && email) {
         const user = await queryRunner.manager.findOne(User, { where: { email } });
         if (user) {
@@ -423,6 +498,7 @@ export class BillingService {
         }
       }
 
+      // 6. Fallback: check first active organization
       if (!targetOrgId) {
         const firstOrg = await queryRunner.manager.findOne(Organization, {
           relations: { users: true },
@@ -449,24 +525,28 @@ export class BillingService {
       const existingTx = await queryRunner.manager.findOne(Transaction, { where: { referenceId: reference } });
       if (existingTx) {
         await queryRunner.rollbackTransaction();
-        return;
+        return { credited: false, orgId: targetOrgId, balance: Number(wallet.balance) };
       }
 
       wallet.balance = Number(wallet.balance) + amountNgx;
       await queryRunner.manager.save(wallet);
+
+      const isDva = options?.channel === 'dedicated_nuban' ||
+        options?.description?.toLowerCase().includes('dva') ||
+        Boolean(options?.dvaAccountNumber);
 
       const transaction = new Transaction();
       transaction.wallet_id = wallet.id;
       transaction.amount = amountNgx;
       transaction.status = TransactionStatus.COMPLETED;
       transaction.referenceId = reference;
-      transaction.description = 'Paystack Top-up / Payment';
+      transaction.description = options?.description || (isDva ? 'Dedicated Bank Transfer (DVA)' : 'Paystack Top-up / Payment');
       await queryRunner.manager.save(transaction);
 
       await queryRunner.commitTransaction();
 
       if (targetEmail) {
-        await this.notificationsService.sendTopUpSuccessEmail(targetEmail, amountNgx, wallet.balance);
+        await this.notificationsService.sendTopUpSuccessEmail(targetEmail, amountNgx, wallet.balance).catch(() => {});
       }
 
       this.dispatchClientWebhook(targetOrgId, {
@@ -475,12 +555,81 @@ export class BillingService {
         currency: 'NGN',
         balance: wallet.balance,
       });
+
+      return { credited: true, orgId: targetOrgId, balance: Number(wallet.balance) };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async syncDvaDeposits(orgId: string): Promise<{
+    success: boolean;
+    syncedCount: number;
+    creditedAmount: number;
+    currentBalance: number;
+    message: string;
+  }> {
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    if (!org) {
+      throw new BadRequestException('Organization not found');
+    }
+
+    const dva = (org.complianceData as any)?.dva;
+    const customerCode = dva?.customerCode;
+    const orgPrefixEmail = `org-${org.id.slice(0, 8)}@verixaid.com`;
+
+    let allTxs: any[] = [];
+    if (customerCode) {
+      const txs = await this.paystackService.fetchCustomerTransactions(customerCode);
+      allTxs.push(...txs);
+    }
+    const emailTxs = await this.paystackService.fetchCustomerTransactions(orgPrefixEmail);
+    const seenRefs = new Set(allTxs.map((t) => t.reference));
+    for (const et of emailTxs) {
+      if (!seenRefs.has(et.reference)) {
+        allTxs.push(et);
+        seenRefs.add(et.reference);
+      }
+    }
+
+    let syncedCount = 0;
+    let creditedAmount = 0;
+
+    for (const tx of allTxs) {
+      if (tx.status === 'success') {
+        const exists = await this.transactionRepository.findOne({ where: { referenceId: tx.reference } });
+        if (!exists) {
+          await this.handleSuccessfulTopup(
+            tx.customerEmail || orgPrefixEmail,
+            tx.amount,
+            tx.reference,
+            orgId,
+            {
+              dvaAccountNumber: dva?.accountNumber,
+              customerCode: dva?.customerCode,
+              channel: tx.channel || 'dedicated_nuban',
+              description: 'Dedicated Bank Transfer (DVA Sync)',
+            }
+          );
+          syncedCount++;
+          creditedAmount += tx.amount;
+        }
+      }
+    }
+
+    const balanceData = await this.getBalance(orgId);
+    return {
+      success: true,
+      syncedCount,
+      creditedAmount,
+      currentBalance: balanceData.live.balance,
+      message: syncedCount > 0
+        ? `Successfully credited ${syncedCount} deposit(s) totaling ₦${creditedAmount.toLocaleString()} to your balance.`
+        : 'All bank deposits are currently up to date.',
+    };
   }
 
   async verifyPayment(reference: string, orgId?: string) {

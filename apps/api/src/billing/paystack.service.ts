@@ -28,7 +28,7 @@ export class PaystackService {
     private configRepository: Repository<SystemConfig>,
   ) {}
 
-  private async getSecretKey(): Promise<string> {
+  public async getSecretKey(): Promise<string> {
     try {
       const dbConfig = await this.configRepository.findOne({ where: { key: 'PAYSTACK_SECRET_KEY' } });
       if (dbConfig && dbConfig.value && !dbConfig.value.startsWith('sk_test_mock')) {
@@ -186,6 +186,38 @@ export class PaystackService {
     } catch (error: any) {
       this.logger.error(`Failed to verify transaction ${reference}`, error?.response?.data || error.message);
       return null;
+    }
+  }
+  async fetchCustomerTransactions(customerCodeOrEmail: string): Promise<Array<{
+    reference: string;
+    amount: number;
+    status: string;
+    channel: string;
+    customerEmail?: string;
+    paidAt?: string;
+  }>> {
+    const key = await this.getSecretKey();
+    if (!key || key.startsWith('sk_test_mock')) {
+      return [];
+    }
+
+    try {
+      const res = await axios.get(
+        `https://api.paystack.co/transaction?customer=${encodeURIComponent(customerCodeOrEmail)}`,
+        { headers: { Authorization: `Bearer ${key}` } }
+      );
+      const items = res.data?.data || [];
+      return items.map((d: any) => ({
+        reference: d.reference,
+        amount: (d.amount || 0) / 100,
+        status: d.status,
+        channel: d.channel,
+        customerEmail: d.customer?.email,
+        paidAt: d.paid_at,
+      }));
+    } catch (err: any) {
+      this.logger.warn(`Could not fetch transactions for ${customerCodeOrEmail}: ${err?.response?.data?.message || err.message}`);
+      return [];
     }
   }
 }

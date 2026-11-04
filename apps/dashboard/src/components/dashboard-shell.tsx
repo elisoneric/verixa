@@ -216,11 +216,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Navigation Groups - Static, non-scrollable desktop layout */}
-      <div className="flex-1 overflow-hidden px-3 py-2.5 space-y-3">
+      {/* Navigation Groups - Ergonomic, comfortable menu height & touch targets */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
         {navSections.map((section) => (
-          <div key={section.title} className="space-y-0.5">
-            <span className="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+          <div key={section.title} className="space-y-1">
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 block pt-1">
               {section.title}
             </span>
             {section.items.map((item) => {
@@ -229,20 +229,20 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${isActive
-                      ? "bg-slate-900 text-white font-medium shadow-xs"
+                  className={`flex items-center gap-3 px-3 h-10 rounded-xl text-xs font-semibold tracking-tight transition-all ${isActive
+                      ? "bg-slate-900 text-white shadow-xs"
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                     }`}
                 >
                   <svg
-                    className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-white" : "text-slate-500"}`}
+                    className={`w-4 h-4 shrink-0 transition-colors ${isActive ? "text-white" : "text-slate-500"}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={item.icon} />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
                   </svg>
-                  <span>{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                 </Link>
               )
             })}

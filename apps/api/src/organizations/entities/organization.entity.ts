@@ -57,6 +57,7 @@ export class Organization {
       bankName?: string;
       accountNumber?: string;
       accountName?: string;
+      customerCode?: string;
       provisionedAt?: string;
     };
     status?: 'active' | 'suspended';
