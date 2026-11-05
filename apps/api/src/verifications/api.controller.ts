@@ -529,9 +529,9 @@ export class ApiController {
     );
   }
 
-  // GET & POST /api/v1/kyc/nin/premium
+  // GET & POST /api/v1/kyc/nin/premium (Custom NIMC Plastic Card & A4 Printable PDF)
   @UseGuards(ApiKeyGuard)
-  @Get('v1/kyc/nin/premium')
+  @Get(['v1/kyc/nin/premium', 'v1/kyc/nin/card', 'v1/kyc/nin/plastic-card'])
   @HttpCode(HttpStatus.OK)
   async getKycNinPremium(@Req() req: any, @Query() query: any) {
     const nin = String(query.nin || query.id || '').trim();
@@ -543,12 +543,12 @@ export class ApiController {
       nin,
       query,
       150,
-      () => (isLive ? this.dojahProvider.verifyNin({ nin, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, tier: 'premium' }))
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...query, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, ...query, tier: 'premium' }))
     );
   }
 
   @UseGuards(ApiKeyGuard)
-  @Post('v1/kyc/nin/premium')
+  @Post(['v1/kyc/nin/premium', 'v1/kyc/nin/card', 'v1/kyc/nin/plastic-card'])
   @HttpCode(HttpStatus.OK)
   async postKycNinPremium(@Req() req: any, @Body() body: any, @Query() query: any) {
     const payload = { ...query, ...body };

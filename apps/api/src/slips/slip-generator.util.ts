@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import AdmZip from 'adm-zip';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
 import * as qrcode from 'qrcode';
+import sharp from 'sharp';
 
 export interface SlipData {
   nin: string;
@@ -636,12 +637,201 @@ export async function generatePaperSlipSvg(data: SlipData): Promise<string> {
   </svg>`;
 }
 
+export interface NimcPremiumCardResult {
+  cardImageBase64: string;
+  cardBackBase64: string;
+  pdfBase64: string;
+  pdfBuffer: Buffer;
+  cardImageBuffer: Buffer;
+}
+
+export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremiumCardResult> {
+  const photoBuffer = resolveSlipPhotoBuffer(data.photo);
+  const frontTemplatePath = getSlipAssetPath('nimc_premium_front.jpg');
+  const backTemplatePath = getSlipAssetPath('nimc_premium_back.jpg');
+  const a4TemplatePath = getSlipAssetPath('nimc_premium_a4_template.jpg');
+  const fontPath = getSlipAssetPath('OCRB.ttf');
+
+  const frontTemplateBytes = fs.readFileSync(frontTemplatePath);
+  const backTemplateBytes = fs.existsSync(backTemplatePath) ? fs.readFileSync(backTemplatePath) : frontTemplateBytes;
+  const a4TemplateBytes = fs.existsSync(a4TemplatePath) ? fs.readFileSync(a4TemplatePath) : frontTemplateBytes;
+  const fontBytes = fs.readFileSync(fontPath);
+  const fontB64 = fontBytes.toString('base64');
+
+  // Format fields
+  const cleanNin = String(data.nin || '').replace(/\D/g, '');
+  const ninFormatted = cleanNin.length === 11 
+    ? `${cleanNin.slice(0, 4)} ${cleanNin.slice(4, 7)} ${cleanNin.slice(7)}`
+    : cleanNin;
+  const ninSpaced = ninFormatted.split('').join(' ');
+
+  const rawSurname = (data.surname || (data as any).last_name || '').toUpperCase().trim();
+  const surname = rawSurname.split('').join(' ');
+
+  const first = (data.firstName || (data as any).first_name || '').toUpperCase().trim();
+  const middle = (data.middleName || (data as any).middle_name || '').toUpperCase().trim();
+  const words = [first, middle].filter(Boolean);
+  const givenNames = words.map((w) => w.split('').join(' ')).join('   ');
+
+  const rawDob = data.birthdate || (data as any).dob || (data as any).date_of_birth;
+  const formattedDob = formatNimcDate(rawDob || '1990-01-01');
+  const dobSpaced = formattedDob.split('').join(' ');
+
+  const genderChar = (data.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M';
+  const issueDateFormatted = formatNimcDate(new Date().toISOString().slice(0, 10));
+  const issueDateSpaced = issueDateFormatted.split('').join(' ');
+
+  // Resize citizen photo to 585 x 760 (exact fit over silhouette without removing background)
+  let resizedPhoto: Buffer;
+  if (photoBuffer) {
+    try {
+      resizedPhoto = await sharp(photoBuffer)
+        .resize(585, 760, { fit: 'cover', position: 'top' })
+        .toBuffer();
+    } catch {
+      const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
+      resizedPhoto = await sharp(fs.readFileSync(defaultPhotoPath))
+        .resize(585, 760, { fit: 'cover' })
+        .toBuffer();
+    }
+  } else {
+    const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
+    resizedPhoto = await sharp(fs.readFileSync(defaultPhotoPath))
+      .resize(585, 760, { fit: 'cover' })
+      .toBuffer();
+  }
+
+  // Generate SVG overlay for front card image (2576 x 1632)
+  const svgOverlay = Buffer.from(`
+    <svg width="2576" height="1632" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          @font-face {
+            font-family: 'OCRB';
+            src: url('data:font/truetype;charset=utf-8;base64,${fontB64}') format('truetype');
+          }
+          .ocrb-text {
+            font-family: 'OCRB', monospace;
+            fill: #000000;
+            font-weight: 500;
+          }
+          .watermark {
+            font-family: 'OCRB', monospace;
+            fill: #006633;
+            opacity: 0.16;
+            font-size: 70px;
+            letter-spacing: 4px;
+          }
+        </style>
+      </defs>
+
+      <!-- Diagonal Watermarks -->
+      <g transform="rotate(35, 300, 1420)">
+        <text x="150" y="1420" class="watermark">${ninFormatted}</text>
+      </g>
+      <g transform="rotate(-35, 2050, 1380)">
+        <text x="1900" y="1380" class="watermark">${ninFormatted}</text>
+      </g>
+      <g transform="rotate(35, 2350, 830)">
+        <text x="2150" y="830" class="watermark">${ninFormatted}</text>
+      </g>
+
+      <!-- Citizen Details -->
+      <text x="795" y="620" font-size="58" class="ocrb-text">${surname}</text>
+      <text x="795" y="810" font-size="58" class="ocrb-text">${givenNames}</text>
+      <text x="795" y="1025" font-size="58" class="ocrb-text">${dobSpaced}</text>
+      <text x="1500" y="1025" font-size="58" class="ocrb-text">${genderChar}</text>
+      <text x="1945" y="1120" font-size="58" class="ocrb-text">${issueDateSpaced}</text>
+      <text x="470" y="1520" font-size="160" class="ocrb-text">${ninSpaced}</text>
+    </svg>
+  `);
+
+  const cardImageBuffer = await sharp(frontTemplateBytes)
+    .composite([
+      { input: resizedPhoto, top: 422, left: 99 },
+      { input: svgOverlay, top: 0, left: 0 },
+    ])
+    .png()
+    .toBuffer();
+
+  const cardImageBase64 = `data:image/png;base64,${cardImageBuffer.toString('base64')}`;
+  const cardBackBase64 = `data:image/jpeg;base64,${backTemplateBytes.toString('base64')}`;
+
+  // 2. Generate printable A4 PDF (Front on top, Back immediately below) in ~20ms
+  const doc = await PDFDocument.create();
+  const fontkitPkg = require('@pdf-lib/fontkit');
+  doc.registerFontkit(fontkitPkg);
+  const ocrbFont = await doc.embedFont(fontBytes);
+
+  const a4TemplateImg = await doc.embedJpg(a4TemplateBytes);
+  const page = doc.addPage([595.28, 841.89]); // A4 standard
+
+  // Centered A4 background placement
+  page.drawImage(a4TemplateImg, {
+    x: 135.0,
+    y: 384.654,
+    width: 317.52,
+    height: 434.736,
+  });
+
+  // Photo on A4 sheet
+  const a4PhotoImg = await doc.embedJpg(await sharp(resizedPhoto).jpeg().toBuffer());
+  page.drawImage(a4PhotoImg, {
+    x: 182.25,
+    y: 593.712,
+    width: 54.023,
+    height: 71.928,
+  });
+
+  // Text on A4 sheet
+  page.drawText(' ' + surname, { x: 249.12, y: 644.764, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
+  page.drawText(' ' + givenNames, { x: 249.12, y: 623.164, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
+  page.drawText(' ' + dobSpaced, { x: 249.12, y: 600.844, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
+  page.drawText(' ' + genderChar, { x: 325.8, y: 600.844, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
+  page.drawText(' ' + issueDateSpaced, { x: 372.96, y: 589.324, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
+  page.drawText(' ' + ninSpaced, { x: 221.04, y: 554.925, size: 22.5, font: ocrbFont, color: rgb(0, 0, 0) });
+
+  // Diagonal faint watermarks on A4
+  page.drawText(ninFormatted, {
+    x: 185,
+    y: 565,
+    size: 9.5,
+    font: ocrbFont,
+    color: rgb(0.1, 0.4, 0.2),
+    opacity: 0.2,
+    rotate: degrees(35),
+  });
+
+  page.drawText(ninFormatted, {
+    x: 380,
+    y: 560,
+    size: 9.5,
+    font: ocrbFont,
+    color: rgb(0.1, 0.4, 0.2),
+    opacity: 0.2,
+    rotate: degrees(-38),
+  });
+
+  const pdfBytes = await doc.save();
+  const pdfBuffer = Buffer.from(pdfBytes);
+  const pdfBase64 = `data:application/pdf;base64,${pdfBuffer.toString('base64')}`;
+
+  return {
+    cardImageBase64,
+    cardBackBase64,
+    pdfBase64,
+    pdfBuffer,
+    cardImageBuffer,
+  };
+}
+
 export const SlipGeneratorUtil = {
   generateDocxSlip,
   generatePdfSlip,
   generateDigitalNinCardPdf,
   generateDigitalNinCardSvg,
   generatePaperSlipSvg,
+  generateNimcPremiumCard,
   getSlipAssetPath,
   resolveSlipPhotoBuffer,
   wrapText,
@@ -649,6 +839,7 @@ export const SlipGeneratorUtil = {
 
 export const generateNimcCard = SlipGeneratorUtil.generateDigitalNinCardPdf;
 export const generateStandardNinSlip = SlipGeneratorUtil.generatePdfSlip;
+
 
 
 

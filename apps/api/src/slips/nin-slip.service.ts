@@ -17,6 +17,7 @@ import {
   generateDigitalNinCardPdf,
   generateDigitalNinCardSvg,
   generatePaperSlipSvg,
+  generateNimcPremiumCard,
   getSlipAssetPath,
   resolveSlipPhotoBuffer,
   generateNimcCard,
@@ -76,6 +77,14 @@ export class NinSlipService {
       return await generatePaperSlipSvg(data);
     } catch (err: any) {
       throw new InternalServerErrorException(`Paper Slip SVG generation error: ${err?.message}`);
+    }
+  }
+
+  async generatePremiumCard(data: NinAdvanceResult | any) {
+    try {
+      return await generateNimcPremiumCard(data);
+    } catch (err: any) {
+      throw new InternalServerErrorException(`NIMC Premium Card generation error: ${err?.message}`);
     }
   }
 

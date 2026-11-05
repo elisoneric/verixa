@@ -28,7 +28,7 @@ import {
 import { MockProvider } from './mock.provider';
 import { AdminService } from '../../admin/admin.service';
 import { decryptSecret } from '../../common/utils/crypto.util';
-import { generatePdfSlip, generateDocxSlip, generateDigitalNinCardPdf, generateDigitalNinCardSvg } from '../../slips/slip-generator.util';
+import { generatePdfSlip, generateDocxSlip, generateDigitalNinCardPdf, generateDigitalNinCardSvg, generateNimcPremiumCard } from '../../slips/slip-generator.util';
 
 @Injectable()
 export class DojahProvider implements IVerificationProvider {
@@ -163,7 +163,8 @@ export class DojahProvider implements IVerificationProvider {
       if (data.tier === 'advance') {
         return this.verifyNinAdvance({ nin: data.nin, consent: data.consent });
       } else if (data.tier === 'premium') {
-        endpoint = `${baseUrl}/api/v1/kyc/nin/premium`;
+        // Custom NIMC Card Premium: Query NIN Basic (strictly ₦60 upstream cost, no address needed!)
+        endpoint = `${baseUrl}/api/v1/kyc/nin`;
       } else if (data.tier === 'slip') {
         endpoint = `${baseUrl}/api/v1/kyc/nin/nin_slip`;
       }
@@ -244,6 +245,28 @@ export class DojahProvider implements IVerificationProvider {
           });
         } catch (e: any) {
           this.logger.warn(`Could not generate Digital NIN Card: ${e?.message}`);
+        }
+      }
+
+      // Synthesize Custom NIMC Card Premium (Plastic Card Image + A4 Printable PDF)
+      if (data.tier === 'premium' && (entity.first_name || entity.firstname)) {
+        try {
+          const cardRes = await generateNimcPremiumCard({
+            nin: data.nin,
+            trackingId: entity.tracking_id || entity.trackingId || entity.nin,
+            firstName: entity.first_name || entity.firstname,
+            surname: entity.last_name || entity.surname,
+            middleName: entity.middle_name || entity.middlename,
+            gender: entity.gender,
+            birthdate: entity.date_of_birth || entity.dob || entity.birthdate,
+            photo: entity.photo,
+          });
+          entity.card_image = cardRes.cardImageBase64;
+          entity.card_back_image = cardRes.cardBackBase64;
+          entity.card_pdf = cardRes.pdfBase64;
+          entity.nin_id = cardRes.pdfBase64;
+        } catch (e: any) {
+          this.logger.warn(`Could not generate NIMC Premium Card: ${e?.message}`);
         }
       }
 

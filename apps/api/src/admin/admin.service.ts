@@ -201,7 +201,7 @@ export class AdminService implements OnModuleInit {
     const rates = {
       nin: parseInt(map['DOJAH_COST_NIN'] || '60', 10),
       ninAdvance: parseInt(map['DOJAH_COST_NIN_ADVANCE'] || '85', 10),
-      ninPremium: parseInt(map['DOJAH_COST_NIN_PREMIUM'] || '110', 10),
+      ninPremium: parseInt(map['DOJAH_COST_NIN_PREMIUM'] || '60', 10),
       ninSlip: parseInt(map['DOJAH_COST_NIN_SLIP'] || '180', 10),
       bvn: parseInt(map['DOJAH_COST_BVN'] || '70', 10),
       bvnAdvance: parseInt(map['DOJAH_COST_BVN_ADVANCE'] || '90', 10),

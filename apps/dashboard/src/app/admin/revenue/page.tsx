@@ -19,7 +19,7 @@ export default function AdminRevenuePage() {
   const [upstreamRates, setUpstreamRates] = React.useState({
     nin: "60",
     ninAdvance: "85",
-    ninPremium: "110",
+    ninPremium: "60",
     ninSlip: "180",
     bvn: "70",
     bvnAdvance: "90",
@@ -40,7 +40,7 @@ export default function AdminRevenuePage() {
           setUpstreamRates({
             nin: String(incoming.nin ?? 60),
             ninAdvance: String(incoming.ninAdvance ?? 85),
-            ninPremium: String(incoming.ninPremium ?? 110),
+            ninPremium: String(incoming.ninPremium ?? 60),
             ninSlip: String(incoming.ninSlip ?? 180),
             bvn: String(incoming.bvn ?? 70),
             bvnAdvance: String(incoming.bvnAdvance ?? 90),

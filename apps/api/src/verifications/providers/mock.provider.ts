@@ -28,6 +28,7 @@ import {
   generateDocxSlip,
   generateDigitalNinCardPdf,
   generateDigitalNinCardSvg,
+  generateNimcPremiumCard,
 } from '../../slips/slip-generator.util';
 
 @Injectable()
@@ -119,10 +120,36 @@ export class MockProvider implements IVerificationProvider {
       photoBase64 = '';
     }
 
+    const surname = lastName;
+    let cardImageBase64 = '';
+    let cardBackBase64 = '';
+    let premiumPdfBase64 = '';
+
+    try {
+      const cardRes = await generateNimcPremiumCard({
+        nin: data.nin,
+        trackingId: data.nin,
+        firstName,
+        surname: surname || 'DOE',
+        middleName,
+        gender: 'M',
+        birthdate: dob,
+        photo: photoBase64,
+      });
+      cardImageBase64 = cardRes.cardImageBase64;
+      cardBackBase64 = cardRes.cardBackBase64;
+      premiumPdfBase64 = cardRes.pdfBase64;
+    } catch {
+      // ignore
+    }
+
     return {
       status: 'success',
       data: {
         nin: data.nin,
+        card_image: cardImageBase64,
+        card_back_image: cardBackBase64,
+        card_pdf: premiumPdfBase64,
         first_name: firstName,
         last_name: lastName,
         gender: 'Male',
@@ -243,10 +270,35 @@ export class MockProvider implements IVerificationProvider {
       cardPdfBase64 = '';
     }
 
+    let cardImageBase64 = '';
+    let cardBackBase64 = '';
+    let premiumPdfBase64 = '';
+
+    try {
+      const cardRes = await generateNimcPremiumCard({
+        nin: data.nin,
+        trackingId: data.nin,
+        firstName,
+        surname: surname || 'DOE',
+        middleName,
+        gender: 'M',
+        birthdate: dob,
+        photo: photoBase64,
+      });
+      cardImageBase64 = cardRes.cardImageBase64;
+      cardBackBase64 = cardRes.cardBackBase64;
+      premiumPdfBase64 = cardRes.pdfBase64;
+    } catch {
+      // ignore
+    }
+
     return {
       status: 'success',
       data: {
         nin: data.nin,
+        card_image: cardImageBase64,
+        card_back_image: cardBackBase64,
+        card_pdf: premiumPdfBase64,
         first_name: firstName,
         last_name: surname,
         middle_name: middleName,
