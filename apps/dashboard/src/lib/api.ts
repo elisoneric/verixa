@@ -630,9 +630,13 @@ export class ApiClient {
   static async getAdminRevenue() {
     return this.request<{
       totalDepositedNgx: number
-      trueDeposits?: Array<{ amount: number; label: string; orgName?: string; createdAt?: string }>
+      trueDeposits?: Array<{ id?: string; amount: number; label: string; orgName?: string; createdAt?: string }>
       totalConsumedNgx: number
+      customerCostSpentNgx?: number
+      adminCostSpentNgx?: number
       realCostSpentNgx?: number
+      customerCallsCount?: number
+      adminCallsCount?: number
       netProfitNgx?: number
       profitMarginPercent?: number
       cacheSavingsNgx?: number

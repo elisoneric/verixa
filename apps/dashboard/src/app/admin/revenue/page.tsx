@@ -165,45 +165,61 @@ export default function AdminRevenuePage() {
         </Button>
       </div>
 
-      {/* Financial Overview Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Gross Client Revenue */}
+      {/* Financial Overview Cards Row - Shows Gross Customer Revenue, Customer Upstream Cost, Admin Test Cost, and Net True Profit */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Gross Customer Revenue */}
         <Card className="p-5 bg-white border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
-              Gross Client Revenue
+              Customer Billed
             </span>
-            <Badge variant="neutral" size="sm">BILLED</Badge>
+            <Badge variant="neutral" size="sm">REVENUE</Badge>
           </div>
           <div className="mt-2 text-2xl font-bold font-mono text-slate-900">
             ₦{Number(data?.totalConsumedNgx || 0).toLocaleString()}.00
           </div>
           <span className="mt-2 block text-[11px] text-slate-500 font-mono">
-            All-time fees charged to organizations
+            Live fees billed to customer tenants
           </span>
         </Card>
 
-        {/* Real Upstream Direct Cost */}
+        {/* Customer Upstream Direct Cost */}
         <Card className="p-5 bg-white border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
-              Real Upstream Cost
+              Customer Upstream
             </span>
-            <Badge variant="warning" size="sm">BUY RATE</Badge>
+            <Badge variant="warning" size="sm">DOJAH BUY</Badge>
           </div>
           <div className="mt-2 text-2xl font-bold font-mono text-rose-600">
-            ₦{Number(data?.realCostSpentNgx || 0).toLocaleString()}.00
+            ₦{Number(data?.customerCostSpentNgx || 0).toLocaleString()}.00
           </div>
           <span className="mt-2 block text-[11px] text-slate-500 font-mono">
-            Actual upstream provider expenditure
+            Dojah cost for {data?.customerCallsCount || 0} customer lookup(s)
           </span>
         </Card>
 
-        {/* Net Gross Profit */}
+        {/* Admin Incurred Upstream Cost (Dojah) */}
+        <Card className="p-5 bg-white border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
+              Admin Upstream Cost
+            </span>
+            <Badge variant="failed" size="sm">INTERNAL</Badge>
+          </div>
+          <div className="mt-2 text-2xl font-bold font-mono text-amber-600">
+            ₦{Number(data?.adminCostSpentNgx || 0).toLocaleString()}.00
+          </div>
+          <span className="mt-2 block text-[11px] text-slate-500 font-mono">
+            Dojah expense for {data?.adminCallsCount || 0} admin test lookup(s)
+          </span>
+        </Card>
+
+        {/* Net True Profit */}
         <Card className="p-5 bg-white border border-emerald-200 bg-emerald-50/20 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-mono text-emerald-800 uppercase tracking-wider block font-bold">
-              Net Gross Profit
+              Net True Profit
             </span>
             <Badge variant="verified" size="sm">
               +{data?.profitMarginPercent || 0}% MARGIN
@@ -213,7 +229,7 @@ export default function AdminRevenuePage() {
             ₦{Number(data?.netProfitNgx || 0).toLocaleString()}.00
           </div>
           <span className="mt-2 block text-[11px] text-emerald-700 font-mono">
-            Revenue minus real upstream buy cost
+            Billed − Customer Cost − Admin Cost
           </span>
         </Card>
 
@@ -221,7 +237,7 @@ export default function AdminRevenuePage() {
         <Card className="p-5 bg-white border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
-              Smart Cache Retained Profit
+              Smart Cache Savings
             </span>
             <Badge variant="verified" size="sm">100% MARGIN</Badge>
           </div>
@@ -234,30 +250,28 @@ export default function AdminRevenuePage() {
         </Card>
       </div>
 
-      {/* Second Row: Deposit Reserves */}
+      {/* Second Row: True Customer Deposits & Escrow Reserve */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* All-time true deposits */}
         <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs font-mono text-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-slate-500 block text-[11px] font-bold">TRUE CUSTOMER DEPOSITS</span>
-            <Badge variant="verified" size="sm">3 AUTHENTIC</Badge>
+            <Badge variant="verified" size="sm">LIVE RECONCILED</Badge>
           </div>
           <span className="text-2xl font-bold text-slate-900 block font-mono">
-            ₦{Number(data?.totalDepositedNgx || 500200).toLocaleString()}.00
+            ₦{Number(data?.totalDepositedNgx || 0).toLocaleString()}.00
           </span>
-          <div className="space-y-1 pt-1 border-t border-slate-100 text-[11px]">
-            <div className="flex justify-between text-slate-600">
-              <span>• Trust Bricks Prepaid Onboarding:</span>
-              <strong className="text-slate-900">₦500,000.00</strong>
-            </div>
-            <div className="flex justify-between text-slate-600">
-              <span>• Customer Micro Top-up #1:</span>
-              <strong className="text-slate-900">₦100.00</strong>
-            </div>
-            <div className="flex justify-between text-slate-600">
-              <span>• Customer Micro Top-up #2:</span>
-              <strong className="text-slate-900">₦100.00</strong>
-            </div>
+          <div className="space-y-1.5 pt-1 border-t border-slate-100 text-[11px]">
+            {data?.trueDeposits && data.trueDeposits.length > 0 ? (
+              data.trueDeposits.map((dep: any, idx: number) => (
+                <div key={dep.id || idx} className="flex justify-between items-center text-slate-600">
+                  <span className="truncate pr-2">• {dep.label || dep.orgName}:</span>
+                  <strong className="text-slate-900 shrink-0 font-mono">₦{Number(dep.amount).toLocaleString()}.00</strong>
+                </div>
+              ))
+            ) : (
+              <span className="text-slate-400">Loading live deposits...</span>
+            )}
           </div>
         </div>
 
@@ -271,7 +285,7 @@ export default function AdminRevenuePage() {
             ₦{Number(data?.totalConsumedNgx || 0).toLocaleString()}.00
           </span>
           <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
-            Total deductions billed across client API and UI lookups.
+            Total live usage deducted from customer tenant balances.
           </p>
         </div>
 
@@ -282,10 +296,10 @@ export default function AdminRevenuePage() {
             <Badge variant="verified" size="sm">HELD IN ESCROW</Badge>
           </div>
           <span className="text-2xl font-bold text-blue-600 block font-mono">
-            ₦{Number(data?.netReserveNgx || (500200 - Number(data?.totalConsumedNgx || 0))).toLocaleString()}.00
+            ₦{Number(data?.netReserveNgx || 0).toLocaleString()}.00
           </span>
-          <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
-            Remaining unspent prepaid client balance (₦500,200 minus customer usage).
+          <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-100 font-mono">
+            ₦{Number(data?.netReserveNgx || 0).toLocaleString()}.00 unspent reserve (₦{Number(data?.totalDepositedNgx || 0).toLocaleString()} customer deposits − ₦{Number(data?.totalConsumedNgx || 0).toLocaleString()} customer consumed).
           </p>
         </div>
       </div>
@@ -454,7 +468,8 @@ export default function AdminRevenuePage() {
               <TableHead>Service</TableHead>
               <TableHead className="text-right">Live Calls</TableHead>
               <TableHead className="text-right">Dojah Buy Rate</TableHead>
-              <TableHead className="text-right">Total Upstream Cost</TableHead>
+              <TableHead className="text-right">Customer Cost</TableHead>
+              <TableHead className="text-right">Admin Cost (Internal)</TableHead>
               <TableHead className="text-right">Customer Billed</TableHead>
               <TableHead className="text-right">Net Profit</TableHead>
             </TableRow>
@@ -464,8 +479,10 @@ export default function AdminRevenuePage() {
               const breakdown = data?.breakdownByService?.[s.key.toLowerCase()] || data?.breakdownByService?.[s.key]
               const callCount = breakdown?.count || 0
               const unitCost = parseInt((upstreamRates as any)[s.key], 10) || 0
-              const totalCost = breakdown?.realCost || (callCount * unitCost)
-              const totalRev = breakdown?.revenue || (callCount * s.sellPrice)
+              const custCost = breakdown?.realCost || 0
+              const admCost = breakdown?.adminCost || 0
+              const totalCost = custCost + admCost
+              const totalRev = breakdown?.revenue || 0
               const profit = totalRev - totalCost
 
               return (
@@ -473,7 +490,8 @@ export default function AdminRevenuePage() {
                   <TableCell className="font-semibold text-xs text-slate-900">{s.label}</TableCell>
                   <TableCell className="font-mono text-xs text-right text-slate-700 font-bold">{callCount}</TableCell>
                   <TableCell className="font-mono text-xs text-right text-slate-500">₦{unitCost}.00</TableCell>
-                  <TableCell className="font-mono text-xs text-right text-rose-600 font-bold">₦{totalCost.toLocaleString()}.00</TableCell>
+                  <TableCell className="font-mono text-xs text-right text-rose-600 font-bold">₦{custCost.toLocaleString()}.00</TableCell>
+                  <TableCell className="font-mono text-xs text-right text-amber-600 font-bold">₦{admCost.toLocaleString()}.00</TableCell>
                   <TableCell className="font-mono text-xs text-right text-slate-900 font-bold">₦{totalRev.toLocaleString()}.00</TableCell>
                   <TableCell className={`font-mono text-xs text-right font-bold ${profit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                     {profit >= 0 ? `+₦${profit.toLocaleString()}.00` : `-₦${Math.abs(profit).toLocaleString()}.00`}
@@ -483,6 +501,13 @@ export default function AdminRevenuePage() {
             })}
           </TableBody>
         </Table>
+
+        <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs font-mono text-slate-600 gap-2">
+          <span>Customer Revenue: <strong className="text-slate-900">₦{Number(data?.totalConsumedNgx || 0).toLocaleString()}.00</strong></span>
+          <span>Customer Upstream: <strong className="text-rose-600">−₦{Number(data?.customerCostSpentNgx || 0).toLocaleString()}.00</strong></span>
+          <span>Admin Incurred: <strong className="text-amber-600">−₦{Number(data?.adminCostSpentNgx || 0).toLocaleString()}.00</strong></span>
+          <span className="text-emerald-700 font-bold">Net True Profit: ₦{Number(data?.netProfitNgx || 0).toLocaleString()}.00</span>
+        </div>
       </Card>
 
       {/* Transactions Section */}

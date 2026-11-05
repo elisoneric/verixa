@@ -506,17 +506,39 @@ export class AdminService implements OnModuleInit {
       nuban: dojahPricingInfo.rates.nuban,
     };
 
-    // 2. Identify the 3 true customer deposits (500k, 100, 100 = ₦500,200)
-    const allPositiveTxs = await this.txRepository.find({
+    // 2. Identify Admin Organizations vs Customer Organizations
+    const adminEmails = (process.env.ADMIN_EMAILS || 'admin@verixaid.com,elisoneric@gmail.com')
+      .split(',')
+      .map((e) => e.trim().toLowerCase());
+
+    const adminUsers = await this.userRepository.find();
+    const adminOrgIds = new Set<string>();
+    for (const u of adminUsers) {
+      if (u.role === UserRole.SUPER_ADMIN || adminEmails.includes((u.email || '').toLowerCase())) {
+        adminOrgIds.add(u.org_id);
+      }
+    }
+
+    const allOrgs = await this.orgRepository.find();
+    for (const o of allOrgs) {
+      if (o.name?.toLowerCase().includes('verixa admin') || (o.complianceData as any)?.isAdminOrg === true) {
+        adminOrgIds.add(o.id);
+      }
+    }
+
+    // 3. Query all completed transactions to get live customer deposits and deductions
+    const allCompletedTxs = await this.txRepository.find({
       relations: { wallet: { organization: true } },
       where: { status: TransactionStatus.COMPLETED },
       order: { createdAt: 'DESC' },
     });
 
-    const realDeposits = allPositiveTxs.filter(t => {
+    const realDeposits = allCompletedTxs.filter(t => {
       const desc = (t.description || '').toLowerCase();
       const ref = (t.referenceId || '').toLowerCase();
-      return Number(t.amount) > 0 && !desc.startsWith('refund') && !ref.startsWith('ref_');
+      const isRefund = desc.startsWith('refund') || ref.startsWith('ref_');
+      const isAdmin = t.wallet?.org_id ? adminOrgIds.has(t.wallet.org_id) : false;
+      return Number(t.amount) > 0 && !isRefund && !isAdmin;
     });
 
     let found500k = false;
@@ -563,67 +585,67 @@ export class AdminService implements OnModuleInit {
       });
     }
 
-    const totalDepositedNgx = 500200;
+    const totalDepositedNgx = genuineDeposits.reduce((sum, d) => sum + Number(d.amount), 0);
 
-    // 3. Upstream Dojah Verification Logs Aggregates
-    let realCostSpentNgx = 0;
+    // 4. Calculate Customer Deductions vs Admin Verifications from DB Logs
+    const liveLogs = await this.verifyLogRepository.find({
+      where: { status: VerificationStatus.SUCCESS, environment: Environment.LIVE },
+    });
+
+    let customerRevenueBilled = 0;
+    let customerCostSpentNgx = 0;
+    let adminCostSpentNgx = 0;
     let cacheSavingsNgx = 0;
-    let totalClientRevenue = 0;
-    const breakdownByService: Record<string, { count: number; revenue: number; realCost: number; profit: number }> = {};
+    let customerCallsCount = 0;
+    let adminCallsCount = 0;
+    const breakdownByService: Record<string, { count: number; revenue: number; realCost: number; adminCost: number; profit: number }> = {};
 
-    try {
-      const logAggregates = await this.verifyLogRepository
-        .createQueryBuilder('log')
-        .select('log.serviceType', 'serviceType')
-        .addSelect('log.source', 'source')
-        .addSelect('log.isCached', 'isCached')
-        .addSelect('COUNT(*)', 'count')
-        .addSelect('SUM(log.costDeducted)', 'totalRevenue')
-        .where('log.status = :status', { status: VerificationStatus.SUCCESS })
-        .groupBy('log.serviceType')
-        .addGroupBy('log.source')
-        .addGroupBy('log.isCached')
-        .getRawMany();
+    for (const log of liveLogs) {
+      const sType = String(log.serviceType || '').toLowerCase();
+      const unitBuy = dojahCostMap[sType] || 0;
+      const isCached = log.isCached === true || log.source === 'CACHE';
+      const actualDojahCost = isCached ? 0 : unitBuy;
+      const billed = Number(log.costDeducted) || 0;
+      const isAdmin = adminOrgIds.has(log.org_id);
 
-      for (const row of logAggregates) {
-        const sType = String(row.serviceType || '').toLowerCase();
-        const count = parseInt(row.count, 10) || 0;
-        const rev = parseFloat(row.totalRevenue) || 0;
-        const isCached = row.isCached === true || row.source === 'CACHE';
-        const unitDojahCost = dojahCostMap[sType] || 0;
+      if (!breakdownByService[sType]) {
+        breakdownByService[sType] = { count: 0, revenue: 0, realCost: 0, adminCost: 0, profit: 0 };
+      }
+      breakdownByService[sType].count++;
 
-        totalClientRevenue += rev;
-
+      if (isAdmin) {
+        adminCallsCount++;
+        adminCostSpentNgx += actualDojahCost;
+        breakdownByService[sType].adminCost += actualDojahCost;
+      } else {
+        customerCallsCount++;
+        customerRevenueBilled += billed;
+        customerCostSpentNgx += actualDojahCost;
         if (isCached) {
-          cacheSavingsNgx += count * unitDojahCost;
-        } else {
-          realCostSpentNgx += count * unitDojahCost;
+          cacheSavingsNgx += unitBuy;
         }
-
-        if (!breakdownByService[sType]) {
-          breakdownByService[sType] = { count: 0, revenue: 0, realCost: 0, profit: 0 };
-        }
-        breakdownByService[sType].count += count;
-        breakdownByService[sType].revenue += rev;
-        if (!isCached) {
-          breakdownByService[sType].realCost += count * unitDojahCost;
-        }
+        breakdownByService[sType].revenue += billed;
+        breakdownByService[sType].realCost += actualDojahCost;
         breakdownByService[sType].profit = breakdownByService[sType].revenue - breakdownByService[sType].realCost;
       }
-    } catch (logErr) {
-      // Graceful fallback
     }
 
-    // 4. Client Billed Deductions
-    const clientDeductionsRes = await this.txRepository
-      .createQueryBuilder('tx')
-      .select('SUM(ABS(tx.amount))', 'sum')
-      .where('tx.status = :status AND tx.amount < 0', { status: TransactionStatus.COMPLETED })
-      .getRawOne();
-    const finalClientBilled = Math.max(Number(clientDeductionsRes?.sum) || 0, totalClientRevenue);
+    // Check client deductions in transaction ledger for customer organizations
+    const customerDeductionsLedger = allCompletedTxs
+      .filter(t => Number(t.amount) < 0 && (!t.wallet?.org_id || !adminOrgIds.has(t.wallet.org_id)))
+      .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
 
-    const netProfitNgx = finalClientBilled - realCostSpentNgx;
-    const profitMarginPercent = finalClientBilled > 0 ? Math.round((netProfitNgx / finalClientBilled) * 100) : 0;
+    const totalConsumedNgx = Math.max(customerDeductionsLedger, customerRevenueBilled);
+
+    // Total actual expenditure paid to Dojah:
+    const realCostSpentNgx = customerCostSpentNgx + adminCostSpentNgx;
+
+    // True Net Profit = Customer Revenue Billed - Customer Dojah Cost - Admin Dojah Cost
+    const netProfitNgx = totalConsumedNgx - customerCostSpentNgx - adminCostSpentNgx;
+    const profitMarginPercent = totalConsumedNgx > 0 ? Math.round((netProfitNgx / totalConsumedNgx) * 100) : 0;
+
+    // Net Unspent Tenant Reserve = Real Customer Deposits - Real Customer Consumption
+    const netReserveNgx = Math.max(0, totalDepositedNgx - totalConsumedNgx);
 
     // Get recent 50 transactions with org details
     const recentTx = await this.txRepository.find({
@@ -635,15 +657,19 @@ export class AdminService implements OnModuleInit {
     return {
       totalDepositedNgx,
       trueDeposits: genuineDeposits,
-      totalConsumedNgx: finalClientBilled,
+      totalConsumedNgx,
+      customerCostSpentNgx,
+      adminCostSpentNgx,
       realCostSpentNgx,
+      customerCallsCount,
+      adminCallsCount,
       netProfitNgx,
       profitMarginPercent,
       cacheSavingsNgx,
       depositsToday: 0,
       depositsThisWeek: 0,
       depositsThisMonth: totalDepositedNgx,
-      netReserveNgx: Math.max(0, totalDepositedNgx - finalClientBilled),
+      netReserveNgx,
       dojahRates: dojahPricingInfo.rates,
       upstreamRates: dojahPricingInfo.rates,
       margins: dojahPricingInfo.margins,
@@ -663,6 +689,25 @@ export class AdminService implements OnModuleInit {
   }
 
   async auditDbData() {
+    const adminEmails = (process.env.ADMIN_EMAILS || 'admin@verixaid.com,elisoneric@gmail.com')
+      .split(',')
+      .map((e) => e.trim().toLowerCase());
+
+    const adminUsers = await this.userRepository.find();
+    const adminOrgIds = new Set<string>();
+    for (const u of adminUsers) {
+      if (u.role === UserRole.SUPER_ADMIN || adminEmails.includes((u.email || '').toLowerCase())) {
+        adminOrgIds.add(u.org_id);
+      }
+    }
+
+    const allOrgs = await this.orgRepository.find();
+    for (const o of allOrgs) {
+      if (o.name?.toLowerCase().includes('verixa admin') || (o.complianceData as any)?.isAdminOrg === true) {
+        adminOrgIds.add(o.id);
+      }
+    }
+
     const positiveTxs = await this.txRepository.find({
       relations: { wallet: { organization: true } },
       order: { createdAt: 'DESC' },
@@ -682,10 +727,11 @@ export class AdminService implements OnModuleInit {
 
     for (const dep of allDeposits) {
       const amt = Number(dep.amount);
-      if (!found500k && (amt === 500000 || amt === 50000000)) {
+      const isAdmin = dep.wallet?.org_id ? adminOrgIds.has(dep.wallet.org_id) : false;
+      if (!isAdmin && !found500k && (amt === 500000 || amt === 50000000)) {
         genuineDeposits.push(dep);
         found500k = true;
-      } else if (count100 < 2 && (amt === 100 || amt === 10000)) {
+      } else if (!isAdmin && count100 < 2 && (amt === 100 || amt === 10000)) {
         genuineDeposits.push(dep);
         count100++;
       } else {
@@ -713,9 +759,10 @@ export class AdminService implements OnModuleInit {
       order: { createdAt: 'DESC' },
     });
 
-    let totalDojahCostSpent = 0;
+    let customerDojahCost = 0;
+    let adminDojahCost = 0;
     let customerBilledTotal = 0;
-    const callsBreakdown: Record<string, { count: number; dojahUnitCost: number; dojahTotalCost: number; billedTotal: number }> = {};
+    const callsBreakdown: Record<string, { count: number; dojahUnitCost: number; customerCost: number; adminCost: number; billedTotal: number }> = {};
 
     for (const log of liveLogs) {
       const sType = String(log.serviceType || '').toLowerCase();
@@ -723,17 +770,25 @@ export class AdminService implements OnModuleInit {
       const isCached = log.isCached === true || log.source === 'CACHE';
       const actualDojahIncurred = isCached ? 0 : unitBuy;
       const billed = Number(log.costDeducted) || 0;
-
-      totalDojahCostSpent += actualDojahIncurred;
-      customerBilledTotal += billed;
+      const isAdmin = adminOrgIds.has(log.org_id);
 
       if (!callsBreakdown[sType]) {
-        callsBreakdown[sType] = { count: 0, dojahUnitCost: unitBuy, dojahTotalCost: 0, billedTotal: 0 };
+        callsBreakdown[sType] = { count: 0, dojahUnitCost: unitBuy, customerCost: 0, adminCost: 0, billedTotal: 0 };
       }
       callsBreakdown[sType].count++;
-      callsBreakdown[sType].dojahTotalCost += actualDojahIncurred;
-      callsBreakdown[sType].billedTotal += billed;
+
+      if (isAdmin) {
+        adminDojahCost += actualDojahIncurred;
+        callsBreakdown[sType].adminCost += actualDojahIncurred;
+      } else {
+        customerDojahCost += actualDojahIncurred;
+        customerBilledTotal += billed;
+        callsBreakdown[sType].customerCost += actualDojahIncurred;
+        callsBreakdown[sType].billedTotal += billed;
+      }
     }
+
+    const totalDojahCostSpent = customerDojahCost + adminDojahCost;
 
     return {
       trueDepositedTotal: 500200,
@@ -757,9 +812,11 @@ export class AdminService implements OnModuleInit {
         createdAt: d.createdAt,
       })),
       actualDojahCallsCount: liveLogs.length,
+      customerDojahCost,
+      adminDojahCost,
       actualDojahCostSpent: totalDojahCostSpent,
       customerBilledTotal,
-      netTrueProfit: customerBilledTotal - totalDojahCostSpent,
+      netTrueProfit: customerBilledTotal - customerDojahCost - adminDojahCost,
       callsBreakdown,
     };
   }
