@@ -621,15 +621,10 @@ export class VerificationsController {
     if (!bypassCache && identifier) {
       const notFoundCached = await this.identityCacheService.getNotFoundRecord(serviceType, identifier);
       if (notFoundCached) {
-        const cacheRate = await this.billingService.getEffectiveRate(req.organizationId, serviceType as any, true);
-        const cacheCost = cacheRate.effectiveRate;
+        const latencyMs = Math.max(5, Date.now() - startTime);
         const reference = `vx_neg_${uuidv4().slice(0, 12)}`;
 
-        // Model A: Bill discounted cache fee because Verixa verified identity non-existence via cache
-        await this.billingService.deductCredits(req.organizationId, validEnv, cacheCost, reference);
-
-        const latencyMs = Math.max(5, Date.now() - startTime);
-
+        // FREE Negative Cache: Client is NOT charged for repeat 404 lookups; upstream Dojah is NOT called (₦0 cost)
         await this.logRepository.save({
           org_id: req.organizationId,
           environment: validEnv,
@@ -639,7 +634,7 @@ export class VerificationsController {
           upstreamProvider: 'verixa_negative_cache',
           isCached: true,
           source: 'CACHE',
-          costDeducted: cacheCost,
+          costDeducted: 0,
           latencyMs,
           cacheKey: this.identityCacheService.generateNotFoundKey(serviceType, identifier),
           idempotencyKey: req.headers['idempotency-key'] || undefined,
@@ -651,7 +646,7 @@ export class VerificationsController {
           statusCode: 404,
           error: 'Not Found',
           message: `Identity record not found for ${serviceType} (${identifier}). Verified via upstream registry cache.`,
-          billed_amount: cacheCost,
+          billed_amount: 0,
           cached: true,
         });
       }

@@ -112,17 +112,10 @@ export class ApiController {
     if (identifier) {
       const notFoundCached = await this.identityCacheService.getNotFoundRecord(service, identifier);
       if (notFoundCached) {
-        const cacheRateInfo = await this.billingService.getEffectiveRate(orgId, rateKey, true);
-        const cacheCost = exactPrice !== undefined ? Math.round(exactPrice * 0.5) : cacheRateInfo.effectiveRate;
         const reference = `vx_neg_${uuidv4().slice(0, 12)}`;
-
-        // Model A: Bill discounted cache fee (e.g. ₦50) because Verixa verified identity non-existence via cache
-        if (orgId) {
-          await this.billingService.deductCredits(orgId, env, cacheCost, reference);
-        }
-
         const latencyMs = Math.max(5, Date.now() - startTime);
 
+        // FREE Negative Cache: Client is NOT charged for repeat 404 queries; upstream Dojah is NOT called (₦0 cost)
         await this.logRepository.save({
           org_id: orgId,
           environment: env,
@@ -132,7 +125,7 @@ export class ApiController {
           upstreamProvider: 'verixa_negative_cache',
           isCached: true,
           source: 'CACHE',
-          costDeducted: cacheCost,
+          costDeducted: 0,
           latencyMs,
           cacheKey: this.identityCacheService.generateNotFoundKey(service, identifier),
           idempotencyKey: req.headers?.['idempotency-key'] || undefined,
@@ -144,7 +137,7 @@ export class ApiController {
           try {
             req.res.setHeader('X-Request-Id', reference);
             req.res.setHeader('X-Cached', 'true');
-            req.res.setHeader('X-Billed-Amount', String(cacheCost));
+            req.res.setHeader('X-Billed-Amount', '0');
             req.res.setHeader('X-Latency-Ms', String(latencyMs));
           } catch {}
         }
@@ -153,7 +146,7 @@ export class ApiController {
           statusCode: 404,
           error: 'Not Found',
           message: `Identity record not found for ${service} (${identifier}). Verified via upstream registry cache.`,
-          billed_amount: cacheCost,
+          billed_amount: 0,
           cached: true,
         });
       }
