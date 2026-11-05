@@ -256,7 +256,7 @@ export function formatNimcDate(rawDate?: string): string {
       const day = String(d.getDate()).padStart(2, '0');
       const mon = months[d.getMonth()];
       const year = d.getFullYear();
-      return `${day}  ${mon}  ${year}`;
+      return `${day} ${mon} ${year}`;
     }
   } catch {}
   return String(rawDate).toUpperCase();
@@ -748,54 +748,54 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
   // 3. Citizen Details: Start writing immediately under their respective titles!
   // Surname
   page.drawText(surname, {
-    x: cardX + (800 * s),
-    y: cardY + cardH - (630 * s),
-    size: 7.5,
+    x: cardX + (cardW * 0.311),
+    y: cardY + cardH - (cardH * 0.370),
+    size: 8.0,
     font: ocrbFont,
     color: rgb(0, 0, 0),
   });
 
   // Given Names
   page.drawText(givenNames, {
-    x: cardX + (800 * s),
-    y: cardY + cardH - (820 * s),
-    size: 7.5,
+    x: cardX + (cardW * 0.311),
+    y: cardY + cardH - (cardH * 0.510),
+    size: 8.0,
     font: ocrbFont,
     color: rgb(0, 0, 0),
   });
 
-  // Date of Birth
+  // Date of Birth: single space between day, month, year!
   page.drawText(formattedDob, {
-    x: cardX + (800 * s),
-    y: cardY + cardH - (1035 * s),
-    size: 7.5,
+    x: cardX + (cardW * 0.311),
+    y: cardY + cardH - (cardH * 0.645),
+    size: 8.0,
     font: ocrbFont,
     color: rgb(0, 0, 0),
   });
 
   // Sex
   page.drawText(genderChar, {
-    x: cardX + (1500 * s),
-    y: cardY + cardH - (1035 * s),
-    size: 7.5,
+    x: cardX + (cardW * 0.566),
+    y: cardY + cardH - (cardH * 0.645),
+    size: 8.0,
     font: ocrbFont,
     color: rgb(0, 0, 0),
   });
 
-  // Issue Date
+  // Issue Date: strictly below the 'ISSUE DATE' label with clean breathing space!
   page.drawText(issueDateFormatted, {
-    x: cardX + (1900 * s),
-    y: cardY + cardH - (1035 * s),
-    size: 7.5,
+    x: cardX + (cardW * 0.756),
+    y: cardY + cardH - (cardH * 0.695),
+    size: 8.0,
     font: ocrbFont,
     color: rgb(0, 0, 0),
   });
 
-  // 4. National Identification Number (NIN): Centered with strict width limit!
-  const ninFontSize = 13.5;
+  // 4. National Identification Number (NIN): Bigger bold size (21.0 pt), centered horizontally!
+  const ninFontSize = 21.0;
   const ninTextWidth = ocrbFont.widthOfTextAtSize(ninFormatted, ninFontSize);
   const ninCenterX = cardX + (cardW / 2) - (ninTextWidth / 2);
-  const ninY = cardY + cardH - (1485 * s);
+  const ninY = cardY + 10.5;
 
   page.drawText(ninFormatted, {
     x: ninCenterX,
