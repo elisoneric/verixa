@@ -648,113 +648,233 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
   const photoBuffer = resolveSlipPhotoBuffer(data.photo);
   const frontTemplatePath = getSlipAssetPath('nimc_premium_front.jpg');
   const backTemplatePath = getSlipAssetPath('nimc_premium_back.jpg');
-  const a4TemplatePath = getSlipAssetPath('nimc_premium_a4_template.jpg');
   const fontPath = getSlipAssetPath('OCRB.ttf');
 
   const frontTemplateBytes = fs.existsSync(frontTemplatePath) ? fs.readFileSync(frontTemplatePath) : Buffer.alloc(0);
   const backTemplateBytes = fs.existsSync(backTemplatePath) ? fs.readFileSync(backTemplatePath) : frontTemplateBytes;
-  const a4TemplateBytes = fs.existsSync(a4TemplatePath) ? fs.readFileSync(a4TemplatePath) : frontTemplateBytes;
   const fontBytes = fs.readFileSync(fontPath);
 
-  // Format fields
+  // Format fields - natural typography without artificial spaces between letters!
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
   const ninFormatted = cleanNin.length === 11 
     ? `${cleanNin.slice(0, 4)} ${cleanNin.slice(4, 7)} ${cleanNin.slice(7)}`
     : cleanNin;
-  const ninSpaced = ninFormatted.split('').join(' ');
+  
+  // Diagonal watermark: NO space after first 4 numbers! e.g. '3088241 1172'
+  const watermarkNin = cleanNin.length === 11
+    ? `${cleanNin.slice(0, 7)} ${cleanNin.slice(7)}`
+    : cleanNin;
 
   const rawSurname = (data.surname || (data as any).last_name || '').toUpperCase().trim();
-  const surname = rawSurname.split('').join(' ');
+  const surname = rawSurname;
 
   const first = (data.firstName || (data as any).first_name || '').toUpperCase().trim();
   const middle = (data.middleName || (data as any).middle_name || '').toUpperCase().trim();
-  const words = [first, middle].filter(Boolean);
-  const givenNames = words.map((w) => w.split('').join(' ')).join('   ');
+  const givenNames = [first, middle].filter(Boolean).join(' ');
 
   const rawDob = data.birthdate || (data as any).dob || (data as any).date_of_birth;
   const formattedDob = formatNimcDate(rawDob || '1990-01-01');
-  const dobSpaced = formattedDob.split('').join(' ');
 
   const genderChar = (data.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M';
   const issueDateFormatted = formatNimcDate(new Date().toISOString().slice(0, 10));
-  const issueDateSpaced = issueDateFormatted.split('').join(' ');
 
-  // 1. Generate printable A4 PDF (Front on top, Back immediately below) in ~25ms
+  // Generate printable A4 PDF (Front on top, Back immediately below, fold guide in center)
   const doc = await PDFDocument.create();
   const fontkitPkg = require('@pdf-lib/fontkit');
   doc.registerFontkit(fontkitPkg);
   const ocrbFont = await doc.embedFont(fontBytes);
 
-  const a4TemplateImg = await doc.embedJpg(a4TemplateBytes);
+  const frontImg = await doc.embedJpg(frontTemplateBytes);
+  const backImg = await doc.embedJpg(backTemplateBytes);
+
   const page = doc.addPage([595.28, 841.89]); // A4 standard
 
-  // Centered A4 background placement
-  page.drawImage(a4TemplateImg, {
-    x: 135.0,
-    y: 384.654,
-    width: 317.52,
-    height: 434.736,
+  // Standard ID-1 plastic card dimensions: 244 x 154.58 pt (ratio 1.5784 matching 2576x1632)
+  const cardW = 244.0;
+  const cardH = 154.58;
+  const cardX = (595.28 - cardW) / 2; // 175.64 (centered horizontally)
+  const cardY = 460.0; // Front card bottom
+
+  // 1. Draw Front Card (Top) with high-res rounded corners
+  page.drawImage(frontImg, {
+    x: cardX,
+    y: cardY,
+    width: cardW,
+    height: cardH,
   });
 
-  // Citizen Photo on A4 sheet
+  // Scale factor from 2576x1632 template to cardW x cardH
+  const s = cardW / 2576.0;
+
+  // 2. Citizen Photo
   if (photoBuffer && photoBuffer.length > 0) {
     try {
-      let a4PhotoImg;
+      let photoImg;
       try {
-        a4PhotoImg = await doc.embedJpg(photoBuffer);
+        photoImg = await doc.embedJpg(photoBuffer);
       } catch {
-        a4PhotoImg = await doc.embedPng(photoBuffer);
+        photoImg = await doc.embedPng(photoBuffer);
       }
-      page.drawImage(a4PhotoImg, {
-        x: 182.25,
-        y: 593.712,
-        width: 54.023,
-        height: 71.928,
+      const photoW = 585 * s;
+      const photoH = 760 * s;
+      const photoX = cardX + (99 * s);
+      const photoY = cardY + cardH - ((422 + 760) * s);
+      page.drawImage(photoImg, {
+        x: photoX,
+        y: photoY,
+        width: photoW,
+        height: photoH,
       });
     } catch {
-      // Graceful fallback to default photo
       try {
         const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
         if (fs.existsSync(defaultPhotoPath)) {
-          const a4PhotoImg = await doc.embedJpg(fs.readFileSync(defaultPhotoPath));
-          page.drawImage(a4PhotoImg, {
-            x: 182.25,
-            y: 593.712,
-            width: 54.023,
-            height: 71.928,
+          const photoImg = await doc.embedJpg(fs.readFileSync(defaultPhotoPath));
+          const photoW = 585 * s;
+          const photoH = 760 * s;
+          const photoX = cardX + (99 * s);
+          const photoY = cardY + cardH - ((422 + 760) * s);
+          page.drawImage(photoImg, {
+            x: photoX,
+            y: photoY,
+            width: photoW,
+            height: photoH,
           });
         }
       } catch {}
     }
   }
 
-  // Text on A4 sheet
-  page.drawText(' ' + surname, { x: 249.12, y: 644.764, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
-  page.drawText(' ' + givenNames, { x: 249.12, y: 623.164, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
-  page.drawText(' ' + dobSpaced, { x: 249.12, y: 600.844, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
-  page.drawText(' ' + genderChar, { x: 325.8, y: 600.844, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
-  page.drawText(' ' + issueDateSpaced, { x: 372.96, y: 589.324, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
-  page.drawText(' ' + ninSpaced, { x: 221.04, y: 554.925, size: 22.5, font: ocrbFont, color: rgb(0, 0, 0) });
-
-  // Diagonal faint watermarks on A4
-  page.drawText(ninFormatted, {
-    x: 185,
-    y: 565,
-    size: 9.5,
+  // 3. Citizen Details: Start writing immediately under their respective titles!
+  // Surname
+  page.drawText(surname, {
+    x: cardX + (800 * s),
+    y: cardY + cardH - (630 * s),
+    size: 7.5,
     font: ocrbFont,
-    color: rgb(0.1, 0.4, 0.2),
-    opacity: 0.2,
+    color: rgb(0, 0, 0),
+  });
+
+  // Given Names
+  page.drawText(givenNames, {
+    x: cardX + (800 * s),
+    y: cardY + cardH - (820 * s),
+    size: 7.5,
+    font: ocrbFont,
+    color: rgb(0, 0, 0),
+  });
+
+  // Date of Birth
+  page.drawText(formattedDob, {
+    x: cardX + (800 * s),
+    y: cardY + cardH - (1035 * s),
+    size: 7.5,
+    font: ocrbFont,
+    color: rgb(0, 0, 0),
+  });
+
+  // Sex
+  page.drawText(genderChar, {
+    x: cardX + (1500 * s),
+    y: cardY + cardH - (1035 * s),
+    size: 7.5,
+    font: ocrbFont,
+    color: rgb(0, 0, 0),
+  });
+
+  // Issue Date
+  page.drawText(issueDateFormatted, {
+    x: cardX + (1900 * s),
+    y: cardY + cardH - (1035 * s),
+    size: 7.5,
+    font: ocrbFont,
+    color: rgb(0, 0, 0),
+  });
+
+  // 4. National Identification Number (NIN): Centered with strict width limit!
+  const ninFontSize = 13.5;
+  const ninTextWidth = ocrbFont.widthOfTextAtSize(ninFormatted, ninFontSize);
+  const ninCenterX = cardX + (cardW / 2) - (ninTextWidth / 2);
+  const ninY = cardY + cardH - (1485 * s);
+
+  page.drawText(ninFormatted, {
+    x: ninCenterX,
+    y: ninY,
+    size: ninFontSize,
+    font: ocrbFont,
+    color: rgb(0, 0, 0),
+  });
+
+  // 5. Diagonal Security Watermarks (3 appearances, no space after first 4 digits)
+  const wmColor = rgb(0.0, 0.4, 0.2);
+  const wmOpacity = 0.18;
+  const wmSize = 8.5;
+
+  // Appearance 1: Lower-left under photo
+  page.drawText(watermarkNin, {
+    x: cardX + 15,
+    y: cardY + 28,
+    size: wmSize,
+    font: ocrbFont,
+    color: wmColor,
+    opacity: wmOpacity,
     rotate: degrees(35),
   });
 
-  page.drawText(ninFormatted, {
-    x: 380,
-    y: 560,
-    size: 9.5,
+  // Appearance 2: Center / Upper-right
+  page.drawText(watermarkNin, {
+    x: cardX + 175,
+    y: cardY + 30,
+    size: wmSize,
     font: ocrbFont,
-    color: rgb(0.1, 0.4, 0.2),
-    opacity: 0.2,
-    rotate: degrees(-38),
+    color: wmColor,
+    opacity: wmOpacity,
+    rotate: degrees(-35),
+  });
+
+  // Appearance 3: Top-right
+  page.drawText(watermarkNin, {
+    x: cardX + 190,
+    y: cardY + 90,
+    size: wmSize,
+    font: ocrbFont,
+    color: wmColor,
+    opacity: wmOpacity,
+    rotate: degrees(35),
+  });
+
+  // 6. Draw Back Card immediately below front card (inverted for A4 folding)
+  const backY = cardY - cardH;
+  page.drawImage(backImg, {
+    x: cardX,
+    y: backY,
+    width: cardW,
+    height: cardH,
+  });
+
+  // Fold guide line between cards
+  page.drawLine({
+    start: { x: cardX - 15, y: cardY },
+    end: { x: cardX + cardW + 15, y: cardY },
+    thickness: 0.5,
+    color: rgb(0.6, 0.6, 0.6),
+    dashArray: [3, 3],
+  });
+
+  // Top header on A4 sheet
+  page.drawText('NIGERIAN NATIONAL IDENTITY MANAGEMENT COMMISSION', {
+    x: 155,
+    y: 650,
+    size: 9.0,
+    font: ocrbFont,
+    color: rgb(0.2, 0.2, 0.2),
+  });
+  page.drawText('FEDERAL REPUBLIC OF NIGERIA - NATIONAL IDENTIFICATION CARD', {
+    x: 140,
+    y: 638,
+    size: 7.5,
+    font: ocrbFont,
+    color: rgb(0.4, 0.4, 0.4),
   });
 
   const pdfBytes = await doc.save();
