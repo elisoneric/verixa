@@ -109,6 +109,7 @@ export class AdminService implements OnModuleInit {
         bvn: parseInt(map['BASE_BVN_PRICE'] || '95', 10),
         nin: parseInt(map['BASE_NIN_PRICE'] || '125', 10),
         ninAdvance: parseInt(map['BASE_NIN_ADVANCE_PRICE'] || '125', 10),
+        ninPremium: parseInt(map['BASE_NIN_PREMIUM_PRICE'] || '120', 10),
         ninSlip: parseInt(map['BASE_NIN_SLIP_PRICE'] || '250', 10),
         nuban: parseInt(map['BASE_NUBAN_PRICE'] || '0', 10),
         phone: parseInt(map['BASE_PHONE_PRICE'] || '50', 10),
@@ -121,6 +122,7 @@ export class AdminService implements OnModuleInit {
         bvn: parseInt(map['BASE_BVN_CACHE_PRICE'] || '38', 10),
         nin: parseInt(map['BASE_NIN_CACHE_PRICE'] || '50', 10),
         ninAdvance: parseInt(map['BASE_NIN_ADVANCE_CACHE_PRICE'] || '50', 10),
+        ninPremium: parseInt(map['BASE_NIN_PREMIUM_CACHE_PRICE'] || '0', 10),
         ninSlip: parseInt(map['BASE_NIN_SLIP_CACHE_PRICE'] || '50', 10),
         nuban: parseInt(map['BASE_NUBAN_CACHE_PRICE'] || '0', 10),
         phone: parseInt(map['BASE_PHONE_CACHE_PRICE'] || '20', 10),
@@ -157,6 +159,7 @@ export class AdminService implements OnModuleInit {
       if (body.baseRates.bvn != null) await this.updateConfig('BASE_BVN_PRICE', String(body.baseRates.bvn), false, 'Base BVN Live Price');
       if (body.baseRates.nin != null) await this.updateConfig('BASE_NIN_PRICE', String(body.baseRates.nin), false, 'Base NIN Live Price');
       if (body.baseRates.ninAdvance != null) await this.updateConfig('BASE_NIN_ADVANCE_PRICE', String(body.baseRates.ninAdvance), false, 'Base NIN Advance Live Price');
+      if (body.baseRates.ninPremium != null) await this.updateConfig('BASE_NIN_PREMIUM_PRICE', String(body.baseRates.ninPremium), false, 'Base NIN Premium Live Price');
       if (body.baseRates.ninSlip != null) await this.updateConfig('BASE_NIN_SLIP_PRICE', String(body.baseRates.ninSlip), false, 'Base NIN Slip Generation Price');
       if (body.baseRates.nuban != null) await this.updateConfig('BASE_NUBAN_PRICE', String(body.baseRates.nuban), false, 'Base NUBAN Live Price');
       if (body.baseRates.phone != null) await this.updateConfig('BASE_PHONE_PRICE', String(body.baseRates.phone), false, 'Base Phone Lookup Price');
@@ -170,6 +173,7 @@ export class AdminService implements OnModuleInit {
       if (body.cacheRates.bvn != null) await this.updateConfig('BASE_BVN_CACHE_PRICE', String(body.cacheRates.bvn), false, 'Base BVN Cache Hit Price');
       if (body.cacheRates.nin != null) await this.updateConfig('BASE_NIN_CACHE_PRICE', String(body.cacheRates.nin), false, 'Base NIN Cache Hit Price');
       if (body.cacheRates.ninAdvance != null) await this.updateConfig('BASE_NIN_ADVANCE_CACHE_PRICE', String(body.cacheRates.ninAdvance), false, 'Base NIN Advance Cache Hit Price');
+      if (body.cacheRates.ninPremium != null) await this.updateConfig('BASE_NIN_PREMIUM_CACHE_PRICE', String(body.cacheRates.ninPremium), false, 'Base NIN Premium Cache Hit Price');
       if (body.cacheRates.ninSlip != null) await this.updateConfig('BASE_NIN_SLIP_CACHE_PRICE', String(body.cacheRates.ninSlip), false, 'Base NIN Slip Cache Hit Price');
       if (body.cacheRates.nuban != null) await this.updateConfig('BASE_NUBAN_CACHE_PRICE', String(body.cacheRates.nuban), false, 'Base NUBAN Cache Hit Price');
       if (body.cacheRates.phone != null) await this.updateConfig('BASE_PHONE_CACHE_PRICE', String(body.cacheRates.phone), false, 'Base Phone Cache Hit Price');
@@ -213,7 +217,7 @@ export class AdminService implements OnModuleInit {
     const sellingRates = {
       nin: parseInt(map['BASE_NIN_PRICE'] || '120', 10),
       ninAdvance: parseInt(map['BASE_NIN_ADVANCE_PRICE'] || '120', 10),
-      ninPremium: parseInt(map['BASE_NIN_PREMIUM_PRICE'] || '150', 10),
+      ninPremium: parseInt(map['BASE_NIN_PREMIUM_PRICE'] || '120', 10),
       ninSlip: parseInt(map['BASE_NIN_SLIP_PRICE'] || '250', 10),
       bvn: parseInt(map['BASE_BVN_PRICE'] || '95', 10),
       bvnAdvance: parseInt(map['BASE_BVN_ADVANCE_PRICE'] || '125', 10),

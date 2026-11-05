@@ -3,7 +3,6 @@ import * as path from 'path';
 import AdmZip from 'adm-zip';
 import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
 import * as qrcode from 'qrcode';
-import sharp from 'sharp';
 
 export interface SlipData {
   nin: string;
@@ -642,7 +641,7 @@ export interface NimcPremiumCardResult {
   cardBackBase64: string;
   pdfBase64: string;
   pdfBuffer: Buffer;
-  cardImageBuffer: Buffer;
+  cardImageBuffer?: Buffer;
 }
 
 export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremiumCardResult> {
@@ -652,11 +651,10 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
   const a4TemplatePath = getSlipAssetPath('nimc_premium_a4_template.jpg');
   const fontPath = getSlipAssetPath('OCRB.ttf');
 
-  const frontTemplateBytes = fs.readFileSync(frontTemplatePath);
+  const frontTemplateBytes = fs.existsSync(frontTemplatePath) ? fs.readFileSync(frontTemplatePath) : Buffer.alloc(0);
   const backTemplateBytes = fs.existsSync(backTemplatePath) ? fs.readFileSync(backTemplatePath) : frontTemplateBytes;
   const a4TemplateBytes = fs.existsSync(a4TemplatePath) ? fs.readFileSync(a4TemplatePath) : frontTemplateBytes;
   const fontBytes = fs.readFileSync(fontPath);
-  const fontB64 = fontBytes.toString('base64');
 
   // Format fields
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
@@ -681,83 +679,7 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
   const issueDateFormatted = formatNimcDate(new Date().toISOString().slice(0, 10));
   const issueDateSpaced = issueDateFormatted.split('').join(' ');
 
-  // Resize citizen photo to 585 x 760 (exact fit over silhouette without removing background)
-  let resizedPhoto: Buffer;
-  if (photoBuffer) {
-    try {
-      resizedPhoto = await sharp(photoBuffer)
-        .resize(585, 760, { fit: 'cover', position: 'top' })
-        .toBuffer();
-    } catch {
-      const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
-      resizedPhoto = await sharp(fs.readFileSync(defaultPhotoPath))
-        .resize(585, 760, { fit: 'cover' })
-        .toBuffer();
-    }
-  } else {
-    const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
-    resizedPhoto = await sharp(fs.readFileSync(defaultPhotoPath))
-      .resize(585, 760, { fit: 'cover' })
-      .toBuffer();
-  }
-
-  // Generate SVG overlay for front card image (2576 x 1632)
-  const svgOverlay = Buffer.from(`
-    <svg width="2576" height="1632" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <style>
-          @font-face {
-            font-family: 'OCRB';
-            src: url('data:font/truetype;charset=utf-8;base64,${fontB64}') format('truetype');
-          }
-          .ocrb-text {
-            font-family: 'OCRB', monospace;
-            fill: #000000;
-            font-weight: 500;
-          }
-          .watermark {
-            font-family: 'OCRB', monospace;
-            fill: #006633;
-            opacity: 0.16;
-            font-size: 70px;
-            letter-spacing: 4px;
-          }
-        </style>
-      </defs>
-
-      <!-- Diagonal Watermarks -->
-      <g transform="rotate(35, 300, 1420)">
-        <text x="150" y="1420" class="watermark">${ninFormatted}</text>
-      </g>
-      <g transform="rotate(-35, 2050, 1380)">
-        <text x="1900" y="1380" class="watermark">${ninFormatted}</text>
-      </g>
-      <g transform="rotate(35, 2350, 830)">
-        <text x="2150" y="830" class="watermark">${ninFormatted}</text>
-      </g>
-
-      <!-- Citizen Details -->
-      <text x="795" y="620" font-size="58" class="ocrb-text">${surname}</text>
-      <text x="795" y="810" font-size="58" class="ocrb-text">${givenNames}</text>
-      <text x="795" y="1025" font-size="58" class="ocrb-text">${dobSpaced}</text>
-      <text x="1500" y="1025" font-size="58" class="ocrb-text">${genderChar}</text>
-      <text x="1945" y="1120" font-size="58" class="ocrb-text">${issueDateSpaced}</text>
-      <text x="470" y="1520" font-size="160" class="ocrb-text">${ninSpaced}</text>
-    </svg>
-  `);
-
-  const cardImageBuffer = await sharp(frontTemplateBytes)
-    .composite([
-      { input: resizedPhoto, top: 422, left: 99 },
-      { input: svgOverlay, top: 0, left: 0 },
-    ])
-    .png()
-    .toBuffer();
-
-  const cardImageBase64 = `data:image/png;base64,${cardImageBuffer.toString('base64')}`;
-  const cardBackBase64 = `data:image/jpeg;base64,${backTemplateBytes.toString('base64')}`;
-
-  // 2. Generate printable A4 PDF (Front on top, Back immediately below) in ~20ms
+  // 1. Generate printable A4 PDF (Front on top, Back immediately below) in ~25ms
   const doc = await PDFDocument.create();
   const fontkitPkg = require('@pdf-lib/fontkit');
   doc.registerFontkit(fontkitPkg);
@@ -774,14 +696,37 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
     height: 434.736,
   });
 
-  // Photo on A4 sheet
-  const a4PhotoImg = await doc.embedJpg(await sharp(resizedPhoto).jpeg().toBuffer());
-  page.drawImage(a4PhotoImg, {
-    x: 182.25,
-    y: 593.712,
-    width: 54.023,
-    height: 71.928,
-  });
+  // Citizen Photo on A4 sheet
+  if (photoBuffer && photoBuffer.length > 0) {
+    try {
+      let a4PhotoImg;
+      try {
+        a4PhotoImg = await doc.embedJpg(photoBuffer);
+      } catch {
+        a4PhotoImg = await doc.embedPng(photoBuffer);
+      }
+      page.drawImage(a4PhotoImg, {
+        x: 182.25,
+        y: 593.712,
+        width: 54.023,
+        height: 71.928,
+      });
+    } catch {
+      // Graceful fallback to default photo
+      try {
+        const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
+        if (fs.existsSync(defaultPhotoPath)) {
+          const a4PhotoImg = await doc.embedJpg(fs.readFileSync(defaultPhotoPath));
+          page.drawImage(a4PhotoImg, {
+            x: 182.25,
+            y: 593.712,
+            width: 54.023,
+            height: 71.928,
+          });
+        }
+      } catch {}
+    }
+  }
 
   // Text on A4 sheet
   page.drawText(' ' + surname, { x: 249.12, y: 644.764, size: 8.0, font: ocrbFont, color: rgb(0, 0, 0) });
@@ -815,13 +760,15 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
   const pdfBytes = await doc.save();
   const pdfBuffer = Buffer.from(pdfBytes);
   const pdfBase64 = `data:application/pdf;base64,${pdfBuffer.toString('base64')}`;
+  const cardBackBase64 = backTemplateBytes.length ? `data:image/jpeg;base64,${backTemplateBytes.toString('base64')}` : '';
+  const cardImageBase64 = frontTemplateBytes.length ? `data:image/jpeg;base64,${frontTemplateBytes.toString('base64')}` : '';
 
   return {
     cardImageBase64,
     cardBackBase64,
     pdfBase64,
     pdfBuffer,
-    cardImageBuffer,
+    cardImageBuffer: frontTemplateBytes,
   };
 }
 

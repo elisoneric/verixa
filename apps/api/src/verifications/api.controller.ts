@@ -542,7 +542,7 @@ export class ApiController {
       'nin_premium',
       nin,
       query,
-      150,
+      120,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, ...query, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, ...query, tier: 'premium' }))
     );
   }
@@ -560,7 +560,7 @@ export class ApiController {
       'nin_premium',
       nin,
       payload,
-      150,
+      120,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: 'premium' }))
     );
   }

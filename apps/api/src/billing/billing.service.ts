@@ -202,9 +202,9 @@ export class BillingService {
     if (isAdmin) {
       const configMap = await this.getConfigMap();
       const dojahCosts: Record<string, number> = {
-        nin: parseInt(configMap['DOJAH_COST_NIN'] || '90', 10),
-        nin_advance: parseInt(configMap['DOJAH_COST_NIN_ADVANCE'] || '90', 10),
-        nin_premium: parseInt(configMap['DOJAH_COST_NIN_PREMIUM'] || '110', 10),
+        nin: parseInt(configMap['DOJAH_COST_NIN'] || '60', 10),
+        nin_advance: parseInt(configMap['DOJAH_COST_NIN_ADVANCE'] || '85', 10),
+        nin_premium: parseInt(configMap['DOJAH_COST_NIN_PREMIUM'] || '60', 10),
         nin_slip: parseInt(configMap['DOJAH_COST_NIN_SLIP'] || '180', 10),
         bvn: parseInt(configMap['DOJAH_COST_BVN'] || '70', 10),
         bvn_advance: parseInt(configMap['DOJAH_COST_BVN_ADVANCE'] || '90', 10),
