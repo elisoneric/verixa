@@ -53,6 +53,9 @@ export default function DashboardOverviewPage() {
       : balance?.sandbox.balance ?? 100000
 
   const dva = balance?.dedicatedVirtualAccount
+  const isPlatformSuperAdmin = Boolean(
+    user?.role === "super_admin" || user?.role === "SuperAdmin" || user?.is_super_admin === true || balance?.isAdmin === true
+  )
 
   const liveCalls = metrics.liveRequests ?? Math.round(metrics.totalRequests * 0.6)
   const cacheCalls = metrics.cacheRequests ?? (metrics.totalRequests - liveCalls)
@@ -139,127 +142,193 @@ export default function DashboardOverviewPage() {
       </div>
 
       {/* Prominent Wallet & Easy Deposit Card */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          {/* Balance Block (Left Column) */}
-          <div className="lg:col-span-5 space-y-3 lg:border-r lg:border-slate-100 lg:pr-6">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Available Wallet Balance
-              </span>
-              <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                1 NGX = ₦1.00
-              </span>
-            </div>
-
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-mono">
-                ₦{currentBalance.toLocaleString()}
-              </span>
-              <span className="text-sm font-semibold text-slate-500">NGX</span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              {environment === "live" ? (
-                <button
-                  type="button"
-                  onClick={() => setTopupModalOpen(true)}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <span>Deposit Funds</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleSandboxFaucet}
-                  disabled={isFaucetLoading}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <span>{isFaucetLoading ? "Adding..." : "Add 10,000 Test Credits"}</span>
-                </button>
-              )}
-
-              <Link
-                href="/dashboard/billing"
-                className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
-              >
-                Billing Details →
-              </Link>
-            </div>
-          </div>
-
-          {/* Dedicated Virtual Account Block (Right Column) */}
-          <div className="lg:col-span-7">
-            {dva ? (
-              <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
-                      Dedicated Bank Transfer Account
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded">
-                    Instant Auto-Credit
-                  </span>
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white border border-slate-200 rounded-lg p-3">
-                  <div className="min-w-0 flex-1">
-                    <span className="text-[11px] text-slate-500 uppercase block font-medium truncate">
-                      {dva.bankName}
-                    </span>
-                    <span className="text-xl font-bold font-mono text-slate-900 tracking-wider block break-all">
-                      {dva.accountNumber}
-                    </span>
-                    <span className="text-xs text-slate-600 block mt-0.5 truncate">
-                      {dva.accountName}
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleCopyAccount(dva.accountNumber)}
-                    className="self-start sm:self-center px-3.5 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
-                  >
-                    <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                    </svg>
-                    <span>{copiedDva ? "Copied!" : "Copy Account"}</span>
-                  </button>
-                </div>
-
-                <p className="text-[11px] text-slate-500">
-                  Transfer directly from any Nigerian banking app (GTBank, Zenith, Access, Kuda, OPay, Moniepoint). Credits apply instantly 24/7.
-                </p>
+      {isPlatformSuperAdmin ? (
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            {/* Admin Usage Block (Left Column) */}
+            <div className="lg:col-span-7 space-y-3 lg:border-r lg:border-slate-100 lg:pr-6">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Admin Platform Mode • Direct Upstream Settlement
+                </span>
+                <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  UNLIMITED BYPASS
+                </span>
               </div>
-            ) : (
-              <div className="rounded-xl bg-slate-50 border border-dashed border-slate-300 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="space-y-1">
-                  <span className="text-xs font-bold text-slate-900 block">
-                    Automated Bank Transfer Deposit
-                  </span>
-                  <p className="text-xs text-slate-500">
-                    Get a dedicated virtual account in your name for 24/7 automated wallet funding.
-                  </p>
-                </div>
+
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-mono">
+                  ₦{(balance?.adminUsageCost ?? 0).toLocaleString()}.00
+                </span>
+                <span className="text-sm font-semibold text-slate-500">Direct Dojah Cost Incurred</span>
+              </div>
+
+              <p className="text-xs text-slate-500 leading-relaxed">
+                As a platform administrator, all your identity lookups run with direct upstream Dojah settlement. No wallet pre-funding or balance deposits are required.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 <Link
-                  href="/dashboard/billing"
-                  className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors shrink-0 text-center"
+                  href="/admin/revenue"
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
-                  Setup Virtual Account →
+                  <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <span>Admin Revenue & Profit Ledger →</span>
+                </Link>
+                <Link
+                  href="/dashboard/verify"
+                  className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
+                >
+                  Verify ID
                 </Link>
               </div>
-            )}
+            </div>
+
+            {/* Admin Metrics Block (Right Column) */}
+            <div className="lg:col-span-5 bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2.5">
+              <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block font-bold">
+                Upstream Settlement Status
+              </span>
+              <div className="flex items-center justify-between text-xs py-1.5 border-b border-slate-200/60">
+                <span className="text-slate-600">Total Live Invocations</span>
+                <span className="font-mono font-bold text-slate-900">{balance?.adminCallsCount ?? metrics?.totalRequests ?? 0}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs py-1.5 border-b border-slate-200/60">
+                <span className="text-slate-600">Pricing Schedule</span>
+                <span className="font-mono font-bold text-emerald-700">Dojah Buy Rate (Direct)</span>
+              </div>
+              <div className="flex items-center justify-between text-xs py-1.5">
+                <span className="text-slate-600">Prepaid Deposit Gate</span>
+                <span className="font-mono font-bold text-slate-500">Exempt (Cleared)</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            {/* Balance Block (Left Column) */}
+            <div className="lg:col-span-5 space-y-3 lg:border-r lg:border-slate-100 lg:pr-6">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Available Wallet Balance
+                </span>
+                <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  1 NGX = ₦1.00
+                </span>
+              </div>
+
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-mono">
+                  ₦{currentBalance.toLocaleString()}
+                </span>
+                <span className="text-sm font-semibold text-slate-500">NGX</span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                {environment === "live" ? (
+                  <button
+                    type="button"
+                    onClick={() => setTopupModalOpen(true)}
+                    className="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Deposit Funds</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSandboxFaucet}
+                    disabled={isFaucetLoading}
+                    className="px-4 py-2 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>{isFaucetLoading ? "Adding..." : "Add 10,000 Test Credits"}</span>
+                  </button>
+                )}
+
+                <Link
+                  href="/dashboard/billing"
+                  className="px-3.5 py-2 text-xs font-medium rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
+                >
+                  Billing Details →
+                </Link>
+              </div>
+            </div>
+
+            {/* Dedicated Virtual Account Block (Right Column) */}
+            <div className="lg:col-span-7">
+              {dva ? (
+                <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                        Dedicated Bank Transfer Account
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded">
+                      Instant Auto-Credit
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white border border-slate-200 rounded-lg p-3">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[11px] text-slate-500 uppercase block font-medium truncate">
+                        {dva.bankName}
+                      </span>
+                      <span className="text-xl font-bold font-mono text-slate-900 tracking-wider block break-all">
+                        {dva.accountNumber}
+                      </span>
+                      <span className="text-xs text-slate-600 block mt-0.5 truncate">
+                        {dva.accountName}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleCopyAccount(dva.accountNumber)}
+                      className="self-start sm:self-center px-3.5 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
+                    >
+                      <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                      </svg>
+                      <span>{copiedDva ? "Copied!" : "Copy Account"}</span>
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-slate-500">
+                    Transfer directly from any Nigerian banking app (GTBank, Zenith, Access, Kuda, OPay, Moniepoint). Credits apply instantly 24/7.
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-xl bg-slate-50 border border-dashed border-slate-300 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="space-y-1">
+                    <span className="text-xs font-bold text-slate-900 block">
+                      Automated Bank Transfer Deposit
+                    </span>
+                    <p className="text-xs text-slate-500">
+                      Get a dedicated virtual account in your name for 24/7 automated wallet funding.
+                    </p>
+                  </div>
+                  <Link
+                    href="/dashboard/billing"
+                    className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors shrink-0 text-center"
+                  >
+                    Setup Virtual Account →
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Metrics Cards Grid (Mobile responsive: 1 col on mobile, 2 on sm, 4 on lg) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Headers, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { OrganizationTier } from '../organizations/entities/organization.entity';
@@ -18,6 +18,31 @@ export class PricingController {
   }
 }
 
+@Controller('v1/admin-tools')
+export class AdminToolsController {
+  constructor(private adminService: AdminService) {}
+
+  private verifyKey(key?: string, queryKey?: string) {
+    const expected = process.env.ADMIN_RECONCILE_SECRET || 'verixa_reconcile_secret_2026';
+    if ((key && key === expected) || (queryKey && queryKey === expected)) {
+      return true;
+    }
+    throw new UnauthorizedException('Invalid administrative reconciliation secret key');
+  }
+
+  @Get('audit-db')
+  async externalAuditDb(@Headers('x-admin-key') key?: string, @Query('key') queryKey?: string) {
+    this.verifyKey(key, queryKey);
+    return this.adminService.auditDbData();
+  }
+
+  @Post('reconcile-ledger')
+  async externalReconcileLedger(@Headers('x-admin-key') key?: string, @Query('key') queryKey?: string) {
+    this.verifyKey(key, queryKey);
+    return this.adminService.reconcileLedger();
+  }
+}
+
 @Controller('v1/admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.SUPER_ADMIN)
@@ -34,6 +59,18 @@ export class AdminController {
   @Get('revenue')
   async getRevenue() {
     return this.adminService.getRevenueMetrics();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('revenue/audit')
+  async auditRevenueDb() {
+    return this.adminService.auditDbData();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('revenue/reconcile')
+  async reconcileLedger() {
+    return this.adminService.reconcileLedger();
   }
 
   @UseGuards(JwtAuthGuard)

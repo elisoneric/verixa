@@ -4,8 +4,9 @@ import { Repository, DataSource, In } from 'typeorm';
 import { Wallet } from './entities/wallet.entity';
 import { Transaction, TransactionStatus } from './entities/transaction.entity';
 import { Environment, EnvironmentConfig } from '../organizations/entities/environment-config.entity';
-import { User } from '../users/entities/user.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 import { Organization, OrganizationTier } from '../organizations/entities/organization.entity';
+import { VerificationLog, VerificationStatus } from '../verifications/entities/verification-log.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SystemConfig } from '../admin/entities/system-config.entity';
 import { PaystackService } from './paystack.service';
@@ -28,6 +29,10 @@ export class BillingService {
     private configRepository: Repository<SystemConfig>,
     @InjectRepository(EnvironmentConfig)
     private envConfigRepository: Repository<EnvironmentConfig>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(VerificationLog)
+    private verifyLogRepository: Repository<VerificationLog>,
     private notificationsService: NotificationsService,
     private paystackService: PaystackService,
   ) {}
@@ -161,11 +166,62 @@ export class BillingService {
     };
   }
 
+  async isSuperAdminOrg(orgId: string): Promise<boolean> {
+    const adminEmails = (process.env.ADMIN_EMAILS || 'admin@verixaid.com,elisoneric@gmail.com')
+      .split(',')
+      .map((e) => e.trim().toLowerCase());
+    
+    const users = await this.userRepository.find({ where: { org_id: orgId } });
+    const hasAdminUser = users.some(u => 
+      u.role === UserRole.SUPER_ADMIN || adminEmails.includes((u.email || '').toLowerCase())
+    );
+    if (hasAdminUser) return true;
+
+    const org = await this.orgRepository.findOne({ where: { id: orgId } });
+    if (org) {
+      if (
+        org.name?.toLowerCase().includes('verixa admin') || 
+        (org.complianceData as any)?.isAdminOrg === true
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   async getBalance(orgId: string) {
     const org = await this.orgRepository.findOne({ where: { id: orgId } });
     const wallets = await this.walletRepository.find({ where: { org_id: orgId } });
     const liveWallet = wallets.find((w) => w.environment === Environment.LIVE);
     const sandboxWallet = wallets.find((w) => w.environment === Environment.SANDBOX);
+    const isAdmin = await this.isSuperAdminOrg(orgId);
+
+    // If admin org, calculate direct upstream usage at Dojah rates
+    let adminUsageCost = 0;
+    let adminCallsCount = 0;
+    if (isAdmin) {
+      const configMap = await this.getConfigMap();
+      const dojahCosts: Record<string, number> = {
+        nin: parseInt(configMap['DOJAH_COST_NIN'] || '90', 10),
+        nin_advance: parseInt(configMap['DOJAH_COST_NIN_ADVANCE'] || '90', 10),
+        nin_premium: parseInt(configMap['DOJAH_COST_NIN_PREMIUM'] || '110', 10),
+        nin_slip: parseInt(configMap['DOJAH_COST_NIN_SLIP'] || '180', 10),
+        bvn: parseInt(configMap['DOJAH_COST_BVN'] || '70', 10),
+        bvn_advance: parseInt(configMap['DOJAH_COST_BVN_ADVANCE'] || '90', 10),
+        cac: parseInt(configMap['DOJAH_COST_CAC'] || '85', 10),
+        phone: parseInt(configMap['DOJAH_COST_PHONE'] || '35', 10),
+        nuban: parseInt(configMap['DOJAH_COST_NUBAN'] || '0', 10),
+      };
+
+      const adminLogs = await this.verifyLogRepository.find({
+        where: { org_id: orgId, environment: Environment.LIVE, status: VerificationStatus.SUCCESS },
+      });
+      adminCallsCount = adminLogs.length;
+      for (const log of adminLogs) {
+        const sType = (log.serviceType || '').toLowerCase();
+        adminUsageCost += dojahCosts[sType] || 0;
+      }
+    }
 
     const bvnLive = await this.getEffectiveRate(orgId, 'bvn', false);
     const ninLive = await this.getEffectiveRate(orgId, 'nin', false);
@@ -186,8 +242,12 @@ export class BillingService {
     const orgDva = (org?.complianceData as any)?.dva;
 
     return {
+      isAdmin,
+      unlimitedUsage: isAdmin,
+      adminUsageCost: isAdmin ? adminUsageCost : undefined,
+      adminCallsCount: isAdmin ? adminCallsCount : undefined,
       live: {
-        balance: liveWallet ? Number(liveWallet.balance) : 0,
+        balance: isAdmin ? 0 : (liveWallet ? Number(liveWallet.balance) : 0),
         currency: 'NGX',
       },
       sandbox: {
@@ -329,18 +389,26 @@ export class BillingService {
     await queryRunner.startTransaction();
 
     try {
-      const wallet = await queryRunner.manager.findOne(Wallet, {
+      let wallet = await queryRunner.manager.findOne(Wallet, {
         where: { org_id: orgId, environment: targetEnv },
         lock: { mode: 'pessimistic_write' },
       });
 
       if (!wallet) {
-        throw new BadRequestException('Wallet not found for this environment');
+        wallet = new Wallet();
+        wallet.org_id = orgId;
+        wallet.environment = targetEnv;
+        wallet.balance = 0;
+        await queryRunner.manager.save(wallet);
       }
+
+      // Check if this is an admin organization
+      const isAdmin = await this.isSuperAdminOrg(orgId);
 
       // Check organization overdraft / postpaid allowance
       const org = await queryRunner.manager.findOne(Organization, { where: { id: orgId } });
       const allowOverdraft = 
+        isAdmin ||
         org?.complianceData?.allowOverdraft === true || 
         org?.complianceData?.postpaidEnabled === true ||
         org?.id === 'efc85dad-a353-4a80-a0ab-37ba9a6f1a24' ||
@@ -349,15 +417,22 @@ export class BillingService {
       const overdraftLimit = org?.complianceData?.overdraftLimit ?? 500000;
       const currentBalance = Number(wallet.balance) || 0;
 
-      if (!allowOverdraft && currentBalance < amount) {
-        throw new BadRequestException(`Insufficient NGX balance. Required: ${amount} NGX, Available: ${currentBalance} NGX`);
+      // Regular users are subject to wallet balance checks; admin bypasses all balance checks
+      if (!isAdmin) {
+        if (!allowOverdraft && currentBalance < amount) {
+          throw new BadRequestException(`Insufficient NGX balance. Required: ${amount} NGX, Available: ${currentBalance} NGX`);
+        }
+
+        if (allowOverdraft && (currentBalance - amount) < -overdraftLimit) {
+          throw new BadRequestException(`Postpaid overdraft limit exceeded (-₦${overdraftLimit.toLocaleString()}). Current balance: ${currentBalance} NGX`);
+        }
+
+        wallet.balance = currentBalance - amount;
+      } else {
+        // Admin balance is kept at 0; usage is recorded directly at Dojah pricing
+        wallet.balance = 0;
       }
 
-      if (allowOverdraft && (currentBalance - amount) < -overdraftLimit) {
-        throw new BadRequestException(`Postpaid overdraft limit exceeded (-₦${overdraftLimit.toLocaleString()}). Current balance: ${currentBalance} NGX`);
-      }
-
-      wallet.balance = currentBalance - amount;
       await queryRunner.manager.save(wallet);
 
       const transaction = new Transaction();
@@ -365,13 +440,15 @@ export class BillingService {
       transaction.amount = -amount;
       transaction.status = TransactionStatus.COMPLETED;
       transaction.referenceId = referenceId;
-      transaction.description = `API Verification (${targetEnv.toUpperCase()})`;
+      transaction.description = isAdmin 
+        ? `Admin Direct Verification (${targetEnv.toUpperCase()})` 
+        : `API Verification (${targetEnv.toUpperCase()})`;
 
       await queryRunner.manager.save(transaction);
       await queryRunner.commitTransaction();
 
-      // Dispatch low balance warning if live wallet dips below threshold
-      if (targetEnv === Environment.LIVE && Number(wallet.balance) < 1000) {
+      // Dispatch low balance warning if live wallet dips below threshold (skip for admin)
+      if (!isAdmin && targetEnv === Environment.LIVE && Number(wallet.balance) < 1000) {
         this.orgRepository.findOne({ where: { id: orgId }, relations: { users: true } }).then((org) => {
           if (org?.users?.length) {
             org.users.forEach((u) => {

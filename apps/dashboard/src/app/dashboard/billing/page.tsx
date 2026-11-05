@@ -174,7 +174,17 @@ export default function BillingPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {environment === "sandbox" ? (
+          {balance?.isAdmin ? (
+            <Link
+              href="/admin/revenue"
+              className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
+            >
+              <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <span>Admin Revenue & Profit Ledger →</span>
+            </Link>
+          ) : environment === "sandbox" ? (
             <button
               type="button"
               onClick={handleSandboxFaucet}
@@ -210,7 +220,37 @@ export default function BillingPage() {
 
       {/* Financial Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* Current Balance Card */}
+        {/* Current Balance / Admin Usage Card */}
+        {balance?.isAdmin ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 flex flex-col justify-between shadow-xs">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 font-mono">
+                  Admin Platform Engine
+                </span>
+                <Badge variant="verified" size="sm">
+                  DIRECT DOJAH USAGE
+                </Badge>
+              </div>
+
+              <div className="mt-4 flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold font-mono tracking-tight text-slate-900">
+                  ₦{(balance?.adminUsageCost ?? 0).toLocaleString()}.00
+                </span>
+                <span className="text-sm font-semibold text-slate-500">Incurred Cost</span>
+              </div>
+
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                Admin accounts bypass all balance checks and run at direct Dojah wholesale pricing. Balance requirements are cleared.
+              </p>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+              <span className="text-slate-500">Calls executed: <strong className="text-slate-800">{balance?.adminCallsCount ?? 0}</strong></span>
+              <span className="text-emerald-700 font-bold">Wallet Pre-funding: Exempt</span>
+            </div>
+          </div>
+        ) : (
         <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 flex flex-col justify-between shadow-xs">
           <div>
             <div className="flex items-center justify-between">
@@ -256,6 +296,7 @@ export default function BillingPage() {
             </button>
           </div>
         </div>
+        )}
 
         {/* Dedicated Virtual Account Card */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 flex flex-col justify-between shadow-xs">

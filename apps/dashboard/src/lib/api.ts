@@ -67,6 +67,10 @@ export interface VerificationResultPayload<T = Record<string, any>> {
 }
 
 export interface BalanceData {
+  isAdmin?: boolean
+  unlimitedUsage?: boolean
+  adminUsageCost?: number
+  adminCallsCount?: number
   live: { balance: number; currency: string }
   sandbox: { balance: number; currency: string }
   dedicatedVirtualAccount: {
@@ -626,6 +630,7 @@ export class ApiClient {
   static async getAdminRevenue() {
     return this.request<{
       totalDepositedNgx: number
+      trueDeposits?: Array<{ amount: number; label: string; orgName?: string; createdAt?: string }>
       totalConsumedNgx: number
       realCostSpentNgx?: number
       netProfitNgx?: number
@@ -651,6 +656,35 @@ export class ApiClient {
         createdAt: string
       }>
     }>("/v1/admin/revenue")
+  }
+
+  static async auditAdminRevenueDb() {
+    return this.request<{
+      trueDepositedTotal: number
+      genuineDepositsCount: number
+      genuineDeposits: Array<any>
+      testDepositsCount: number
+      testDepositsTotal: number
+      testDeposits: Array<any>
+      actualDojahCallsCount: number
+      actualDojahCostSpent: number
+      customerBilledTotal: number
+      netTrueProfit: number
+      callsBreakdown: Record<string, any>
+    }>("/v1/admin/revenue/audit")
+  }
+
+  static async reconcileAdminLedger() {
+    return this.request<{
+      success: boolean
+      message: string
+      purgedTestDepositsCount: number
+      genuineDepositsRetainedCount: number
+      trueTotalDepositsNgx: number
+      adminWalletsResetCount: number
+    }>("/v1/admin/revenue/reconcile", {
+      method: "POST",
+    })
   }
 
   static async getAdminLogs(params?: {

@@ -1,7 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminService } from './admin.service';
-import { AdminController, PricingController } from './admin.controller';
+import { AdminController, PricingController, AdminToolsController } from './admin.controller';
 import { SystemConfig } from './entities/system-config.entity';
 import { Organization } from '../organizations/entities/organization.entity';
 import { Transaction } from '../billing/entities/transaction.entity';
@@ -23,7 +23,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
       User,
     ])
   ],
-  controllers: [AdminController, PricingController],
+  controllers: [AdminController, PricingController, AdminToolsController],
   providers: [AdminService, RolesGuard],
   exports: [AdminService],
 })

@@ -10,6 +10,8 @@ import { SystemConfig } from '../admin/entities/system-config.entity';
 import { ApiKey } from '../auth/entities/api-key.entity';
 import { EnvironmentConfig } from '../organizations/entities/environment-config.entity';
 import { DualAuthGuard } from '../auth/guards/dual-auth.guard';
+import { User } from '../users/entities/user.entity';
+import { VerificationLog } from '../verifications/entities/verification-log.entity';
 
 @Global()
 @Module({
@@ -20,7 +22,9 @@ import { DualAuthGuard } from '../auth/guards/dual-auth.guard';
       Organization, 
       SystemConfig, 
       ApiKey, 
-      EnvironmentConfig
+      EnvironmentConfig,
+      User,
+      VerificationLog,
     ])
   ],
   controllers: [BillingController],
