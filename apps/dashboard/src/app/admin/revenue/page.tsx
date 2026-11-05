@@ -17,8 +17,8 @@ export default function AdminRevenuePage() {
 
   // Upstream Buy-Rates Form State
   const [upstreamRates, setUpstreamRates] = React.useState({
-    nin: "90",
-    ninAdvance: "90",
+    nin: "60",
+    ninAdvance: "60",
     ninPremium: "110",
     ninSlip: "180",
     bvn: "70",
