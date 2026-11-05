@@ -100,6 +100,7 @@ export class ApiController {
     let rateKey: any = 'nin';
     if (service === 'nin_advance') rateKey = 'nin_advance';
     else if (service === 'nin_slip') rateKey = 'nin_slip';
+    else if (service === 'nin_premium') rateKey = 'nin_premium';
     else if (service === 'bvn' || service === 'bvn_advance' || service === 'bvn_face_match') rateKey = 'bvn';
     else if (service === 'cac') rateKey = 'cac';
     else if (service === 'phone') rateKey = 'phone';
