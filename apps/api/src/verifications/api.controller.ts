@@ -112,8 +112,16 @@ export class ApiController {
     if (identifier) {
       const notFoundCached = await this.identityCacheService.getNotFoundRecord(service, identifier);
       if (notFoundCached) {
-        const latencyMs = Math.max(5, Date.now() - startTime);
+        const cacheRateInfo = await this.billingService.getEffectiveRate(orgId, rateKey, true);
+        const cacheCost = exactPrice !== undefined ? Math.round(exactPrice * 0.5) : cacheRateInfo.effectiveRate;
         const reference = `vx_neg_${uuidv4().slice(0, 12)}`;
+
+        // Model A: Bill discounted cache fee (e.g. ₦50) because Verixa verified identity non-existence via cache
+        if (orgId) {
+          await this.billingService.deductCredits(orgId, env, cacheCost, reference);
+        }
+
+        const latencyMs = Math.max(5, Date.now() - startTime);
 
         await this.logRepository.save({
           org_id: orgId,
@@ -124,7 +132,7 @@ export class ApiController {
           upstreamProvider: 'verixa_negative_cache',
           isCached: true,
           source: 'CACHE',
-          costDeducted: 0,
+          costDeducted: cacheCost,
           latencyMs,
           cacheKey: this.identityCacheService.generateNotFoundKey(service, identifier),
           idempotencyKey: req.headers?.['idempotency-key'] || undefined,
@@ -136,15 +144,16 @@ export class ApiController {
           try {
             req.res.setHeader('X-Request-Id', reference);
             req.res.setHeader('X-Cached', 'true');
-            req.res.setHeader('X-Billed-Amount', '0');
+            req.res.setHeader('X-Billed-Amount', String(cacheCost));
             req.res.setHeader('X-Latency-Ms', String(latencyMs));
           } catch {}
         }
 
         throw new NotFoundException({
-          status: 'error',
           statusCode: 404,
+          error: 'Not Found',
           message: `Identity record not found for ${service} (${identifier}). Verified via upstream registry cache.`,
+          billed_amount: cacheCost,
           cached: true,
         });
       }
@@ -241,19 +250,14 @@ export class ApiController {
     try {
       result = await this.identityCacheService.deduplicateRequest(dedupKey, () => queryFn());
     } catch (err: any) {
-      // Auto-refund deducted credits immediately if upstream gateway failed
-      if (orgId) {
-        try {
-          await this.billingService.refundCredits(orgId, env, finalPrice, reference);
-        } catch {
-          // ignore refund error
-        }
-      }
-
-      // Check if upstream failure was a 404 Not Found (Missing Record)
+      // Check if upstream failure was a 404 Not Found (Missing / Unregistered Record)
       if (identifier && isUpstreamNotFoundError(err)) {
-        // Cache the 404 tombstone for 7 days so no one can repeatedly drain our wallet with this missing ID!
+        // Model A: Under industry standard, 404 is a completed identity query (Dojah charged ₦60).
+        // Retain pre-debited fee (e.g. ₦120). Verixa retains full profit margin and avoids out-of-pocket bleed!
+        // Cache the 404 tombstone for 7 days so subsequent queries are served from cache at ₦0 Dojah cost.
         await this.identityCacheService.setNotFoundRecord(service, identifier, 7);
+
+        const latencyMs = Math.max(35, Date.now() - startTime);
 
         await this.logRepository.save({
           org_id: orgId,
@@ -264,20 +268,39 @@ export class ApiController {
           upstreamProvider: 'direct',
           isCached: false,
           source: 'LIVE',
-          costDeducted: 0,
-          latencyMs: Date.now() - startTime,
+          costDeducted: finalPrice,
+          latencyMs,
           cacheKey: this.identityCacheService.generateNotFoundKey(service, identifier),
           idempotencyKey: req.headers?.['idempotency-key'] || undefined,
           requestPayload: payload,
           responsePayload: { error: 'Upstream 404: Record not found', upstreamMessage: err?.message },
         });
 
+        if (req.res && typeof req.res.setHeader === 'function') {
+          try {
+            req.res.setHeader('X-Request-Id', reference);
+            req.res.setHeader('X-Cached', 'false');
+            req.res.setHeader('X-Billed-Amount', String(finalPrice));
+            req.res.setHeader('X-Latency-Ms', String(latencyMs));
+          } catch {}
+        }
+
         throw new NotFoundException({
-          status: 'error',
           statusCode: 404,
+          error: 'Not Found',
           message: err.response?.data?.message || err.message || `Identity record not found for ${service} (${identifier})`,
+          billed_amount: finalPrice,
           cached: false,
         });
+      }
+
+      // ONLY refund if upstream gateway actually crashed, timed out, or had a 500 error!
+      if (orgId) {
+        try {
+          await this.billingService.refundCredits(orgId, env, finalPrice, reference);
+        } catch {
+          // ignore refund error
+        }
       }
 
       throw new BadRequestException(err.message || `Failed to verify ${service}`);

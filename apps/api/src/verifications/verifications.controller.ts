@@ -621,8 +621,14 @@ export class VerificationsController {
     if (!bypassCache && identifier) {
       const notFoundCached = await this.identityCacheService.getNotFoundRecord(serviceType, identifier);
       if (notFoundCached) {
-        const latencyMs = Math.max(5, Date.now() - startTime);
+        const cacheRate = await this.billingService.getEffectiveRate(req.organizationId, serviceType as any, true);
+        const cacheCost = cacheRate.effectiveRate;
         const reference = `vx_neg_${uuidv4().slice(0, 12)}`;
+
+        // Model A: Bill discounted cache fee because Verixa verified identity non-existence via cache
+        await this.billingService.deductCredits(req.organizationId, validEnv, cacheCost, reference);
+
+        const latencyMs = Math.max(5, Date.now() - startTime);
 
         await this.logRepository.save({
           org_id: req.organizationId,
@@ -633,7 +639,7 @@ export class VerificationsController {
           upstreamProvider: 'verixa_negative_cache',
           isCached: true,
           source: 'CACHE',
-          costDeducted: 0,
+          costDeducted: cacheCost,
           latencyMs,
           cacheKey: this.identityCacheService.generateNotFoundKey(serviceType, identifier),
           idempotencyKey: req.headers['idempotency-key'] || undefined,
@@ -642,9 +648,10 @@ export class VerificationsController {
         });
 
         throw new NotFoundException({
-          status: 'error',
           statusCode: 404,
+          error: 'Not Found',
           message: `Identity record not found for ${serviceType} (${identifier}). Verified via upstream registry cache.`,
+          billed_amount: cacheCost,
           cached: true,
         });
       }
@@ -764,11 +771,11 @@ export class VerificationsController {
         },
       };
     } catch (error: any) {
-      // Refund if upstream fails
-      await this.billingService.refundCredits(req.organizationId, validEnv, cost, reference);
-
       // Check if upstream failure was a 404 Not Found (Missing Record)
       if (identifier && isUpstreamNotFoundError(error)) {
+        // Model A: Under industry standard, 404 is a completed identity query (Dojah charged ₦60).
+        // Retain pre-debited fee. Verixa retains full profit margin and avoids out-of-pocket bleed!
+        // Cache the 404 tombstone for 7 days so subsequent queries are served from cache at ₦0 Dojah cost.
         await this.identityCacheService.setNotFoundRecord(serviceType, identifier, 7);
 
         await this.logRepository.save({
@@ -780,7 +787,7 @@ export class VerificationsController {
           upstreamProvider: 'direct',
           isCached: false,
           source: 'LIVE',
-          costDeducted: 0,
+          costDeducted: cost,
           latencyMs: Date.now() - startTime,
           cacheKey: this.identityCacheService.generateNotFoundKey(serviceType, identifier),
           idempotencyKey: req.headers['idempotency-key'] || undefined,
@@ -789,13 +796,16 @@ export class VerificationsController {
         });
 
         throw new NotFoundException({
-          status: 'error',
           statusCode: 404,
+          error: 'Not Found',
           message: error.response?.data?.message || error.message || `Identity record not found for ${serviceType} (${identifier})`,
+          billed_amount: cost,
           cached: false,
         });
       }
 
+      // ONLY refund if upstream provider actually crashed, timed out, or had a 500 error!
+      await this.billingService.refundCredits(req.organizationId, validEnv, cost, reference);
       throw new InternalServerErrorException(error?.message || 'Upstream provider failed');
     }
   }
