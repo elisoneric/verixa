@@ -17,7 +17,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { MockProvider } from './providers/mock.provider';
 import { DojahProvider } from './providers/dojah.provider';
 import { BillingService } from '../billing/billing.service';
-import { IdentityCacheService } from './identity-cache.service';
+import {
+  IdentityCacheService,
+  isUpstreamNotFoundError,
+  validateNationalIdFormat,
+} from './identity-cache.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VerificationLog, VerificationStatus } from './entities/verification-log.entity';
@@ -599,12 +603,52 @@ export class VerificationsController {
     providerCall: () => Promise<any>
   ) {
     const startTime = Date.now();
+
+    // Upfront input validation for National Identifiers to protect funds from malformed queries
+    const formatError = validateNationalIdFormat(serviceType, identifier);
+    if (formatError) {
+      throw new BadRequestException(formatError);
+    }
+
     const bypassCache =
       req.headers['x-bypass-cache'] === 'true' ||
       req.headers['x-refresh-cache'] === 'true' ||
       payload?.bypassCache === true;
 
     const validEnv = normalizeEnvironment(req.environment);
+
+    // 0. Check Negative Cache (Not-Found Tombstone): Prevents repeated upstream charges on missing IDs
+    if (!bypassCache && identifier) {
+      const notFoundCached = await this.identityCacheService.getNotFoundRecord(serviceType, identifier);
+      if (notFoundCached) {
+        const latencyMs = Math.max(5, Date.now() - startTime);
+        const reference = `vx_neg_${uuidv4().slice(0, 12)}`;
+
+        await this.logRepository.save({
+          org_id: req.organizationId,
+          environment: validEnv,
+          api_key_id: req.apiKeyId || 'sdk_key',
+          serviceType,
+          status: VerificationStatus.FAILED,
+          upstreamProvider: 'verixa_negative_cache',
+          isCached: true,
+          source: 'CACHE',
+          costDeducted: 0,
+          latencyMs,
+          cacheKey: this.identityCacheService.generateNotFoundKey(serviceType, identifier),
+          idempotencyKey: req.headers['idempotency-key'] || undefined,
+          requestPayload: maskPii(payload),
+          responsePayload: { error: 'Record not found (Negative Cache Hit)', cachedAt: notFoundCached.cachedAt },
+        });
+
+        throw new NotFoundException({
+          status: 'error',
+          statusCode: 404,
+          message: `Identity record not found for ${serviceType} (${identifier}). Verified via upstream registry cache.`,
+          cached: true,
+        });
+      }
+    }
 
     // 1. Check Smart Identity Cache (if enabled & not bypassed)
     if (!bypassCache && identifier) {
@@ -670,8 +714,9 @@ export class VerificationsController {
     await this.billingService.deductCredits(req.organizationId, validEnv, cost, reference);
 
     try {
-      // Execute Upstream Provider Call
-      const result = await providerCall();
+      // Execute Upstream Provider Call with Anti-Stampede Deduplication
+      const dedupKey = `${validEnv}:${serviceType}:${identifier || reference}`;
+      const result = await this.identityCacheService.deduplicateRequest(dedupKey, () => providerCall());
       const latencyMs = Math.max(135, Date.now() - startTime);
 
       // If lookup succeeded and returned data, store into Smart Identity Cache
@@ -718,10 +763,40 @@ export class VerificationsController {
           environment: validEnv,
         },
       };
-    } catch (error) {
+    } catch (error: any) {
       // Refund if upstream fails
       await this.billingService.refundCredits(req.organizationId, validEnv, cost, reference);
-      throw new InternalServerErrorException('Upstream provider failed');
+
+      // Check if upstream failure was a 404 Not Found (Missing Record)
+      if (identifier && isUpstreamNotFoundError(error)) {
+        await this.identityCacheService.setNotFoundRecord(serviceType, identifier, 7);
+
+        await this.logRepository.save({
+          org_id: req.organizationId,
+          environment: validEnv,
+          api_key_id: req.apiKeyId || 'sdk_key',
+          serviceType,
+          status: VerificationStatus.FAILED,
+          upstreamProvider: 'direct',
+          isCached: false,
+          source: 'LIVE',
+          costDeducted: 0,
+          latencyMs: Date.now() - startTime,
+          cacheKey: this.identityCacheService.generateNotFoundKey(serviceType, identifier),
+          idempotencyKey: req.headers['idempotency-key'] || undefined,
+          requestPayload: maskPii(payload),
+          responsePayload: { error: 'Upstream 404: Record not found', upstreamMessage: error?.message },
+        });
+
+        throw new NotFoundException({
+          status: 'error',
+          statusCode: 404,
+          message: error.response?.data?.message || error.message || `Identity record not found for ${serviceType} (${identifier})`,
+          cached: false,
+        });
+      }
+
+      throw new InternalServerErrorException(error?.message || 'Upstream provider failed');
     }
   }
 

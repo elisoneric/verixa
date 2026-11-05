@@ -18,7 +18,7 @@ export default function AdminRevenuePage() {
   // Upstream Buy-Rates Form State
   const [upstreamRates, setUpstreamRates] = React.useState({
     nin: "60",
-    ninAdvance: "60",
+    ninAdvance: "85",
     ninPremium: "110",
     ninSlip: "180",
     bvn: "70",
@@ -38,8 +38,8 @@ export default function AdminRevenuePage() {
         const incoming = res?.upstreamRates || res?.dojahRates
         if (incoming) {
           setUpstreamRates({
-            nin: String(incoming.nin ?? 90),
-            ninAdvance: String(incoming.ninAdvance ?? 90),
+            nin: String(incoming.nin ?? 60),
+            ninAdvance: String(incoming.ninAdvance ?? 85),
             ninPremium: String(incoming.ninPremium ?? 110),
             ninSlip: String(incoming.ninSlip ?? 180),
             bvn: String(incoming.bvn ?? 70),
