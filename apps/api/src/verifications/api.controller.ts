@@ -245,8 +245,19 @@ export class ApiController {
     } catch (err: any) {
       // Check if upstream failure was a 404 Not Found (Missing / Unregistered Record)
       if (identifier && isUpstreamNotFoundError(err)) {
-        // Model A: Under industry standard, 404 is a completed identity query (Dojah charged ₦60).
-        // Retain pre-debited fee (e.g. ₦120). Verixa retains full profit margin and avoids out-of-pocket bleed!
+        // User Policy: Bill for live 404 is strictly ₦60 (cost recovery of Dojah's ₦60 fee); repeat queries on cached 404 are ₦0.
+        const notFoundBillAmount = 60;
+        const refundAmount = Math.max(0, finalPrice - notFoundBillAmount);
+        if (orgId && refundAmount > 0) {
+          await this.billingService.refundCredits(
+            orgId,
+            env,
+            refundAmount,
+            reference,
+            `Refund: 404 Not Found standard rate adjustment (₦60 billed, ₦${refundAmount} refunded)`
+          );
+        }
+
         // Cache the 404 tombstone for 7 days so subsequent queries are served from cache at ₦0 Dojah cost.
         await this.identityCacheService.setNotFoundRecord(service, identifier, 7);
 
@@ -261,19 +272,19 @@ export class ApiController {
           upstreamProvider: 'direct',
           isCached: false,
           source: 'LIVE',
-          costDeducted: finalPrice,
+          costDeducted: notFoundBillAmount,
           latencyMs,
           cacheKey: this.identityCacheService.generateNotFoundKey(service, identifier),
           idempotencyKey: req.headers?.['idempotency-key'] || undefined,
           requestPayload: payload,
-          responsePayload: { error: 'Upstream 404: Record not found', upstreamMessage: err?.message },
+          responsePayload: { error: 'Upstream 404: Record not found', upstreamMessage: err?.message, billed: notFoundBillAmount },
         });
 
         if (req.res && typeof req.res.setHeader === 'function') {
           try {
             req.res.setHeader('X-Request-Id', reference);
             req.res.setHeader('X-Cached', 'false');
-            req.res.setHeader('X-Billed-Amount', String(finalPrice));
+            req.res.setHeader('X-Billed-Amount', String(notFoundBillAmount));
             req.res.setHeader('X-Latency-Ms', String(latencyMs));
           } catch {}
         }
@@ -282,7 +293,7 @@ export class ApiController {
           statusCode: 404,
           error: 'Not Found',
           message: err.response?.data?.message || err.message || `Identity record not found for ${service} (${identifier})`,
-          billed_amount: finalPrice,
+          billed_amount: notFoundBillAmount,
           cached: false,
         });
       }

@@ -468,7 +468,7 @@ export class BillingService {
     }
   }
 
-  async refundCredits(orgId: string, environment: Environment, amount: number, originalReferenceId: string): Promise<void> {
+  async refundCredits(orgId: string, environment: Environment, amount: number, originalReferenceId: string, description?: string): Promise<void> {
     const targetEnv = String(environment).toLowerCase() === 'live' ? Environment.LIVE : Environment.SANDBOX;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -490,7 +490,7 @@ export class BillingService {
       refundTx.amount = amount;
       refundTx.status = TransactionStatus.COMPLETED;
       refundTx.referenceId = `ref_${originalReferenceId}`;
-      refundTx.description = `Refund: Upstream provider failure (${originalReferenceId.slice(0, 8)})`;
+      refundTx.description = description || `Refund: Upstream provider failure (${originalReferenceId.slice(0, 8)})`;
 
       await queryRunner.manager.save(refundTx);
       await queryRunner.commitTransaction();
