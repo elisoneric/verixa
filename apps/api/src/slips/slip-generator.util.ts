@@ -692,7 +692,7 @@ export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string
       </clipPath>
       <style>
         .ocrb { font-family: 'Courier New', 'Consolas', monospace; font-weight: bold; fill: #000000; }
-        .wm { font-family: 'Courier New', 'Consolas', monospace; font-weight: bold; fill: #00552b; opacity: 0.18; }
+        .wm { font-family: 'Courier New', 'Consolas', monospace; font-weight: bold; fill: #325f2d; opacity: 0.42; }
       </style>
     </defs>
     <!-- 1. Authentic High-Definition Blank Template (2576 x 1632) -->
@@ -711,12 +711,12 @@ export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string
     <text x="2204" y="1100" class="ocrb" font-size="64" text-anchor="middle">${issueDateFormatted}</text>
 
     <!-- 5. National Identification Number (NIN): Big bold font, centered under title (center x = 1318) -->
-    <text x="1318" y="1490" class="ocrb" font-size="160" text-anchor="middle" letter-spacing="4">${ninFormatted}</text>
+    <text x="1318" y="1505" class="ocrb" font-size="160" text-anchor="middle" letter-spacing="4">${ninFormatted}</text>
 
     <!-- 6. Three Diagonal Watermarks (no space after 4th digit) -->
-    <text x="320" y="1380" class="wm" font-size="68" transform="rotate(35 320 1380)">${watermarkNin}</text>
-    <text x="2000" y="800" class="wm" font-size="68" transform="rotate(35 2000 800)">${watermarkNin}</text>
-    <text x="2190" y="1450" class="wm" font-size="68" transform="rotate(35 2190 1450)">${watermarkNin}</text>
+    <text x="120" y="1360" class="wm" font-size="72" transform="rotate(35 120 1360)">${watermarkNin}</text>
+    <text x="1950" y="780" class="wm" font-size="72" transform="rotate(35 1950 780)">${watermarkNin}</text>
+    <text x="2180" y="1420" class="wm" font-size="72" transform="rotate(35 2180 1420)">${watermarkNin}</text>
   </svg>`;
 }
 

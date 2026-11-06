@@ -146,10 +146,7 @@ export class MockProvider implements IVerificationProvider {
       status: 'success',
       data: {
         nin: data.nin,
-        card_image: cardImageBase64,
         image: cardImageBase64,
-        card_pdf: premiumPdfBase64,
-        pdf: premiumPdfBase64,
         first_name: firstName,
         last_name: lastName,
         gender: 'Male',
@@ -295,10 +292,7 @@ export class MockProvider implements IVerificationProvider {
       status: 'success',
       data: {
         nin: data.nin,
-        card_image: cardImageBase64,
         image: cardImageBase64,
-        card_pdf: premiumPdfBase64,
-        pdf: premiumPdfBase64,
         first_name: firstName,
         last_name: surname,
         middle_name: middleName,

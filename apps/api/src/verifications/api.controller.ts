@@ -192,6 +192,12 @@ export class ApiController {
         });
 
         const cleanEntity = cached.data?.entity !== undefined ? cached.data.entity : cached.data;
+        if (service === 'nin_premium' && cleanEntity && typeof cleanEntity === 'object') {
+          delete cleanEntity.card_image;
+          delete cleanEntity.card_pdf;
+          delete cleanEntity.pdf;
+          delete cleanEntity.nin_id;
+        }
 
         if (req.res && typeof req.res.setHeader === 'function') {
           try {
@@ -337,6 +343,12 @@ export class ApiController {
     });
 
     const cleanEntity = rawData?.entity !== undefined ? rawData.entity : rawData;
+    if (service === 'nin_premium' && cleanEntity && typeof cleanEntity === 'object') {
+      delete cleanEntity.card_image;
+      delete cleanEntity.card_pdf;
+      delete cleanEntity.pdf;
+      delete cleanEntity.nin_id;
+    }
 
     if (req.res && typeof req.res.setHeader === 'function') {
       try {

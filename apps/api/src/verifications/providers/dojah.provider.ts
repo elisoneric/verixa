@@ -261,11 +261,11 @@ export class DojahProvider implements IVerificationProvider {
             birthdate: entity.date_of_birth || entity.dob || entity.birthdate,
             photo: entity.photo,
           });
-          entity.card_image = cardRes.cardImageBase64;
           entity.image = cardRes.cardImageBase64;
-          entity.card_pdf = cardRes.pdfBase64;
-          entity.pdf = cardRes.pdfBase64;
-          entity.nin_id = cardRes.pdfBase64;
+          delete entity.card_image;
+          delete entity.card_pdf;
+          delete entity.pdf;
+          delete entity.nin_id;
         } catch (e: any) {
           this.logger.warn(`Could not generate NIMC Premium Card: ${e?.message}`);
         }
