@@ -46,7 +46,7 @@ export class NinSlipController {
     }
     const nin = String(body.nin || '').trim();
     const requestedFormat = String(body.format || '').toLowerCase();
-    const cardType: 'card' | 'slip' = body.cardType || body.type || (requestedFormat === 'card' ? 'card' : 'slip');
+    const cardType: 'card' | 'slip' | 'premium' = body.cardType || body.type || (requestedFormat === 'premium' ? 'premium' : (requestedFormat === 'card' ? 'card' : 'slip'));
     const fileType = body.fileType || (requestedFormat === 'docx' ? 'docx' : (requestedFormat === 'pdf' ? 'pdf' : 'both'));
 
     return this.ninSlipService.generateSlipForOrganization(
@@ -133,7 +133,7 @@ export class NinSlipController {
     }
     const nin = String(body.nin || '').trim();
     const requestedFormat = String(body.format || '').toLowerCase();
-    const cardType: 'card' | 'slip' = body.cardType || body.type || (requestedFormat === 'card' ? 'card' : 'slip');
+    const cardType: 'card' | 'slip' | 'premium' = body.cardType || body.type || (requestedFormat === 'premium' ? 'premium' : (requestedFormat === 'card' ? 'card' : 'slip'));
     const fileType = body.fileType || (requestedFormat === 'docx' ? 'docx' : (requestedFormat === 'pdf' ? 'pdf' : 'both'));
 
     return this.ninSlipService.generateSlipForOrganization(

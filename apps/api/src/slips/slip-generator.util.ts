@@ -638,10 +638,86 @@ export async function generatePaperSlipSvg(data: SlipData): Promise<string> {
 
 export interface NimcPremiumCardResult {
   cardImageBase64: string;
-  cardBackBase64: string;
+  cardSvg: string;
+  cardBackBase64?: string;
   pdfBase64: string;
   pdfBuffer: Buffer;
   cardImageBuffer?: Buffer;
+}
+
+export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string> {
+  const photoBuffer = resolveSlipPhotoBuffer(data.photo);
+  const frontTemplatePath = getSlipAssetPath('nimc_premium_front.jpg');
+  const frontBytes = fs.existsSync(frontTemplatePath) ? fs.readFileSync(frontTemplatePath) : Buffer.alloc(0);
+  const frontBase64 = `data:image/jpeg;base64,${frontBytes.toString('base64')}`;
+
+  const cleanNin = String(data.nin || '').replace(/\D/g, '');
+  const ninFormatted = cleanNin.length === 11 
+    ? `${cleanNin.slice(0, 4)} ${cleanNin.slice(4, 7)} ${cleanNin.slice(7)}`
+    : cleanNin;
+  
+  // Diagonal watermark: NO space after first 4 numbers! e.g. '3088241 1172'
+  const watermarkNin = cleanNin.length === 11
+    ? `${cleanNin.slice(0, 7)} ${cleanNin.slice(7)}`
+    : cleanNin;
+
+  const rawSurname = (data.surname || (data as any).last_name || '').toUpperCase().trim();
+  const surname = rawSurname;
+
+  const first = (data.firstName || (data as any).first_name || '').toUpperCase().trim();
+  const middle = (data.middleName || (data as any).middle_name || '').toUpperCase().trim();
+  const givenNames = [first, middle].filter(Boolean).join(' ');
+
+  const rawDob = data.birthdate || (data as any).dob || (data as any).date_of_birth;
+  const formattedDob = formatNimcDate(rawDob || '1990-01-01');
+
+  const genderChar = (data.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M';
+  const issueDateFormatted = formatNimcDate(new Date().toISOString().slice(0, 10));
+
+  let photoDataUri = '';
+  if (photoBuffer && photoBuffer.length > 0) {
+    photoDataUri = `data:image/jpeg;base64,${photoBuffer.toString('base64')}`;
+  } else {
+    const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
+    if (fs.existsSync(defaultPhotoPath)) {
+      photoDataUri = `data:image/jpeg;base64,${fs.readFileSync(defaultPhotoPath).toString('base64')}`;
+    }
+  }
+
+  // Exact 1:1 coordinates mapped from premium.webp onto the 2576 x 1632 canvas
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2576 1632" width="100%" height="100%">
+    <defs>
+      <clipPath id="photoClip">
+        <rect x="110" y="390" width="610" height="780" rx="35" ry="35" />
+      </clipPath>
+      <style>
+        .ocrb { font-family: 'Courier New', 'Consolas', monospace; font-weight: bold; fill: #000000; }
+        .wm { font-family: 'Courier New', 'Consolas', monospace; font-weight: bold; fill: #00552b; opacity: 0.18; }
+      </style>
+    </defs>
+    <!-- 1. Authentic High-Definition Blank Template (2576 x 1632) -->
+    <image href="${frontBase64}" x="0" y="0" width="2576" height="1632" />
+
+    <!-- 2. Citizen Photo strictly clipped inside portrait boundary (never exceeds card width) -->
+    ${photoDataUri ? `<image href="${photoDataUri}" x="110" y="390" width="610" height="780" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)" />` : ''}
+
+    <!-- 3. Left-Aligned Demographic Details (under respective titles) -->
+    <text x="802" y="605" class="ocrb" font-size="64">${surname}</text>
+    <text x="801" y="815" class="ocrb" font-size="64">${givenNames}</text>
+    <text x="801" y="1030" class="ocrb" font-size="64">${formattedDob}</text>
+    <text x="1458" y="1030" class="ocrb" font-size="64">${genderChar}</text>
+
+    <!-- 4. Issue Date: Centered directly under 'ISSUE DATE' title (center x = 2204) -->
+    <text x="2204" y="1100" class="ocrb" font-size="64" text-anchor="middle">${issueDateFormatted}</text>
+
+    <!-- 5. National Identification Number (NIN): Big bold font, centered under title (center x = 1318) -->
+    <text x="1318" y="1490" class="ocrb" font-size="160" text-anchor="middle" letter-spacing="4">${ninFormatted}</text>
+
+    <!-- 6. Three Diagonal Watermarks (no space after 4th digit) -->
+    <text x="320" y="1380" class="wm" font-size="68" transform="rotate(35 320 1380)">${watermarkNin}</text>
+    <text x="2000" y="800" class="wm" font-size="68" transform="rotate(35 2000 800)">${watermarkNin}</text>
+    <text x="2190" y="1450" class="wm" font-size="68" transform="rotate(35 2190 1450)">${watermarkNin}</text>
+  </svg>`;
 }
 
 export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremiumCardResult> {
@@ -655,6 +731,11 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
   const frontTemplateBytes = fs.existsSync(frontTemplatePath) ? fs.readFileSync(frontTemplatePath) : a4TemplateBytes;
   const backTemplateBytes = fs.existsSync(backTemplatePath) ? fs.readFileSync(backTemplatePath) : a4TemplateBytes;
   const fontBytes = fs.readFileSync(fontPath);
+
+  // Generate full synthesized SVG copy
+  const cardSvg = await generateNimcPremiumCardSvg(data);
+  const cardSvgBuffer = Buffer.from(cardSvg, 'utf-8');
+  const cardImageBase64 = `data:image/svg+xml;base64,${cardSvgBuffer.toString('base64')}`;
 
   // Format fields - natural typography matching official NIMC standard
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
@@ -697,7 +778,7 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
     height: 434.736,
   });
 
-  // 2. Citizen Photo
+  // 2. Citizen Photo (guaranteed to not spill outside card width)
   if (photoBuffer && photoBuffer.length > 0) {
     try {
       let photoImg;
@@ -830,10 +911,10 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
   const pdfBuffer = Buffer.from(pdfBytes);
   const pdfBase64 = `data:application/pdf;base64,${pdfBuffer.toString('base64')}`;
   const cardBackBase64 = backTemplateBytes.length ? `data:image/jpeg;base64,${backTemplateBytes.toString('base64')}` : '';
-  const cardImageBase64 = frontTemplateBytes.length ? `data:image/jpeg;base64,${frontTemplateBytes.toString('base64')}` : '';
 
   return {
     cardImageBase64,
+    cardSvg,
     cardBackBase64,
     pdfBase64,
     pdfBuffer,
@@ -848,6 +929,7 @@ export const SlipGeneratorUtil = {
   generateDigitalNinCardSvg,
   generatePaperSlipSvg,
   generateNimcPremiumCard,
+  generateNimcPremiumCardSvg,
   getSlipAssetPath,
   resolveSlipPhotoBuffer,
   wrapText,

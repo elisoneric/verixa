@@ -10,7 +10,7 @@ interface GeneratedSlip {
   trackingId: string
   fullName: string
   photoBase64?: string
-  slipType: "card" | "slip"
+  slipType: "card" | "slip" | "premium"
   pdfBase64?: string
   svgContent?: string
   cached: boolean
@@ -31,11 +31,41 @@ interface OptimisticIdentity {
   latencyMs: number
 }
 
+const FORMAT_CONFIGS = {
+  slip: {
+    id: "slip",
+    title: "NIMC Slip",
+    price: 250,
+    rateLabel: "₦250 / document",
+    badge: "Official Standard A4 Slip",
+    subtitle: "Standard official government slip formatted for A4 printing with full demographic and tracking details.",
+    sampleImage: "/samples/sample_slip.png",
+  },
+  card: {
+    id: "card",
+    title: "NIMC Card",
+    price: 300,
+    rateLabel: "₦300 / document",
+    badge: "Official ID-1 Format",
+    subtitle: "Compact digital card format matching statutory NIMC dimensions without full address.",
+    sampleImage: "/samples/sample_card.png",
+  },
+  premium: {
+    id: "premium",
+    title: "NIMC Card Premium",
+    price: 350,
+    rateLabel: "₦350 / document",
+    badge: "Plastic Card + A4 Foldable",
+    subtitle: "High-definition custom plastic card with 22pt bold NIN, authentic typography, and printable foldable A4 sheet.",
+    sampleImage: "/samples/sample_premium.png",
+  },
+} as const
+
 export default function NinSlipGeneratorPage() {
   const { environment, refreshBalance } = useAuth()
   const [ninInput, setNinInput] = React.useState("")
   const [consent, setConsent] = React.useState(true)
-  const [formatType, setFormatType] = React.useState<"card" | "slip">("card")
+  const [formatType, setFormatType] = React.useState<"slip" | "card" | "premium">("premium")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [optimisticRecord, setOptimisticRecord] = React.useState<OptimisticIdentity | null>(null)
   const [currentSlip, setCurrentSlip] = React.useState<GeneratedSlip | null>(null)
@@ -218,49 +248,76 @@ export default function NinSlipGeneratorPage() {
             NIN Slips & NIMC Cards
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Instant official NIMC government slips and standard verification documents.
+            Instant official NIMC government slips, ID-1 cards, and premium plastic card documents.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200/80 text-xs self-start sm:self-center">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-xs self-start sm:self-center shadow-2xs">
           <span className="text-emerald-700 font-mono font-medium text-[11px]">RATE:</span>
-          <span className="font-semibold text-emerald-900 font-mono text-xs">₦250 / document</span>
+          <span className="font-bold text-emerald-900 font-mono text-sm">{FORMAT_CONFIGS[formatType].rateLabel}</span>
         </div>
       </div>
 
-      {/* Segmented Format Selector (NIMC Card ID-1 vs Standard Slip A4) */}
-      <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
-        <button
-          type="button"
-          onClick={() => handleFormatChange("card")}
-          className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-            formatType === "card"
-              ? "bg-white text-slate-900 shadow-xs border border-slate-200"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth={1.8} />
-            <line x1="2" y1="10" x2="22" y2="10" strokeWidth={1.8} />
-            <rect x="5" y="13" width="3" height="3" rx="0.5" fill="currentColor" />
-          </svg>
-          <span>NIMC Card (ID-1)</span>
-        </button>
+      {/* 3-Tier Format Dropdown Selector & Visual Sample Preview */}
+      <div className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <label htmlFor="format-select" className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+              Select Document Format
+            </label>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Choose from standard paper slip, compact ID-1 digital card, or custom NIMC premium plastic card.
+            </p>
+          </div>
+          <div className="relative min-w-[280px]">
+            <select
+              id="format-select"
+              value={formatType}
+              onChange={(e) => setFormatType(e.target.value as "slip" | "card" | "premium")}
+              className="w-full h-11 px-3.5 pr-10 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-semibold text-sm shadow-2xs focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all cursor-pointer appearance-none"
+            >
+              <option value="slip">NIMC Slip — ₦250</option>
+              <option value="card">NIMC Card — ₦300</option>
+              <option value="premium">NIMC Card Premium — ₦350</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
 
-        <button
-          type="button"
-          onClick={() => handleFormatChange("slip")}
-          className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-            formatType === "slip"
-              ? "bg-white text-slate-900 shadow-xs border border-slate-200"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span>Standard Slip (A4)</span>
-        </button>
+        {/* Live Visual Sample Preview (Updates dynamically based on selection) */}
+        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center gap-4">
+          <div className="relative w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white shrink-0 shadow-2xs flex items-center justify-center">
+            <img
+              src={FORMAT_CONFIGS[formatType].sampleImage}
+              alt={FORMAT_CONFIGS[formatType].title}
+              className="w-full h-full object-contain p-1"
+            />
+            <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-900/80 text-white backdrop-blur-xs">
+              SAMPLE PREVIEW
+            </div>
+          </div>
+          <div className="flex-1 space-y-1 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-2">
+              <span className="font-bold text-slate-900 text-sm">{FORMAT_CONFIGS[formatType].title}</span>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                ₦{FORMAT_CONFIGS[formatType].price}
+              </span>
+              <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-slate-200/80 text-slate-700">
+                {FORMAT_CONFIGS[formatType].badge}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {FORMAT_CONFIGS[formatType].subtitle}
+            </p>
+            <p className="text-[11px] text-slate-400 font-mono">
+              ✓ Authentic typography &bull; Official government standard &bull; Instant print-ready output
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Main Generator Form */}
@@ -417,7 +474,7 @@ export default function NinSlipGeneratorPage() {
                     type="button"
                     onClick={() => downloadFile(
                       currentSlip.pdfBase64!,
-                      `${currentSlip.slipType === "card" ? "NIMC_Direct_Slip" : "NIN_Standard_Slip"}_${currentSlip.nin}.pdf`,
+                      `${currentSlip.slipType === "premium" ? "NIMC_Premium_Card" : (currentSlip.slipType === "card" ? "NIMC_Direct_Slip" : "NIN_Standard_Slip")}_${currentSlip.nin}.pdf`,
                       "application/pdf"
                     )}
                     className="h-8 px-3 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-xs flex items-center gap-1"
@@ -448,10 +505,10 @@ export default function NinSlipGeneratorPage() {
             <div className="space-y-2.5 pt-2 border-t border-slate-100">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 font-mono">
-                  Preview: {currentSlip.slipType === "card" ? "NIMC Card (Official Slip)" : "Standard Slip (A4)"}
+                  Preview: {currentSlip.slipType === "premium" ? "NIMC Card Premium (Plastic Card + Foldable A4)" : (currentSlip.slipType === "card" ? "NIMC Card (ID-1)" : "Standard Slip (A4)")}
                 </span>
                 <span className="text-[11px] font-mono text-slate-400">
-                  {currentSlip.slipType === "card" ? "NIMC Official Document" : "Word DOCX to PDF"}
+                  {currentSlip.slipType === "premium" ? "NIMC Premium Document" : (currentSlip.slipType === "card" ? "NIMC Official Document" : "Word DOCX to PDF")}
                 </span>
               </div>
 
@@ -512,12 +569,12 @@ export default function NinSlipGeneratorPage() {
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center text-slate-700 shrink-0 font-mono text-[10px] font-bold">
-                    {item.format === "card" ? "ID" : "A4"}
+                    {item.format === "premium" ? "PR" : (item.format === "card" ? "ID" : "A4")}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-slate-900">
-                        {item.format === "card" ? "NIMC Card (ID-1)" : "Standard NIN Slip"}
+                        {item.format === "premium" ? "NIMC Card Premium" : (item.format === "card" ? "NIMC Card (ID-1)" : "Standard NIN Slip")}
                       </span>
                       <span className="text-[10px] font-mono text-slate-500">
                         {item.identifier || item.id.slice(0, 8)}

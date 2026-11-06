@@ -60,7 +60,7 @@ export class BillingService {
 
   async getEffectiveRate(
     orgId: string,
-    serviceType: 'bvn' | 'nin' | 'nuban' | 'nin_advance' | 'nin_slip' | 'nin_premium' | 'phone' | 'cac' | 'nuban_kyc' | 'sms' | 'airtime' | 'data',
+    serviceType: 'bvn' | 'nin' | 'nuban' | 'nin_advance' | 'nin_slip' | 'nin_card' | 'nin_premium' | 'phone' | 'cac' | 'nuban_kyc' | 'sms' | 'airtime' | 'data',
     isCacheHit = false
   ): Promise<{
     effectiveRate: number;
@@ -95,6 +95,9 @@ export class BillingService {
     } else if (serviceType === 'nin_premium') {
       defaultLive = 120;
       defaultCache = 0;
+    } else if (serviceType === 'nin_card') {
+      defaultLive = 300;
+      defaultCache = 50;
     } else if (serviceType === 'nin_slip') {
       defaultLive = 250;
       defaultCache = 50;
@@ -121,6 +124,7 @@ export class BillingService {
       if (serviceType === 'bvn' && configMap['BASE_BVN_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_BVN_CACHE_PRICE'], 10);
       else if ((serviceType === 'nin' || serviceType === 'nin_advance') && configMap['BASE_NIN_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_CACHE_PRICE'], 10);
       else if (serviceType === 'nin_premium' && configMap['BASE_NIN_PREMIUM_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_PREMIUM_CACHE_PRICE'], 10);
+      else if (serviceType === 'nin_card' && configMap['BASE_NIN_CARD_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_CARD_CACHE_PRICE'], 10);
       else if (serviceType === 'nin_slip' && configMap['BASE_NIN_SLIP_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_SLIP_CACHE_PRICE'], 10);
       else if (serviceType === 'phone' && configMap['BASE_PHONE_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_PHONE_CACHE_PRICE'], 10);
       else if (serviceType === 'cac' && configMap['BASE_CAC_CACHE_PRICE']) baseRate = parseInt(configMap['BASE_CAC_CACHE_PRICE'], 10);
@@ -129,6 +133,7 @@ export class BillingService {
       else if (serviceType === 'nin' && configMap['BASE_NIN_PRICE']) baseRate = parseInt(configMap['BASE_NIN_PRICE'], 10);
       else if (serviceType === 'nin_advance' && configMap['BASE_NIN_ADVANCE_PRICE']) baseRate = parseInt(configMap['BASE_NIN_ADVANCE_PRICE'], 10);
       else if (serviceType === 'nin_premium' && configMap['BASE_NIN_PREMIUM_PRICE']) baseRate = parseInt(configMap['BASE_NIN_PREMIUM_PRICE'], 10);
+      else if (serviceType === 'nin_card' && configMap['BASE_NIN_CARD_PRICE']) baseRate = parseInt(configMap['BASE_NIN_CARD_PRICE'], 10);
       else if (serviceType === 'nin_slip' && configMap['BASE_NIN_SLIP_PRICE']) baseRate = parseInt(configMap['BASE_NIN_SLIP_PRICE'], 10);
       else if (serviceType === 'phone' && configMap['BASE_PHONE_PRICE']) baseRate = parseInt(configMap['BASE_PHONE_PRICE'], 10);
       else if (serviceType === 'cac' && configMap['BASE_CAC_PRICE']) baseRate = parseInt(configMap['BASE_CAC_PRICE'], 10);

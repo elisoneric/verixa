@@ -255,9 +255,9 @@ export class NinSlipService {
     orgId: string,
     environment: Environment,
     nin: string,
-    format: 'pdf' | 'docx' | 'both' | 'card' | 'slip' | string = 'pdf',
+    format: 'pdf' | 'docx' | 'both' | 'card' | 'slip' | 'premium' | string = 'pdf',
     apiKeyId?: string,
-    cardType: 'slip' | 'card' = 'slip',
+    cardType: 'slip' | 'card' | 'premium' = 'slip',
   ) {
 
     const cleanNin = String(nin || '').replace(/\D/g, '');
@@ -269,6 +269,20 @@ export class NinSlipService {
     const isSandbox = validEnv === Environment.SANDBOX || cleanNin === '70123456789' || cleanNin === '11234567890';
     const provider = isSandbox ? this.mockProvider : this.dojahProvider;
     const startTime = Date.now();
+
+    const isPremium = cardType === 'premium' || format === 'premium';
+    const isDojahSlipSelected = (cardType === 'card' || format === 'card') && !isPremium;
+    const effectiveCardType: 'slip' | 'card' | 'premium' = isPremium ? 'premium' : (isDojahSlipSelected ? 'card' : 'slip');
+
+    let serviceTypeRateKey: any = 'nin_slip';
+    let defaultSlipPrice = 250;
+    if (effectiveCardType === 'card') {
+      serviceTypeRateKey = 'nin_card';
+      defaultSlipPrice = 300;
+    } else if (effectiveCardType === 'premium') {
+      serviceTypeRateKey = 'nin_premium';
+      defaultSlipPrice = 350;
+    }
 
     // 1. Check Smart Identity Cache for existing NIN record
     const cached = await this.identityCacheService.getCachedRecord(
@@ -286,14 +300,14 @@ export class NinSlipService {
     if (cached && cached.data?.photo) {
       // CACHE HIT! Discounted rate for regenerating existing verified slip
       isCacheHit = true;
-      const rateInfo = await this.billingService.getEffectiveRate(orgId, 'nin_slip' as any, true);
-      cost = rateInfo.effectiveRate;
+      const rateInfo = await this.billingService.getEffectiveRate(orgId, serviceTypeRateKey, true);
+      cost = rateInfo.effectiveRate || 50;
       await this.billingService.deductCredits(orgId, validEnv, cost, reference);
       identityData = cached.data;
     } else {
       // CACHE MISS: Live or Sandbox NIN Query
-      const rateInfo = await this.billingService.getEffectiveRate(orgId, 'nin_slip' as any, false);
-      cost = rateInfo.effectiveRate;
+      const rateInfo = await this.billingService.getEffectiveRate(orgId, serviceTypeRateKey, false);
+      cost = rateInfo.effectiveRate || defaultSlipPrice;
       await this.billingService.deductCredits(orgId, validEnv, cost, reference);
 
       try {
@@ -398,17 +412,34 @@ export class NinSlipService {
       throw new BadRequestException('Failed to retrieve verified NIN data');
     }
 
-    const isDojahSlipSelected = cardType === 'card' || format === 'card';
-    const effectiveCardType: 'card' | 'slip' = isDojahSlipSelected ? 'card' : 'slip';
-
     // 2. Generate requested format:
-    // - "card": Output is the authentic Dojah official NIMC slip (entity.nin_id)
-    // - "slip": Output is the standard government slip compiled from Word DOCX to PDF
+    // - "premium": Custom NIMC Card Premium (Plastic Card + Printable A4 PDF)
+    // - "card": Authentic Dojah official NIMC card (entity.nin_id)
+    // - "slip": Standard government slip compiled from Word DOCX to PDF
     let pdfBuffer: Buffer | null = null;
     let docxBuffer: Buffer | null = null;
     let slipSvg: string | null = null;
+    let cardImageBase64: string | null = null;
 
-    if (isDojahSlipSelected) {
+    if (isPremium) {
+      try {
+        const premiumRes = await generateNimcPremiumCard({
+          nin: cleanNin,
+          trackingId: identityData.trackingId || cleanNin,
+          firstName: identityData.firstName,
+          surname: identityData.surname,
+          middleName: identityData.middleName,
+          gender: identityData.gender,
+          birthdate: identityData.birthdate,
+          photo: identityData.photo,
+        });
+        pdfBuffer = premiumRes.pdfBuffer;
+        slipSvg = premiumRes.cardSvg;
+        cardImageBase64 = premiumRes.cardImageBase64;
+      } catch (e: any) {
+        this.logger.warn(`Could not generate NIMC Premium Card: ${e?.message}`);
+      }
+    } else if (isDojahSlipSelected) {
       if (identityData.nin_id) {
         pdfBuffer = Buffer.from(identityData.nin_id, 'base64');
       } else {
@@ -418,6 +449,9 @@ export class NinSlipService {
           this.logger.warn(`Could not generate fallback PDF Slip: ${e?.message}`);
         }
       }
+      try {
+        slipSvg = await this.generateCardSvg(identityData);
+      } catch {}
     } else {
       try {
         pdfBuffer = await this.generatePdf(identityData);
@@ -429,12 +463,9 @@ export class NinSlipService {
       } catch (e: any) {
         this.logger.warn(`Could not generate DOCX Slip: ${e?.message}`);
       }
-    }
-
-    try {
-      slipSvg = await this.generatePaperSvg(identityData);
-    } catch (e: any) {
-      this.logger.warn(`Could not generate Paper Slip SVG: ${e?.message}`);
+      try {
+        slipSvg = await this.generatePaperSvg(identityData);
+      } catch {}
     }
 
     const latencyMs = Math.max(85, Date.now() - startTime);
@@ -524,8 +555,11 @@ export class NinSlipService {
       nin_id: effectivePdfBase64,
       pdfBase64: effectivePdfBase64,
       pdfBuffer: effectivePdfBuffer,
-      docxBase64: (!isDojahSlipSelected && docxBuffer) ? docxBuffer.toString('base64') : null,
-      docxBuffer: !isDojahSlipSelected ? docxBuffer : null,
+      card_image: cardImageBase64,
+      image: cardImageBase64,
+      cardPdfBase64: (isPremium || isDojahSlipSelected) ? effectivePdfBase64 : undefined,
+      docxBase64: (!isDojahSlipSelected && !isPremium && docxBuffer) ? docxBuffer.toString('base64') : null,
+      docxBuffer: (!isDojahSlipSelected && !isPremium) ? docxBuffer : null,
       svgContent: slipSvg,
       slipSvg,
     };
@@ -559,6 +593,9 @@ export class NinSlipService {
       slipType: effectiveCardType,
       nin_id: effectivePdfBase64,
       pdfBase64: effectivePdfBase64,
+      card_image: cardImageBase64,
+      image: cardImageBase64,
+      cardPdfBase64: (isPremium || isDojahSlipSelected) ? effectivePdfBase64 : undefined,
       svgContent: slipSvg,
       data: resultData,
       entity: resultData,
@@ -635,17 +672,17 @@ export class NinSlipService {
       throw new BadRequestException('Identity demographic data cannot be retrieved from record');
     }
 
-    const normalizedFormat = String(format || 'slip').toLowerCase() as 'card' | 'slip';
+    const normalizedFormat = String(format || 'slip').toLowerCase() as 'card' | 'slip' | 'premium';
     const normalizedFileType = String(fileType || 'pdf').toLowerCase() as 'pdf' | 'docx';
 
-    if (normalizedFormat !== 'card' && normalizedFormat !== 'slip') {
-      throw new BadRequestException(`Invalid format "${format}". Supported formats are "card" or "slip".`);
+    if (normalizedFormat !== 'card' && normalizedFormat !== 'slip' && normalizedFormat !== 'premium') {
+      throw new BadRequestException(`Invalid format "${format}". Supported formats are "card", "slip", or "premium".`);
     }
     if (normalizedFileType !== 'pdf' && normalizedFileType !== 'docx') {
       throw new BadRequestException(`Invalid fileType "${fileType}". Supported file types are "pdf" or "docx".`);
     }
-    if (normalizedFormat === 'card' && normalizedFileType === 'docx') {
-      throw new BadRequestException('DOCX format is not supported for NIMC Card. NIMC Card is available only in PDF format.');
+    if ((normalizedFormat === 'card' || normalizedFormat === 'premium') && normalizedFileType === 'docx') {
+      throw new BadRequestException('DOCX format is not supported for NIMC Card or NIMC Card Premium. Available only in PDF format.');
     }
 
     const cleanNin = String(identityData.nin || log.requestPayload?.nin || '').replace(/\D/g, '');
@@ -668,14 +705,19 @@ export class NinSlipService {
     let filename: string;
     const fileId = cleanNin || log.id.slice(0, 8);
 
-    if (normalizedFormat === 'card' && normalizedFileType === 'pdf') {
+    if (normalizedFormat === 'premium' && normalizedFileType === 'pdf') {
+      const premRes = await generateNimcPremiumCard(slipData);
+      buffer = premRes.pdfBuffer;
+      contentType = 'application/pdf';
+      filename = `NIMC_Premium_Card_${fileId}.pdf`;
+    } else if (normalizedFormat === 'card' && normalizedFileType === 'pdf') {
       if (identityData.nin_id) {
         buffer = Buffer.from(identityData.nin_id, 'base64');
       } else {
         buffer = await generateStandardNinSlip(slipData);
       }
       contentType = 'application/pdf';
-      filename = `NIMC_Direct_Slip_${fileId}.pdf`;
+      filename = `NIN_Digital_Card_${fileId}.pdf`;
     } else if (normalizedFormat === 'slip' && normalizedFileType === 'pdf') {
       buffer = await generateStandardNinSlip(slipData);
       contentType = 'application/pdf';

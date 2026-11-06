@@ -9,6 +9,8 @@ import {
   generateDigitalNinCardPdf,
   generateDigitalNinCardSvg,
   generatePaperSlipSvg,
+  generateNimcPremiumCard,
+  generateNimcPremiumCardSvg,
   getSlipAssetPath,
   resolveSlipPhotoBuffer,
   wrapText,
@@ -104,9 +106,9 @@ describe('SlipGeneratorUtil', () => {
   });
 
   describe('formatNimcDate', () => {
-    it('should format ISO date to NIMC standard DD  MON  YYYY', () => {
-      expect(formatNimcDate('1988-06-12')).toBe('12  JUN  1988');
-      expect(formatNimcDate('2001-01-05')).toBe('05  JAN  2001');
+    it('should format ISO date to NIMC standard DD MON YYYY with clean single spacing', () => {
+      expect(formatNimcDate('1988-06-12')).toBe('12 JUN 1988');
+      expect(formatNimcDate('2001-01-05')).toBe('05 JAN 2001');
     });
 
     it('should return uppercase string if date parsing yields fallback', () => {
@@ -229,6 +231,26 @@ describe('SlipGeneratorUtil', () => {
       expect(svg).toContain('viewBox="0 0 1539 733"');
       expect(svg).toContain('12345678901');
       expect(svg).toContain('BELLO');
+    });
+
+    it('should generate valid NIMC Premium Card SVG matching 2576x1632 specification', async () => {
+      const svg = await generateNimcPremiumCardSvg(sampleSlipData);
+      expect(svg).toContain('<svg');
+      expect(svg).toContain('viewBox="0 0 2576 1632"');
+      expect(svg).toContain('clipPath id="photoClip"');
+      expect(svg).toContain('1234 567 8901');
+      expect(svg).toContain('BELLO');
+      expect(svg).toContain('1234567 8901'); // watermark no space after 4th digit
+    });
+
+    it('should generate valid NIMC Premium Card result with SVG and A4 printable PDF', async () => {
+      const res = await generateNimcPremiumCard(sampleSlipData);
+      expect(res.cardImageBase64).toContain('data:image/svg+xml;base64,');
+      expect(res.cardSvg).toContain('viewBox="0 0 2576 1632"');
+      expect(res.pdfBuffer).toBeDefined();
+      expect(res.pdfBuffer.length).toBeGreaterThan(1000);
+      const doc = await PDFDocument.load(res.pdfBuffer);
+      expect(doc.getPageCount()).toBe(1);
     });
   });
 });

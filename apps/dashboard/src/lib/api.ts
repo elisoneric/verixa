@@ -422,11 +422,11 @@ export class ApiClient {
 
   static async generateNinSlip(
     nin: string,
-    format: "pdf" | "card" | "slip" | "both" | "docx" | string = "both",
+    format: "pdf" | "card" | "slip" | "premium" | "both" | "docx" | string = "both",
     consent = true,
-    options?: { cardType?: "card" | "slip"; fileType?: "pdf" | "docx" | "both" }
+    options?: { cardType?: "card" | "slip" | "premium"; fileType?: "pdf" | "docx" | "both" }
   ) {
-    const cardType = options?.cardType || (format === "card" ? "card" : (format === "slip" ? "slip" : undefined))
+    const cardType = options?.cardType || (format === "premium" ? "premium" : (format === "card" ? "card" : (format === "slip" ? "slip" : undefined)))
     const fileType = options?.fileType
 
     return this.request<{
@@ -436,13 +436,15 @@ export class ApiClient {
       fullName: string
       nin: string
       photoBase64?: string
-      slipType: "card" | "slip"
+      slipType: "card" | "slip" | "premium"
       pdfBase64?: string
       docxBase64?: string
       svgContent?: string
       cardPdfBase64?: string
       cardSvg?: string
       slipSvg?: string
+      card_image?: string
+      image?: string
       data: {
         nin: string
         trackingId: string
@@ -451,7 +453,7 @@ export class ApiClient {
         surname?: string
         middleName?: string
         photoBase64?: string
-        slipType?: "card" | "slip"
+        slipType?: "card" | "slip" | "premium"
         pdfBase64?: string
         nin_id?: string
         slipSvg?: string
@@ -491,7 +493,7 @@ export class ApiClient {
 
   static async downloadHistoricalSlip(
     logId: string,
-    format: "card" | "slip" = "slip",
+    format: "card" | "slip" | "premium" = "slip",
     fileType: "pdf" = "pdf"
   ): Promise<{ blob: Blob; filename: string }> {
     return this.downloadOnDemandSlip(logId, format, fileType)
@@ -499,7 +501,7 @@ export class ApiClient {
 
   static async downloadOnDemandSlip(
     logId: string,
-    format: "card" | "slip",
+    format: "card" | "slip" | "premium",
     fileType: "pdf" | "docx"
   ): Promise<{ blob: Blob; filename: string }> {
     const baseUrl = getApiUrl()

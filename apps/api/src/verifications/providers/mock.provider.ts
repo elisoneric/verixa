@@ -137,7 +137,6 @@ export class MockProvider implements IVerificationProvider {
         photo: photoBase64,
       });
       cardImageBase64 = cardRes.cardImageBase64;
-      cardBackBase64 = cardRes.cardBackBase64;
       premiumPdfBase64 = cardRes.pdfBase64;
     } catch {
       // ignore
@@ -148,8 +147,9 @@ export class MockProvider implements IVerificationProvider {
       data: {
         nin: data.nin,
         card_image: cardImageBase64,
-        card_back_image: cardBackBase64,
+        image: cardImageBase64,
         card_pdf: premiumPdfBase64,
+        pdf: premiumPdfBase64,
         first_name: firstName,
         last_name: lastName,
         gender: 'Male',
@@ -286,7 +286,6 @@ export class MockProvider implements IVerificationProvider {
         photo: photoBase64,
       });
       cardImageBase64 = cardRes.cardImageBase64;
-      cardBackBase64 = cardRes.cardBackBase64;
       premiumPdfBase64 = cardRes.pdfBase64;
     } catch {
       // ignore
@@ -297,8 +296,9 @@ export class MockProvider implements IVerificationProvider {
       data: {
         nin: data.nin,
         card_image: cardImageBase64,
-        card_back_image: cardBackBase64,
+        image: cardImageBase64,
         card_pdf: premiumPdfBase64,
+        pdf: premiumPdfBase64,
         first_name: firstName,
         last_name: surname,
         middle_name: middleName,
