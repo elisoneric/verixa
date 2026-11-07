@@ -8,7 +8,7 @@ COPY apps/api/package*.json ./apps/api/
 COPY packages ./packages
 
 # Install dependencies
-RUN npm ci --workspace=apps/api --include-workspace-root
+RUN npm ci --workspace=apps/api --include-workspace-root || npm install --workspace=apps/api --include-workspace-root
 
 # Copy api source
 COPY apps/api ./apps/api
