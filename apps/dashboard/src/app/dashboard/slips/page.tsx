@@ -12,6 +12,7 @@ interface GeneratedSlip {
   photoBase64?: string
   slipType: "card" | "slip" | "premium"
   pdfBase64?: string
+  docxBase64?: string
   svgContent?: string
   cached: boolean
   cost: number
@@ -37,27 +38,21 @@ const FORMAT_CONFIGS = {
     title: "NIMC Slip",
     price: 250,
     rateLabel: "₦250 / document",
-    badge: "Official Standard A4 Slip",
-    subtitle: "Standard official government slip formatted for A4 printing with full demographic and tracking details.",
-    sampleImage: "/samples/sample_slip.png",
+    sampleImage: "/samples/nimc_slip_preview.webp",
   },
   card: {
     id: "card",
     title: "NIMC Card",
     price: 300,
     rateLabel: "₦300 / document",
-    badge: "Official ID-1 Format",
-    subtitle: "Compact digital card format matching statutory NIMC dimensions without full address.",
-    sampleImage: "/samples/sample_card.png",
+    sampleImage: "/samples/nimc_card_preview.webp",
   },
   premium: {
     id: "premium",
     title: "NIMC Card Premium",
     price: 350,
     rateLabel: "₦350 / document",
-    badge: "Plastic Card + A4 Foldable",
-    subtitle: "High-definition custom plastic card with 22pt bold NIN, authentic typography, and printable foldable A4 sheet.",
-    sampleImage: "/samples/sample_premium.png",
+    sampleImage: "/samples/premium.webp",
   },
 } as const
 
@@ -159,6 +154,7 @@ export default function NinSlipGeneratorPage() {
           photoBase64,
           slipType: formatType,
           pdfBase64: resolvedPdf,
+          docxBase64: d.docxBase64 || (docRes as any).docxBase64,
           svgContent: d.svgContent || docRes.svgContent,
           cached: docRes.meta?.cached || false,
           cost: docRes.meta?.cost_ngx || 250,
@@ -265,9 +261,6 @@ export default function NinSlipGeneratorPage() {
             <label htmlFor="format-select" className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
               Select Document Format
             </label>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Choose from standard paper slip, compact ID-1 digital card, or custom NIMC premium plastic card.
-            </p>
           </div>
           <div className="relative min-w-[280px]">
             <select
@@ -288,7 +281,7 @@ export default function NinSlipGeneratorPage() {
           </div>
         </div>
 
-        {/* Live Visual Sample Preview (Updates dynamically based on selection) */}
+        {/* Live Visual Sample Preview (Fast WebP) */}
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center gap-4">
           <div className="relative w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white shrink-0 shadow-2xs flex items-center justify-center">
             <img
@@ -296,26 +289,14 @@ export default function NinSlipGeneratorPage() {
               alt={FORMAT_CONFIGS[formatType].title}
               className="w-full h-full object-contain p-1"
             />
-            <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-900/80 text-white backdrop-blur-xs">
-              SAMPLE PREVIEW
-            </div>
           </div>
-          <div className="flex-1 space-y-1 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-2">
-              <span className="font-bold text-slate-900 text-sm">{FORMAT_CONFIGS[formatType].title}</span>
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
+          <div className="flex-1 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-2.5">
+              <span className="font-bold text-slate-900 text-base">{FORMAT_CONFIGS[formatType].title}</span>
+              <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
                 ₦{FORMAT_CONFIGS[formatType].price}
               </span>
-              <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-slate-200/80 text-slate-700">
-                {FORMAT_CONFIGS[formatType].badge}
-              </span>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              {FORMAT_CONFIGS[formatType].subtitle}
-            </p>
-            <p className="text-[11px] text-slate-400 font-mono">
-              ✓ Authentic typography &bull; Official government standard &bull; Instant print-ready output
-            </p>
           </div>
         </div>
       </div>
@@ -484,6 +465,23 @@ export default function NinSlipGeneratorPage() {
                     </svg>
                     <span>Download PDF</span>
                   </button>
+
+                  {currentSlip?.docxBase64 && (
+                    <button
+                      type="button"
+                      onClick={() => downloadFile(
+                        currentSlip.docxBase64!,
+                        `${currentSlip.slipType === "premium" ? "NIMC_Premium_Card" : "NIN_Standard_Slip"}_${currentSlip.nin}.docx`,
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      )}
+                      className="h-8 px-2.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer shadow-2xs flex items-center gap-1"
+                    >
+                      <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span>Word (.docx)</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"

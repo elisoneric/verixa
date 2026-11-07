@@ -11,6 +11,7 @@ import {
   generatePaperSlipSvg,
   generateNimcPremiumCard,
   generateNimcPremiumCardSvg,
+  generateNimcPremiumDocx,
   getSlipAssetPath,
   resolveSlipPhotoBuffer,
   wrapText,
@@ -251,6 +252,19 @@ describe('SlipGeneratorUtil', () => {
       expect(res.pdfBuffer.length).toBeGreaterThan(1000);
       const doc = await PDFDocument.load(res.pdfBuffer);
       expect(doc.getPageCount()).toBe(1);
+    });
+
+    it('should generate valid NIMC Premium DOCX using nin premium.docx template', async () => {
+      const docxBuffer = await generateNimcPremiumDocx(sampleSlipData);
+      expect(Buffer.isBuffer(docxBuffer)).toBe(true);
+      expect(docxBuffer[0]).toBe(0x50);
+      expect(docxBuffer[1]).toBe(0x4b);
+      const zip = new AdmZip(docxBuffer);
+      const xml = zip.readAsText('word/document.xml');
+      expect(xml).toContain('AMINU, KANO');
+      expect(xml).toContain('BELLO');
+      expect(xml).toContain('1234 567 8901');
+      expect(xml).toContain('12345678901');
     });
   });
 });

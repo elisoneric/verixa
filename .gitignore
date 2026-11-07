@@ -35,7 +35,9 @@ Thumbs.db
 *.pem
 scratch/
 scratch_img1.jpg/
+~$*
 *.docx
+!apps/api/src/slips/assets/*.docx
 *.pdf
 sample_nin_slip*
 ninslip.docx

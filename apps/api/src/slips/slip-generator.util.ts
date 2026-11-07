@@ -136,6 +136,60 @@ export async function generateDocxSlip(data: SlipData): Promise<Buffer> {
   return zip.toBuffer();
 }
 
+export async function generateNimcPremiumDocx(data: SlipData): Promise<Buffer> {
+  const templatePath = getSlipAssetPath('nin premium.docx');
+  if (!fs.existsSync(templatePath)) {
+    throw new Error(`NIMC Premium DOCX template not found at ${templatePath}`);
+  }
+
+  const zip = new AdmZip(templatePath);
+  let docXml = zip.readAsText('word/document.xml');
+
+  // Strip spell-checking tags that break runs in Word
+  docXml = docXml.replace(/<w:proofErr[^>]*\/>/g, '');
+  docXml = docXml.replace(/<a14:imgLayer[^>]*>.*?<\/a14:imgLayer>/gs, '');
+
+  const cleanNin = String(data.nin || '').replace(/\D/g, '');
+  const ninSpaced = cleanNin.length === 11 
+    ? `${cleanNin.slice(0, 4)} ${cleanNin.slice(4, 7)} ${cleanNin.slice(7, 11)}`
+    : cleanNin;
+
+  const firstName = (data.firstName || (data as any).first_name || (data as any).firstname || '').trim().toUpperCase();
+  const middleName = (data.middleName || (data as any).middle_name || (data as any).middlename || '').trim().toUpperCase();
+  const surname = (data.surname || (data as any).last_name || '').trim().toUpperCase();
+
+  // [FIRST NAME MIDDLE NAME]: WHEN user has middle name add to the side with comma, if not just out first name
+  const firstMiddle = middleName ? `${firstName}, ${middleName}` : firstName;
+
+  const rawDob = data.birthdate || (data as any).dob || (data as any).date_of_birth;
+  const formattedDob = formatNimcDate(rawDob || '1990-01-01');
+
+  const genderChar = (data.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M';
+  const issueDateFormatted = formatNimcDate(new Date().toISOString().slice(0, 10));
+
+  // Replace placeholders:
+  // Note: order matters: '[FIRST NAME MIDDLE NAME]' before other fields, '[N I N]' before '[NIN]'
+  docXml = docXml.replace(/\[FIRST NAME MIDDLE NAME\]/g, firstMiddle);
+  docXml = docXml.replace(/\[SURNAME\]/g, surname);
+  docXml = docXml.replace(/\[N I N\]/g, ninSpaced);
+  docXml = docXml.replace(/\[NIN\]/g, cleanNin);
+  docXml = docXml.replace(/\[ISSUE DATE\]/g, issueDateFormatted);
+  docXml = docXml.replace(/\[DOB\]/g, formattedDob);
+  docXml = docXml.replace(/\[GENDER\]/g, genderChar);
+
+  zip.updateFile('word/document.xml', Buffer.from(docXml, 'utf-8'));
+
+  // Photo replacement
+  const photoBuffer = resolveSlipPhotoBuffer(data.photo);
+  if (photoBuffer && photoBuffer.length > 0) {
+    zip.updateFile('word/media/image2.png', photoBuffer);
+    if (zip.getEntry('word/media/hdphoto1.wdp')) {
+      zip.deleteFile('word/media/hdphoto1.wdp');
+    }
+  }
+
+  return zip.toBuffer();
+}
 
 export async function generatePdfSlip(data: SlipData): Promise<Buffer> {
   const bgPath = getSlipAssetPath('image1.jpg');
@@ -643,6 +697,8 @@ export interface NimcPremiumCardResult {
   pdfBase64: string;
   pdfBuffer: Buffer;
   cardImageBuffer?: Buffer;
+  docxBase64?: string;
+  docxBuffer?: Buffer;
 }
 
 export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string> {
@@ -666,7 +722,7 @@ export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string
 
   const first = (data.firstName || (data as any).first_name || '').toUpperCase().trim();
   const middle = (data.middleName || (data as any).middle_name || '').toUpperCase().trim();
-  const givenNames = [first, middle].filter(Boolean).join(' ');
+  const givenNames = middle ? `${first}, ${middle}` : first;
 
   const rawDob = data.birthdate || (data as any).dob || (data as any).date_of_birth;
   const formattedDob = formatNimcDate(rawDob || '1990-01-01');
@@ -753,7 +809,7 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
 
   const first = (data.firstName || (data as any).first_name || '').toUpperCase().trim();
   const middle = (data.middleName || (data as any).middle_name || '').toUpperCase().trim();
-  const givenNames = [first, middle].filter(Boolean).join(' ');
+  const givenNames = middle ? `${first}, ${middle}` : first;
 
   const rawDob = data.birthdate || (data as any).dob || (data as any).date_of_birth;
   const formattedDob = formatNimcDate(rawDob || '1990-01-01');
@@ -912,18 +968,28 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
   const pdfBase64 = `data:application/pdf;base64,${pdfBuffer.toString('base64')}`;
   const cardBackBase64 = backTemplateBytes.length ? `data:image/jpeg;base64,${backTemplateBytes.toString('base64')}` : '';
 
+  let docxBuffer: Buffer | null = null;
+  let docxBase64: string | null = null;
+  try {
+    docxBuffer = await generateNimcPremiumDocx(data);
+    docxBase64 = docxBuffer.toString('base64');
+  } catch {}
+
   return {
     cardImageBase64,
     cardSvg,
     cardBackBase64,
     pdfBase64,
     pdfBuffer,
+    docxBase64: docxBase64 || undefined,
+    docxBuffer: docxBuffer || undefined,
     cardImageBuffer: frontTemplateBytes,
   };
 }
 
 export const SlipGeneratorUtil = {
   generateDocxSlip,
+  generateNimcPremiumDocx,
   generatePdfSlip,
   generateDigitalNinCardPdf,
   generateDigitalNinCardSvg,

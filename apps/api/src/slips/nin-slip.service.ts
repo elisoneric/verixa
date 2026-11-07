@@ -13,6 +13,7 @@ import { Environment, normalizeEnvironment } from '../organizations/entities/env
 import { NinAdvanceResult } from '../verifications/providers/verification.provider.interface';
 import {
   generateDocxSlip,
+  generateNimcPremiumDocx,
   generatePdfSlip,
   generateDigitalNinCardPdf,
   generateDigitalNinCardSvg,
@@ -436,6 +437,9 @@ export class NinSlipService {
         pdfBuffer = premiumRes.pdfBuffer;
         slipSvg = premiumRes.cardSvg;
         cardImageBase64 = premiumRes.cardImageBase64;
+        if (premiumRes.docxBuffer) {
+          docxBuffer = premiumRes.docxBuffer;
+        }
       } catch (e: any) {
         this.logger.warn(`Could not generate NIMC Premium Card: ${e?.message}`);
       }
@@ -558,8 +562,8 @@ export class NinSlipService {
       card_image: cardImageBase64,
       image: cardImageBase64,
       cardPdfBase64: (isPremium || isDojahSlipSelected) ? effectivePdfBase64 : undefined,
-      docxBase64: (!isDojahSlipSelected && !isPremium && docxBuffer) ? docxBuffer.toString('base64') : null,
-      docxBuffer: (!isDojahSlipSelected && !isPremium) ? docxBuffer : null,
+      docxBase64: docxBuffer ? docxBuffer.toString('base64') : null,
+      docxBuffer: docxBuffer,
       svgContent: slipSvg,
       slipSvg,
     };
@@ -681,8 +685,8 @@ export class NinSlipService {
     if (normalizedFileType !== 'pdf' && normalizedFileType !== 'docx') {
       throw new BadRequestException(`Invalid fileType "${fileType}". Supported file types are "pdf" or "docx".`);
     }
-    if ((normalizedFormat === 'card' || normalizedFormat === 'premium') && normalizedFileType === 'docx') {
-      throw new BadRequestException('DOCX format is not supported for NIMC Card or NIMC Card Premium. Available only in PDF format.');
+    if (normalizedFormat === 'card' && normalizedFileType === 'docx') {
+      throw new BadRequestException('DOCX format is not supported for NIMC Card. Available only in PDF format.');
     }
 
     const cleanNin = String(identityData.nin || log.requestPayload?.nin || '').replace(/\D/g, '');
@@ -710,6 +714,10 @@ export class NinSlipService {
       buffer = premRes.pdfBuffer;
       contentType = 'application/pdf';
       filename = `NIMC_Premium_Card_${fileId}.pdf`;
+    } else if (normalizedFormat === 'premium' && normalizedFileType === 'docx') {
+      buffer = await generateNimcPremiumDocx(slipData);
+      contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      filename = `NIMC_Premium_Card_${fileId}.docx`;
     } else if (normalizedFormat === 'card' && normalizedFileType === 'pdf') {
       if (identityData.nin_id) {
         buffer = Buffer.from(identityData.nin_id, 'base64');
