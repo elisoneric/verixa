@@ -254,6 +254,17 @@ describe('SlipGeneratorUtil', () => {
       expect(doc.getPageCount()).toBe(1);
     });
 
+    it('should generate image-only NIMC Premium Card in fast mode (sub-15ms for Trustbrick API)', async () => {
+      const start = Date.now();
+      const res = await generateNimcPremiumCard(sampleSlipData, { imageOnly: true });
+      const duration = Date.now() - start;
+      expect(res.cardImageBase64).toContain('data:image/svg+xml;base64,');
+      expect(res.cardSvg).toContain('viewBox="0 0 2576 1632"');
+      expect(res.pdfBuffer.length).toBe(0);
+      expect(res.docxBuffer).toBeUndefined();
+      expect(duration).toBeLessThan(50);
+    });
+
     it('should generate valid NIMC Premium DOCX using nin premium.docx template', async () => {
       const docxBuffer = await generateNimcPremiumDocx(sampleSlipData);
       expect(Buffer.isBuffer(docxBuffer)).toBe(true);

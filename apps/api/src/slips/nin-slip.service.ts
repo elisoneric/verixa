@@ -126,39 +126,38 @@ export class NinSlipService {
 
       try {
         let upstreamProviderName = isSandbox ? 'verixa_mock' : 'direct';
-        // Try NIN Slip lookup
+
+        // 1. Fast Basic NIN lookup first (<800ms response time)
         try {
-          const slipRes = await provider.verifyNin({ nin: cleanNin, tier: 'slip' });
-          if (slipRes.status === 'success' && slipRes.data) {
-            const s = slipRes.data;
-            let photoStr = s.photo || '';
+          const basicRes = await provider.verifyNin({ nin: cleanNin });
+          if (basicRes.status === 'success' && basicRes.data) {
+            const b = basicRes.data;
+            let photoStr = b.photo || '';
             if (photoStr.includes('base64,')) {
               photoStr = photoStr.split('base64,')[1];
             }
             identityData = {
               nin: cleanNin,
-              trackingId: s.tracking_id || s.trackingId || '',
-              firstName: s.first_name || s.firstname || '',
-              surname: s.last_name || s.surname || '',
-              middleName: s.middle_name || s.middlename || '',
-              gender: (s.gender || 'MALE').toUpperCase(),
-              birthdate: s.date_of_birth || s.birthdate || s.dob || '',
-              address: s.residence_address_line_1 || s.residence_address || s.address || '',
-              addressLine1: s.residence_lga || s.birth_lga || s.lga || s.addressLine1 || '',
-              state: s.residence_state || s.birth_state || s.state || '',
-              lga: s.residence_lga || s.birth_lga || s.lga || '',
-              phoneNumber: s.phone_number || s.telephoneno || '',
+              trackingId: b.tracking_id || b.trackingId || cleanNin,
+              firstName: b.firstname || b.first_name || '',
+              surname: b.surname || b.last_name || '',
+              middleName: b.middlename || b.middle_name || '',
+              gender: (b.gender || 'MALE').toUpperCase(),
+              birthdate: b.birthdate || b.date_of_birth || b.dob || '',
+              address: b.residence_address_line_1 || b.residence_address || b.address || '',
+              addressLine1: b.residence_lga || b.birth_lga || b.lga || b.residence_town || b.addressLine1 || '',
+              state: b.residence_state || b.birth_state || b.state || '',
+              lga: b.residence_lga || b.birth_lga || b.lga || '',
+              phoneNumber: b.telephoneno || b.phone_number || '',
               photo: photoStr,
-              signature: s.signature || '',
-              employment_status: s.employment_status,
-              marital_status: s.marital_status,
-              height: s.height,
-              nin_id: s.nin_id,
+              signature: b.signature || '',
+              nin_id: b.nin_id,
             };
-            upstreamProviderName = slipRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
+            upstreamProviderName = basicRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
           }
         } catch {}
 
+        // 2. Fall back to Advance NIN lookup if Basic did not populate
         if (!identityData) {
           try {
             const advRes = await provider.verifyNinAdvance({ nin: cleanNin });
@@ -169,33 +168,38 @@ export class NinSlipService {
           } catch {}
         }
 
+        // 3. Fall back to NIN Slip lookup only as last resort
         if (!identityData) {
-          const basicRes = await provider.verifyNin({ nin: cleanNin });
-          if (basicRes.status !== 'success' || !basicRes.data) {
+          const slipRes = await provider.verifyNin({ nin: cleanNin, tier: 'slip' });
+          if (slipRes.status !== 'success' || !slipRes.data) {
             throw new BadRequestException('NIN verification failed or record not found');
           }
-          const b = basicRes.data;
-          let photoStr = b.photo || '';
+          const s = slipRes.data;
+          let photoStr = s.photo || '';
           if (photoStr.includes('base64,')) {
             photoStr = photoStr.split('base64,')[1];
           }
           identityData = {
             nin: cleanNin,
-            trackingId: b.tracking_id || b.trackingId || '',
-            firstName: b.firstname || b.first_name || '',
-            surname: b.surname || b.last_name || '',
-            middleName: b.middlename || b.middle_name || '',
-            gender: (b.gender || 'MALE').toUpperCase(),
-            birthdate: b.birthdate || b.date_of_birth || b.dob || '',
-            address: b.residence_address_line_1 || b.residence_address || b.address || '',
-            addressLine1: b.residence_lga || b.birth_lga || b.lga || b.residence_town || b.addressLine1 || '',
-            state: b.residence_state || b.birth_state || b.state || '',
-            lga: b.residence_lga || b.birth_lga || b.lga || '',
-            phoneNumber: b.telephoneno || b.phone_number || '',
+            trackingId: s.tracking_id || s.trackingId || '',
+            firstName: s.first_name || s.firstname || '',
+            surname: s.last_name || s.surname || '',
+            middleName: s.middle_name || s.middlename || '',
+            gender: (s.gender || 'MALE').toUpperCase(),
+            birthdate: s.date_of_birth || s.birthdate || s.dob || '',
+            address: s.residence_address_line_1 || s.residence_address || s.address || '',
+            addressLine1: s.residence_lga || s.birth_lga || s.lga || s.addressLine1 || '',
+            state: s.residence_state || s.birth_state || s.state || '',
+            lga: s.residence_lga || s.birth_lga || s.lga || '',
+            phoneNumber: s.phone_number || s.telephoneno || '',
             photo: photoStr,
-            signature: b.signature || '',
+            signature: s.signature || '',
+            employment_status: s.employment_status,
+            marital_status: s.marital_status,
+            height: s.height,
+            nin_id: s.nin_id,
           };
-          upstreamProviderName = basicRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
+          upstreamProviderName = slipRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
         }
 
         await this.identityCacheService.setCachedRecord(
@@ -314,39 +318,75 @@ export class NinSlipService {
       try {
         let upstreamProviderName = isSandbox ? 'verixa_mock' : 'direct';
 
-        // 1. Try NIN Slip lookup (full NDPC dataset + photo + tracking ID)
-        try {
-          const slipRes = await provider.verifyNin({ nin: cleanNin, tier: 'slip' });
-          if (slipRes.status === 'success' && slipRes.data) {
-            const s = slipRes.data;
-            let photoStr = s.photo || '';
-            if (photoStr.includes('base64,')) {
-              photoStr = photoStr.split('base64,')[1];
+        // Fast-path: For 'premium' or 'card' formats, query Basic NIN directly (<800ms, strictly ₦60 upstream cost)
+        if (effectiveCardType === 'premium' || effectiveCardType === 'card') {
+          try {
+            const basicRes = await provider.verifyNin({ nin: cleanNin });
+            if (basicRes.status === 'success' && basicRes.data) {
+              const b = basicRes.data;
+              let photoStr = b.photo || '';
+              if (photoStr.includes('base64,')) {
+                photoStr = photoStr.split('base64,')[1];
+              }
+              identityData = {
+                nin: cleanNin,
+                trackingId: b.tracking_id || b.trackingId || cleanNin,
+                firstName: b.firstname || b.first_name || '',
+                surname: b.surname || b.last_name || '',
+                middleName: b.middlename || b.middle_name || '',
+                gender: (b.gender || 'MALE').toUpperCase(),
+                birthdate: b.birthdate || b.date_of_birth || b.dob || '',
+                address: b.residence_address_line_1 || b.residence_address || b.address || '',
+                addressLine1: b.residence_lga || b.birth_lga || b.lga || b.residence_town || b.addressLine1 || '',
+                state: b.residence_state || b.birth_state || b.state || '',
+                lga: b.residence_lga || b.birth_lga || b.lga || '',
+                phoneNumber: b.telephoneno || b.phone_number || '',
+                photo: photoStr,
+                signature: b.signature || '',
+                nin_id: b.nin_id,
+              };
+              upstreamProviderName = basicRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
             }
-            identityData = {
-              nin: cleanNin,
-              trackingId: s.tracking_id || s.trackingId || '',
-              firstName: s.first_name || s.firstname || '',
-              surname: s.last_name || s.surname || '',
-              middleName: s.middle_name || s.middlename || '',
-              gender: (s.gender || 'MALE').toUpperCase(),
-              birthdate: s.date_of_birth || s.birthdate || s.dob || '',
-              address: s.residence_address_line_1 || s.residence_address || s.address || '',
-              addressLine1: s.residence_lga || s.birth_lga || s.lga || s.addressLine1 || '',
-              state: s.residence_state || s.birth_state || s.state || '',
-              lga: s.residence_lga || s.birth_lga || s.lga || '',
-              phoneNumber: s.phone_number || s.telephoneno || '',
-              photo: photoStr,
-              signature: s.signature || '',
-              employment_status: s.employment_status,
-              marital_status: s.marital_status,
-              height: s.height,
-              nin_id: s.nin_id,
-            };
-            upstreamProviderName = slipRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
+          } catch (fastErr: any) {
+            this.logger.warn(`Fast Basic NIN query attempt failed: ${fastErr?.message}, falling back`);
           }
-        } catch (slipErr: any) {
-          this.logger.warn(`verifyNin slip attempt failed: ${slipErr?.message}, falling back to verifyNinAdvance`);
+        }
+
+        // 1. Try NIN Slip lookup (only if identityData not yet populated, e.g. for standard slip format)
+        if (!identityData) {
+          try {
+            const slipRes = await provider.verifyNin({ nin: cleanNin, tier: 'slip' });
+            if (slipRes.status === 'success' && slipRes.data) {
+              const s = slipRes.data;
+              let photoStr = s.photo || '';
+              if (photoStr.includes('base64,')) {
+                photoStr = photoStr.split('base64,')[1];
+              }
+              identityData = {
+                nin: cleanNin,
+                trackingId: s.tracking_id || s.trackingId || '',
+                firstName: s.first_name || s.firstname || '',
+                surname: s.last_name || s.surname || '',
+                middleName: s.middle_name || s.middlename || '',
+                gender: (s.gender || 'MALE').toUpperCase(),
+                birthdate: s.date_of_birth || s.birthdate || s.dob || '',
+                address: s.residence_address_line_1 || s.residence_address || s.address || '',
+                addressLine1: s.residence_lga || s.birth_lga || s.lga || s.addressLine1 || '',
+                state: s.residence_state || s.birth_state || s.state || '',
+                lga: s.residence_lga || s.birth_lga || s.lga || '',
+                phoneNumber: s.phone_number || s.telephoneno || '',
+                photo: photoStr,
+                signature: s.signature || '',
+                employment_status: s.employment_status,
+                marital_status: s.marital_status,
+                height: s.height,
+                nin_id: s.nin_id,
+              };
+              upstreamProviderName = slipRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
+            }
+          } catch (slipErr: any) {
+            this.logger.warn(`verifyNin slip attempt failed: ${slipErr?.message}, falling back to verifyNinAdvance`);
+          }
         }
 
         // 2. Fall back to Advance NIN lookup

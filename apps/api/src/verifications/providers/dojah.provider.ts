@@ -248,7 +248,7 @@ export class DojahProvider implements IVerificationProvider {
         }
       }
 
-      // Synthesize Custom NIMC Card Premium (Plastic Card Image + A4 Printable PDF)
+      // Synthesize Custom NIMC Card Premium (Plastic Card Image) - Fast-path imageOnly for Trustbrick & API calls
       if (data.tier === 'premium' && (entity.first_name || entity.firstname)) {
         try {
           const cardRes = await generateNimcPremiumCard({
@@ -260,7 +260,7 @@ export class DojahProvider implements IVerificationProvider {
             gender: entity.gender,
             birthdate: entity.date_of_birth || entity.dob || entity.birthdate,
             photo: entity.photo,
-          });
+          }, { imageOnly: true });
           entity.image = cardRes.cardImageBase64;
           delete entity.card_image;
           delete entity.card_pdf;

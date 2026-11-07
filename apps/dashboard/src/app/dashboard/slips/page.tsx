@@ -108,37 +108,12 @@ export default function NinSlipGeneratorPage() {
     setErrorMsg(null)
     setIsSubmitting(true)
 
-    // STAGE 1: Fast Optimistic Lookup (<300ms)
+    // Single-Flight Fast Verification & Compilation (<1.0s)
     try {
-      const lookupPromise = ApiClient.lookupNinIdentity(cleanNin, consent)
-      const docGenPromise = ApiClient.generateNinSlip(cleanNin, formatType, consent, {
+      const docRes = await ApiClient.generateNinSlip(cleanNin, formatType, consent, {
         cardType: formatType,
         fileType: "both",
       })
-
-      // Handle Stage 1 response as soon as it resolves
-      lookupPromise
-        .then((lookupRes) => {
-          if (lookupRes && lookupRes.data) {
-            setOptimisticRecord({
-              nin: cleanNin,
-              trackingId: lookupRes.data.trackingId || lookupRes.trackingId || "",
-              fullName: lookupRes.data.fullName || lookupRes.fullName || "VERIFIED CITIZEN",
-              firstName: lookupRes.data.firstName,
-              surname: lookupRes.data.surname,
-              photoBase64: lookupRes.data.photoBase64 || lookupRes.photoBase64,
-              cached: lookupRes.meta?.cached || false,
-              isCompiling: true,
-              latencyMs: lookupRes.meta?.latency_ms || 110,
-            })
-          }
-        })
-        .catch(() => {
-          // If lookup fails standalone, fallback gracefully to full document response
-        })
-
-      // STAGE 2: Full Document Compilation Resolution
-      const docRes = await docGenPromise
 
       if (docRes && (docRes.status === "success" || docRes.success)) {
         const d = docRes.data || docRes
@@ -157,7 +132,7 @@ export default function NinSlipGeneratorPage() {
           docxBase64: d.docxBase64 || (docRes as any).docxBase64,
           svgContent: d.svgContent || docRes.svgContent,
           cached: docRes.meta?.cached || false,
-          cost: docRes.meta?.cost_ngx || 250,
+          cost: docRes.meta?.cost_ngx || (formatType === 'premium' ? 350 : (formatType === 'card' ? 300 : 250)),
           latencyMs: docRes.meta?.latency_ms || 140,
           timestamp: new Date().toLocaleTimeString(),
         }

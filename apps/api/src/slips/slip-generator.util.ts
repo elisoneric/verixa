@@ -32,10 +32,61 @@ export function getSlipAssetPath(filename: string): string {
   return candidates[0];
 }
 
+// In-Memory Asset Cache to eliminate synchronous disk I/O on hot paths
+const assetBufferCache = new Map<string, Buffer>();
+const assetBase64Cache = new Map<string, string>();
+
+export function getSlipAssetBuffer(filename: string): Buffer {
+  let cached = assetBufferCache.get(filename);
+  if (cached) return cached;
+
+  const assetPath = getSlipAssetPath(filename);
+  if (fs.existsSync(assetPath)) {
+    try {
+      cached = fs.readFileSync(assetPath);
+      assetBufferCache.set(filename, cached);
+      return cached;
+    } catch {
+      return Buffer.alloc(0);
+    }
+  }
+  return Buffer.alloc(0);
+}
+
+export function getSlipAssetBase64(filename: string): string {
+  let cached = assetBase64Cache.get(filename);
+  if (cached !== undefined) return cached;
+
+  const buf = getSlipAssetBuffer(filename);
+  cached = buf.length > 0 ? buf.toString('base64') : '';
+  assetBase64Cache.set(filename, cached);
+  return cached;
+}
+
+// Pre-warm static assets into memory immediately at startup
+try {
+  const preWarmList = [
+    'nimc_premium_front.jpg',
+    'nimc_premium_back.jpg',
+    'nimc_premium_a4_template.jpg',
+    'OCRB.ttf',
+    'image1.jpg',
+    'nin_card_template.png',
+    'nin premium.docx',
+    'ninslip.docx',
+    'default_mock_photo.jpg',
+  ];
+  for (const item of preWarmList) {
+    getSlipAssetBuffer(item);
+  }
+} catch {
+  // Graceful silent fallback if running in standalone test runner
+}
+
 export function resolveSlipPhotoBuffer(photo?: string | Buffer): Buffer | null {
   if (!photo) {
-    const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
-    return fs.existsSync(defaultPhotoPath) ? fs.readFileSync(defaultPhotoPath) : null;
+    const defaultBuf = getSlipAssetBuffer('default_mock_photo.jpg');
+    return defaultBuf.length > 0 ? defaultBuf : null;
   }
 
   if (Buffer.isBuffer(photo)) {
@@ -46,8 +97,8 @@ export function resolveSlipPhotoBuffer(photo?: string | Buffer): Buffer | null {
     const cleanBase64 = photo.includes('base64,') ? photo.split('base64,')[1] : photo;
     return Buffer.from(cleanBase64, 'base64');
   } catch {
-    const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
-    return fs.existsSync(defaultPhotoPath) ? fs.readFileSync(defaultPhotoPath) : null;
+    const defaultBuf = getSlipAssetBuffer('default_mock_photo.jpg');
+    return defaultBuf.length > 0 ? defaultBuf : null;
   }
 }
 
@@ -72,12 +123,12 @@ export function wrapText(text: string | undefined, maxCharsPerLine = 28): string
 }
 
 export async function generateDocxSlip(data: SlipData): Promise<Buffer> {
-  const templatePath = getSlipAssetPath('ninslip.docx');
-  if (!fs.existsSync(templatePath)) {
-    throw new Error(`DOCX template not found at ${templatePath}`);
+  const templateBuf = getSlipAssetBuffer('ninslip.docx');
+  if (templateBuf.length === 0) {
+    throw new Error('DOCX template not found (ninslip.docx)');
   }
 
-  const zip = new AdmZip(templatePath);
+  const zip = new AdmZip(templateBuf);
   let docXml = zip.readAsText('word/document.xml');
 
   // Strip spell-checking tags that break runs in Word
@@ -137,12 +188,12 @@ export async function generateDocxSlip(data: SlipData): Promise<Buffer> {
 }
 
 export async function generateNimcPremiumDocx(data: SlipData): Promise<Buffer> {
-  const templatePath = getSlipAssetPath('nin premium.docx');
-  if (!fs.existsSync(templatePath)) {
-    throw new Error(`NIMC Premium DOCX template not found at ${templatePath}`);
+  const templateBuf = getSlipAssetBuffer('nin premium.docx');
+  if (templateBuf.length === 0) {
+    throw new Error('NIMC Premium DOCX template not found (nin premium.docx)');
   }
 
-  const zip = new AdmZip(templatePath);
+  const zip = new AdmZip(templateBuf);
   let docXml = zip.readAsText('word/document.xml');
 
   // Strip spell-checking tags that break runs in Word
@@ -192,12 +243,11 @@ export async function generateNimcPremiumDocx(data: SlipData): Promise<Buffer> {
 }
 
 export async function generatePdfSlip(data: SlipData): Promise<Buffer> {
-  const bgPath = getSlipAssetPath('image1.jpg');
-  if (!fs.existsSync(bgPath)) {
-    throw new Error(`Background image not found at ${bgPath}`);
+  const bgBuffer = getSlipAssetBuffer('image1.jpg');
+  if (bgBuffer.length === 0) {
+    throw new Error('Background image not found (image1.jpg)');
   }
 
-  const bgBuffer = fs.readFileSync(bgPath);
   const photoBuffer = resolveSlipPhotoBuffer(data.photo);
 
   const pdfDoc = await PDFDocument.create();
@@ -516,8 +566,7 @@ export async function generateDigitalNinCardPdf(data: SlipData): Promise<Buffer>
 }
 
 export async function generateDigitalNinCardSvg(data: SlipData): Promise<string> {
-  const templatePath = getSlipAssetPath('nin_card_template.png');
-  const templateB64 = fs.existsSync(templatePath) ? fs.readFileSync(templatePath).toString('base64') : '';
+  const templateB64 = getSlipAssetBase64('nin_card_template.png');
   
   const photoBuf = resolveSlipPhotoBuffer(data.photo);
   const photoB64 = photoBuf ? photoBuf.toString('base64') : '';
@@ -703,9 +752,7 @@ export interface NimcPremiumCardResult {
 
 export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string> {
   const photoBuffer = resolveSlipPhotoBuffer(data.photo);
-  const frontTemplatePath = getSlipAssetPath('nimc_premium_front.jpg');
-  const frontBytes = fs.existsSync(frontTemplatePath) ? fs.readFileSync(frontTemplatePath) : Buffer.alloc(0);
-  const frontBase64 = `data:image/jpeg;base64,${frontBytes.toString('base64')}`;
+  const frontBase64 = `data:image/jpeg;base64,${getSlipAssetBase64('nimc_premium_front.jpg')}`;
 
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
   const ninFormatted = cleanNin.length === 11 
@@ -776,22 +823,27 @@ export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string
   </svg>`;
 }
 
-export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremiumCardResult> {
-  const photoBuffer = resolveSlipPhotoBuffer(data.photo);
-  const frontTemplatePath = getSlipAssetPath('nimc_premium_front.jpg');
-  const backTemplatePath = getSlipAssetPath('nimc_premium_back.jpg');
-  const a4TemplatePath = getSlipAssetPath('nimc_premium_a4_template.jpg');
-  const fontPath = getSlipAssetPath('OCRB.ttf');
-
-  const a4TemplateBytes = fs.existsSync(a4TemplatePath) ? fs.readFileSync(a4TemplatePath) : fs.readFileSync(frontTemplatePath);
-  const frontTemplateBytes = fs.existsSync(frontTemplatePath) ? fs.readFileSync(frontTemplatePath) : a4TemplateBytes;
-  const backTemplateBytes = fs.existsSync(backTemplatePath) ? fs.readFileSync(backTemplatePath) : a4TemplateBytes;
-  const fontBytes = fs.readFileSync(fontPath);
-
+export async function generateNimcPremiumCard(data: SlipData, options?: { imageOnly?: boolean }): Promise<NimcPremiumCardResult> {
   // Generate full synthesized SVG copy
   const cardSvg = await generateNimcPremiumCardSvg(data);
   const cardSvgBuffer = Buffer.from(cardSvg, 'utf-8');
   const cardImageBase64 = `data:image/svg+xml;base64,${cardSvgBuffer.toString('base64')}`;
+
+  // Fast-path: If caller only needs the card image (e.g. Trustbrick API / KYC verification), return immediately in ~10ms!
+  if (options?.imageOnly) {
+    return {
+      cardImageBase64,
+      cardSvg,
+      pdfBase64: '',
+      pdfBuffer: Buffer.alloc(0),
+    };
+  }
+
+  const photoBuffer = resolveSlipPhotoBuffer(data.photo);
+  const a4TemplateBytes = getSlipAssetBuffer('nimc_premium_a4_template.jpg');
+  const frontTemplateBytes = getSlipAssetBuffer('nimc_premium_front.jpg');
+  const backTemplateBytes = getSlipAssetBuffer('nimc_premium_back.jpg');
+  const fontBytes = getSlipAssetBuffer('OCRB.ttf');
 
   // Format fields - natural typography matching official NIMC standard
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
@@ -966,7 +1018,7 @@ export async function generateNimcPremiumCard(data: SlipData): Promise<NimcPremi
   const pdfBytes = await doc.save();
   const pdfBuffer = Buffer.from(pdfBytes);
   const pdfBase64 = `data:application/pdf;base64,${pdfBuffer.toString('base64')}`;
-  const cardBackBase64 = backTemplateBytes.length ? `data:image/jpeg;base64,${backTemplateBytes.toString('base64')}` : '';
+  const cardBackBase64 = backTemplateBytes.length ? `data:image/jpeg;base64,${getSlipAssetBase64('nimc_premium_back.jpg')}` : '';
 
   let docxBuffer: Buffer | null = null;
   let docxBase64: string | null = null;

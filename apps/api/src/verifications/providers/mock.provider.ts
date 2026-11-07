@@ -135,7 +135,7 @@ export class MockProvider implements IVerificationProvider {
         gender: 'M',
         birthdate: dob,
         photo: photoBase64,
-      });
+      }, { imageOnly: true });
       cardImageBase64 = cardRes.cardImageBase64;
       premiumPdfBase64 = cardRes.pdfBase64;
     } catch {
@@ -281,7 +281,7 @@ export class MockProvider implements IVerificationProvider {
         gender: 'M',
         birthdate: dob,
         photo: photoBase64,
-      });
+      }, { imageOnly: true });
       cardImageBase64 = cardRes.cardImageBase64;
       premiumPdfBase64 = cardRes.pdfBase64;
     } catch {
