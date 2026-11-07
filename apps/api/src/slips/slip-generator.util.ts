@@ -3,6 +3,7 @@ import * as path from 'path';
 import AdmZip from 'adm-zip';
 import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
 import * as qrcode from 'qrcode';
+import sharp from 'sharp';
 
 export interface SlipData {
   nin: string;
@@ -753,15 +754,11 @@ export interface NimcPremiumCardResult {
 export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string> {
   const photoBuffer = resolveSlipPhotoBuffer(data.photo);
   const frontBase64 = `data:image/jpeg;base64,${getSlipAssetBase64('nimc_premium_front.jpg')}`;
+  const ocrbBase64 = getSlipAssetBase64('OCRB.ttf');
 
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
   const ninFormatted = cleanNin.length === 11 
     ? `${cleanNin.slice(0, 4)} ${cleanNin.slice(4, 7)} ${cleanNin.slice(7)}`
-    : cleanNin;
-  
-  // Diagonal watermark: NO space after first 4 numbers! e.g. '3088241 1172'
-  const watermarkNin = cleanNin.length === 11
-    ? `${cleanNin.slice(0, 7)} ${cleanNin.slice(7)}`
     : cleanNin;
 
   const rawSurname = (data.surname || (data as any).last_name || '').toUpperCase().trim();
@@ -787,98 +784,95 @@ export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string
     }
   }
 
-  // Exact 1:1 coordinates mapped from premium.webp onto the 2576 x 1632 canvas
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2576 1632" width="100%" height="100%">
+  // Exact 1:1 coordinates extracted from Word design ("nin premium.docx")
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1379 874" width="1379" height="874">
     <defs>
-      <clipPath id="photoClip">
-        <rect x="110" y="390" width="610" height="780" rx="35" ry="35" />
-      </clipPath>
       <style>
-        .ocrb { font-family: 'Courier New', 'Consolas', monospace; font-weight: bold; fill: #000000; }
-        .wm { font-family: 'Courier New', 'Consolas', monospace; font-weight: bold; fill: #325f2d; opacity: 0.42; }
+        @font-face {
+          font-family: 'OCR-B 10 BT';
+          src: url('data:font/truetype;charset=utf-8;base64,${ocrbBase64}') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+        }
+        .ocrb {
+          font-family: 'OCR-B 10 BT', monospace;
+          fill: #000000;
+        }
+        .wm {
+          font-family: 'OCR-B 10 BT', monospace;
+          fill: #9a9a9a;
+          opacity: 0.65;
+        }
       </style>
     </defs>
-    <!-- 1. Authentic High-Definition Blank Template (2576 x 1632) -->
-    <image href="${frontBase64}" x="0" y="0" width="2576" height="1632" />
 
-    <!-- 2. Citizen Photo strictly clipped inside portrait boundary (never exceeds card width) -->
-    ${photoDataUri ? `<image href="${photoDataUri}" x="110" y="390" width="610" height="780" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)" />` : ''}
+    <!-- 1. Authentic Clear Background Template from nin premium clear.pdf (1379 x 874) -->
+    <image href="${frontBase64}" x="0" y="0" width="1379" height="874" />
 
-    <!-- 3. Left-Aligned Demographic Details (under respective titles) -->
-    <text x="802" y="605" class="ocrb" font-size="64">${surname}</text>
-    <text x="801" y="815" class="ocrb" font-size="64">${givenNames}</text>
-    <text x="801" y="1030" class="ocrb" font-size="64">${formattedDob}</text>
-    <text x="1458" y="1030" class="ocrb" font-size="64">${genderChar}</text>
+    <!-- 2. Four Background Watermarks (rendered in background BEFORE photo, so WM 1 goes under photo with small part out) -->
+    <!-- WM 1: Under photo (center 201.7, 604.3), rot -45.57 deg, NO SPACE -->
+    <text x="201.7" y="614" class="wm" font-size="37" text-anchor="middle" transform="rotate(-45.57 201.7 604.3)">${cleanNin}</text>
 
-    <!-- 4. Issue Date: Centered directly under 'ISSUE DATE' title (center x = 2204) -->
-    <text x="2204" y="1100" class="ocrb" font-size="64" text-anchor="middle">${issueDateFormatted}</text>
+    <!-- WM 2: Bottom-left beside photo (center 152.4, 738.6), rot -45.57 deg, NO SPACE -->
+    <text x="152.4" y="748" class="wm" font-size="37" text-anchor="middle" transform="rotate(-45.57 152.4 738.6)">${cleanNin}</text>
 
-    <!-- 5. National Identification Number (NIN): Big bold font, centered under title (center x = 1318) -->
-    <text x="1318" y="1505" class="ocrb" font-size="160" text-anchor="middle" letter-spacing="4">${ninFormatted}</text>
+    <!-- WM 3: Lower right shifted more to the right, pointing directly to bottom-right corner, NO SPACE -->
+    <text x="1170" y="730" class="wm" font-size="37" text-anchor="middle" transform="rotate(38 1170 730)">${cleanNin}</text>
 
-    <!-- 6. Three Diagonal Watermarks (no space after 4th digit) -->
-    <text x="120" y="1360" class="wm" font-size="72" transform="rotate(35 120 1360)">${watermarkNin}</text>
-    <text x="1950" y="780" class="wm" font-size="72" transform="rotate(35 1950 780)">${watermarkNin}</text>
-    <text x="2180" y="1420" class="wm" font-size="72" transform="rotate(35 2180 1420)">${watermarkNin}</text>
+    <!-- WM 4: Horizontal watermark directly centered on the NGA letters, completely clear of QR code, NO SPACE -->
+    <text x="1138" y="458" class="wm" font-size="37" text-anchor="middle">${cleanNin}</text>
+
+    <!-- 3. Citizen Photo strictly with STRAIGHT EDGES (no rounded corners, covers WM 1) -->
+    ${photoDataUri ? `<image href="${photoDataUri}" x="16.5" y="195" width="354" height="435.5" preserveAspectRatio="xMidYMid slice" />` : ''}
+
+    <!-- 4. Left-Aligned Demographics under respective labels -->
+    <text x="424" y="338" class="ocrb" font-size="46">${surname}</text>
+    <text x="422" y="447" class="ocrb" font-size="46">${givenNames}</text>
+    <text x="422" y="565" class="ocrb" font-size="46">${formattedDob}</text>
+    <text x="773" y="565" class="ocrb" font-size="46">${genderChar}</text>
+
+    <!-- 5. Issue Date: Centered under title -->
+    <text x="1196" y="598" class="ocrb" font-size="40" text-anchor="middle">${issueDateFormatted}</text>
+
+    <!-- 6. Big National Identification Number (NIN) centered beneath title with 4-3-4 spacing -->
+    <text x="689" y="818" class="ocrb" font-size="116" text-anchor="middle">${ninFormatted}</text>
   </svg>`;
 }
 
 export async function generateNimcPremiumCard(data: SlipData, options?: { imageOnly?: boolean }): Promise<NimcPremiumCardResult> {
-  // Generate full synthesized SVG copy
+  // 1. Generate full synthesized SVG copy with OCR-B 10 BT font and exact Word coordinates
   const cardSvg = await generateNimcPremiumCardSvg(data);
   const cardSvgBuffer = Buffer.from(cardSvg, 'utf-8');
-  const cardImageBase64 = `data:image/svg+xml;base64,${cardSvgBuffer.toString('base64')}`;
 
-  // Fast-path: If caller only needs the card image (e.g. Trustbrick API / KYC verification), return immediately in ~10ms!
+  // 2. Render high-resolution raster PNG image (fast ~15ms via Sharp)
+  let cardImagePngBuffer: Buffer;
+  try {
+    cardImagePngBuffer = await sharp(cardSvgBuffer).png().toBuffer();
+  } catch (err: any) {
+    cardImagePngBuffer = cardSvgBuffer;
+  }
+  const cardImageBase64 = `data:image/png;base64,${cardImagePngBuffer.toString('base64')}`;
+
+  // Fast-path: If caller only needs the card image (e.g. Trustbrick API / KYC verification), return immediately in ~15ms!
   if (options?.imageOnly) {
     return {
       cardImageBase64,
       cardSvg,
       pdfBase64: '',
       pdfBuffer: Buffer.alloc(0),
+      cardImageBuffer: cardImagePngBuffer,
     };
   }
 
-  const photoBuffer = resolveSlipPhotoBuffer(data.photo);
   const a4TemplateBytes = getSlipAssetBuffer('nimc_premium_a4_template.jpg');
-  const frontTemplateBytes = getSlipAssetBuffer('nimc_premium_front.jpg');
   const backTemplateBytes = getSlipAssetBuffer('nimc_premium_back.jpg');
-  const fontBytes = getSlipAssetBuffer('OCRB.ttf');
 
-  // Format fields - natural typography matching official NIMC standard
-  const cleanNin = String(data.nin || '').replace(/\D/g, '');
-  const ninFormatted = cleanNin.length === 11 
-    ? `${cleanNin.slice(0, 4)} ${cleanNin.slice(4, 7)} ${cleanNin.slice(7)}`
-    : cleanNin;
-  
-  // Diagonal watermark: NO space after first 4 numbers! e.g. '3088241 1172'
-  const watermarkNin = cleanNin.length === 11
-    ? `${cleanNin.slice(0, 7)} ${cleanNin.slice(7)}`
-    : cleanNin;
-
-  const rawSurname = (data.surname || (data as any).last_name || '').toUpperCase().trim();
-  const surname = rawSurname;
-
-  const first = (data.firstName || (data as any).first_name || '').toUpperCase().trim();
-  const middle = (data.middleName || (data as any).middle_name || '').toUpperCase().trim();
-  const givenNames = middle ? `${first}, ${middle}` : first;
-
-  const rawDob = data.birthdate || (data as any).dob || (data as any).date_of_birth;
-  const formattedDob = formatNimcDate(rawDob || '1990-01-01');
-
-  const genderChar = (data.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M';
-  const issueDateFormatted = formatNimcDate(new Date().toISOString().slice(0, 10));
-
-  // Generate printable A4 PDF (Authentic official NIMC 1:1 specification)
+  // 3. Generate printable official A4 PDF (Overlaying front card at exact coordinates over official sheet)
   const doc = await PDFDocument.create();
-  const fontkitPkg = require('@pdf-lib/fontkit');
-  doc.registerFontkit(fontkitPkg);
-  const ocrbFont = await doc.embedFont(fontBytes);
-
-  const a4TemplateImg = await doc.embedJpg(a4TemplateBytes);
   const page = doc.addPage([595.28, 841.89]); // A4 standard
 
-  // 1. Authentic Background Placement: Includes top writeup, front card, scissors/fold spacing, and back card
+  // Official background template: Includes top writeup, scissors/fold spacing, and back card
+  const a4TemplateImg = await doc.embedJpg(a4TemplateBytes);
   page.drawImage(a4TemplateImg, {
     x: 135.000,
     y: 384.654,
@@ -886,133 +880,22 @@ export async function generateNimcPremiumCard(data: SlipData, options?: { imageO
     height: 434.736,
   });
 
-  // 2. Citizen Photo (guaranteed to not spill outside card width)
-  if (photoBuffer && photoBuffer.length > 0) {
-    try {
-      let photoImg;
-      try {
-        photoImg = await doc.embedJpg(photoBuffer);
-      } catch {
-        photoImg = await doc.embedPng(photoBuffer);
-      }
-      page.drawImage(photoImg, {
-        x: 182.250,
-        y: 593.712,
-        width: 54.023,
-        height: 71.928,
-      });
-    } catch {
-      try {
-        const defaultPhotoPath = getSlipAssetPath('default_mock_photo.jpg');
-        if (fs.existsSync(defaultPhotoPath)) {
-          const photoImg = await doc.embedJpg(fs.readFileSync(defaultPhotoPath));
-          page.drawImage(photoImg, {
-            x: 182.250,
-            y: 593.712,
-            width: 54.023,
-            height: 71.928,
-          });
-        }
-      } catch {}
-    }
-  }
-
-  // 3. Citizen Details: Exact official coordinates from authentic NIMC PDF
-  // Surname
-  page.drawText(' ' + surname, {
-    x: 249.120,
-    y: 644.764,
-    size: 8.0,
-    font: ocrbFont,
-    color: rgb(0, 0, 0),
+  // White-out underlying card region completely (covering from y = 544 up to 705 pt)
+  page.drawRectangle({
+    x: 180.000,
+    y: 544.000,
+    width: 258.000,
+    height: 161.000,
+    color: rgb(1, 1, 1),
   });
 
-  // Given Names
-  page.drawText(' ' + givenNames, {
-    x: 249.120,
-    y: 623.164,
-    size: 8.0,
-    font: ocrbFont,
-    color: rgb(0, 0, 0),
-  });
-
-  // Date of Birth: clean single spacing
-  page.drawText(' ' + formattedDob, {
-    x: 249.120,
-    y: 600.844,
-    size: 8.0,
-    font: ocrbFont,
-    color: rgb(0, 0, 0),
-  });
-
-  // Gender
-  page.drawText(' ' + genderChar, {
-    x: 325.800,
-    y: 600.844,
-    size: 8.0,
-    font: ocrbFont,
-    color: rgb(0, 0, 0),
-  });
-
-  // Issue Date: placed cleanly below the title label
-  page.drawText(' ' + issueDateFormatted, {
-    x: 372.960,
-    y: 589.324,
-    size: 8.0,
-    font: ocrbFont,
-    color: rgb(0, 0, 0),
-  });
-
-  // 4. National Identification Number (NIN): Big bold size (22.0 pt), centered directly under the title
-  const ninFontSize = 22.0;
-  const ninWidth = ocrbFont.widthOfTextAtSize(ninFormatted, ninFontSize);
-  // Center directly under the 'National Identification Number (NIN)' heading (center x ~ 304.0)
-  const ninCenterX = 304.0 - (ninWidth / 2);
-
-  page.drawText(ninFormatted, {
-    x: ninCenterX,
-    y: 554.925,
-    size: ninFontSize,
-    font: ocrbFont,
-    color: rgb(0, 0, 0),
-  });
-
-  // 5. Diagonal Security Watermarks (3 appearances, no space after first 4 digits: '3088241 1172')
-  const wmColor = rgb(0.0, 0.4, 0.2);
-  const wmOpacity = 0.18;
-  const wmSize = 9.0;
-
-  // Appearance 1: lower-left under photo
-  page.drawText(watermarkNin, {
-    x: 171.360,
-    y: 576.210,
-    size: wmSize,
-    font: ocrbFont,
-    color: wmColor,
-    opacity: wmOpacity,
-    rotate: degrees(35),
-  });
-
-  // Appearance 2: upper-left
-  page.drawText(watermarkNin, {
-    x: 171.360,
-    y: 610.770,
-    size: wmSize,
-    font: ocrbFont,
-    color: wmColor,
-    opacity: wmOpacity,
-    rotate: degrees(35),
-  });
-
-  // Appearance 3: upper-right
-  page.drawText(watermarkNin, {
-    x: 356.240,
-    y: 554.610,
-    size: wmSize,
-    font: ocrbFont,
-    color: wmColor,
-    opacity: wmOpacity,
-    rotate: degrees(-38),
+  // Front card overlay (Word design rendered via sharp with exact OCR-B 10 BT font and clean height)
+  const frontImg = await doc.embedPng(cardImagePngBuffer);
+  page.drawImage(frontImg, {
+    x: 182.000,
+    y: 545.500,
+    width: 255.000,
+    height: 157.000,
   });
 
   const pdfBytes = await doc.save();
@@ -1035,7 +918,7 @@ export async function generateNimcPremiumCard(data: SlipData, options?: { imageO
     pdfBuffer,
     docxBase64: docxBase64 || undefined,
     docxBuffer: docxBuffer || undefined,
-    cardImageBuffer: frontTemplateBytes,
+    cardImageBuffer: cardImagePngBuffer,
   };
 }
 

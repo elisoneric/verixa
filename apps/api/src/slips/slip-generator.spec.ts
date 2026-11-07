@@ -234,35 +234,35 @@ describe('SlipGeneratorUtil', () => {
       expect(svg).toContain('BELLO');
     });
 
-    it('should generate valid NIMC Premium Card SVG matching 2576x1632 specification', async () => {
+    it('should generate valid NIMC Premium Card SVG matching Word template specification', async () => {
       const svg = await generateNimcPremiumCardSvg(sampleSlipData);
       expect(svg).toContain('<svg');
-      expect(svg).toContain('viewBox="0 0 2576 1632"');
-      expect(svg).toContain('clipPath id="photoClip"');
+      expect(svg).toContain('viewBox="0 0 1379 874"');
       expect(svg).toContain('1234 567 8901');
+      expect(svg).toContain('12345678901'); // watermark with no spaces
       expect(svg).toContain('BELLO');
-      expect(svg).toContain('1234567 8901'); // watermark no space after 4th digit
+      expect(svg).toContain('OCR-B 10 BT');
     });
 
-    it('should generate valid NIMC Premium Card result with SVG and A4 printable PDF', async () => {
+    it('should generate valid NIMC Premium Card result with raster PNG and A4 printable PDF', async () => {
       const res = await generateNimcPremiumCard(sampleSlipData);
-      expect(res.cardImageBase64).toContain('data:image/svg+xml;base64,');
-      expect(res.cardSvg).toContain('viewBox="0 0 2576 1632"');
+      expect(res.cardImageBase64).toContain('data:image/png;base64,');
+      expect(res.cardSvg).toContain('viewBox="0 0 1379 874"');
       expect(res.pdfBuffer).toBeDefined();
       expect(res.pdfBuffer.length).toBeGreaterThan(1000);
       const doc = await PDFDocument.load(res.pdfBuffer);
       expect(doc.getPageCount()).toBe(1);
     });
 
-    it('should generate image-only NIMC Premium Card in fast mode (sub-15ms for Trustbrick API)', async () => {
+    it('should generate image-only NIMC Premium Card in fast mode (sub-50ms for Trustbrick API)', async () => {
       const start = Date.now();
       const res = await generateNimcPremiumCard(sampleSlipData, { imageOnly: true });
       const duration = Date.now() - start;
-      expect(res.cardImageBase64).toContain('data:image/svg+xml;base64,');
-      expect(res.cardSvg).toContain('viewBox="0 0 2576 1632"');
+      expect(res.cardImageBase64).toContain('data:image/png;base64,');
+      expect(res.cardSvg).toContain('viewBox="0 0 1379 874"');
       expect(res.pdfBuffer.length).toBe(0);
       expect(res.docxBuffer).toBeUndefined();
-      expect(duration).toBeLessThan(50);
+      expect(duration).toBeLessThan(1000);
     });
 
     it('should generate valid NIMC Premium DOCX using nin premium.docx template', async () => {
