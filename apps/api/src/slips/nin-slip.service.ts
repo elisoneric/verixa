@@ -536,7 +536,7 @@ export class NinSlipService {
       org_id: orgId,
       environment: validEnv,
       api_key_id: apiKeyId || 'dashboard_slip',
-      serviceType: 'nin_slip',
+      serviceType: serviceTypeRateKey,
       status: VerificationStatus.SUCCESS,
       upstreamProvider: isCacheHit ? 'verixa_smart_cache' : (isSandbox ? 'verixa_mock' : 'direct'),
       isCached: isCacheHit,
@@ -554,7 +554,7 @@ export class NinSlipService {
       : (identityData.nin_id || null);
     const effectivePdfBuffer = pdfBuffer || (effectivePdfBase64 ? Buffer.from(effectivePdfBase64, 'base64') : null);
 
-    const resultData = {
+    const resultData: any = {
       // 1. Identity Identifiers
       nin: cleanNin,
       tracking_id: identityData.trackingId,
@@ -598,15 +598,18 @@ export class NinSlipService {
       slipType: effectiveCardType,
       nin_id: effectivePdfBase64,
       pdfBase64: effectivePdfBase64,
-      pdfBuffer: effectivePdfBuffer,
       card_image: cardImageBase64,
       image: cardImageBase64,
       cardPdfBase64: (isPremium || isDojahSlipSelected) ? effectivePdfBase64 : undefined,
       docxBase64: docxBuffer ? docxBuffer.toString('base64') : null,
-      docxBuffer: docxBuffer,
       svgContent: slipSvg,
       slipSvg,
     };
+
+    // Attach binary buffers as non-enumerable properties so they are accessible in Node.js
+    // but NEVER serialized into multi-megabyte JSON arrays in HTTP responses!
+    Object.defineProperty(resultData, 'pdfBuffer', { value: effectivePdfBuffer, enumerable: false, writable: true });
+    Object.defineProperty(resultData, 'docxBuffer', { value: docxBuffer, enumerable: false, writable: true });
 
     return {
       success: true,
@@ -716,7 +719,28 @@ export class NinSlipService {
       throw new BadRequestException('Identity demographic data cannot be retrieved from record');
     }
 
-    const normalizedFormat = String(format || 'slip').toLowerCase() as 'card' | 'slip' | 'premium';
+    const reqCardType = (log.requestPayload as any)?.cardType || (log.requestPayload as any)?.type;
+    const reqFormat = (log.requestPayload as any)?.format;
+    const cost = Number(log.costDeducted || 0);
+    const sType = String(log.serviceType || '').toLowerCase();
+    let originalFormat: 'card' | 'slip' | 'premium' = 'slip';
+    if (
+      reqCardType === 'premium' ||
+      reqFormat === 'premium' ||
+      sType === 'nin_premium' ||
+      cost === 350
+    ) {
+      originalFormat = 'premium';
+    } else if (
+      reqCardType === 'card' ||
+      reqFormat === 'card' ||
+      sType === 'nin_card' ||
+      cost === 300
+    ) {
+      originalFormat = 'card';
+    }
+
+    const normalizedFormat = String(format || originalFormat).toLowerCase() as 'card' | 'slip' | 'premium';
     const normalizedFileType = String(fileType || 'pdf').toLowerCase() as 'pdf' | 'docx';
 
     if (normalizedFormat !== 'card' && normalizedFormat !== 'slip' && normalizedFormat !== 'premium') {

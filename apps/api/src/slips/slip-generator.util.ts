@@ -844,11 +844,14 @@ export async function generateNimcPremiumCard(data: SlipData, options?: { imageO
   const cardSvg = await generateNimcPremiumCardSvg(data);
   const cardSvgBuffer = Buffer.from(cardSvg, 'utf-8');
 
-  // 2. Render high-resolution raster PNG image (fast ~15ms via Sharp)
+  // 2. Render high-resolution raster image (fast ~15ms via Sharp)
   let cardImagePngBuffer: Buffer;
+  let cardJpgBuffer: Buffer;
   try {
+    cardJpgBuffer = await sharp(cardSvgBuffer).jpeg({ quality: 92 }).toBuffer();
     cardImagePngBuffer = await sharp(cardSvgBuffer).png().toBuffer();
   } catch (err: any) {
+    cardJpgBuffer = cardSvgBuffer;
     cardImagePngBuffer = cardSvgBuffer;
   }
   const cardImageBase64 = `data:image/png;base64,${cardImagePngBuffer.toString('base64')}`;
@@ -889,8 +892,9 @@ export async function generateNimcPremiumCard(data: SlipData, options?: { imageO
     color: rgb(1, 1, 1),
   });
 
-  // Front card overlay (Word design rendered via sharp with exact OCR-B 10 BT font and clean height)
-  const frontImg = await doc.embedPng(cardImagePngBuffer);
+  // Front card overlay (Word design rendered with exact OCR-B 10 BT font and clean height)
+  // Embed crisp compressed JPEG to keep A4 PDF lightweight (~640KB vs 2.5MB)
+  const frontImg = await doc.embedJpg(cardJpgBuffer);
   page.drawImage(frontImg, {
     x: 182.000,
     y: 545.500,

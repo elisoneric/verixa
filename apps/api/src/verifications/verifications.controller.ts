@@ -317,7 +317,14 @@ export class VerificationsController {
       .take(limitNum);
 
     if (service && service !== 'all') {
-      queryBuilder.andWhere('log.serviceType = :service', { service: service.toLowerCase() });
+      const s = service.toLowerCase();
+      if (s === 'nin_slip') {
+        queryBuilder.andWhere('log.serviceType IN (:...slipsServices)', {
+          slipsServices: ['nin_slip', 'nin_card', 'nin_premium'],
+        });
+      } else {
+        queryBuilder.andWhere('log.serviceType = :service', { service: s });
+      }
     }
     if (status && status !== 'all') {
       const dbStatus = status.toLowerCase() === 'verified' || status.toLowerCase() === 'success'
@@ -336,21 +343,50 @@ export class VerificationsController {
     const [items, total] = await queryBuilder.getManyAndCount();
 
     return {
-      items: items.map((log) => ({
-        id: log.id,
-        service: log.serviceType.toUpperCase(),
-        status: log.status === VerificationStatus.SUCCESS ? 'Verified' : 'Failed',
-        environment: log.environment,
-        provider: log.upstreamProvider,
-        isCached: log.isCached ?? false,
-        source: log.source || (log.isCached ? 'CACHE' : 'LIVE'),
-        costDeducted: log.costDeducted ? Number(log.costDeducted) : (log.isCached ? 20 : (log.serviceType === 'nuban' ? 10 : 50)),
-        latencyMs: log.latencyMs || (log.isCached ? 14 : 142),
-        idempotencyKey: log.idempotencyKey,
-        identifier: log.requestPayload?.nin ? ('***' + String(log.requestPayload.nin).slice(-4)) : (log.requestPayload?.bvn ? ('***' + String(log.requestPayload.bvn).slice(-4)) : (log.requestPayload?.accountNumber || log.requestPayload?.rcNumber || log.requestPayload?.phone || ('Ref: ' + log.id.slice(0, 8)))),
-        format: log.requestPayload?.format || 'slip',
-        createdAt: log.createdAt,
-      })),
+      items: items.map((log) => {
+        const rawCardType = (log.requestPayload as any)?.cardType || (log.requestPayload as any)?.type;
+        const rawFormat = (log.requestPayload as any)?.format;
+        const cost = Number(log.costDeducted || 0);
+        const sType = String(log.serviceType || '').toLowerCase();
+        let resolvedFormat = 'slip';
+        if (
+          rawCardType === 'premium' ||
+          rawFormat === 'premium' ||
+          sType === 'nin_premium' ||
+          cost === 350 ||
+          (log.isCached && rawCardType === 'premium')
+        ) {
+          resolvedFormat = 'premium';
+        } else if (
+          rawCardType === 'card' ||
+          rawFormat === 'card' ||
+          sType === 'nin_card' ||
+          cost === 300 ||
+          (log.isCached && rawCardType === 'card')
+        ) {
+          resolvedFormat = 'card';
+        } else if (rawCardType === 'slip' || rawFormat === 'slip' || sType === 'nin_slip' || cost === 250) {
+          resolvedFormat = 'slip';
+        } else if (rawFormat && rawFormat !== 'both' && rawFormat !== 'pdf' && rawFormat !== 'docx') {
+          resolvedFormat = rawFormat;
+        }
+
+        return {
+          id: log.id,
+          service: log.serviceType.toUpperCase(),
+          status: log.status === VerificationStatus.SUCCESS ? 'Verified' : 'Failed',
+          environment: log.environment,
+          provider: log.upstreamProvider,
+          isCached: log.isCached ?? false,
+          source: log.source || (log.isCached ? 'CACHE' : 'LIVE'),
+          costDeducted: log.costDeducted ? Number(log.costDeducted) : (log.isCached ? 20 : (log.serviceType === 'nuban' ? 10 : 50)),
+          latencyMs: log.latencyMs || (log.isCached ? 14 : 142),
+          idempotencyKey: log.idempotencyKey,
+          identifier: log.requestPayload?.nin ? ('***' + String(log.requestPayload.nin).slice(-4)) : (log.requestPayload?.bvn ? ('***' + String(log.requestPayload.bvn).slice(-4)) : (log.requestPayload?.accountNumber || log.requestPayload?.rcNumber || log.requestPayload?.phone || ('Ref: ' + log.id.slice(0, 8)))),
+          format: resolvedFormat,
+          createdAt: log.createdAt,
+        };
+      }),
       total,
       page: pageNum,
       totalPages: Math.ceil(total / limitNum),
