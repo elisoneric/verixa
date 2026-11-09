@@ -305,8 +305,14 @@ export class NinSlipService {
     const reference = `vx_slip_${uuidv4().slice(0, 12)}`;
 
     // For standard slip, cache is only valid if complete address is present
+    // For NIMC Card, cache is only valid if authentic Dojah nin_id document is present
     const hasAddress = Boolean(cached?.data?.address || cached?.data?.residence_address || cached?.data?.residence_address_line_1 || cached?.data?.lga);
-    const isCacheUsable = Boolean(cached && cached.data?.photo && (effectiveCardType !== 'slip' || hasAddress));
+    const hasAuthenticCard = Boolean(cached?.data?.nin_id && String(cached?.data?.nin_id).startsWith('JVBERi'));
+    const isCacheUsable = Boolean(
+      cached &&
+      cached.data?.photo &&
+      (effectiveCardType === 'premium' || (effectiveCardType === 'slip' ? hasAddress : hasAuthenticCard))
+    );
 
     if (isCacheUsable) {
       // CACHE HIT! Discounted rate for regenerating existing verified slip
@@ -494,8 +500,8 @@ export class NinSlipService {
         this.logger.warn(`Could not generate NIMC Premium Card: ${e?.message}`);
       }
     } else if (isDojahSlipSelected) {
-      // NIMC Card: Use Dojah's authentic official card asset (entity.nin_id / image)
-      const rawCardAsset = identityData.nin_id || (identityData as any).image;
+      // NIMC Card: Use Dojah's authentic official card asset (entity.nin_id)
+      const rawCardAsset = identityData.nin_id;
       if (rawCardAsset) {
         const cleanAssetStr = String(rawCardAsset).replace(/^data:image\/[a-z]+;base64,/, '');
         if (cleanAssetStr.startsWith('JVBERi')) {

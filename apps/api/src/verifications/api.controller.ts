@@ -27,6 +27,7 @@ import { VerificationLog, VerificationStatus } from './entities/verification-log
 import { Wallet } from '../billing/entities/wallet.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { encryptPayload, sanitizeIdentityRetention } from '../common/utils/crypto.util';
+import { generateNimcPremiumCard } from '../slips/slip-generator.util';
 
 @Controller(['api', ''])
 export class ApiController {
@@ -192,11 +193,29 @@ export class ApiController {
         });
 
         const cleanEntity = cached.data?.entity !== undefined ? cached.data.entity : cached.data;
-        if (service === 'nin_premium' && cleanEntity && typeof cleanEntity === 'object') {
+        if ((service === 'nin_premium' || (cleanEntity && cleanEntity.tier === 'premium')) && cleanEntity && typeof cleanEntity === 'object') {
           delete cleanEntity.card_image;
           delete cleanEntity.card_pdf;
           delete cleanEntity.pdf;
           delete cleanEntity.nin_id;
+
+          // Always dynamically synthesize fresh OCR-B vector card image on cache hit
+          // Guarantees cached records in Redis or PostgreSQL never return stale/tofu images
+          try {
+            const cardRes = await generateNimcPremiumCard({
+              nin: cleanEntity.nin || identifier,
+              trackingId: cleanEntity.tracking_id || cleanEntity.trackingId || '',
+              firstName: cleanEntity.first_name || cleanEntity.firstname || '',
+              surname: cleanEntity.last_name || cleanEntity.surname || '',
+              middleName: cleanEntity.middle_name || cleanEntity.middlename || '',
+              gender: cleanEntity.gender || 'M',
+              birthdate: cleanEntity.date_of_birth || cleanEntity.dob || cleanEntity.birthdate || '',
+              photo: cleanEntity.photo,
+            }, { imageOnly: true });
+            cleanEntity.image = cardRes.cardImageBase64;
+          } catch {
+            // retain existing image on error
+          }
         }
 
         if (req.res && typeof req.res.setHeader === 'function') {
@@ -343,11 +362,26 @@ export class ApiController {
     });
 
     const cleanEntity = rawData?.entity !== undefined ? rawData.entity : rawData;
-    if (service === 'nin_premium' && cleanEntity && typeof cleanEntity === 'object') {
+    if ((service === 'nin_premium' || (cleanEntity && cleanEntity.tier === 'premium')) && cleanEntity && typeof cleanEntity === 'object') {
       delete cleanEntity.card_image;
       delete cleanEntity.card_pdf;
       delete cleanEntity.pdf;
       delete cleanEntity.nin_id;
+
+      // Ensure image is synthesized via OCR-B vector engine
+      try {
+        const cardRes = await generateNimcPremiumCard({
+          nin: cleanEntity.nin || identifier,
+          trackingId: cleanEntity.tracking_id || cleanEntity.trackingId || '',
+          firstName: cleanEntity.first_name || cleanEntity.firstname || '',
+          surname: cleanEntity.last_name || cleanEntity.surname || '',
+          middleName: cleanEntity.middle_name || cleanEntity.middlename || '',
+          gender: cleanEntity.gender || 'M',
+          birthdate: cleanEntity.date_of_birth || cleanEntity.dob || cleanEntity.birthdate || '',
+          photo: cleanEntity.photo,
+        }, { imageOnly: true });
+        cleanEntity.image = cardRes.cardImageBase64;
+      } catch {}
     }
 
     if (req.res && typeof req.res.setHeader === 'function') {
@@ -489,13 +523,16 @@ export class ApiController {
     const nin = String(query.nin || query.id || '').trim();
     if (!nin) throw new BadRequestException('nin query parameter is required');
     const isLive = req.environment === Environment.LIVE;
+    const tier = query.tier || 'basic';
+    const service = tier === 'premium' ? 'nin_premium' : (tier === 'slip' ? 'nin_slip' : 'nin');
+    const price = tier === 'premium' ? 120 : (tier === 'slip' ? 250 : 125);
     return this.executeVerification(
       req,
-      'nin',
+      service,
       nin,
       query,
-      125,
-      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...query, tier: 'basic' }) : this.mockProvider.verifyNin({ nin, ...query, tier: 'basic' }))
+      price,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...query, tier }) : this.mockProvider.verifyNin({ nin, ...query, tier }))
     );
   }
 
@@ -507,13 +544,16 @@ export class ApiController {
     const nin = String(payload.nin || payload.id || '').trim();
     if (!nin) throw new BadRequestException('nin is required');
     const isLive = req.environment === Environment.LIVE;
+    const tier = payload.tier || query.tier || 'basic';
+    const service = tier === 'premium' ? 'nin_premium' : (tier === 'slip' ? 'nin_slip' : 'nin');
+    const price = tier === 'premium' ? 120 : (tier === 'slip' ? 250 : 125);
     return this.executeVerification(
       req,
-      'nin',
+      service,
       nin,
       payload,
-      125,
-      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: payload.tier || 'basic' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: payload.tier || 'basic' }))
+      price,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier }) : this.mockProvider.verifyNin({ nin, ...payload, tier }))
     );
   }
 
@@ -555,7 +595,7 @@ export class ApiController {
 
   // GET & POST /api/v1/kyc/nin/premium (Custom NIMC Plastic Card & A4 Printable PDF)
   @UseGuards(ApiKeyGuard)
-  @Get(['v1/kyc/nin/premium', 'v1/kyc/nin/card', 'v1/kyc/nin/plastic-card'])
+  @Get(['v1/kyc/nin/premium', 'v1/kyc/nin/plastic-card'])
   @HttpCode(HttpStatus.OK)
   async getKycNinPremium(@Req() req: any, @Query() query: any) {
     const nin = String(query.nin || query.id || '').trim();
@@ -572,7 +612,7 @@ export class ApiController {
   }
 
   @UseGuards(ApiKeyGuard)
-  @Post(['v1/kyc/nin/premium', 'v1/kyc/nin/card', 'v1/kyc/nin/plastic-card'])
+  @Post(['v1/kyc/nin/premium', 'v1/kyc/nin/plastic-card'])
   @HttpCode(HttpStatus.OK)
   async postKycNinPremium(@Req() req: any, @Body() body: any, @Query() query: any) {
     const payload = { ...query, ...body };
@@ -586,6 +626,42 @@ export class ApiController {
       payload,
       120,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: 'premium' }))
+    );
+  }
+
+  // GET & POST /api/v1/kyc/nin/card (Authentic Dojah NIMC Card Document)
+  @UseGuards(ApiKeyGuard)
+  @Get('v1/kyc/nin/card')
+  @HttpCode(HttpStatus.OK)
+  async getKycNinCard(@Req() req: any, @Query() query: any) {
+    const nin = String(query.nin || query.id || '').trim();
+    if (!nin) throw new BadRequestException('nin query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_card',
+      nin,
+      query,
+      300,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...query, tier: 'slip' }) : this.mockProvider.verifyNin({ nin, ...query, tier: 'slip' }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post('v1/kyc/nin/card')
+  @HttpCode(HttpStatus.OK)
+  async postKycNinCard(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const nin = String(payload.nin || payload.id || '').trim();
+    if (!nin) throw new BadRequestException('nin is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_card',
+      nin,
+      payload,
+      300,
+      () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: 'slip' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: 'slip' }))
     );
   }
 
