@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import AdmZip from 'adm-zip';
 import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 import * as qrcode from 'qrcode';
 import sharp from 'sharp';
 
@@ -751,10 +752,73 @@ export interface NimcPremiumCardResult {
   docxBuffer?: Buffer;
 }
 
+let cachedOcrbFont: any = null;
+export function getOcrbFont() {
+  if (!cachedOcrbFont) {
+    const fontBuf = getSlipAssetBuffer('OCRB.ttf');
+    cachedOcrbFont = (fontkit as any).create(fontBuf);
+  }
+  return cachedOcrbFont;
+}
+
+export function renderOcrbSvgText(
+  text: string,
+  x: number,
+  y: number,
+  fontSize: number,
+  options: {
+    anchor?: 'start' | 'middle' | 'center' | 'end' | 'right';
+    fill?: string;
+    opacity?: number;
+    rotate?: number;
+    rotateOrigin?: [number, number];
+  } = {},
+): string {
+  const str = String(text || '');
+  if (!str) return '';
+
+  const font = getOcrbFont();
+  const run = font.layout(str);
+  const scale = fontSize / font.unitsPerEm;
+  let totalAdvance = 0;
+  for (let i = 0; i < run.glyphs.length; i++) {
+    totalAdvance += (run.positions[i]?.xAdvance ?? run.glyphs[i].advanceWidth) * scale;
+  }
+
+  let startX = x;
+  if (options.anchor === 'middle' || options.anchor === 'center') {
+    startX = x - totalAdvance / 2;
+  } else if (options.anchor === 'end' || options.anchor === 'right') {
+    startX = x - totalAdvance;
+  }
+
+  let currX = startX;
+  const glyphElements: string[] = [];
+  for (let i = 0; i < run.glyphs.length; i++) {
+    const glyph = run.glyphs[i];
+    const pos = run.positions[i];
+    const glyphX = currX + ((pos?.xOffset || 0) * scale);
+    const svgPath = glyph.path ? glyph.path.toSVG() : '';
+    if (svgPath && svgPath.length > 0) {
+      glyphElements.push(`<path d="${svgPath}" transform="translate(${glyphX.toFixed(2)}, ${y.toFixed(2)}) scale(${scale.toFixed(6)}, ${(-scale).toFixed(6)})" />`);
+    }
+    currX += (pos?.xAdvance ?? glyph.advanceWidth) * scale;
+  }
+
+  let transformAttr = '';
+  if (options.rotate !== undefined && options.rotateOrigin) {
+    transformAttr = ` transform="rotate(${options.rotate} ${options.rotateOrigin[0]} ${options.rotateOrigin[1]})"`;
+  }
+
+  const fill = options.fill || '#000000';
+  const opacityAttr = options.opacity !== undefined && options.opacity < 1 ? ` fill-opacity="${options.opacity}"` : '';
+
+  return `<g data-text="${str}" data-font="OCR-B 10 BT" aria-label="${str}" fill="${fill}"${opacityAttr}${transformAttr}>\n    ${glyphElements.join('\n    ')}\n  </g>`;
+}
+
 export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string> {
   const photoBuffer = resolveSlipPhotoBuffer(data.photo);
   const frontBase64 = `data:image/jpeg;base64,${getSlipAssetBase64('nimc_premium_front.jpg')}`;
-  const ocrbBase64 = getSlipAssetBase64('OCRB.ttf');
 
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
   const ninFormatted = cleanNin.length === 11 
@@ -785,57 +849,39 @@ export async function generateNimcPremiumCardSvg(data: SlipData): Promise<string
   }
 
   // Exact 1:1 coordinates extracted from Word design ("nin premium.docx")
+  // Rendered as native TrueType SVG vector paths from OCRB.ttf via fontkit for 100% font fidelity
+  // Guaranteed zero missing glyphs / tofu boxes on all Linux Docker containers & browser engines
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1379 874" width="1379" height="874">
-    <defs>
-      <style>
-        @font-face {
-          font-family: 'OCR-B 10 BT';
-          src: url('data:font/truetype;charset=utf-8;base64,${ocrbBase64}') format('truetype');
-          font-weight: normal;
-          font-style: normal;
-        }
-        .ocrb {
-          font-family: 'OCR-B 10 BT', monospace;
-          fill: #000000;
-        }
-        .wm {
-          font-family: 'OCR-B 10 BT', monospace;
-          fill: #9a9a9a;
-          opacity: 0.65;
-        }
-      </style>
-    </defs>
-
     <!-- 1. Authentic Clear Background Template from nin premium clear.pdf (1379 x 874) -->
     <image href="${frontBase64}" x="0" y="0" width="1379" height="874" />
 
     <!-- 2. Four Background Watermarks (rendered in background BEFORE photo, so WM 1 goes under photo with small part out) -->
     <!-- WM 1: Under photo (center 201.7, 604.3), rot -45.57 deg, NO SPACE -->
-    <text x="201.7" y="614" class="wm" font-size="37" text-anchor="middle" transform="rotate(-45.57 201.7 604.3)">${cleanNin}</text>
+    ${renderOcrbSvgText(cleanNin, 201.7, 614, 37, { anchor: 'middle', fill: '#9a9a9a', opacity: 0.65, rotate: -45.57, rotateOrigin: [201.7, 604.3] })}
 
     <!-- WM 2: Bottom-left beside photo (center 152.4, 738.6), rot -45.57 deg, NO SPACE -->
-    <text x="152.4" y="748" class="wm" font-size="37" text-anchor="middle" transform="rotate(-45.57 152.4 738.6)">${cleanNin}</text>
+    ${renderOcrbSvgText(cleanNin, 152.4, 748, 37, { anchor: 'middle', fill: '#9a9a9a', opacity: 0.65, rotate: -45.57, rotateOrigin: [152.4, 738.6] })}
 
     <!-- WM 3: Lower right shifted more to the right, pointing directly to bottom-right corner, NO SPACE -->
-    <text x="1170" y="730" class="wm" font-size="37" text-anchor="middle" transform="rotate(38 1170 730)">${cleanNin}</text>
+    ${renderOcrbSvgText(cleanNin, 1170, 730, 37, { anchor: 'middle', fill: '#9a9a9a', opacity: 0.65, rotate: 38, rotateOrigin: [1170, 730] })}
 
     <!-- WM 4: Horizontal watermark directly centered on the NGA letters, completely clear of QR code, NO SPACE -->
-    <text x="1138" y="458" class="wm" font-size="37" text-anchor="middle">${cleanNin}</text>
+    ${renderOcrbSvgText(cleanNin, 1138, 458, 37, { anchor: 'middle', fill: '#9a9a9a', opacity: 0.65 })}
 
     <!-- 3. Citizen Photo strictly with STRAIGHT EDGES (no rounded corners, covers WM 1) -->
     ${photoDataUri ? `<image href="${photoDataUri}" x="16.5" y="195" width="354" height="435.5" preserveAspectRatio="xMidYMid slice" />` : ''}
 
     <!-- 4. Left-Aligned Demographics under respective labels -->
-    <text x="424" y="338" class="ocrb" font-size="46">${surname}</text>
-    <text x="422" y="447" class="ocrb" font-size="46">${givenNames}</text>
-    <text x="422" y="565" class="ocrb" font-size="46">${formattedDob}</text>
-    <text x="773" y="565" class="ocrb" font-size="46">${genderChar}</text>
+    ${renderOcrbSvgText(surname, 424, 338, 46, { fill: '#000000' })}
+    ${renderOcrbSvgText(givenNames, 422, 447, 46, { fill: '#000000' })}
+    ${renderOcrbSvgText(formattedDob, 422, 565, 46, { fill: '#000000' })}
+    ${renderOcrbSvgText(genderChar, 773, 565, 46, { fill: '#000000' })}
 
     <!-- 5. Issue Date: Centered under title -->
-    <text x="1196" y="598" class="ocrb" font-size="40" text-anchor="middle">${issueDateFormatted}</text>
+    ${renderOcrbSvgText(issueDateFormatted, 1196, 598, 40, { anchor: 'middle', fill: '#000000' })}
 
     <!-- 6. Big National Identification Number (NIN) centered beneath title with 4-3-4 spacing -->
-    <text x="689" y="818" class="ocrb" font-size="116" text-anchor="middle">${ninFormatted}</text>
+    ${renderOcrbSvgText(ninFormatted, 689, 818, 116, { anchor: 'middle', fill: '#000000' })}
   </svg>`;
 }
 

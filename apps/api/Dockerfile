@@ -24,14 +24,19 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=4000
 
-# Install curl for healthcheck
-RUN apk add --no-cache curl
+# Install curl for healthcheck and system fonts for Sharp / librsvg fontconfig
+RUN apk add --no-cache curl fontconfig ttf-dejavu font-noto
 
 # Copy runtime packages and built assets
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/src/slips/assets ./apps/api/src/slips/assets
 COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
+
+# Install OCR-B font into system fonts and rebuild fontconfig cache
+RUN mkdir -p /usr/share/fonts/truetype/ocrb && \
+    cp /app/apps/api/src/slips/assets/OCRB.ttf /usr/share/fonts/truetype/ocrb/ && \
+    fc-cache -f -v
 
 EXPOSE 4000
 
