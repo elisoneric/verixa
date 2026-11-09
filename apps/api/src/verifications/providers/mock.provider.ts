@@ -29,6 +29,7 @@ import {
   generateDigitalNinCardPdf,
   generateDigitalNinCardSvg,
   generateNimcPremiumCard,
+  getSlipAssetBase64,
 } from '../../slips/slip-generator.util';
 
 @Injectable()
@@ -97,7 +98,49 @@ export class MockProvider implements IVerificationProvider {
       };
     }
 
-    if (data.tier === 'advance' || data.tier === 'premium' || data.tier === 'slip') {
+    if (data.tier === 'slip') {
+      const isSandboxDojahNin = data.nin === '70123456789';
+      const firstName = isSandboxDojahNin ? 'JOHN' : (data.firstName?.toUpperCase() || faker.person.firstName().toUpperCase());
+      const lastName = isSandboxDojahNin ? 'MUSA' : (data.lastName?.toUpperCase() || faker.person.lastName().toUpperCase());
+      const middleName = isSandboxDojahNin ? 'DOE' : 'CHUKWUEMEKA';
+      const phone = isSandboxDojahNin ? '09011111111' : `080${faker.string.numeric(8)}`;
+      const dob = isSandboxDojahNin ? '1990-01-11' : '1982-01-01';
+      const dojahCardB64 = getSlipAssetBase64('nimc card preview.webp');
+
+      let photoBase64 = '';
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        const photoPath = path.resolve(__dirname, '../../slips/assets/default_mock_photo.jpg');
+        if (fs.existsSync(photoPath)) {
+          photoBase64 = fs.readFileSync(photoPath).toString('base64');
+        }
+      } catch {
+        photoBase64 = '';
+      }
+
+      return {
+        status: 'success',
+        data: {
+          nin: data.nin,
+          first_name: firstName,
+          last_name: lastName,
+          gender: 'Male',
+          middle_name: middleName,
+          photo: photoBase64,
+          date_of_birth: dob,
+          phone_number: phone,
+          employment_status: 'employed',
+          marital_status: 'single',
+          nin_id: dojahCardB64,
+          image: dojahCardB64,
+          card_image: dojahCardB64,
+        },
+        meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+      };
+    }
+
+    if (data.tier === 'advance' || data.tier === 'premium') {
       return this.verifyNinAdvance({ nin: data.nin, isSlip: true });
     }
 

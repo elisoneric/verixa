@@ -139,7 +139,7 @@ export async function generateDocxSlip(data: SlipData): Promise<Buffer> {
   docXml = docXml.replace(/<a14:imgLayer[^>]*>.*?<\/a14:imgLayer>/gs, '');
 
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
-  const rawTrackingId = data.trackingId || ((data as any).nin_id && !(data as any).nin_id.startsWith('JVBERi') && (data as any).nin_id.length < 50 ? (data as any).nin_id : '');
+  const rawTrackingId = data.trackingId ? String(data.trackingId).trim() : '';
   const cleanTrackingId = rawTrackingId ? String(rawTrackingId).replace(/[\s-]/g, '') : '';
   const genderChar = (data.gender || '').toUpperCase().startsWith('F') ? 'F' : 'M';
 
@@ -289,7 +289,7 @@ export async function generatePdfSlip(data: SlipData): Promise<Buffer> {
   const photoRelYFromTop = emuToPt(781050) + photoHeight;
 
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
-  const rawTrackingId = data.trackingId || ((data as any).nin_id && !(data as any).nin_id.startsWith('JVBERi') && (data as any).nin_id.length < 50 ? (data as any).nin_id : '');
+  const rawTrackingId = data.trackingId ? String(data.trackingId).trim() : '';
   const cleanTrackingId = rawTrackingId ? String(rawTrackingId).replace(/[\s-]/g, '') : '';
   const genderChar = (data.gender || '').toUpperCase().startsWith('F') ? 'F' : 'M';
 
@@ -706,7 +706,7 @@ export async function generatePaperSlipSvg(data: SlipData): Promise<string> {
   const photoMime = photoBuf && photoBuf[0] === 0x89 && photoBuf[1] === 0x50 ? 'image/png' : 'image/jpeg';
 
   const cleanNin = String(data.nin || '').replace(/\D/g, '');
-  const rawTrackingId = data.trackingId || ((data as any).nin_id && !(data as any).nin_id.startsWith('JVBERi') && (data as any).nin_id.length < 50 ? (data as any).nin_id : '');
+  const rawTrackingId = data.trackingId ? String(data.trackingId).trim() : '';
   const cleanTrackingId = rawTrackingId ? String(rawTrackingId).replace(/[\s-]/g, '') : '';
   const genderChar = (data.gender || 'M').toUpperCase().startsWith('F') ? 'F' : 'M';
 
@@ -727,7 +727,7 @@ export async function generatePaperSlipSvg(data: SlipData): Promise<string> {
     ${photoB64 ? `<image href="data:${photoMime};base64,${photoB64}" x="1302" y="171" width="231" height="299" preserveAspectRatio="xMidYMid slice"/>` : ''}
 
     <!-- Demographic Text Overlays matching standard EMU coordinate positioning -->
-    <text x="173" y="222" font-family="'Courier New', Courier, monospace" font-weight="bold" font-size="20" fill="#000000">${cleanTrackingId}</text>
+    ${cleanTrackingId ? `<text x="173" y="222" font-family="'Courier New', Courier, monospace" font-weight="bold" font-size="20" fill="#000000">${cleanTrackingId}</text>` : ''}
     <text x="173" y="307" font-family="'Courier New', Courier, monospace" font-weight="bold" font-size="20" fill="#000000">${cleanNin}</text>
     <text x="567" y="228" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="20" fill="#000000">${surname}</text>
     <text x="567" y="306" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="20" fill="#000000">${firstName}</text>

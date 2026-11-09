@@ -182,7 +182,7 @@ export class DojahProvider implements IVerificationProvider {
         try {
           const pdfBuf = await generatePdfSlip({
             nin: data.nin,
-            trackingId: entity.tracking_id || entity.trackingId,
+            trackingId: entity.tracking_id || entity.trackingId || '',
             firstName: entity.first_name || entity.firstname,
             surname: entity.last_name || entity.surname,
             middleName: entity.middle_name || entity.middlename,
@@ -203,7 +203,7 @@ export class DojahProvider implements IVerificationProvider {
         try {
           const docxBuf = await generateDocxSlip({
             nin: data.nin,
-            trackingId: entity.tracking_id || entity.trackingId || entity.nin,
+            trackingId: entity.tracking_id || entity.trackingId || '',
             firstName: entity.first_name || entity.firstname,
             surname: entity.last_name || entity.surname,
             middleName: entity.middle_name || entity.middlename,
@@ -224,7 +224,7 @@ export class DojahProvider implements IVerificationProvider {
         try {
           const cardBuf = await generateDigitalNinCardPdf({
             nin: data.nin,
-            trackingId: entity.tracking_id || entity.trackingId || entity.nin,
+            trackingId: entity.tracking_id || entity.trackingId || '',
             firstName: entity.first_name || entity.firstname,
             surname: entity.last_name || entity.surname,
             middleName: entity.middle_name || entity.middlename,
@@ -235,7 +235,7 @@ export class DojahProvider implements IVerificationProvider {
           entity.cardPdfBase64 = cardBuf.toString('base64');
           entity.cardSvg = await generateDigitalNinCardSvg({
             nin: data.nin,
-            trackingId: entity.tracking_id || entity.trackingId || entity.nin,
+            trackingId: entity.tracking_id || entity.trackingId || '',
             firstName: entity.first_name || entity.firstname,
             surname: entity.last_name || entity.surname,
             middleName: entity.middle_name || entity.middlename,
@@ -253,7 +253,7 @@ export class DojahProvider implements IVerificationProvider {
         try {
           const cardRes = await generateNimcPremiumCard({
             nin: data.nin,
-            trackingId: entity.tracking_id || entity.trackingId || entity.nin,
+            trackingId: entity.tracking_id || entity.trackingId || '',
             firstName: entity.first_name || entity.firstname,
             surname: entity.last_name || entity.surname,
             middleName: entity.middle_name || entity.middlename,

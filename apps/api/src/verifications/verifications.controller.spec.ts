@@ -72,6 +72,9 @@ describe('VerificationsController', () => {
     identityCacheService = {
       getCachedRecord: jest.fn().mockResolvedValue(null),
       setCachedRecord: jest.fn().mockResolvedValue(undefined),
+      getNotFoundRecord: jest.fn().mockResolvedValue(null),
+      setNotFoundRecord: jest.fn().mockResolvedValue(undefined),
+      deduplicateRequest: jest.fn().mockImplementation((key, fn) => fn()),
       generateKey: jest.fn().mockImplementation((org, env, srv, id) => `vx_cache:${env}:${org}:${srv}:${id}`),
     };
 

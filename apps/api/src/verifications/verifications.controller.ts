@@ -320,7 +320,7 @@ export class VerificationsController {
       const s = service.toLowerCase();
       if (s === 'nin_slip') {
         queryBuilder.andWhere('log.serviceType IN (:...slipsServices)', {
-          slipsServices: ['nin_slip', 'nin_card', 'nin_premium'],
+          slipsServices: ['nin_slip', 'nin_card', 'nin_premium', 'nin_premium_ui'],
         });
       } else {
         queryBuilder.andWhere('log.serviceType = :service', { service: s });
@@ -353,7 +353,9 @@ export class VerificationsController {
           rawCardType === 'premium' ||
           rawFormat === 'premium' ||
           sType === 'nin_premium' ||
+          sType === 'nin_premium_ui' ||
           cost === 350 ||
+          (cost === 120 && sType.includes('premium')) ||
           (log.isCached && rawCardType === 'premium')
         ) {
           resolvedFormat = 'premium';

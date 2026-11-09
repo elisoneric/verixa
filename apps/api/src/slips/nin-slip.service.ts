@@ -138,7 +138,7 @@ export class NinSlipService {
             }
             identityData = {
               nin: cleanNin,
-              trackingId: b.tracking_id || b.trackingId || cleanNin,
+              trackingId: (b.tracking_id || b.trackingId || '').trim(),
               firstName: b.firstname || b.first_name || '',
               surname: b.surname || b.last_name || '',
               middleName: b.middlename || b.middle_name || '',
@@ -181,7 +181,7 @@ export class NinSlipService {
           }
           identityData = {
             nin: cleanNin,
-            trackingId: s.tracking_id || s.trackingId || '',
+            trackingId: (s.tracking_id || s.trackingId || '').trim(),
             firstName: s.first_name || s.firstname || '',
             surname: s.last_name || s.surname || '',
             middleName: s.middle_name || s.middlename || '',
@@ -279,14 +279,16 @@ export class NinSlipService {
     const isDojahSlipSelected = (cardType === 'card' || format === 'card') && !isPremium;
     const effectiveCardType: 'slip' | 'card' | 'premium' = isPremium ? 'premium' : (isDojahSlipSelected ? 'card' : 'slip');
 
-    let serviceTypeRateKey: any = 'nin_slip';
+    const isApiCall = Boolean(apiKeyId && apiKeyId !== 'dashboard_ui' && apiKeyId !== 'dashboard_slip' && apiKeyId !== 'dashboard_download');
+
+    let serviceTypeRateKey: 'nin_slip' | 'nin_card' | 'nin_premium' | 'nin_premium_ui' = 'nin_slip';
     let defaultSlipPrice = 250;
     if (effectiveCardType === 'card') {
       serviceTypeRateKey = 'nin_card';
       defaultSlipPrice = 300;
     } else if (effectiveCardType === 'premium') {
-      serviceTypeRateKey = 'nin_premium';
-      defaultSlipPrice = 350;
+      serviceTypeRateKey = isApiCall ? 'nin_premium' : 'nin_premium_ui';
+      defaultSlipPrice = isApiCall ? 120 : 350;
     }
 
     // 1. Check Smart Identity Cache for existing NIN record
@@ -302,13 +304,17 @@ export class NinSlipService {
     let cost = 0;
     const reference = `vx_slip_${uuidv4().slice(0, 12)}`;
 
-    if (cached && cached.data?.photo) {
+    // For standard slip, cache is only valid if complete address is present
+    const hasAddress = Boolean(cached?.data?.address || cached?.data?.residence_address || cached?.data?.residence_address_line_1 || cached?.data?.lga);
+    const isCacheUsable = Boolean(cached && cached.data?.photo && (effectiveCardType !== 'slip' || hasAddress));
+
+    if (isCacheUsable) {
       // CACHE HIT! Discounted rate for regenerating existing verified slip
       isCacheHit = true;
       const rateInfo = await this.billingService.getEffectiveRate(orgId, serviceTypeRateKey, true);
       cost = rateInfo.effectiveRate || 50;
       await this.billingService.deductCredits(orgId, validEnv, cost, reference);
-      identityData = cached.data;
+      identityData = cached!.data;
     } else {
       // CACHE MISS: Live or Sandbox NIN Query
       const rateInfo = await this.billingService.getEffectiveRate(orgId, serviceTypeRateKey, false);
@@ -318,10 +324,10 @@ export class NinSlipService {
       try {
         let upstreamProviderName = isSandbox ? 'verixa_mock' : 'direct';
 
-        // Fast-path: For 'premium' or 'card' formats, query Basic NIN directly (<800ms, strictly ₦60 upstream cost)
-        if (effectiveCardType === 'premium' || effectiveCardType === 'card') {
+        if (effectiveCardType === 'premium') {
+          // 1. Premium calls Dojah Basic (tier: 'basic', upstream cost ₦60)
           try {
-            const basicRes = await provider.verifyNin({ nin: cleanNin });
+            const basicRes = await provider.verifyNin({ nin: cleanNin, tier: 'basic' });
             if (basicRes.status === 'success' && basicRes.data) {
               const b = basicRes.data;
               let photoStr = b.photo || '';
@@ -330,7 +336,7 @@ export class NinSlipService {
               }
               identityData = {
                 nin: cleanNin,
-                trackingId: b.tracking_id || b.trackingId || cleanNin,
+                trackingId: (b.tracking_id || b.trackingId || '').trim(),
                 firstName: b.firstname || b.first_name || '',
                 surname: b.surname || b.last_name || '',
                 middleName: b.middlename || b.middle_name || '',
@@ -348,12 +354,10 @@ export class NinSlipService {
               upstreamProviderName = basicRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
             }
           } catch (fastErr: any) {
-            this.logger.warn(`Fast Basic NIN query attempt failed: ${fastErr?.message}, falling back`);
+            this.logger.warn(`Basic NIN query failed for premium: ${fastErr?.message}`);
           }
-        }
-
-        // 1. Try NIN Slip lookup (only if identityData not yet populated, e.g. for standard slip format)
-        if (!identityData) {
+        } else if (effectiveCardType === 'card') {
+          // 2. NIMC Card calls Dojah NIN Slip (tier: 'slip', upstream cost ₦80)
           try {
             const slipRes = await provider.verifyNin({ nin: cleanNin, tier: 'slip' });
             if (slipRes.status === 'success' && slipRes.data) {
@@ -364,7 +368,7 @@ export class NinSlipService {
               }
               identityData = {
                 nin: cleanNin,
-                trackingId: s.tracking_id || s.trackingId || '',
+                trackingId: (s.tracking_id || s.trackingId || '').trim(),
                 firstName: s.first_name || s.firstname || '',
                 surname: s.last_name || s.surname || '',
                 middleName: s.middle_name || s.middlename || '',
@@ -380,29 +384,33 @@ export class NinSlipService {
                 employment_status: s.employment_status,
                 marital_status: s.marital_status,
                 height: s.height,
-                nin_id: s.nin_id,
+                nin_id: s.nin_id || s.image || (s as any).card_image,
+                image: s.image || s.nin_id || (s as any).card_image,
               };
               upstreamProviderName = slipRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
             }
           } catch (slipErr: any) {
-            this.logger.warn(`verifyNin slip attempt failed: ${slipErr?.message}, falling back to verifyNinAdvance`);
+            this.logger.warn(`verifyNin slip attempt failed: ${slipErr?.message}`);
           }
-        }
-
-        // 2. Fall back to Advance NIN lookup
-        if (!identityData) {
+        } else {
+          // 3. Standard NIN Slip calls Dojah NIN Advance (upstream cost ₦85) so it gets full address
           try {
             const upstreamRes = await provider.verifyNinAdvance({ nin: cleanNin });
             if (upstreamRes.status === 'success' && upstreamRes.data) {
-              identityData = upstreamRes.data;
+              const a = upstreamRes.data;
+              identityData = {
+                ...a,
+                nin: cleanNin,
+                trackingId: (a.tracking_id || a.trackingId || '').trim(),
+              };
               upstreamProviderName = upstreamRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
             }
           } catch (advErr: any) {
-            this.logger.warn(`verifyNinAdvance attempt failed: ${advErr?.message}, falling back to verifyNin basic`);
+            this.logger.warn(`verifyNinAdvance attempt failed: ${advErr?.message}`);
           }
         }
 
-        // 3. Fall back to Basic NIN lookup if Advance did not populate
+        // Fallback to basic NIN lookup if initial query did not populate
         if (!identityData) {
           const basicRes = await provider.verifyNin({ nin: cleanNin });
           if (basicRes.status !== 'success' || !basicRes.data) {
@@ -416,7 +424,7 @@ export class NinSlipService {
 
           identityData = {
             nin: cleanNin,
-            trackingId: b.tracking_id || b.trackingId || '',
+            trackingId: (b.tracking_id || b.trackingId || '').trim(),
             firstName: b.firstname || b.first_name || '',
             surname: b.surname || b.last_name || '',
             middleName: b.middlename || b.middle_name || '',
@@ -429,6 +437,8 @@ export class NinSlipService {
             phoneNumber: b.telephoneno || b.phone_number || '',
             photo: photoStr,
             signature: b.signature || '',
+            nin_id: b.nin_id,
+            image: b.image || b.nin_id,
           };
           upstreamProviderName = basicRes.meta?.provider || (isSandbox ? 'verixa_mock' : 'direct');
         }
@@ -466,7 +476,7 @@ export class NinSlipService {
       try {
         const premiumRes = await generateNimcPremiumCard({
           nin: cleanNin,
-          trackingId: identityData.trackingId || cleanNin,
+          trackingId: identityData.trackingId || '',
           firstName: identityData.firstName,
           surname: identityData.surname,
           middleName: identityData.middleName,
@@ -484,8 +494,36 @@ export class NinSlipService {
         this.logger.warn(`Could not generate NIMC Premium Card: ${e?.message}`);
       }
     } else if (isDojahSlipSelected) {
-      if (identityData.nin_id) {
-        pdfBuffer = Buffer.from(identityData.nin_id, 'base64');
+      // NIMC Card: Use Dojah's authentic official card asset (entity.nin_id / image)
+      const rawCardAsset = identityData.nin_id || (identityData as any).image;
+      if (rawCardAsset) {
+        const cleanAssetStr = String(rawCardAsset).replace(/^data:image\/[a-z]+;base64,/, '');
+        if (cleanAssetStr.startsWith('JVBERi')) {
+          pdfBuffer = Buffer.from(cleanAssetStr, 'base64');
+        } else {
+          cardImageBase64 = rawCardAsset.startsWith('data:') ? rawCardAsset : `data:image/webp;base64,${cleanAssetStr}`;
+          try {
+            const imgBuf = Buffer.from(cleanAssetStr, 'base64');
+            const { PDFDocument } = await import('pdf-lib');
+            const pdfDoc = await PDFDocument.create();
+            // ID-1 standard dimensions: 242.6pt x 153pt
+            const cardPage = pdfDoc.addPage([242.6, 153]);
+            let embeddedImg;
+            if (imgBuf[0] === 0x89 && imgBuf[1] === 0x50) {
+              embeddedImg = await pdfDoc.embedPng(imgBuf);
+            } else if (imgBuf[0] === 0xFF && imgBuf[1] === 0xD8) {
+              embeddedImg = await pdfDoc.embedJpg(imgBuf);
+            } else {
+              const sharp = require('sharp');
+              const pngBuf = await sharp(imgBuf).png().toBuffer();
+              embeddedImg = await pdfDoc.embedPng(pngBuf);
+            }
+            cardPage.drawImage(embeddedImg, { x: 0, y: 0, width: 242.6, height: 153 });
+            pdfBuffer = Buffer.from(await pdfDoc.save());
+          } catch (pdfErr: any) {
+            this.logger.warn(`Could not wrap Dojah card image into PDF: ${pdfErr?.message}`);
+          }
+        }
       } else {
         try {
           pdfBuffer = await this.generatePdf(identityData);
@@ -493,9 +531,6 @@ export class NinSlipService {
           this.logger.warn(`Could not generate fallback PDF Slip: ${e?.message}`);
         }
       }
-      try {
-        slipSvg = await this.generateCardSvg(identityData);
-      } catch {}
     } else {
       try {
         pdfBuffer = await this.generatePdf(identityData);
@@ -756,7 +791,7 @@ export class NinSlipService {
     const cleanNin = String(identityData.nin || log.requestPayload?.nin || '').replace(/\D/g, '');
     const slipData: SlipData = {
       nin: cleanNin,
-      trackingId: identityData.trackingId || identityData.nin_id || log.idempotencyKey || log.id.slice(0, 16),
+      trackingId: (identityData.trackingId || identityData.tracking_id || '').trim(),
       firstName: identityData.firstName || identityData.first_name || identityData.firstname || '',
       surname: identityData.surname || identityData.last_name || '',
       middleName: identityData.middleName || identityData.middle_name || identityData.middlename || '',
@@ -783,8 +818,33 @@ export class NinSlipService {
       contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
       filename = `NIMC_Premium_Card_${fileId}.docx`;
     } else if (normalizedFormat === 'card' && normalizedFileType === 'pdf') {
-      if (identityData.nin_id) {
-        buffer = Buffer.from(identityData.nin_id, 'base64');
+      const rawCardAsset = identityData.nin_id || identityData.image;
+      if (rawCardAsset) {
+        const cleanAssetStr = String(rawCardAsset).replace(/^data:image\/[a-z]+;base64,/, '');
+        if (cleanAssetStr.startsWith('JVBERi')) {
+          buffer = Buffer.from(cleanAssetStr, 'base64');
+        } else {
+          try {
+            const imgBuf = Buffer.from(cleanAssetStr, 'base64');
+            const { PDFDocument } = await import('pdf-lib');
+            const pdfDoc = await PDFDocument.create();
+            const cardPage = pdfDoc.addPage([242.6, 153]);
+            let embeddedImg;
+            if (imgBuf[0] === 0x89 && imgBuf[1] === 0x50) {
+              embeddedImg = await pdfDoc.embedPng(imgBuf);
+            } else if (imgBuf[0] === 0xFF && imgBuf[1] === 0xD8) {
+              embeddedImg = await pdfDoc.embedJpg(imgBuf);
+            } else {
+              const sharp = require('sharp');
+              const pngBuf = await sharp(imgBuf).png().toBuffer();
+              embeddedImg = await pdfDoc.embedPng(pngBuf);
+            }
+            cardPage.drawImage(embeddedImg, { x: 0, y: 0, width: 242.6, height: 153 });
+            buffer = Buffer.from(await pdfDoc.save());
+          } catch {
+            buffer = Buffer.from(cleanAssetStr, 'base64');
+          }
+        }
       } else {
         buffer = await generateStandardNinSlip(slipData);
       }

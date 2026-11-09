@@ -568,12 +568,12 @@ export default function NinSlipGeneratorPage() {
                 )}
               </div>
 
-              {currentSlip.slipType === "premium" && premiumViewMode === "card" && (currentSlip.cardImageBase64 || currentSlip.svgContent) ? (
+              {((currentSlip.slipType === "premium" && premiumViewMode === "card") || currentSlip.slipType === "card") && (currentSlip.cardImageBase64 || currentSlip.svgContent) ? (
                 <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100/70 p-3 sm:p-6 flex items-center justify-center shadow-2xs">
                   {currentSlip.cardImageBase64 ? (
                     <img
-                      src={currentSlip.cardImageBase64}
-                      alt="NIMC Premium Card"
+                      src={currentSlip.cardImageBase64.startsWith("data:") ? currentSlip.cardImageBase64 : `data:image/webp;base64,${currentSlip.cardImageBase64}`}
+                      alt={currentSlip.slipType === "premium" ? "NIMC Premium Card" : "NIMC Card"}
                       className="max-w-full max-h-[440px] object-contain rounded-lg shadow-md border border-slate-200"
                     />
                   ) : (
