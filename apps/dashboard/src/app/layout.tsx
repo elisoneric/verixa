@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s | Verixa ID",
   },
   description:
-    "Low-cost, high-reliability NIN & BVN verification APIs for Nigerian businesses. Instant automated standard NIN slip and NIMC plastic card generation, free NUBAN bank account resolution, and sub-15ms Smart Cache from ₦38.",
+    "Low-cost, high-reliability NIN & BVN verification APIs for Nigerian businesses. Instant automated standard NIN slip and NIMC plastic card generation, and free NUBAN bank account resolution.",
   applicationName: "Verixa ID",
   keywords: [
     "NIN verification API Nigeria",
@@ -65,14 +65,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://verixaid.com",
     title: "Verixa ID — Low-Cost NIN & BVN Verification APIs Nigeria",
-    description: "Low-cost, high-reliability NIN & BVN verification APIs with sub-15ms Smart Identity Cache and instant slip generation from ₦38.",
+    description: "Low-cost, high-reliability NIN & BVN verification APIs and instant slip generation for Nigerian businesses.",
     siteName: "Verixa ID",
     images: [{ url: "/icon.svg", width: 1200, height: 630, alt: "Verixa ID" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Verixa ID — Low-Cost NIN & BVN Verification APIs Nigeria",
-    description: "Low-cost NIN & BVN verification APIs with sub-15ms Smart Identity Cache and instant slip generation from ₦38.",
+    description: "Low-cost NIN & BVN verification APIs and instant slip generation for Nigerian businesses.",
     images: ["/icon.svg"],
   },
   robots: {
@@ -131,9 +131,9 @@ export default function RootLayout({
         "url": "https://verixaid.com",
         "offers": {
           "@type": "Offer",
-          "price": "38.00",
+          "price": "100.00",
           "priceCurrency": "NGN",
-          "description": "Sub-15ms cached NIN and BVN identity verification starting from ₦38 per successful check.",
+          "description": "Low-cost NIN and BVN identity verification APIs and instant slip generation.",
         },
       },
     ],

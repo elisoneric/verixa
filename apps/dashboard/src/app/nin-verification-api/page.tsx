@@ -93,7 +93,7 @@ export default function NinVerificationPage() {
             NIN Verification API for Nigerian Businesses & Developers
           </h1>
           <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Verify 11-digit National Identification Numbers instantly. Resolve portraits, full names, dates of birth, and addresses from just <strong className="text-slate-900">₦38 per check</strong>.
+            Verify 11-digit National Identification Numbers instantly. Resolve portraits, full names, dates of birth, and verified demographics. Starts from ₦120 on API.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
@@ -115,31 +115,31 @@ export default function NinVerificationPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
-                ₦38
+                API
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Cached NIN Lookup</h3>
+              <h3 className="text-lg font-bold text-slate-900">Developer API Access</h3>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Repeat verifications are served from our distributed Smart Cache at ₦38 with sub-15ms latency, saving you up to 68% on verification costs.
+                High-throughput REST API with 99.9% uptime. Starts from ₦120 on API with instant JSON response.
               </p>
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3">
               <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700 font-bold">
-                ₦60
+                KYC
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Live NIMC Basic</h3>
+              <h3 className="text-lg font-bold text-slate-900">Demographic & Portrait Verification</h3>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Direct lookup resolving official citizen portrait, surname, given names, date of birth, gender, and telephone number.
+                Direct lookup resolving official citizen portrait, surname, given names, date of birth, gender, and verified details.
               </p>
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3">
               <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 font-bold">
-                ₦85
+                SLIP
               </div>
-              <h3 className="text-lg font-bold text-slate-900">NIN Advance</h3>
+              <h3 className="text-lg font-bold text-slate-900">Automated Slip Generation</h3>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Comprehensive KYC record returning full street residence address, LGA, state of origin, tracking ID, and next-of-kin records.
+                Generate official standard NIN slips and digital NIMC cards instantly with high-resolution vector output.
               </p>
             </div>
           </div>
@@ -220,3 +220,4 @@ export default function NinVerificationPage() {
     </div>
   );
 }
+

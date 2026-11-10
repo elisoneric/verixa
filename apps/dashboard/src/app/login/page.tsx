@@ -119,6 +119,13 @@ function LoginForm() {
     }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !isLoading && !isGoogleLoading) {
+      e.preventDefault()
+      handleSubmit(e as any)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative font-sans selection:bg-emerald-500/20 selection:text-emerald-900">
       {Boolean(googleClientId) && (
@@ -208,7 +215,7 @@ function LoginForm() {
             </>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-4">
             <div>
               <label className="text-xs font-semibold text-slate-700 block mb-1">
                 Work Email
@@ -217,6 +224,7 @@ function LoginForm() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={handleKeyDown}
                 required
               />
             </div>
@@ -229,6 +237,7 @@ function LoginForm() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={handleKeyDown}
                 required
               />
             </div>

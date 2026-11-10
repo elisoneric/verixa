@@ -93,7 +93,7 @@ export default function NinSlipGeneratorPage() {
             Automated NIN Slip Generator & NIMC Card Download
           </h1>
           <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Generate official Standard NIN Slips, NIMC Cards, and Premium Plastic Cards instantly. Clean vector layouts, high-res photos, and instant PDF download.
+            Generate official Standard NIN Slips, NIMC Cards, and Premium Plastic Cards instantly. Clean vector layouts, high-res photos, and instant PDF download. Starts from ₦250 for NIN Slip.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
@@ -150,7 +150,7 @@ export default function NinSlipGeneratorPage() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-900">NIMC Card</h3>
-                <p className="text-xs font-mono text-sky-700 font-semibold">Live ₦300 • Cached ₦50</p>
+                <p className="text-xs font-mono text-sky-700 font-semibold">₦300 / card</p>
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
                 Authentic official digital identity card document resolved directly via primary registry with verified portrait and citizen credentials.
@@ -169,7 +169,7 @@ export default function NinSlipGeneratorPage() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-900">Standard NIN Slip</h3>
-                <p className="text-xs font-mono text-slate-600 font-semibold">Live ₦250 • Cached ₦50</p>
+                <p className="text-xs font-mono text-slate-600 font-semibold">Starts from ₦250 for NIN Slip</p>
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
                 Official standard government A4 paper slip with complete residential street address, LGA, state of origin, tracking ID, and citizen portrait.
@@ -264,3 +264,4 @@ export default function NinSlipGeneratorPage() {
     </div>
   );
 }
+

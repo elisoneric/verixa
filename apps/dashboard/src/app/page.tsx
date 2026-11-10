@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     absolute: "Verixa ID | Low-Cost NIN & BVN Verification APIs Nigeria",
   },
   description:
-    "Low-cost, high-reliability NIN & BVN verification APIs for Nigerian businesses. Instant automated standard NIN slip and NIMC plastic card generation, free NUBAN bank account resolution, and sub-15ms Smart Cache from ₦38.",
+    "Low-cost, high-reliability NIN & BVN verification APIs for Nigerian businesses. Instant automated standard NIN slip and NIMC plastic card generation, and free NUBAN bank account resolution.",
   alternates: {
     canonical: "https://verixaid.com",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     url: "https://verixaid.com",
     title: "Verixa ID | Low-Cost NIN & BVN Verification APIs Nigeria",
     description:
-      "Low-cost NIN & BVN verification APIs with sub-15ms Smart Identity Cache and instant slip generation from ₦38.",
+      "Low-cost NIN & BVN verification APIs with instant slip generation and free bank account resolution.",
     siteName: "Verixa ID",
   },
 }
@@ -61,7 +61,7 @@ export default function PublicLandingPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Verify identity information, validate customer details, and streamline digital onboarding with reliable NIN, BVN, and bank account verification APIs. Sub-15ms Smart Cache from ₦38.
+            Verify identity information, validate customer details, and streamline digital onboarding with reliable NIN, BVN, and bank account verification APIs.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -102,10 +102,10 @@ export default function PublicLandingPage() {
               </div>
               <h3 className="text-base font-bold text-slate-900">NIN Verification API</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Retrieve verified demographics, residential address, telephone, tracking ID, and portrait image.
+                Verify national identification records with instant demographic lookup and facial portrait data.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-emerald-600">
-                From ₦38 (Cached) / ₦80 (Live)
+                Starts from ₦120 on API
               </div>
               <Link href="/nin-verification-api" className="text-xs font-semibold text-emerald-700 hover:underline inline-block pt-1">
                 Explore NIN API &rarr;
@@ -118,10 +118,10 @@ export default function PublicLandingPage() {
               </div>
               <h3 className="text-base font-bold text-slate-900">Automated Slip Generator</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Instant Standard NIN Slip (₦250), NIMC Card (₦300), and NIMC Card Premium (₦120 API / ₦350 UI).
+                Generate high-resolution printable NIN slips and digital NIMC cards instantly with official styling.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-sky-600">
-                From ₦120 / slip
+                Starts from ₦250 for NIN Slip
               </div>
               <Link href="/nin-slip-generator" className="text-xs font-semibold text-sky-700 hover:underline inline-block pt-1">
                 Explore Slip Generator &rarr;
@@ -134,10 +134,10 @@ export default function PublicLandingPage() {
               </div>
               <h3 className="text-base font-bold text-slate-900">BVN Validation API</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Real-time NIBSS BVN identity validation, date of birth verification, biometric face match, and name matching.
+                Real-time BVN identity validation, date of birth verification, biometric face match, and name matching.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-indigo-600">
-                From ₦38 (Cached) / ₦75 (Live)
+                Starts from ₦100 on API
               </div>
               <Link href="/bvn-verification-api" className="text-xs font-semibold text-indigo-700 hover:underline inline-block pt-1">
                 Explore BVN API &rarr;
@@ -150,7 +150,7 @@ export default function PublicLandingPage() {
               </div>
               <h3 className="text-base font-bold text-slate-900">NUBAN Resolution</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Instant 10-digit NUBAN account name resolution across all commercial banks, microfinance institutions, and digital wallets.
+                Instant 10-digit NUBAN account name resolution across all commercial banks and digital wallets.
               </p>
               <div className="pt-2 font-mono text-sm font-bold text-emerald-600">
                 100% Free
@@ -184,8 +184,8 @@ export default function PublicLandingPage() {
                 <tr>
                   <th className="py-3.5 px-5">Method & Endpoint</th>
                   <th className="py-3.5 px-5">Identity Service</th>
-                  <th className="py-3.5 px-5">Live Price</th>
-                  <th className="py-3.5 px-5">Cached Price</th>
+                  <th className="py-3.5 px-5">Rate Schedule</th>
+                  <th className="py-3.5 px-5">Response Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -195,8 +195,8 @@ export default function PublicLandingPage() {
                     <span className="text-slate-700">/api/v1/verifications/nin</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-slate-900">NIN Verification</td>
-                  <td className="py-3.5 px-5 font-sans text-slate-700">₦80</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-700 font-bold">₦38 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-700 font-bold">Starts from ₦120 on API</td>
+                  <td className="py-3.5 px-5 text-slate-500 font-sans">&lt; 180ms</td>
                 </tr>
                 <tr className="hover:bg-slate-50/60 transition-colors">
                   <td className="py-3.5 px-5 font-mono text-xs">
@@ -204,17 +204,17 @@ export default function PublicLandingPage() {
                     <span className="text-slate-700">/api/v1/verifications/bvn</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-slate-900">BVN Validation</td>
-                  <td className="py-3.5 px-5 font-sans text-slate-700">₦75</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-700 font-bold">₦38 / query</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-700 font-bold">Starts from ₦100 on API</td>
+                  <td className="py-3.5 px-5 text-slate-500 font-sans">&lt; 150ms</td>
                 </tr>
                 <tr className="hover:bg-slate-50/60 transition-colors">
                   <td className="py-3.5 px-5 font-mono text-xs">
                     <span className="text-sky-700 font-bold bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200 mr-2">POST</span>
-                    <span className="text-slate-700">/api/v1/slips/nin (Standard)</span>
+                    <span className="text-slate-700">/api/v1/slips/nin</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-slate-900">Standard NIN Slip (A4)</td>
-                  <td className="py-3.5 px-5 font-sans text-slate-700">₦250</td>
-                  <td className="py-3.5 px-5 font-sans text-sky-700 font-bold">₦50 / regen</td>
+                  <td className="py-3.5 px-5 font-sans text-sky-700 font-bold">Starts from ₦250 for NIN Slip</td>
+                  <td className="py-3.5 px-5 text-slate-500 font-sans">&lt; 350ms</td>
                 </tr>
                 <tr className="hover:bg-slate-50/60 transition-colors">
                   <td className="py-3.5 px-5 font-mono text-xs">
@@ -222,8 +222,8 @@ export default function PublicLandingPage() {
                     <span className="text-slate-700">/api/v1/slips/nin/card</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-slate-900">NIMC Card (ID-1)</td>
-                  <td className="py-3.5 px-5 font-sans text-slate-700">₦300</td>
-                  <td className="py-3.5 px-5 font-sans text-sky-700 font-bold">₦50 / regen</td>
+                  <td className="py-3.5 px-5 font-sans text-sky-700 font-bold">₦300 / card</td>
+                  <td className="py-3.5 px-5 text-slate-500 font-sans">&lt; 300ms</td>
                 </tr>
                 <tr className="hover:bg-slate-50/60 transition-colors">
                   <td className="py-3.5 px-5 font-mono text-xs">
@@ -231,8 +231,8 @@ export default function PublicLandingPage() {
                     <span className="text-slate-700">/api/v1/slips/nin/premium</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-slate-900">NIMC Card Premium (A4 Sheet)</td>
-                  <td className="py-3.5 px-5 font-sans text-purple-700 font-bold">₦120 API / ₦350 UI</td>
-                  <td className="py-3.5 px-5 font-sans text-purple-700 font-bold">₦50 / regen</td>
+                  <td className="py-3.5 px-5 font-sans text-purple-700 font-bold">₦120 on API / ₦350 UI</td>
+                  <td className="py-3.5 px-5 text-slate-500 font-sans">&lt; 350ms</td>
                 </tr>
                 <tr className="bg-emerald-50/40 hover:bg-emerald-50/70 transition-colors">
                   <td className="py-3.5 px-5 font-mono text-xs">
@@ -240,8 +240,8 @@ export default function PublicLandingPage() {
                     <span className="text-slate-700">/api/v1/bank/resolve</span>
                   </td>
                   <td className="py-3.5 px-5 font-semibold font-sans text-slate-900">NUBAN Resolution</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-700 font-bold">Free (₦0)</td>
-                  <td className="py-3.5 px-5 font-sans text-emerald-700 font-bold">Free (₦0)</td>
+                  <td className="py-3.5 px-5 font-sans text-emerald-700 font-bold">100% Free (₦0)</td>
+                  <td className="py-3.5 px-5 text-slate-500 font-sans">&lt; 120ms</td>
                 </tr>
               </tbody>
             </table>

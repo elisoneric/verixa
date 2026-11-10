@@ -93,7 +93,7 @@ export default function BvnVerificationPage() {
             BVN Verification API for Nigerian Fintechs & Businesses
           </h1>
           <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Verify 11-digit Bank Verification Numbers with official biometric photo, full name, and date of birth from just <strong className="text-slate-900">₦38 per check</strong>.
+            Verify 11-digit Bank Verification Numbers with official biometric photo, full name, and date of birth. Starts from ₦100 on API.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
@@ -115,21 +115,21 @@ export default function BvnVerificationPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
-                ₦38
+                API
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Smart Cached BVN</h3>
+              <h3 className="text-lg font-bold text-slate-900">Developer API Access</h3>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Sub-15ms response time for repeat queries within your organization with 99.99% uptime and zero upstream gateway latency.
+                High-throughput REST API with 99.9% uptime. Starts from ₦100 on API with instant JSON response.
               </p>
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3">
               <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700 font-bold">
-                ₦75
+                BVN
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Live Gateway BVN</h3>
+              <h3 className="text-lg font-bold text-slate-900">Official BVN Validation</h3>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Direct lookup resolving official citizen portrait, first name, middle name, surname, DOB, gender, and verified phone number.
+                Direct lookup resolving official citizen portrait, first name, middle name, surname, DOB, gender, and verified details.
               </p>
             </div>
 
@@ -220,3 +220,4 @@ export default function BvnVerificationPage() {
     </div>
   );
 }
+

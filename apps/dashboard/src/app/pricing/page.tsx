@@ -93,7 +93,7 @@ export default function PricingPage() {
             Transparent Pricing Built for Nigerian Scale
           </h1>
           <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Stop overpaying for identity verification. Slash your verification budget by up to 68% with our high-speed Smart Identity Cache.
+            Transparent, low-cost verification rates with zero subscription lock-in. Scale your customer onboarding effortlessly.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
@@ -116,7 +116,7 @@ export default function PricingPage() {
             <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h3 className="text-lg font-bold text-slate-900">Per-Verification Rate Schedule</h3>
-                <p className="text-xs text-slate-500">Live rates vs Smart Cache discounted pricing</p>
+                <p className="text-xs text-slate-500">Transparent rates with volume discounts for API developers</p>
               </div>
               <Badge variant="verified" size="sm">TRANSPARENT BILLING</Badge>
             </div>
@@ -126,53 +126,47 @@ export default function PricingPage() {
                 <thead>
                   <tr className="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50/70">
                     <th className="py-3.5 px-6">Verification Service</th>
-                    <th className="py-3.5 px-6">Smart Cache (Repeat)</th>
-                    <th className="py-3.5 px-6">Live Gateway</th>
+                    <th className="py-3.5 px-6">API Rate</th>
+                    <th className="py-3.5 px-6">UI Console Rate</th>
                     <th className="py-3.5 px-6">Industry Competitors</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-mono text-xs">
                   <tr className="hover:bg-slate-50/50">
-                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">NIN Basic (Portrait & Demographics)</td>
-                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">₦38</td>
-                    <td className="py-4 px-6 text-slate-900">₦60</td>
-                    <td className="py-4 px-6 text-slate-400 line-through">₦120 – ₦150</td>
-                  </tr>
-                  <tr className="hover:bg-slate-50/50">
-                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">BVN Validation (Portrait & Phone)</td>
-                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">₦38</td>
-                    <td className="py-4 px-6 text-slate-900">₦75</td>
-                    <td className="py-4 px-6 text-slate-400 line-through">₦100 – ₦150</td>
-                  </tr>
-                  <tr className="hover:bg-slate-50/50">
-                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">NIN Advance (Full Street Address)</td>
-                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">₦50</td>
-                    <td className="py-4 px-6 text-slate-900">₦85</td>
+                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">NIN Verification API</td>
+                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">Starts from ₦120 on API</td>
+                    <td className="py-4 px-6 text-slate-900 font-sans font-medium">₦150 / query</td>
                     <td className="py-4 px-6 text-slate-400 line-through">₦150 – ₦250</td>
                   </tr>
                   <tr className="hover:bg-slate-50/50">
-                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">NUBAN Bank Account Resolution</td>
-                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">₦0 (FREE)</td>
-                    <td className="py-4 px-6 text-emerald-700 font-bold">₦0 (FREE)</td>
-                    <td className="py-4 px-6 text-slate-400 line-through">₦10 – ₦25</td>
+                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">BVN Validation API</td>
+                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">Starts from ₦100 on API</td>
+                    <td className="py-4 px-6 text-slate-900 font-sans font-medium">₦120 / query</td>
+                    <td className="py-4 px-6 text-slate-400 line-through">₦150 – ₦200</td>
                   </tr>
                   <tr className="hover:bg-slate-50/50">
                     <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">Standard NIN Slip (A4 Printable PDF)</td>
-                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">₦50</td>
-                    <td className="py-4 px-6 text-slate-900">₦250</td>
-                    <td className="py-4 px-6 text-slate-400 line-through">₦300 – ₦500</td>
+                    <td className="py-4 px-6 font-bold text-sky-700 bg-sky-50/40">Starts from ₦250 for NIN Slip</td>
+                    <td className="py-4 px-6 text-slate-900 font-sans font-medium">₦250 / slip</td>
+                    <td className="py-4 px-6 text-slate-400 line-through">₦350 – ₦500</td>
                   </tr>
                   <tr className="hover:bg-slate-50/50">
-                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">NIMC Card (Official Document)</td>
-                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">₦50</td>
-                    <td className="py-4 px-6 text-slate-900">₦300</td>
+                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">NIMC Card (ID-1 Digital Card)</td>
+                    <td className="py-4 px-6 font-bold text-sky-700 bg-sky-50/40">₦300 / card</td>
+                    <td className="py-4 px-6 text-slate-900 font-sans font-medium">₦300 / card</td>
                     <td className="py-4 px-6 text-slate-400 line-through">₦500 – ₦1,000</td>
                   </tr>
                   <tr className="hover:bg-slate-50/50">
-                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">NIMC Card Premium (Plastic Image + A4)</td>
-                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">₦50</td>
-                    <td className="py-4 px-6 text-slate-900">₦350 (UI) / ₦120 (API)</td>
+                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">NIMC Card Premium (Plastic Image + A4 Sheet)</td>
+                    <td className="py-4 px-6 font-bold text-purple-700 bg-purple-50/40">₦120 on API</td>
+                    <td className="py-4 px-6 text-slate-900 font-sans font-medium">₦350 / card</td>
                     <td className="py-4 px-6 text-slate-400 line-through">₦800 – ₦1,500</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="py-4 px-6 font-sans font-semibold text-slate-900 text-sm">NUBAN Bank Account Resolution</td>
+                    <td className="py-4 px-6 font-bold text-emerald-700 bg-emerald-50/40">100% Free (₦0)</td>
+                    <td className="py-4 px-6 text-emerald-700 font-bold">100% Free (₦0)</td>
+                    <td className="py-4 px-6 text-slate-400 line-through">₦10 – ₦25</td>
                   </tr>
                 </tbody>
               </table>
@@ -258,3 +252,4 @@ export default function PricingPage() {
     </div>
   );
 }
+
