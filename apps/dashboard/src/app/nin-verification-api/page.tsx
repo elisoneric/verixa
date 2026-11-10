@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo, Badge, Button } from "@verixa/ui";
+import { PublicHeader } from "@/components/public-header";
 
 export const metadata: Metadata = {
   title: "NIN Verification API Nigeria | Instant NIMC Validation",
   description:
-    "Verify Nigerian National Identification Numbers (NIN) in real time with sub-15ms Smart Cache from ₦38. Fast biometric portrait match, full name, and address resolution via NIMC gateway.",
+    "Verify Nigerian National Identification Numbers (NIN) in real time with official NIMC validation starting from ₦120 on API. Biometric portrait match, full name, and address resolution.",
   alternates: {
     canonical: "https://verixaid.com/nin-verification-api",
   },
   openGraph: {
     title: "NIN Verification API Nigeria | Instant NIMC Validation — Verixa ID",
     description:
-      "Verify Nigerian NINs with sub-15ms Smart Cache from ₦38. Resolve verified portraits, names, and residential addresses via official NIMC gateways.",
+      "Verify Nigerian NINs with sub-15ms Smart Cache starting from ₦120 on API. Resolve verified portraits, names, and residential addresses via official NIMC gateways.",
     url: "https://verixaid.com/nin-verification-api",
     siteName: "Verixa ID",
     images: [{ url: "/icon.svg", width: 1200, height: 630 }],
@@ -29,7 +30,7 @@ export default function NinVerificationPage() {
         "name": "How much does NIN verification cost on Verixa ID?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Verixa ID offers NIN lookups starting from ₦38 for cached records and ₦60 for basic live NIMC verification, significantly lower than the standard industry rate of ₦120+."
+          "text": "NIN verification starts from ₦120 on API."
         }
       },
       {
@@ -59,28 +60,7 @@ export default function NinVerificationPage() {
       />
 
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
-          <Link href="/" className="hover:opacity-90 transition-opacity">
-            <Logo size="md" />
-          </Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <Link href="/nin-verification-api" className="text-emerald-700 font-bold">NIN API</Link>
-            <Link href="/bvn-verification-api" className="hover:text-slate-900 transition-colors">BVN API</Link>
-            <Link href="/nin-slip-generator" className="hover:text-slate-900 transition-colors">Slip Generator</Link>
-            <Link href="/pricing" className="hover:text-slate-900 transition-colors">Pricing</Link>
-            <a href="https://docs.verixaid.com" target="_blank" rel="noreferrer" className="hover:text-slate-900 transition-colors">Docs</a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="outline" size="sm" className="font-semibold h-9 px-4">Sign In</Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="emerald" size="sm" className="font-semibold h-9 px-4">Get Started Free</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Hero Section */}
       <main className="flex-1">
@@ -166,9 +146,9 @@ export default function NinVerificationPage() {
             <div className="bg-slate-900 text-slate-100 p-5 rounded-2xl font-mono text-xs overflow-x-auto shadow-xl border border-slate-800">
               <p className="text-slate-400 mb-2"># Live cURL Example</p>
               <pre className="text-emerald-400">{`curl -X POST "https://api.verixaid.com/api/v1/kyc/nin" \\
-  -H "Authorization: Bearer vx_live_secret..." \\
+  -H "x-api-key: vx_live_secret..." \\
   -H "Content-Type: application/json" \\
-  -d '{"nin": "30882411172"}'`}</pre>
+  -d '{"nin": "30882411172", "consent": true}'`}</pre>
             </div>
           </div>
         </section>
@@ -184,7 +164,7 @@ export default function NinVerificationPage() {
             <div className="bg-white p-5 rounded-xl border border-slate-200 space-y-2">
               <h4 className="font-bold text-slate-900 text-base">How much does NIN verification cost on Verixa ID?</h4>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Cached checks start from ₦38. Live NIMC basic verification is ₦60, and advance verification with full address is ₦85.
+                NIN verification starts from ₦120 on API.
               </p>
             </div>
 

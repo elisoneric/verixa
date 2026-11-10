@@ -5,7 +5,7 @@ import { Badge, CodeBlock } from "@verixa/ui"
 export const metadata: Metadata = {
   title: "Verixa ID Docs — Low-Cost NIN, BVN & Identity API Reference",
   description:
-    "Official developer documentation for Verixa ID. Low-cost NIN (₦125), BVN (₦95), and free NUBAN resolution APIs. Comprehensive REST taxonomy, cURL snippets, and sub-15ms Smart Cache.",
+    "Official developer documentation for Verixa ID. NIN (starts from ₦120 on API), BVN (starts from ₦100 on API), and free NUBAN resolution APIs. Comprehensive REST taxonomy, cURL snippets, and sub-15ms Smart Cache.",
   keywords: [
     "NIN API documentation",
     "BVN API documentation",
@@ -83,156 +83,83 @@ export default function DocsHomePage() {
             1. Identity & Government KYC Lookups
           </div>
 
-          {/* 1. BVN Validate */}
+          {/* 1. BVN Verification */}
           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
             <div className="flex items-center gap-3">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                GET
+                POST
               </span>
               <div>
-                <span className="text-slate-900 font-semibold font-sans">BVN Validation (Match Details)</span>
-                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/bvn?bvn=...</code>
+                <span className="text-slate-900 font-semibold font-sans">BVN Validation API</span>
+                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/bvn</code>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-slate-900 font-bold font-sans text-sm">₦95.00</span>
-              <span className="text-slate-400 font-sans text-xs">/ ₦38.00 cache</span>
+              <span className="text-slate-900 font-bold font-sans text-sm">Starts from ₦100 on API</span>
             </div>
           </div>
 
-          {/* 2. BVN Full Profile */}
+          {/* 2. NIN Verification */}
           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
             <div className="flex items-center gap-3">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                GET
+                POST
               </span>
               <div>
-                <span className="text-slate-900 font-semibold font-sans">BVN Full Lookup</span>
-                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/bvn/full?bvn=...</code>
+                <span className="text-slate-900 font-semibold font-sans">NIN Verification API</span>
+                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/nin</code>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-slate-900 font-bold font-sans text-sm">₦95.00</span>
-              <span className="text-slate-400 font-sans text-xs">/ ₦38.00 cache</span>
+              <span className="text-slate-900 font-bold font-sans text-sm">Starts from ₦120 on API</span>
             </div>
           </div>
 
-          {/* 3. BVN Advance */}
-          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                GET
-              </span>
-              <div>
-                <span className="text-slate-900 font-semibold font-sans">BVN Advance</span>
-                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/bvn/advance?bvn=...</code>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-slate-900 font-bold font-sans text-sm">₦125.00</span>
-              <span className="text-slate-400 font-sans text-xs">/ ₦50.00 cache</span>
-            </div>
-          </div>
-
-          {/* 4. BVN Face Match */}
+          {/* 3. Standard NIN Slip */}
           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
             <div className="flex items-center gap-3">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 POST
               </span>
               <div>
-                <span className="text-slate-900 font-semibold font-sans">BVN + Facial Verification</span>
-                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/bvn/verify</code>
+                <span className="text-slate-900 font-semibold font-sans">Standard NIN Slip (A4 Printable Layout)</span>
+                <code className="block text-slate-500 text-[11px] mt-0.5">/api/slips/nin (type: standard)</code>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-slate-900 font-bold font-sans text-sm">₦150.00</span>
-              <span className="text-slate-400 font-sans text-xs">/ ₦60.00 cache</span>
+              <span className="text-slate-900 font-bold font-sans text-sm">Starts from ₦250 for NIN Slip</span>
             </div>
           </div>
 
-          {/* 5. NIN Basic */}
-          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                GET
-              </span>
-              <div>
-                <span className="text-slate-900 font-semibold font-sans">NIN Basic Lookup</span>
-                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/nin?nin=...</code>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-slate-900 font-bold font-sans text-sm">₦125.00</span>
-              <span className="text-slate-400 font-sans text-xs">/ ₦50.00 cache</span>
-            </div>
-          </div>
-
-          {/* 6. NIN Advance */}
-          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                GET
-              </span>
-              <div>
-                <span className="text-slate-900 font-semibold font-sans">NIN Advance (Demographics & Photo)</span>
-                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/nin/advance?nin=...</code>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-slate-900 font-bold font-sans text-sm">₦125.00</span>
-              <span className="text-slate-400 font-sans text-xs">/ ₦50.00 cache</span>
-            </div>
-          </div>
-
-          {/* 7. NIN Slip */}
-          <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                GET
-              </span>
-              <div>
-                <span className="text-slate-900 font-semibold font-sans">Automated NIN Slip</span>
-                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/nin/nin_slip?nin=...</code>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-slate-900 font-bold font-sans text-sm">₦250.00</span>
-              <span className="text-slate-400 font-sans text-xs">/ ₦100.00 cache</span>
-            </div>
-          </div>
-
-          {/* 8. NIMC Direct Card & Slip Generation */}
+          {/* 4. NIMC Card */}
           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
             <div className="flex items-center gap-3">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 POST
               </span>
               <div>
-                <span className="text-slate-900 font-semibold font-sans">NIMC Direct Card &amp; Slip Generator (Dual Format)</span>
-                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/slips/nin</code>
+                <span className="text-slate-900 font-semibold font-sans">NIMC Card (Official ID-1 Format)</span>
+                <code className="block text-slate-500 text-[11px] mt-0.5">/api/slips/nin (type: card)</code>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-slate-900 font-bold font-sans text-sm">₦250.00</span>
-              <span className="text-slate-400 font-sans text-xs">/ &lt;150ms SVG</span>
+              <span className="text-slate-900 font-bold font-sans text-sm">₦300 / card</span>
             </div>
           </div>
 
-          {/* 9. On-Demand Document Reconstruction */}
+          {/* 5. NIMC Card Premium */}
           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
             <div className="flex items-center gap-3">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
                 POST
               </span>
               <div>
-                <span className="text-slate-900 font-semibold font-sans">On-Demand Dynamic Document Reconstruction</span>
-                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/slips/on-demand</code>
+                <span className="text-slate-900 font-semibold font-sans">NIMC Card Premium (Digital Wallet Card)</span>
+                <code className="block text-slate-500 text-[11px] mt-0.5">/api/v1/kyc/nin/premium &amp; /api/slips/nin/premium</code>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-emerald-700 font-bold font-sans text-sm">Included</span>
-              <span className="text-slate-400 font-sans text-xs">/ NDPC Compliant</span>
+              <span className="text-slate-900 font-bold font-sans text-sm">₦120 on API / ₦350 on UI</span>
             </div>
           </div>
 
@@ -314,7 +241,7 @@ export default function DocsHomePage() {
     "phone_number1": "08039218492",
     "gender": "Male"
   },
-  "billed_amount": 95,
+  "billed_amount": 100,
   "cached": false,
   "meta": {
     "request_id": "vx_req_8f19a02d",

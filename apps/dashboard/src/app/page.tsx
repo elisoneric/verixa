@@ -2,7 +2,7 @@ import * as React from "react"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Logo, Badge, Button } from "@verixa/ui"
-import { AuthNavButtons } from "../components/auth-nav-buttons"
+import { PublicHeader } from "../components/public-header"
 
 export const metadata: Metadata = {
   title: {
@@ -28,25 +28,7 @@ export default function PublicLandingPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-emerald-500/20 selection:text-emerald-800">
       {/* Top Public Navigation */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
-          <Link href="/" className="hover:opacity-90 transition-opacity">
-            <Logo size="md" />
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
-            <Link href="/nin-verification-api" className="hover:text-slate-900 transition-colors">NIN API</Link>
-            <Link href="/bvn-verification-api" className="hover:text-slate-900 transition-colors">BVN API</Link>
-            <Link href="/nin-slip-generator" className="hover:text-slate-900 transition-colors">Slip Generator</Link>
-            <Link href="/pricing" className="hover:text-slate-900 transition-colors">Pricing</Link>
-            <a href="https://docs.verixaid.com" target="_blank" rel="noreferrer" className="hover:text-slate-900 transition-colors">API Docs</a>
-          </nav>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <AuthNavButtons />
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 lg:py-28">

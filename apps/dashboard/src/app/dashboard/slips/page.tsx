@@ -60,7 +60,7 @@ const FORMAT_CONFIGS = {
 export default function NinSlipGeneratorPage() {
   const { environment, refreshBalance } = useAuth()
   const [ninInput, setNinInput] = React.useState("")
-  const [consent, setConsent] = React.useState(true)
+  const [consent, setConsent] = React.useState(false)
   const [formatType, setFormatType] = React.useState<"slip" | "card" | "premium">("premium")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [optimisticRecord, setOptimisticRecord] = React.useState<OptimisticIdentity | null>(null)

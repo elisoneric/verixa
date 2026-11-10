@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
 export const metadata: Metadata = {
-  title: "NIN Verification API (Low-Cost ₦120) & Automated Slip Generator",
+  title: "NIN Verification API & Automated Slip Generator | Verixa ID",
   description:
-    "Low-cost NIN verification API in Nigeria. Verify 11-digit NIN with NIMC, retrieve portrait photos, residential demography, automated PDF slips (₦250), and Smart Cache lookups from ₦38.",
+    "NIN verification API in Nigeria. Verify 11-digit NIN with NIMC, retrieve portrait photos, residential demography, and automated PDF slips. Starts from ₦120 on API.",
   keywords: [
     "NIN verification API",
     "NIN API Nigeria",
@@ -68,20 +68,20 @@ export default function NinDocsPage() {
       {/* Pricing and SLA Chips */}
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">BASIC & ADVANCE NIN</span>
-          <span className="text-emerald-700 font-bold">120 NGX (₦120.00)</span>
+          <span className="text-slate-500 block">NIN VERIFICATION</span>
+          <span className="text-emerald-700 font-bold">Starts from ₦120 on API</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">PREMIUM / BIOMETRIC</span>
-          <span className="text-emerald-700 font-bold">150 NGX</span>
+          <span className="text-slate-500 block">STANDARD NIN SLIP</span>
+          <span className="text-emerald-700 font-bold">Starts from ₦250 for NIN Slip</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">OFFICIAL NIN SLIP (PDF)</span>
-          <span className="text-emerald-700 font-bold">250 NGX (₦250.00)</span>
+          <span className="text-slate-500 block">NIMC CARD</span>
+          <span className="text-emerald-700 font-bold">₦300 / card</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">SMART CACHE HIT (50% OFF)</span>
-          <span className="text-cyan-700 font-bold">50 NGX (₦50.00)</span>
+          <span className="text-slate-500 block">SMART CACHE</span>
+          <span className="text-cyan-700 font-bold">Sub-15ms accelerated</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
           <span className="text-slate-500 block">LATENCY (CACHE / LIVE)</span>
@@ -167,8 +167,13 @@ export default function NinDocsPage() {
         <CodeBlock
           language="bash"
           title="cURL Request (Basic NIN)"
-          code={`curl -X GET "https://api.verixaid.com/api/v1/kyc/nin?nin=70123456789" \\
-  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..."`}
+          code={`curl -X POST "https://api.verixaid.com/api/v1/kyc/nin" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "nin": "70123456789",
+    "consent": true
+  }'`}
         />
 
         <CodeBlock
@@ -199,8 +204,13 @@ export default function NinDocsPage() {
         <CodeBlock
           language="bash"
           title="cURL Request (Advance Profile)"
-          code={`curl -X GET "https://api.verixaid.com/api/v1/kyc/nin/advance?nin=70123456789" \\
-  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..."`}
+          code={`curl -X POST "https://api.verixaid.com/api/v1/kyc/nin/advance" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "nin": "70123456789",
+    "consent": true
+  }'`}
         />
 
         <CodeBlock
@@ -247,8 +257,13 @@ export default function NinDocsPage() {
         <CodeBlock
           language="bash"
           title="cURL Request (NIN Slip Record)"
-          code={`curl -X GET "https://api.verixaid.com/api/v1/kyc/nin/nin_slip?nin=70123456789" \\
-  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..."`}
+          code={`curl -X POST "https://api.verixaid.com/api/v1/kyc/nin/nin_slip" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "nin": "70123456789",
+    "consent": true
+  }'`}
         />
 
         <CodeBlock

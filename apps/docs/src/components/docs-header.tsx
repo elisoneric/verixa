@@ -25,7 +25,7 @@ const SEARCH_INDEX: SearchItem[] = [
   { title: "Biometrics & AML Screening", href: "/biometrics-aml", category: "Risk Intelligence", desc: "Facial matching and anti-money laundering checks" },
   { title: "Airtime & Mobile Data VTU", href: "/airtime-data", category: "VAS", desc: "Instant mobile recharge API across Nigerian telcos" },
   { title: "SMS & WhatsApp OTP", href: "/messaging", category: "VAS", desc: "High-deliverability 2FA & OTP delivery" },
-  { title: "Smart Identity Cache", href: "/smart-cache", category: "Platform", desc: "Sub-15ms cached lookups with 50% discount" },
+  { title: "Smart Identity Cache", href: "/smart-cache", category: "Platform", desc: "Sub-15ms accelerated cached lookups and instant delivery" },
   { title: "Wallet Balance API", href: "/balance", category: "Platform", desc: "Prepaid wallet query endpoint" },
   { title: "Billing & Credits", href: "/billing-api", category: "Platform", desc: "Prepaid metering and NGX transactions" },
   { title: "Idempotency Keys", href: "/idempotency", category: "Platform", desc: "Prevent duplicate charges with Idempotency-Key" },

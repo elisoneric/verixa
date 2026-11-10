@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo, Badge, Button } from "@verixa/ui";
+import { PublicHeader } from "@/components/public-header";
 
 export const metadata: Metadata = {
   title: "NIN Slip Generator & NIMC Card Download | Verixa ID",
@@ -29,7 +30,7 @@ export default function NinSlipGeneratorPage() {
         "name": "What NIN slip formats can I generate on Verixa ID?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Verixa ID generates three official document tiers: 1) Standard NIN Slip (Full residential address, A4 printable PDF), 2) NIMC Card (Authentic ID-1 card document), and 3) NIMC Card Premium (Synthesized plastic card with authentic OCR-B typography and printable A4 overlay)."
+          "text": "Verixa ID generates three official document tiers: 1) Standard NIN Slip (Full residential address, A4 printable PDF), 2) NIMC Card (Authentic ID-1 card document), and 3) NIMC Card Premium (High-resolution digital wallet card with printable folding template)."
         }
       },
       {
@@ -37,7 +38,7 @@ export default function NinSlipGeneratorPage() {
         "name": "How much does it cost to generate a NIN slip or card?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Standard NIN Slips are ₦250, NIMC Cards are ₦300, and NIMC Card Premium is ₦350 on the web dashboard (or ₦120 programmatically via API). Regenerating an already cached document is discounted to just ₦50."
+          "text": "Standard NIN Slips start from ₦250, NIMC Cards are ₦300, and NIMC Card Premium is ₦120 on API (₦350 on UI)."
         }
       },
       {
@@ -59,28 +60,7 @@ export default function NinSlipGeneratorPage() {
       />
 
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
-          <Link href="/" className="hover:opacity-90 transition-opacity">
-            <Logo size="md" />
-          </Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <Link href="/nin-verification-api" className="hover:text-slate-900 transition-colors">NIN API</Link>
-            <Link href="/bvn-verification-api" className="hover:text-slate-900 transition-colors">BVN API</Link>
-            <Link href="/nin-slip-generator" className="text-emerald-700 font-bold">Slip Generator</Link>
-            <Link href="/pricing" className="hover:text-slate-900 transition-colors">Pricing</Link>
-            <a href="https://docs.verixaid.com" target="_blank" rel="noreferrer" className="hover:text-slate-900 transition-colors">Docs</a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="outline" size="sm" className="font-semibold h-9 px-4">Sign In</Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="emerald" size="sm" className="font-semibold h-9 px-4">Get Started Free</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Hero Section */}
       <main className="flex-1">
@@ -134,12 +114,12 @@ export default function NinSlipGeneratorPage() {
                 <p className="text-xs font-mono text-emerald-700 font-semibold">UI ₦350 • API ₦120</p>
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Modern plastic wallet card with authentic OCR-B 10 BT vector typography, 4 background security watermarks, and printable A4 folding template.
+                High-resolution digital wallet identity card featuring official security guilloche patterns, barcode verification, and ready-to-print folding template.
               </p>
               <ul className="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
-                <li className="flex items-center gap-1.5">✓ Native TrueType vector typography</li>
-                <li className="flex items-center gap-1.5">✓ 4-3-4 spaced 11-digit NIN</li>
-                <li className="flex items-center gap-1.5">✓ Printable A4 cutting template</li>
+                <li className="flex items-center gap-1.5">✓ High-fidelity digital identity card</li>
+                <li className="flex items-center gap-1.5">✓ Standard national citizen format</li>
+                <li className="flex items-center gap-1.5">✓ Print-ready folding template</li>
               </ul>
             </div>
 
@@ -153,11 +133,11 @@ export default function NinSlipGeneratorPage() {
                 <p className="text-xs font-mono text-sky-700 font-semibold">₦300 / card</p>
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Authentic official digital identity card document resolved directly via primary registry with verified portrait and citizen credentials.
+                Standard official digital identity card document resolved directly with verified portrait and citizen credentials.
               </p>
               <ul className="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
-                <li className="flex items-center gap-1.5">✓ Official ID-1 card dimensions</li>
-                <li className="flex items-center gap-1.5">✓ Primary registry resolution</li>
+                <li className="flex items-center gap-1.5">✓ Standard ID-1 card dimensions</li>
+                <li className="flex items-center gap-1.5">✓ High-resolution output</li>
                 <li className="flex items-center gap-1.5">✓ Instant high-res PDF</li>
               </ul>
             </div>
@@ -172,12 +152,12 @@ export default function NinSlipGeneratorPage() {
                 <p className="text-xs font-mono text-slate-600 font-semibold">Starts from ₦250 for NIN Slip</p>
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Official standard government A4 paper slip with complete residential street address, LGA, state of origin, tracking ID, and citizen portrait.
+                Official standard verification document with complete residential address, LGA, state of origin, tracking ID, and citizen portrait.
               </p>
               <ul className="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
-                <li className="flex items-center gap-1.5">✓ Full residential street address</li>
+                <li className="flex items-center gap-1.5">✓ Complete residential street address</li>
                 <li className="flex items-center gap-1.5">✓ State & LGA of origin</li>
-                <li className="flex items-center gap-1.5">✓ Standard government A4 layout</li>
+                <li className="flex items-center gap-1.5">✓ Standard official verification layout</li>
               </ul>
             </div>
           </div>
@@ -228,7 +208,7 @@ export default function NinSlipGeneratorPage() {
             <div className="bg-white p-5 rounded-xl border border-slate-200 space-y-2">
               <h4 className="font-bold text-slate-900 text-base">Can I regenerate a previously generated slip?</h4>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Yes! Any document previously verified in your organization can be regenerated and downloaded on-demand from your audit history at a discounted rate of just ₦50.
+                Yes! Any document previously verified in your organization can be regenerated and downloaded on-demand from your audit history.
               </p>
             </div>
 

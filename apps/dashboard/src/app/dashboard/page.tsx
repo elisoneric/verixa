@@ -160,11 +160,11 @@ export default function DashboardOverviewPage() {
                 <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-mono">
                   ₦{(balance?.adminUsageCost ?? 0).toLocaleString()}.00
                 </span>
-                <span className="text-sm font-semibold text-slate-500">Direct Dojah Cost Incurred</span>
+                <span className="text-sm font-semibold text-slate-500">Direct Gateway Cost Incurred</span>
               </div>
 
               <p className="text-xs text-slate-500 leading-relaxed">
-                As a platform administrator, all your identity lookups run with direct upstream Dojah settlement. No wallet pre-funding or balance deposits are required.
+                As a platform administrator, all your identity lookups run with direct primary gateway settlement. No wallet pre-funding or balance deposits are required.
               </p>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -197,7 +197,7 @@ export default function DashboardOverviewPage() {
               </div>
               <div className="flex items-center justify-between text-xs py-1.5 border-b border-slate-200/60">
                 <span className="text-slate-600">Pricing Schedule</span>
-                <span className="font-mono font-bold text-emerald-700">Dojah Buy Rate (Direct)</span>
+                <span className="font-mono font-bold text-emerald-700">Wholesale Gateway Rate</span>
               </div>
               <div className="flex items-center justify-between text-xs py-1.5">
                 <span className="text-slate-600">Prepaid Deposit Gate</span>

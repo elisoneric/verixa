@@ -229,7 +229,7 @@ export default function BillingPage() {
                   Admin Platform Engine
                 </span>
                 <Badge variant="verified" size="sm">
-                  DIRECT DOJAH USAGE
+                  DIRECT GATEWAY SETTLEMENT
                 </Badge>
               </div>
 
@@ -241,7 +241,7 @@ export default function BillingPage() {
               </div>
 
               <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                Admin accounts bypass all balance checks and run at direct Dojah wholesale pricing. Balance requirements are cleared.
+                Admin accounts bypass all balance checks and settle directly with primary gateway infrastructure. Pre-funding requirements are exempt.
               </p>
             </div>
 

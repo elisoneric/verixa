@@ -68,16 +68,16 @@ export default function SlipsDocsPage() {
       {/* Pricing and Performance Chips */}
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">STANDARD RATE</span>
-          <span className="text-emerald-700 font-bold">250 NGX (₦250.00)</span>
+          <span className="text-slate-500 block">STANDARD NIN SLIP</span>
+          <span className="text-emerald-700 font-bold">Starts from ₦250 for NIN Slip</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">DEMOGRAPHIC DATA</span>
-          <span className="text-sky-700 font-bold">Full Profile Returned</span>
+          <span className="text-slate-500 block">NIMC CARD</span>
+          <span className="text-emerald-700 font-bold">₦300 / card</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">DOCUMENT FORMATS</span>
-          <span className="text-slate-900 font-bold">Authentic NIMC Slip / A4 DOCX to PDF</span>
+          <span className="text-slate-500 block">NIMC CARD PREMIUM</span>
+          <span className="text-purple-700 font-bold">₦120 on API / ₦350 on UI</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
           <span className="text-slate-500 block">DATA RETENTION</span>
@@ -85,41 +85,55 @@ export default function SlipsDocsPage() {
         </div>
       </div>
 
-      {/* Two Document Pipelines Overview */}
+      {/* Three Document Pipelines Overview */}
       <div className="space-y-4 pt-2">
         <h2 className="text-lg font-bold text-slate-900 tracking-tight">Available Document Pipelines</h2>
-        <div className="grid sm:grid-cols-2 gap-4 text-xs">
-          {/* Format 1: NIMC Direct Official Slip */}
-          <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 shadow-2xs space-y-2">
+        <div className="grid sm:grid-cols-3 gap-4 text-xs">
+          {/* Format 1: Standard NIN Slip */}
+          <div className="p-4 rounded-xl border border-sky-200 bg-sky-50/40 shadow-2xs space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-emerald-800 font-bold font-mono text-sm">1. NIMC Card (Option: &quot;card&quot;)</span>
-              <Badge variant="verified">OFFICIAL UPSTREAM SLIP</Badge>
+              <span className="text-sky-800 font-bold font-mono text-sm">1. Standard Slip</span>
+              <Badge variant="info">FROM ₦250</Badge>
             </div>
             <p className="text-slate-700 leading-relaxed font-sans text-xs">
-              Outputs the authentic, government-issued NIMC slip delivered directly from upstream identity infrastructure:
+              Official standard government A4 paper slip with full address:
             </p>
             <ul className="list-disc list-inside space-y-1 text-slate-600 font-sans text-xs">
-              <li>Official NIMC watermark and tamper-evident government layout</li>
-              <li>Embedded citizen photo and official tracking ID</li>
-              <li>Delivered as authentic base64 PDF in <code className="text-emerald-800">pdfBase64</code> and <code className="text-emerald-800">nin_id</code></li>
-              <li>Accepted across tier-1 banks, embassies, and regulatory compliance agencies</li>
+              <li>Full residential street address, LGA, state of origin</li>
+              <li>Official tracking ID and citizen portrait</li>
+              <li>Standard government A4 printable PDF</li>
             </ul>
           </div>
 
-          {/* Format 2: Standard NIN Slip (DOCX to PDF) */}
-          <div className="p-4 rounded-xl border border-sky-200 bg-sky-50/40 shadow-2xs space-y-2">
+          {/* Format 2: NIMC Card */}
+          <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 shadow-2xs space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sky-800 font-bold font-mono text-sm">2. Standard Slip (Option: &quot;slip&quot;)</span>
-              <Badge variant="info">WORD DOCX TO PDF</Badge>
+              <span className="text-emerald-800 font-bold font-mono text-sm">2. NIMC Card</span>
+              <Badge variant="verified">₦300 / CARD</Badge>
             </div>
             <p className="text-slate-700 leading-relaxed font-sans text-xs">
-              The full statutory paper slip compiled directly from Word DOCX templates into high-resolution vector PDF:
+              Standard official digital identity card document:
             </p>
             <ul className="list-disc list-inside space-y-1 text-slate-600 font-sans text-xs">
-              <li>Complete demographic record: full name, DOB, gender, phone number</li>
-              <li>Permanent residential address, LGA, and State of Origin</li>
-              <li>Tamper-proof vector PDF layout optimized for desktop and mobile printing</li>
-              <li>Direct DOCX buffer availability for enterprise document automation pipelines</li>
+              <li>Official ID-1 card dimensions</li>
+              <li>Resolved directly with verified portrait and citizen credentials</li>
+              <li>Instant high-res PDF</li>
+            </ul>
+          </div>
+
+          {/* Format 3: NIMC Card Premium */}
+          <div className="p-4 rounded-xl border border-purple-200 bg-purple-50/40 shadow-2xs space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-purple-800 font-bold font-mono text-sm">3. NIMC Card Premium</span>
+              <Badge variant="verified">₦120 API / ₦350 UI</Badge>
+            </div>
+            <p className="text-slate-700 leading-relaxed font-sans text-xs">
+              High-resolution digital wallet card with folding template:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-slate-600 font-sans text-xs">
+              <li>Official security guilloche patterns and barcode</li>
+              <li>Ready-to-print folding template</li>
+              <li>Available via /api/slips/nin/premium</li>
             </ul>
           </div>
         </div>

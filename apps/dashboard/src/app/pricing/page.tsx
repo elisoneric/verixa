@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo, Badge, Button } from "@verixa/ui";
+import { PublicHeader } from "@/components/public-header";
 
 export const metadata: Metadata = {
   title: "Identity Verification Pricing Nigeria | Transparent Rates — Verixa ID",
   description:
-    "Lowest identity verification pricing in Nigeria. NIN checks from ₦38, BVN validation from ₦38, free NUBAN bank account resolution, and transparent prepaid credit top-up.",
+    "Lowest identity verification pricing in Nigeria. NIN verification starts from ₦120 on API, BVN validation starts from ₦100 on API, Standard NIN Slip starts from ₦250, and 100% free NUBAN resolution.",
   alternates: {
     canonical: "https://verixaid.com/pricing",
   },
   openGraph: {
     title: "Identity Verification Pricing Nigeria | Transparent Rates — Verixa ID",
     description:
-      "Lowest identity verification rates in Nigeria. NIN and BVN validation from ₦38 cached, free NUBAN resolution, and zero monthly maintenance fees.",
+      "Lowest identity verification rates in Nigeria. NIN starts from ₦120 on API, BVN starts from ₦100 on API, slips from ₦250, free NUBAN resolution, and zero monthly maintenance fees.",
     url: "https://verixaid.com/pricing",
     siteName: "Verixa ID",
     images: [{ url: "/icon.svg", width: 1200, height: 630 }],
@@ -37,7 +38,7 @@ export default function PricingPage() {
         "name": "How does the Smart Identity Cache pricing work?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "When you verify a NIN or BVN for the first time, you pay the live primary gateway rate. Any repeat verification of the same record within your organization is automatically discounted to just ₦38, saving you up to 68%."
+          "text": "When you verify a NIN or BVN, you get instant real-time resolution with sub-15ms cached responses and transparent pay-as-you-go billing."
         }
       },
       {
@@ -59,28 +60,7 @@ export default function PricingPage() {
       />
 
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
-          <Link href="/" className="hover:opacity-90 transition-opacity">
-            <Logo size="md" />
-          </Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <Link href="/nin-verification-api" className="hover:text-slate-900 transition-colors">NIN API</Link>
-            <Link href="/bvn-verification-api" className="hover:text-slate-900 transition-colors">BVN API</Link>
-            <Link href="/nin-slip-generator" className="hover:text-slate-900 transition-colors">Slip Generator</Link>
-            <Link href="/pricing" className="text-emerald-700 font-bold">Pricing</Link>
-            <a href="https://docs.verixaid.com" target="_blank" rel="noreferrer" className="hover:text-slate-900 transition-colors">Docs</a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="outline" size="sm" className="font-semibold h-9 px-4">Sign In</Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="emerald" size="sm" className="font-semibold h-9 px-4">Get Started Free</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Hero Section */}
       <main className="flex-1">

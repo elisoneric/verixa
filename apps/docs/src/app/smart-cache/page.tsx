@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
 export const metadata: Metadata = {
-  title: "Smart Identity Cache (50% Cost Reduction & Sub-15ms) | Verixa ID",
+  title: "Smart Identity Cache (Sub-15ms Accelerated Lookups) | Verixa ID",
   description:
-    "Slash NIN & BVN verification API costs by 50% with Smart Identity Cache. Sub-15ms cached lookups from ₦38 with isolated tenant security.",
+    "Accelerate NIN & BVN verification to sub-15ms with tenant-isolated Smart Identity Cache. Instant responses for repeated verification lookups.",
   keywords: [
     "Smart Identity Cache",
     "cheap NIN verification API",
@@ -78,7 +78,7 @@ export default function SmartCacheDocsPage() {
             </div>
             <h4 className="text-sm font-bold text-slate-900">Live Upstream Query</h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              When an identity is verified for the first time, Verixa routes the request to authorized upstream verification registries. The verified payload is stored in Verixa's tenant-isolated in-memory Redis cache with a 30-day retention window. Billed at standard live rate (₦125 NIN / ₦95 BVN).
+              When an identity is verified for the first time, Verixa routes the request to authorized verification registries. The verified payload is stored in Verixa's tenant-isolated in-memory cache with a 30-day retention window.
             </p>
           </div>
 
@@ -89,7 +89,7 @@ export default function SmartCacheDocsPage() {
             </div>
             <h4 className="text-sm font-bold text-slate-900">Sub-15ms Cache Delivery</h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Subsequent queries for the same NIN, BVN, or account within 30 days are served instantly from cache memory without querying upstream registries. Billed at 50% automated fee reduction (₦50 for NIN, ₦38 for BVN).
+              Subsequent queries for the same NIN, BVN, or account within 30 days are served instantly from cache memory with zero network delay and discounted retrieval.
             </p>
           </div>
         </div>
@@ -97,9 +97,9 @@ export default function SmartCacheDocsPage() {
 
       {/* Pricing Comparison Table */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Live vs Smart Cache Rate Schedule</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">Rate Schedule & Performance</h2>
         <p className="text-xs sm:text-sm text-slate-600">
-          Smart Cache savings are applied automatically to all Starter, Growth, and Enterprise accounts.
+          Smart Cache speed improvements are applied automatically to all Starter, Growth, and Enterprise accounts.
         </p>
 
         <Table>
@@ -108,38 +108,31 @@ export default function SmartCacheDocsPage() {
               <TableHead>Service</TableHead>
               <TableHead>First Lookup (Live Miss)</TableHead>
               <TableHead>Cached Lookup (Cache Hit)</TableHead>
-              <TableHead>Client Savings</TableHead>
+              <TableHead>Speed Advantage</TableHead>
               <TableHead>Latency</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
               <TableCell className="font-semibold text-slate-900">BVN Verification</TableCell>
-              <TableCell className="font-mono text-slate-700">95 NGX (₦95.00)</TableCell>
-              <TableCell className="font-mono text-emerald-700 font-bold">38 NGX (₦38.00)</TableCell>
-              <TableCell className="text-emerald-700 font-bold">50% OFF</TableCell>
-              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms (Cache) vs ~140ms</TableCell>
+              <TableCell className="font-mono text-slate-700">Starts from ₦100 on API</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">Sub-15ms Cached</TableCell>
+              <TableCell className="text-emerald-700 font-bold">Up to 10x Faster</TableCell>
+              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms vs ~140ms</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-semibold text-slate-900">NIN Verification</TableCell>
-              <TableCell className="font-mono text-slate-700">125 NGX (₦125.00)</TableCell>
-              <TableCell className="font-mono text-emerald-700 font-bold">50 NGX (₦50.00)</TableCell>
-              <TableCell className="text-emerald-700 font-bold">50% OFF</TableCell>
-              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms (Cache) vs ~160ms</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-semibold text-slate-900">CAC Company Verification</TableCell>
-              <TableCell className="font-mono text-slate-700">120 NGX (₦120.00)</TableCell>
-              <TableCell className="font-mono text-emerald-700 font-bold">48 NGX (₦48.00)</TableCell>
-              <TableCell className="text-emerald-700 font-bold">50% OFF</TableCell>
-              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms (Cache) vs ~220ms</TableCell>
+              <TableCell className="font-mono text-slate-700">Starts from ₦120 on API</TableCell>
+              <TableCell className="font-mono text-emerald-700 font-bold">Sub-15ms Cached</TableCell>
+              <TableCell className="text-emerald-700 font-bold">Up to 10x Faster</TableCell>
+              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms vs ~160ms</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-semibold text-slate-900">Bank Account (NUBAN)</TableCell>
               <TableCell className="font-mono text-emerald-700 font-bold">Free (₦0.00)</TableCell>
               <TableCell className="font-mono text-emerald-700 font-bold">Free (₦0.00)</TableCell>
-              <TableCell className="text-emerald-700 font-bold">100% Free</TableCell>
-              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms (Cache) vs ~80ms</TableCell>
+              <TableCell className="text-emerald-700 font-bold">Always Free</TableCell>
+              <TableCell className="font-mono text-xs text-slate-600">&lt;15ms vs ~80ms</TableCell>
             </TableRow>
           </TableBody>
         </Table>

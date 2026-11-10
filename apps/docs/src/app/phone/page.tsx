@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
 export const metadata: Metadata = {
-  title: "Phone Number Verification & Carrier KYC API (₦85) | Verixa ID",
+  title: "Phone Number Verification & Carrier KYC API | Verixa ID",
   description:
-    "Low-cost Nigerian phone number verification API. Query subscriber identity, telecom carrier intelligence (MTN, Airtel, Glo, 9mobile), and SIM registration status from ₦30 with Smart Cache.",
+    "Low-cost Nigerian phone number verification API. Query subscriber identity, telecom carrier intelligence (MTN, Airtel, Glo, 9mobile), and SIM registration status with Smart Cache.",
   keywords: [
     "phone number verification API",
     "Nigeria phone lookup API",
@@ -66,8 +66,8 @@ export default function PhoneDocsPage() {
       {/* Pricing and SLA Chips */}
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">BASIC PHONE</span>
-          <span className="text-emerald-700 font-bold">85 NGX (₦85.00)</span>
+          <span className="text-slate-500 block">CARRIER RESOLUTION</span>
+          <span className="text-emerald-700 font-bold">Live Carrier Registry</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
           <span className="text-slate-500 block">FULL INTELLIGENCE</span>

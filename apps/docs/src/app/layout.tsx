@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     template: "%s | Verixa ID Docs",
   },
   description:
-    "Official developer documentation, curl examples, and REST endpoints for low-cost NIN verification (₦125), BVN validation (₦95), automated NIN slips (₦250), free NUBAN resolution, and sub-15ms Smart Identity Cache (₦38).",
+    "Official developer documentation, curl examples, and REST endpoints for NIN verification (starts from ₦120 on API), BVN validation (starts from ₦100 on API), automated NIN slips (starts from ₦250 for NIN Slip), and free NUBAN resolution.",
   applicationName: "Verixa ID Docs",
   keywords: [
     "NIN and BVN API",

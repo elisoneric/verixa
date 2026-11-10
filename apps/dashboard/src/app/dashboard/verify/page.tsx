@@ -192,7 +192,7 @@ function ManualVerifyContent() {
   const [passportLastName, setPassportLastName] = React.useState("")
   const [passportDob, setPassportDob] = React.useState("")
   const [tin, setTin] = React.useState("")
-  const [consent, setConsent] = React.useState(true)
+  const [consent, setConsent] = React.useState(false)
 
   // Status states
   const [isLoading, setIsLoading] = React.useState(false)
@@ -542,7 +542,7 @@ function ManualVerifyContent() {
     window.print()
   }
 
-  // Format 4-3-4 NIN
+  // Format grouped NIN display
   const formatNinPill = (val: string) => {
     const raw = String(val || "").replace(/\D/g, "")
     if (raw.length === 11) {

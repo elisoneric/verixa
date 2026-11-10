@@ -189,17 +189,17 @@ export default function AdminRevenuePage() {
             <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
               Customer Upstream
             </span>
-            <Badge variant="warning" size="sm">DOJAH BUY</Badge>
+            <Badge variant="warning" size="sm">GATEWAY BUY</Badge>
           </div>
           <div className="mt-2 text-2xl font-bold font-mono text-rose-600">
             ₦{Number(data?.customerCostSpentNgx || 0).toLocaleString()}.00
           </div>
           <span className="mt-2 block text-[11px] text-slate-500 font-mono">
-            Dojah cost for {data?.customerCallsCount || 0} customer lookup(s)
+            Gateway cost for {data?.customerCallsCount || 0} customer lookup(s)
           </span>
         </Card>
 
-        {/* Admin Incurred Upstream Cost (Dojah) */}
+        {/* Admin Incurred Upstream Cost */}
         <Card className="p-5 bg-white border border-slate-200 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
@@ -211,7 +211,7 @@ export default function AdminRevenuePage() {
             ₦{Number(data?.adminCostSpentNgx || 0).toLocaleString()}.00
           </div>
           <span className="mt-2 block text-[11px] text-slate-500 font-mono">
-            Dojah expense for {data?.adminCallsCount || 0} admin test lookup(s)
+            Gateway expense for {data?.adminCallsCount || 0} admin test lookup(s)
           </span>
         </Card>
 
@@ -355,7 +355,7 @@ export default function AdminRevenuePage() {
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-3 font-mono">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <span className="font-bold text-slate-900">Live Database Audit Preview</span>
-              <span className="text-[11px] text-slate-500">Actual Calls: {auditData.actualDojahCallsCount} | Dojah Cost: ₦{auditData.actualDojahCostSpent.toLocaleString()}</span>
+              <span className="text-[11px] text-slate-500">Actual Calls: {auditData.actualDojahCallsCount} | Gateway Cost: ₦{auditData.actualDojahCostSpent.toLocaleString()}</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
@@ -450,13 +450,13 @@ export default function AdminRevenuePage() {
         </form>
       </Card>
 
-      {/* Actual Calls to Dojah & Upstream Incurred Costs Table */}
+      {/* Actual Calls to Primary Gateway & Upstream Incurred Costs Table */}
       <Card className="p-6 border border-slate-200 bg-white shadow-xs space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
-            <h2 className="text-base font-bold text-slate-900">Actual Calls to Dojah & Real Upstream Incurred Costs</h2>
+            <h2 className="text-base font-bold text-slate-900">Actual Calls to Gateway & Real Upstream Incurred Costs</h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Breakdown of successful verification lookups, upstream buy-rate cost paid to Dojah, customer revenue billed, and net profit.
+              Breakdown of successful verification lookups, upstream buy-rate cost paid to primary identity registry gateway, customer revenue billed, and net profit.
             </p>
           </div>
           <Badge variant="verified" size="sm">LIVE AUDIT</Badge>
@@ -467,7 +467,7 @@ export default function AdminRevenuePage() {
             <TableRow>
               <TableHead>Service</TableHead>
               <TableHead className="text-right">Live Calls</TableHead>
-              <TableHead className="text-right">Dojah Buy Rate</TableHead>
+              <TableHead className="text-right">Gateway Buy Rate</TableHead>
               <TableHead className="text-right">Customer Cost</TableHead>
               <TableHead className="text-right">Admin Cost (Internal)</TableHead>
               <TableHead className="text-right">Customer Billed</TableHead>

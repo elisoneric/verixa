@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import { Badge, CodeBlock, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@verixa/ui"
 
 export const metadata: Metadata = {
-  title: "BVN Verification API (Low-Cost ₦95) — NIBSS Lookup & Demographics",
+  title: "BVN Verification API — NIBSS Lookup & Demographics | Verixa ID",
   description:
-    "Low-cost BVN verification API for Nigerian fintechs. Verify 11-digit BVN records, validate full demographics, branch codes, and biometric face match from ₦38 with Smart Cache.",
+    "BVN verification API for Nigerian fintechs and enterprises. Verify 11-digit BVN records, validate full demographics, and biometric face match starting from ₦100 on API.",
   keywords: [
     "BVN verification API",
     "BVN API Nigeria",
@@ -67,16 +67,16 @@ export default function BvnDocsPage() {
       {/* Pricing and SLA Chips */}
       <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">STANDARD LOOKUP</span>
-          <span className="text-emerald-700 font-bold">95 NGX (₦95.00)</span>
+          <span className="text-slate-500 block">API PRICING</span>
+          <span className="text-emerald-700 font-bold">Starts from ₦100 on API</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">ADVANCE / BIOMETRIC</span>
-          <span className="text-emerald-700 font-bold">125 - 150 NGX</span>
+          <span className="text-slate-500 block">AUTHENTICATION</span>
+          <span className="text-emerald-700 font-bold">x-api-key / Bearer</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
-          <span className="text-slate-500 block">SMART CACHE HIT (50% OFF)</span>
-          <span className="text-cyan-700 font-bold">38 NGX (₦38.00)</span>
+          <span className="text-slate-500 block">SMART CACHE</span>
+          <span className="text-cyan-700 font-bold">Sub-15ms accelerated</span>
         </div>
         <div className="p-3 rounded-lg bg-white shadow-2xs border border-slate-200">
           <span className="text-slate-500 block">LATENCY (CACHE / LIVE)</span>
@@ -190,7 +190,7 @@ export default function BvnDocsPage() {
     "enrollment_branch": "Ikeja",
     "level_of_account": "LEVEL 2"
   },
-  "billed_amount": 95,
+  "billed_amount": 100,
   "cached": false,
   "meta": {
     "request_id": "vx_req_8f19a02d",

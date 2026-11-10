@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo, Badge, Button } from "@verixa/ui";
+import { PublicHeader } from "@/components/public-header";
 
 export const metadata: Metadata = {
   title: "BVN Verification API Nigeria | Instant CBN Validation",
   description:
-    "Verify Nigerian Bank Verification Numbers (BVN) in real time with sub-15ms Smart Cache from ₦38. Fast portrait retrieval, date of birth, and biometric face match via official gateways.",
+    "Verify Nigerian Bank Verification Numbers (BVN) in real time starting from ₦100 on API. Biometric portrait retrieval, date of birth, and identity match via official gateways.",
   alternates: {
     canonical: "https://verixaid.com/bvn-verification-api",
   },
   openGraph: {
     title: "BVN Verification API Nigeria | Instant CBN Validation — Verixa ID",
     description:
-      "Verify Nigerian BVNs in real time from ₦38. Resolve full names, date of birth, telephone numbers, and portrait photographs instantly.",
+      "Verify Nigerian BVNs in real time starting from ₦100 on API. Resolve full names, date of birth, telephone numbers, and portrait photographs instantly.",
     url: "https://verixaid.com/bvn-verification-api",
     siteName: "Verixa ID",
     images: [{ url: "/icon.svg", width: 1200, height: 630 }],
@@ -29,7 +30,7 @@ export default function BvnVerificationPage() {
         "name": "How much does BVN verification cost on Verixa ID?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Verixa ID offers BVN lookups starting from ₦38 for cached records and ₦75 for live primary gateway checks, delivering significant savings compared to competitors charging ₦120 to ₦150."
+          "text": "BVN verification starts from ₦100 on API."
         }
       },
       {
@@ -59,28 +60,7 @@ export default function BvnVerificationPage() {
       />
 
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
-          <Link href="/" className="hover:opacity-90 transition-opacity">
-            <Logo size="md" />
-          </Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <Link href="/nin-verification-api" className="hover:text-slate-900 transition-colors">NIN API</Link>
-            <Link href="/bvn-verification-api" className="text-emerald-700 font-bold">BVN API</Link>
-            <Link href="/nin-slip-generator" className="hover:text-slate-900 transition-colors">Slip Generator</Link>
-            <Link href="/pricing" className="hover:text-slate-900 transition-colors">Pricing</Link>
-            <a href="https://docs.verixaid.com" target="_blank" rel="noreferrer" className="hover:text-slate-900 transition-colors">Docs</a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="outline" size="sm" className="font-semibold h-9 px-4">Sign In</Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="emerald" size="sm" className="font-semibold h-9 px-4">Get Started Free</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Hero Section */}
       <main className="flex-1">
@@ -166,9 +146,9 @@ export default function BvnVerificationPage() {
             <div className="bg-slate-900 text-slate-100 p-5 rounded-2xl font-mono text-xs overflow-x-auto shadow-xl border border-slate-800">
               <p className="text-slate-400 mb-2"># Live cURL Example</p>
               <pre className="text-emerald-400">{`curl -X POST "https://api.verixaid.com/api/v1/kyc/bvn" \\
-  -H "Authorization: Bearer vx_live_secret..." \\
+  -H "x-api-key: vx_live_secret..." \\
   -H "Content-Type: application/json" \\
-  -d '{"bvn": "22604012847"}'`}</pre>
+  -d '{"bvn": "22604012847", "consent": true}'`}</pre>
             </div>
           </div>
         </section>
@@ -184,7 +164,7 @@ export default function BvnVerificationPage() {
             <div className="bg-white p-5 rounded-xl border border-slate-200 space-y-2">
               <h4 className="font-bold text-slate-900 text-base">How much does BVN verification cost on Verixa ID?</h4>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Cached checks start from ₦38 per lookup. Live primary gateway BVN checks are billed at ₦75, compared to industry rates of ₦120+.
+                BVN verification starts from ₦100 on API.
               </p>
             </div>
 
@@ -198,7 +178,7 @@ export default function BvnVerificationPage() {
             <div className="bg-white p-5 rounded-xl border border-slate-200 space-y-2">
               <h4 className="font-bold text-slate-900 text-base">What happens if an invalid BVN is queried?</h4>
               <p className="text-sm text-slate-600 leading-relaxed">
-                If upstream returns a 404 Not Found, you are only billed a nominal cost recovery of ₦60 (and refunded any difference), while repeat queries for the same invalid number are served free from our negative cache at ₦0.
+                If a BVN does not exist or fails validation, you are not charged full rate, and repeat queries are served instantly.
               </p>
             </div>
           </div>
