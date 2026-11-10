@@ -31,32 +31,65 @@ export const metadata: Metadata = {
     google: "googlef8be8c2862597e1b",
   },
   title: {
-    default: "Developer Console — Verixa ID",
-    template: "%s | Verixa ID Console",
+    default: "Verixa ID — Low-Cost NIN & BVN Verification APIs Nigeria",
+    template: "%s | Verixa ID",
   },
   description:
-    "Developer console for API keys, Paystack DVA wallet management, verification transaction logs, interactive API explorer, and automated NIN dual-slip generation.",
-  applicationName: "Verixa ID Console",
+    "Low-cost, high-reliability NIN & BVN verification APIs for Nigerian businesses. Instant automated standard NIN slip and NIMC plastic card generation, free NUBAN bank account resolution, and sub-15ms Smart Cache from ₦38.",
+  applicationName: "Verixa ID",
+  keywords: [
+    "NIN verification API Nigeria",
+    "BVN verification API Nigeria",
+    "NIN validation API",
+    "BVN validation API",
+    "automated NIN slip generator",
+    "NIMC card download online",
+    "NIMC premium card generator",
+    "free NUBAN API Nigeria",
+    "low cost KYC API Nigeria",
+    "Verixa ID",
+  ],
   icons: {
     icon: [
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icon-96.png", sizes: "96x96", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon.ico", sizes: "32x32" },
     ],
-    shortcut: "/icon.svg",
-    apple: [{ url: "/icon.svg", sizes: "180x180" }],
+    shortcut: "/favicon-48x48.png",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   openGraph: {
     type: "website",
-    title: "Verixa ID Developer Console",
-    description: "Manage API keys, inspect identity lookup audit trails, and top up prepaid verification credits.",
+    locale: "en_US",
+    url: "https://verixaid.com",
+    title: "Verixa ID — Low-Cost NIN & BVN Verification APIs Nigeria",
+    description: "Low-cost, high-reliability NIN & BVN verification APIs with sub-15ms Smart Identity Cache and instant slip generation from ₦38.",
     siteName: "Verixa ID",
-    images: [{ url: "/icon.svg", width: 1200, height: 630 }],
+    images: [{ url: "/icon.svg", width: 1200, height: 630, alt: "Verixa ID" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Verixa ID — Low-Cost NIN & BVN Verification APIs Nigeria",
+    description: "Low-cost NIN & BVN verification APIs with sub-15ms Smart Identity Cache and instant slip generation from ₦38.",
+    images: ["/icon.svg"],
   },
   robots: {
-    index: false, // Internal console pages should not be indexed by search spiders for privacy
+    index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
+  alternates: {
+    canonical: "https://verixaid.com",
+  },
+  category: "technology",
 };
 
 export default function RootLayout({
@@ -64,11 +97,59 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Schema.org Structured Data optimized for Google Search Console Site Names & Rich Results
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://verixaid.com/#website",
+        "url": "https://verixaid.com",
+        "name": "Verixa ID",
+        "alternateName": [
+          "Verixa",
+          "Verixa Identity Platform",
+          "Verixa API",
+        ],
+        "description": "Low-cost, high-reliability NIN & BVN verification APIs and instant slip generator for Nigerian businesses and developers.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Verixa ID",
+          "url": "https://verixaid.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://verixaid.com/icon.svg",
+          },
+        },
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://verixaid.com/#software",
+        "name": "Verixa ID Verification API",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "All",
+        "url": "https://verixaid.com",
+        "offers": {
+          "@type": "Offer",
+          "price": "38.00",
+          "priceCurrency": "NGN",
+          "description": "Sub-15ms cached NIN and BVN identity verification starting from ₦38 per successful check.",
+        },
+      },
+    ],
+  };
+
   return (
     <html
       lang="en"
       className={`${inter.variable} ${outfit.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500/20 selection:text-emerald-900">
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>

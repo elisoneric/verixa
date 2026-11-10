@@ -109,6 +109,41 @@ export class NinSlipController {
     );
   }
 
+  // 1c. Dedicated NIMC Card Premium Endpoint (Plastic Card + Printable A4 PDF, ₦120 API / ₦350 UI)
+  @UseGuards(ApiKeyGuard)
+  @Post('slips/nin/premium')
+  async generatePremiumPostApiKey(@Req() req: any, @Body() body: any) {
+    if (body.consent !== true && body.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const nin = String(body.nin || '').trim();
+    return this.ninSlipService.generateSlipForOrganization(
+      req.organizationId,
+      normalizeEnvironment(req.environment),
+      nin,
+      'pdf',
+      req.apiKeyId,
+      'premium',
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Get('slips/nin/premium')
+  async generatePremiumGetApiKey(@Req() req: any, @Query() query: any) {
+    if (query.consent !== true && query.consent !== 'true') {
+      throw new BadRequestException('Applicant consent is mandatory for regulatory identity lookup (consent: true).');
+    }
+    const nin = String(query.nin || '').trim();
+    return this.ninSlipService.generateSlipForOrganization(
+      req.organizationId,
+      normalizeEnvironment(req.environment),
+      nin,
+      'pdf',
+      req.apiKeyId,
+      'premium',
+    );
+  }
+
   // 2a. Fast Identity Lookup Endpoint (JWT - instant optimistic demographic fetch for dashboard UI)
   @UseGuards(JwtAuthGuard)
   @Post('dashboard/slips/nin/lookup')

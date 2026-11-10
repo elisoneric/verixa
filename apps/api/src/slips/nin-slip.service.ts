@@ -1,6 +1,7 @@
 import { Injectable, Logger, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
+import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import { DojahProvider } from '../verifications/providers/dojah.provider';
 import { MockProvider } from '../verifications/providers/mock.provider';
@@ -305,13 +306,13 @@ export class NinSlipService {
     const reference = `vx_slip_${uuidv4().slice(0, 12)}`;
 
     // For standard slip, cache is only valid if complete address is present
-    // For NIMC Card, cache is only valid if authentic Dojah nin_id document is present
+    // For NIMC Card, cache is valid if demographic data & photo is present
     const hasAddress = Boolean(cached?.data?.address || cached?.data?.residence_address || cached?.data?.residence_address_line_1 || cached?.data?.lga);
-    const hasAuthenticCard = Boolean(cached?.data?.nin_id && String(cached?.data?.nin_id).startsWith('JVBERi'));
+    const hasCardDemographics = Boolean(cached?.data?.firstName || cached?.data?.surname);
     const isCacheUsable = Boolean(
       cached &&
       cached.data?.photo &&
-      (effectiveCardType === 'premium' || (effectiveCardType === 'slip' ? hasAddress : hasAuthenticCard))
+      (effectiveCardType === 'premium' || (effectiveCardType === 'slip' ? hasAddress : hasCardDemographics))
     );
 
     if (isCacheUsable) {
@@ -500,42 +501,20 @@ export class NinSlipService {
         this.logger.warn(`Could not generate NIMC Premium Card: ${e?.message}`);
       }
     } else if (isDojahSlipSelected) {
-      // NIMC Card: Use Dojah's authentic official card asset (entity.nin_id)
-      const rawCardAsset = identityData.nin_id;
-      if (rawCardAsset) {
-        const cleanAssetStr = String(rawCardAsset).replace(/^data:image\/[a-z]+;base64,/, '');
-        if (cleanAssetStr.startsWith('JVBERi')) {
-          pdfBuffer = Buffer.from(cleanAssetStr, 'base64');
-        } else {
-          cardImageBase64 = rawCardAsset.startsWith('data:') ? rawCardAsset : `data:image/webp;base64,${cleanAssetStr}`;
-          try {
-            const imgBuf = Buffer.from(cleanAssetStr, 'base64');
-            const { PDFDocument } = await import('pdf-lib');
-            const pdfDoc = await PDFDocument.create();
-            // ID-1 standard dimensions: 242.6pt x 153pt
-            const cardPage = pdfDoc.addPage([242.6, 153]);
-            let embeddedImg;
-            if (imgBuf[0] === 0x89 && imgBuf[1] === 0x50) {
-              embeddedImg = await pdfDoc.embedPng(imgBuf);
-            } else if (imgBuf[0] === 0xFF && imgBuf[1] === 0xD8) {
-              embeddedImg = await pdfDoc.embedJpg(imgBuf);
-            } else {
-              const sharp = require('sharp');
-              const pngBuf = await sharp(imgBuf).png().toBuffer();
-              embeddedImg = await pdfDoc.embedPng(pngBuf);
-            }
-            cardPage.drawImage(embeddedImg, { x: 0, y: 0, width: 242.6, height: 153 });
-            pdfBuffer = Buffer.from(await pdfDoc.save());
-          } catch (pdfErr: any) {
-            this.logger.warn(`Could not wrap Dojah card image into PDF: ${pdfErr?.message}`);
-          }
-        }
-      } else {
+      // NIMC Card: Generate crisp Digital NIN Card using verified Dojah demographic data
+      // Never pass through Dojah's raw nin_id PDF because Dojah upstream lacks embedded fonts causing tofu rectangles (□□□□)!
+      try {
+        pdfBuffer = await generateDigitalNinCardPdf(identityData);
+        slipSvg = await generateDigitalNinCardSvg(identityData);
         try {
-          pdfBuffer = await this.generatePdf(identityData);
-        } catch (e: any) {
-          this.logger.warn(`Could not generate fallback PDF Slip: ${e?.message}`);
+          const cardPngBuf = await sharp(Buffer.from(slipSvg, 'utf-8')).png().toBuffer();
+          cardImageBase64 = `data:image/png;base64,${cardPngBuf.toString('base64')}`;
+        } catch {
+          cardImageBase64 = `data:image/svg+xml;base64,${Buffer.from(slipSvg, 'utf-8').toString('base64')}`;
         }
+      } catch (cardErr: any) {
+        this.logger.warn(`Could not generate Digital NIN Card: ${cardErr?.message}`);
+        pdfBuffer = await this.generatePdf(identityData);
       }
     } else {
       try {
@@ -824,34 +803,9 @@ export class NinSlipService {
       contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
       filename = `NIMC_Premium_Card_${fileId}.docx`;
     } else if (normalizedFormat === 'card' && normalizedFileType === 'pdf') {
-      const rawCardAsset = identityData.nin_id || identityData.image;
-      if (rawCardAsset) {
-        const cleanAssetStr = String(rawCardAsset).replace(/^data:image\/[a-z]+;base64,/, '');
-        if (cleanAssetStr.startsWith('JVBERi')) {
-          buffer = Buffer.from(cleanAssetStr, 'base64');
-        } else {
-          try {
-            const imgBuf = Buffer.from(cleanAssetStr, 'base64');
-            const { PDFDocument } = await import('pdf-lib');
-            const pdfDoc = await PDFDocument.create();
-            const cardPage = pdfDoc.addPage([242.6, 153]);
-            let embeddedImg;
-            if (imgBuf[0] === 0x89 && imgBuf[1] === 0x50) {
-              embeddedImg = await pdfDoc.embedPng(imgBuf);
-            } else if (imgBuf[0] === 0xFF && imgBuf[1] === 0xD8) {
-              embeddedImg = await pdfDoc.embedJpg(imgBuf);
-            } else {
-              const sharp = require('sharp');
-              const pngBuf = await sharp(imgBuf).png().toBuffer();
-              embeddedImg = await pdfDoc.embedPng(pngBuf);
-            }
-            cardPage.drawImage(embeddedImg, { x: 0, y: 0, width: 242.6, height: 153 });
-            buffer = Buffer.from(await pdfDoc.save());
-          } catch {
-            buffer = Buffer.from(cleanAssetStr, 'base64');
-          }
-        }
-      } else {
+      try {
+        buffer = await generateDigitalNinCardPdf(slipData);
+      } catch {
         buffer = await generateStandardNinSlip(slipData);
       }
       contentType = 'application/pdf';
