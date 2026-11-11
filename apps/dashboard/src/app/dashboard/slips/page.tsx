@@ -128,7 +128,7 @@ export default function NinSlipGeneratorPage() {
     try {
       const docRes = await ApiClient.generateNinSlip(cleanNin, formatType, consent, {
         cardType: formatType,
-        fileType: "both",
+        fileType: formatType === "premium" ? "pdf" : "both",
       })
 
       if (docRes && (docRes.status === "success" || docRes.success)) {
@@ -183,11 +183,10 @@ export default function NinSlipGeneratorPage() {
     try {
       const cleanData = base64Data.includes("base64,") ? base64Data.split("base64,")[1] : base64Data
       const byteCharacters = atob(cleanData)
-      const byteNumbers = new Array(byteCharacters.length)
+      const byteArray = new Uint8Array(byteCharacters.length)
       for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
+        byteArray[i] = byteCharacters.charCodeAt(i)
       }
-      const byteArray = new Uint8Array(byteNumbers)
       const blob = new Blob([byteArray], { type: mimeType })
       const url = URL.createObjectURL(blob)
       const link = document.createElement("a")
@@ -231,11 +230,10 @@ export default function NinSlipGeneratorPage() {
         ? currentSlip.pdfBase64.split("base64,")[1]
         : currentSlip.pdfBase64
       const byteCharacters = atob(cleanData)
-      const byteNumbers = new Array(byteCharacters.length)
+      const byteArray = new Uint8Array(byteCharacters.length)
       for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
+        byteArray[i] = byteCharacters.charCodeAt(i)
       }
-      const byteArray = new Uint8Array(byteNumbers)
       const blob = new Blob([byteArray], { type: "application/pdf" })
       return URL.createObjectURL(blob)
     } catch {

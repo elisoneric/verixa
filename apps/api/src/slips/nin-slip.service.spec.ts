@@ -267,6 +267,67 @@ describe('NinSlipService', () => {
       expect(result.buffer[1]).toBe(0x4b);
       expect(result.sizeBytes).toBe(result.buffer.length);
     });
+
+    it('should successfully synthesize NIMC Card Premium PDF for nin_premium_ui records', async () => {
+      const premiumUiLog = {
+        ...validLog,
+        serviceType: 'nin_premium_ui',
+        costDeducted: 350,
+      };
+      logRepository.findOne.mockResolvedValue(premiumUiLog);
+
+      const result = await service.generateOnDemandSlip({
+        logId: premiumUiLog.id!,
+        format: 'premium',
+        fileType: 'pdf',
+        organizationId: mockOrgId,
+      });
+
+      expect(result.contentType).toBe('application/pdf');
+      expect(result.filename).toBe(`NIMC_Premium_Card_${mockNin}.pdf`);
+      expect(result.buffer.subarray(0, 5).toString('ascii')).toBe('%PDF-');
+      expect(result.sizeBytes).toBe(result.buffer.length);
+    });
+
+    it('should successfully synthesize NIMC Card Premium PDF for nin_premium API records', async () => {
+      const premiumApiLog = {
+        ...validLog,
+        serviceType: 'nin_premium',
+        costDeducted: 120,
+      };
+      logRepository.findOne.mockResolvedValue(premiumApiLog);
+
+      const result = await service.generateOnDemandSlip({
+        logId: premiumApiLog.id!,
+        format: 'premium',
+        fileType: 'pdf',
+        organizationId: mockOrgId,
+      });
+
+      expect(result.contentType).toBe('application/pdf');
+      expect(result.filename).toBe(`NIMC_Premium_Card_${mockNin}.pdf`);
+      expect(result.buffer.subarray(0, 5).toString('ascii')).toBe('%PDF-');
+    });
+
+    it('should successfully synthesize NIMC Digital Card PDF for nin_card records', async () => {
+      const cardLog = {
+        ...validLog,
+        serviceType: 'nin_card',
+        costDeducted: 300,
+      };
+      logRepository.findOne.mockResolvedValue(cardLog);
+
+      const result = await service.generateOnDemandSlip({
+        logId: cardLog.id!,
+        format: 'card',
+        fileType: 'pdf',
+        organizationId: mockOrgId,
+      });
+
+      expect(result.contentType).toBe('application/pdf');
+      expect(result.filename).toBe(`NIN_Digital_Card_${mockNin}.pdf`);
+      expect(result.buffer.subarray(0, 5).toString('ascii')).toBe('%PDF-');
+    });
   });
 
   describe('lookupIdentity', () => {

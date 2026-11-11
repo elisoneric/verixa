@@ -711,7 +711,17 @@ export class NinSlipService {
     }
 
     const serviceType = String(log.serviceType || (log as any).service_type || '').toLowerCase();
-    if (serviceType !== 'nin' && serviceType !== 'nin_slip' && serviceType !== 'nin_advance') {
+    const isNinRecord =
+      serviceType.startsWith('nin') ||
+      serviceType === 'nin' ||
+      serviceType === 'nin_slip' ||
+      serviceType === 'nin_card' ||
+      serviceType === 'nin_premium' ||
+      serviceType === 'nin_premium_ui' ||
+      serviceType === 'nin_advance' ||
+      serviceType === 'nin_phone';
+
+    if (!isNinRecord) {
       throw new BadRequestException(
         `Document synthesis is only supported for NIN records (found: ${log.serviceType || (log as any).service_type || 'unknown'})`
       );
@@ -748,6 +758,7 @@ export class NinSlipService {
       reqCardType === 'premium' ||
       reqFormat === 'premium' ||
       sType === 'nin_premium' ||
+      sType === 'nin_premium_ui' ||
       cost === 350
     ) {
       originalFormat = 'premium';

@@ -27,7 +27,8 @@ import { VerificationLog, VerificationStatus } from './entities/verification-log
 import { Wallet } from '../billing/entities/wallet.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { encryptPayload, sanitizeIdentityRetention } from '../common/utils/crypto.util';
-import { generateNimcPremiumCard } from '../slips/slip-generator.util';
+import sharp from 'sharp';
+import { generateNimcPremiumCard, generateDigitalNinCardSvg, generateDigitalNinCardPdf } from '../slips/slip-generator.util';
 
 @Controller(['api', ''])
 export class ApiController {
@@ -218,6 +219,34 @@ export class ApiController {
           }
         }
 
+        if ((service === 'nin_card' || (cleanEntity && cleanEntity.tier === 'card') || (cleanEntity && cleanEntity.tier === 'slip')) && cleanEntity && typeof cleanEntity === 'object') {
+          // Synthesize crisp digital NIN card with embedded fonts (0 tofu □□□□ characters)
+          try {
+            const cardData = {
+              nin: cleanEntity.nin || identifier,
+              trackingId: cleanEntity.tracking_id || cleanEntity.trackingId || '',
+              firstName: cleanEntity.first_name || cleanEntity.firstname || '',
+              surname: cleanEntity.last_name || cleanEntity.surname || '',
+              middleName: cleanEntity.middle_name || cleanEntity.middlename || '',
+              gender: cleanEntity.gender || 'M',
+              birthdate: cleanEntity.date_of_birth || cleanEntity.dob || cleanEntity.birthdate || '',
+              photo: cleanEntity.photo,
+              address: cleanEntity.residence_address_line_1 || cleanEntity.residence_address || cleanEntity.address,
+              state: cleanEntity.residence_state || cleanEntity.state,
+              lga: cleanEntity.residence_lga || cleanEntity.lga,
+            };
+            const svg = await generateDigitalNinCardSvg(cardData as any);
+            const cardPngBuf = await sharp(Buffer.from(svg, 'utf-8')).png().toBuffer();
+            cleanEntity.image = `data:image/png;base64,${cardPngBuf.toString('base64')}`;
+            cleanEntity.card_image = cleanEntity.image;
+            const cardPdf = await generateDigitalNinCardPdf(cardData as any);
+            cleanEntity.nin_id = cardPdf.toString('base64');
+            cleanEntity.pdf = cleanEntity.nin_id;
+          } catch {
+            // retain existing on error
+          }
+        }
+
         if (req.res && typeof req.res.setHeader === 'function') {
           try {
             req.res.setHeader('X-Request-Id', reference);
@@ -381,6 +410,32 @@ export class ApiController {
           photo: cleanEntity.photo,
         }, { imageOnly: true });
         cleanEntity.image = cardRes.cardImageBase64;
+      } catch {}
+    }
+
+    if ((service === 'nin_card' || (cleanEntity && cleanEntity.tier === 'card') || (cleanEntity && cleanEntity.tier === 'slip')) && cleanEntity && typeof cleanEntity === 'object') {
+      // Synthesize crisp digital NIN card with embedded fonts (0 tofu □□□□ characters)
+      try {
+        const cardData = {
+          nin: cleanEntity.nin || identifier,
+          trackingId: cleanEntity.tracking_id || cleanEntity.trackingId || '',
+          firstName: cleanEntity.first_name || cleanEntity.firstname || '',
+          surname: cleanEntity.last_name || cleanEntity.surname || '',
+          middleName: cleanEntity.middle_name || cleanEntity.middlename || '',
+          gender: cleanEntity.gender || 'M',
+          birthdate: cleanEntity.date_of_birth || cleanEntity.dob || cleanEntity.birthdate || '',
+          photo: cleanEntity.photo,
+          address: cleanEntity.residence_address_line_1 || cleanEntity.residence_address || cleanEntity.address,
+          state: cleanEntity.residence_state || cleanEntity.state,
+          lga: cleanEntity.residence_lga || cleanEntity.lga,
+        };
+        const svg = await generateDigitalNinCardSvg(cardData as any);
+        const cardPngBuf = await sharp(Buffer.from(svg, 'utf-8')).png().toBuffer();
+        cleanEntity.image = `data:image/png;base64,${cardPngBuf.toString('base64')}`;
+        cleanEntity.card_image = cleanEntity.image;
+        const cardPdf = await generateDigitalNinCardPdf(cardData as any);
+        cleanEntity.nin_id = cardPdf.toString('base64');
+        cleanEntity.pdf = cleanEntity.nin_id;
       } catch {}
     }
 
