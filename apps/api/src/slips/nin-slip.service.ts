@@ -264,6 +264,7 @@ export class NinSlipService {
     format: 'pdf' | 'docx' | 'both' | 'card' | 'slip' | 'premium' | string = 'pdf',
     apiKeyId?: string,
     cardType: 'slip' | 'card' | 'premium' = 'slip',
+    bypassCache = false,
   ) {
 
     const cleanNin = String(nin || '').replace(/\D/g, '');
@@ -292,13 +293,15 @@ export class NinSlipService {
       defaultSlipPrice = isApiCall ? 120 : 350;
     }
 
-    // 1. Check Smart Identity Cache for existing NIN record
-    const cached = await this.identityCacheService.getCachedRecord(
-      orgId,
-      validEnv,
-      'nin',
-      cleanNin,
-    );
+    // 1. Check Smart Identity Cache for existing NIN record (unless bypassCache is requested)
+    const cached = bypassCache
+      ? null
+      : await this.identityCacheService.getCachedRecord(
+          orgId,
+          validEnv,
+          'nin',
+          cleanNin,
+        );
 
     let identityData: NinAdvanceResult | null = null;
     let isCacheHit = false;

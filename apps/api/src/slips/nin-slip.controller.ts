@@ -48,6 +48,7 @@ export class NinSlipController {
     const requestedFormat = String(body.format || '').toLowerCase();
     const cardType: 'card' | 'slip' | 'premium' = body.cardType || body.type || (requestedFormat === 'premium' ? 'premium' : (requestedFormat === 'card' ? 'card' : 'slip'));
     const fileType = body.fileType || (requestedFormat === 'docx' ? 'docx' : (requestedFormat === 'pdf' ? 'pdf' : 'both'));
+    const bypassCache = req.headers?.['x-bypass-cache'] === 'true' || body.fresh === true || body.fresh === 'true';
 
     return this.ninSlipService.generateSlipForOrganization(
       req.organizationId,
@@ -56,6 +57,7 @@ export class NinSlipController {
       fileType,
       req.apiKeyId,
       cardType,
+      bypassCache,
     );
   }
 

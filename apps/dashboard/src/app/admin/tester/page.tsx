@@ -451,10 +451,24 @@ export default function AdminTesterPage() {
           {/* Response Header */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-800 uppercase">Upstream Result</span>
+              <span className="text-xs font-semibold text-slate-800 uppercase">Result</span>
               {httpStatus && (
                 <Badge variant={httpStatus === 200 ? "verified" : "failed"} size="sm">
                   {httpStatus} {httpStatus === 200 ? "OK" : "ERROR"}
+                </Badge>
+              )}
+              {response && (
+                <Badge
+                  variant={response?._upstream ? "verified" : response?.cached || response?.meta?.cached ? "info" : "neutral"}
+                  size="sm"
+                >
+                  {response?._upstream
+                    ? "DOJAH DIRECT"
+                    : response?.cached || response?.meta?.cached
+                    ? "FROM CACHE"
+                    : mode === "sandbox"
+                    ? "SANDBOX"
+                    : "LOCAL / MOCK"}
                 </Badge>
               )}
               {latencyMs && <span className="font-mono text-xs text-slate-500">{latencyMs}ms</span>}
