@@ -322,6 +322,7 @@ export class ApiController {
     }
 
     // 2. Resolve Dynamic Live Rate (System Config & Org Custom Overrides)
+    const billingStart = Date.now();
     const liveRateInfo = await this.billingService.getEffectiveRate(orgId, rateKey, false);
     const finalPrice = exactPrice !== undefined ? exactPrice : liveRateInfo.effectiveRate;
     const reference = `vx_live_${uuidv4().slice(0, 12)}`;
@@ -332,6 +333,7 @@ export class ApiController {
     if (orgId) {
       await this.billingService.deductCredits(orgId, env, finalPrice, reference);
     }
+    const billingMs = Date.now() - billingStart;
 
     // 4. Query Primary Gateway with Anti-Stampede Deduplication
     let result: any;
@@ -418,30 +420,33 @@ export class ApiController {
       throw new BadRequestException(err.message || `Failed to verify ${service}`);
     }
 
-    // 5. Cache verified record
-    if (identifier && result?.data) {
-      await this.identityCacheService.setCachedRecord(orgId, env, service, identifier, result.data, 'direct');
-    }
-
+    // 5. Cache verified record & save audit log in parallel (with heavy blobs stripped)
+    const persistStart = Date.now();
     const latencyMs = Math.max(35, Date.now() - startTime);
     const rawData = result?.data || result;
 
-    await this.logRepository.save({
-      org_id: orgId,
-      environment: env,
-      api_key_id: req.apiKeyId || 'api_key',
-      serviceType: service,
-      status: VerificationStatus.SUCCESS,
-      upstreamProvider: 'direct',
-      isCached: false,
-      source: 'LIVE',
-      costDeducted: finalPrice,
-      latencyMs,
-      cacheKey: this.identityCacheService.generateKey(orgId, env, service, identifier),
-      idempotencyKey: req.headers?.['idempotency-key'] || undefined,
-      requestPayload: payload,
-      responsePayload: rawData ? encryptPayload(sanitizeIdentityRetention(rawData)) : null,
-    });
+    await Promise.all([
+      identifier && result?.data
+        ? this.identityCacheService.setCachedRecord(orgId, env, service, identifier, result.data, 'direct').catch(() => {})
+        : Promise.resolve(),
+      this.logRepository.save({
+        org_id: orgId,
+        environment: env,
+        api_key_id: req.apiKeyId || 'api_key',
+        serviceType: service,
+        status: VerificationStatus.SUCCESS,
+        upstreamProvider: 'direct',
+        isCached: false,
+        source: 'LIVE',
+        costDeducted: finalPrice,
+        latencyMs,
+        cacheKey: this.identityCacheService.generateKey(orgId, env, service, identifier),
+        idempotencyKey: req.headers?.['idempotency-key'] || undefined,
+        requestPayload: payload,
+        responsePayload: rawData ? encryptPayload(sanitizeIdentityRetention(rawData)) : null,
+      }),
+    ]);
+    const persistMs = Date.now() - persistStart;
 
     const cleanEntity = rawData?.entity !== undefined ? rawData.entity : rawData;
     if ((service === 'nin_premium' || (cleanEntity && cleanEntity.tier === 'premium')) && cleanEntity && typeof cleanEntity === 'object') {
@@ -523,7 +528,15 @@ export class ApiController {
     const includeAdminDebug =
       req.headers?.['x-admin-debug'] === 'true' &&
       (userRole === 'superadmin' || userRole === 'super_admin' || userRole === 'admin');
-    const upstreamDebug = includeAdminDebug ? result?.meta?.upstreamDebug : undefined;
+    const upstreamDebug =
+      includeAdminDebug && result?.meta?.upstreamDebug
+        ? {
+            ...result.meta.upstreamDebug,
+            billingMs,
+            persistMs,
+            totalServerMs: Date.now() - startTime,
+          }
+        : undefined;
 
     if (req.query?.verbose === 'true' || req.headers?.['x-verixa-verbose'] === 'true') {
       return {
@@ -703,7 +716,7 @@ export class ApiController {
       nin,
       query,
       125,
-      () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin, ...query }) : this.mockProvider.verifyNinAdvance({ nin, ...query }))
+      () => (isLive ? this.dojahProvider.verifyNinAdvanceDirect({ nin, ...query }) : this.mockProvider.verifyNinAdvanceDirect({ nin, ...query }))
     );
   }
 
@@ -721,7 +734,7 @@ export class ApiController {
       nin,
       payload,
       125,
-      () => (isLive ? this.dojahProvider.verifyNinAdvance({ nin, ...payload }) : this.mockProvider.verifyNinAdvance({ nin, ...payload }))
+      () => (isLive ? this.dojahProvider.verifyNinAdvanceDirect({ nin, ...payload }) : this.mockProvider.verifyNinAdvanceDirect({ nin, ...payload }))
     );
   }
 

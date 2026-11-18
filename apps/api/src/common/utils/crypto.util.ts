@@ -98,10 +98,17 @@ export function sanitizeIdentityRetention(data: any): any {
     'svgContent',
     'cardSvg',
     'slipSvg',
+    'card_image',
+    'card_pdf',
+    'pdf',
   ];
 
   for (const key of keysToRemove) {
     delete pruned[key];
+  }
+
+  if (typeof pruned.image === 'string' && pruned.image.length > 50_000) {
+    delete pruned.image;
   }
 
   // Remove raw PDF nin_id if it is a compilation document blob

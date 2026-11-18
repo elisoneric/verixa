@@ -383,6 +383,73 @@ export class MockProvider implements IVerificationProvider {
     };
   }
 
+  async verifyNinAdvanceDirect(data: { nin: string; consent?: boolean }): Promise<VerificationResponse<any>> {
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    if (data.nin === '00000000000') {
+      return {
+        status: 'failed',
+        meta: { provider: this.providerName, reference: uuidv4() },
+      };
+    }
+
+    const isSandboxDojah = data.nin === '70123456789';
+    const firstNames = ['BABATUNDE', 'CHUKWUDI', 'OLUMIDE', 'EMMANUEL', 'IBRAHIM', 'CHINEDU', 'TEMITOPE', 'ZAINAB', 'NGOZI', 'AISHA'];
+    const surnames = ['ADEBAYO', 'OKONKWO', 'BALOGUN', 'BELLO', 'EZE', 'DANJUMA', 'OGUNLEWE', 'ABUBAKAR', 'NWOSU', 'SANUSI'];
+    const middleNames = ['OLUWASEUN', 'SOMTOCHUKWU', 'AYOMIDE', 'IFEANYI', 'DAUDA', 'CHIDIEBERE', 'ENIOLA', 'YAKUBU', 'OLATUNJI'];
+    const seed = String(data.nin || '').split('').reduce((acc: number, c: string) => acc + (parseInt(c, 10) || 0), 0);
+
+    const firstName = isSandboxDojah ? 'JOHN' : firstNames[seed % firstNames.length];
+    const lastName = isSandboxDojah ? 'ANON' : surnames[(seed + 3) % surnames.length];
+    const middleName = isSandboxDojah ? 'DOE' : middleNames[(seed + 5) % middleNames.length];
+    const dob = '1990-01-01';
+    const phone = isSandboxDojah ? '08012345678' : `080${faker.string.numeric(8)}`;
+
+    let photoBase64 = '';
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const photoPath = path.resolve(__dirname, '../../slips/assets/default_mock_photo.jpg');
+      if (fs.existsSync(photoPath)) {
+        photoBase64 = fs.readFileSync(photoPath).toString('base64');
+      }
+    } catch {
+      photoBase64 = '';
+    }
+
+    return {
+      status: 'success',
+      data: {
+        nin: data.nin,
+        first_name: firstName,
+        last_name: lastName,
+        middle_name: middleName,
+        date_of_birth: dob,
+        phone_number: phone,
+        photo: photoBase64,
+        gender: 'Male',
+        birth_country: 'nigeria',
+        birth_lga: 'Ikeja',
+        birth_state: 'Lagos',
+        residence_address_line_1: '1, EXAMPLE STREET',
+        residence_status: 'birth',
+        residence_town: 'IKEJA',
+        residence_lga: 'Ikeja',
+        residence_state: 'Lagos',
+        origin_lga: 'Ikeja',
+        origin_place: 'IKEJA',
+        origin_state: 'Lagos',
+        nok_first_name: 'JANE',
+        nok_middle_name: middleName,
+        nok_last_name: lastName,
+        nok_town: 'IKEJA',
+        nok_lga: 'Ikeja',
+        nok_address_line_1: '1, EXAMPLE STREET',
+      },
+      meta: { provider: this.providerName, reference: `req_${uuidv4()}` },
+    };
+  }
+
   async verifyNinPremiumDetails(data: { nin: string; consent?: boolean }): Promise<VerificationResponse<any>> {
     await new Promise(resolve => setTimeout(resolve, 350));
 

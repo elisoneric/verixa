@@ -354,12 +354,21 @@ export class DojahProvider implements IVerificationProvider {
       throw new Error('Live upstream credentials (DOJAH_APP_ID / DOJAH_SECRET_KEY) are not configured.');
     }
 
+    const endpoint = `${baseUrl}/api/v1/kyc/nin/advance`;
+    const queryParams: Record<string, any> = { nin: data.nin };
+    if ((data as any).nin_tin === true || (data as any).nin_tin === 'true') {
+      queryParams.nin_tin = true;
+    }
+    const calledAt = new Date().toISOString();
+    const t0 = Date.now();
+
     try {
-      const response = await axios.get(`${baseUrl}/api/v1/kyc/nin/advance`, {
-        params: { nin: data.nin },
+      const response = await axios.get(endpoint, {
+        params: queryParams,
         headers: this.getHeaders(secretKey!, appId),
         timeout: 18000,
       });
+      const upstreamLatencyMs = Date.now() - t0;
 
       const rawDirectResponse = JSON.parse(JSON.stringify(response.data || {}));
       const entity = response.data?.entity || {};
@@ -401,11 +410,91 @@ export class DojahProvider implements IVerificationProvider {
         meta: {
           provider: 'direct',
           reference: `vx_${uuidv4().slice(0, 12)}`,
-          upstreamDebug: this.buildUpstreamDebug('GET', `${baseUrl}/api/v1/kyc/nin/advance`, { nin: data.nin }, appId, secretKey, rawDirectResponse),
+          upstreamDebug: this.buildUpstreamDebug('GET', endpoint, queryParams, appId, secretKey, rawDirectResponse, {
+            calledAt,
+            upstreamStatus: response.status,
+            upstreamLatencyMs,
+          }),
         } as any,
       };
     } catch (err: any) {
+      err.upstreamDebug = this.buildUpstreamDebug(
+        'GET',
+        endpoint,
+        queryParams,
+        appId,
+        secretKey,
+        err?.response?.data || { error: err?.message, code: err?.code },
+        {
+          calledAt,
+          upstreamStatus: err?.response?.status || err?.code || 'ERROR',
+          upstreamLatencyMs: Date.now() - t0,
+        },
+      );
       this.logger.error(`Dojah NIN Advance lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
+  async verifyNinAdvanceDirect(data: NinAdvanceVerificationData): Promise<VerificationResponse<any>> {
+    const cleanNin = String(data.nin || '').trim();
+    if (cleanNin === '70123456789' || cleanNin === '00000000000' || cleanNin === '11234567890') {
+      this.logger.log(`DojahProvider: Sandbox test NIN ${cleanNin} detected in advance direct query; routing to mock provider.`);
+      return this.mockProvider.verifyNinAdvanceDirect(data);
+    }
+
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      throw new Error('Live upstream credentials (DOJAH_APP_ID / DOJAH_SECRET_KEY) are not configured.');
+    }
+
+    const endpoint = `${baseUrl}/api/v1/kyc/nin/advance`;
+    const queryParams: Record<string, any> = { nin: data.nin };
+    if ((data as any).nin_tin === true || (data as any).nin_tin === 'true') {
+      queryParams.nin_tin = true;
+    }
+    const calledAt = new Date().toISOString();
+    const t0 = Date.now();
+
+    try {
+      const response = await axios.get(endpoint, {
+        params: queryParams,
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 18000,
+      });
+      const upstreamLatencyMs = Date.now() - t0;
+
+      const rawDirectResponse = JSON.parse(JSON.stringify(response.data || {}));
+      const entity = response.data?.entity || {};
+
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+          upstreamDebug: this.buildUpstreamDebug('GET', endpoint, queryParams, appId, secretKey, rawDirectResponse, {
+            calledAt,
+            upstreamStatus: response.status,
+            upstreamLatencyMs,
+          }),
+        } as any,
+      };
+    } catch (err: any) {
+      err.upstreamDebug = this.buildUpstreamDebug(
+        'GET',
+        endpoint,
+        queryParams,
+        appId,
+        secretKey,
+        err?.response?.data || { error: err?.message, code: err?.code },
+        {
+          calledAt,
+          upstreamStatus: err?.response?.status || err?.code || 'ERROR',
+          upstreamLatencyMs: Date.now() - t0,
+        },
+      );
+      this.logger.error(`Dojah NIN Advance Direct lookup error: ${err?.message}`, err?.response?.data);
       throw err;
     }
   }

@@ -535,7 +535,7 @@ export default function AdminTesterPage() {
               {response?._upstream ? (
                 <>
                   {/* Call Timing & Status Metadata Strip */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-[11px] font-mono">
                     <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
                       <span className="text-slate-400 block text-[10px] uppercase">Called At</span>
                       <span className="text-slate-900 font-bold">
@@ -559,11 +559,27 @@ export default function AdminTesterPage() {
                       </span>
                     </div>
                     <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-                      <span className="text-slate-400 block text-[10px] uppercase">Card Synth Time</span>
+                      <span className="text-slate-400 block text-[10px] uppercase">Card Synth</span>
                       <span className="text-slate-900 font-bold">
                         {response._upstream.cardSynthesisMs != null
                           ? `${response._upstream.cardSynthesisMs}ms`
                           : "0ms"}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                      <span className="text-slate-400 block text-[10px] uppercase">Billing / DB</span>
+                      <span className="text-slate-900 font-bold">
+                        {response._upstream.billingMs != null
+                          ? `${response._upstream.billingMs} / ${response._upstream.persistMs ?? 0}ms`
+                          : "—"}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                      <span className="text-slate-400 block text-[10px] uppercase">Total Server</span>
+                      <span className="text-slate-900 font-bold">
+                        {response._upstream.totalServerMs != null
+                          ? `${response._upstream.totalServerMs}ms`
+                          : "—"}
                       </span>
                     </div>
                   </div>
