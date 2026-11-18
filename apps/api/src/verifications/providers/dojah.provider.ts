@@ -81,6 +81,12 @@ export class DojahProvider implements IVerificationProvider {
     appId: string | null,
     secretKey: string | null,
     rawResponse: any,
+    extra?: {
+      calledAt?: string;
+      upstreamStatus?: number | string;
+      upstreamLatencyMs?: number;
+      cardSynthesisMs?: number;
+    },
   ) {
     const qs = params
       ? new URLSearchParams(
@@ -107,6 +113,10 @@ export class DojahProvider implements IVerificationProvider {
     return {
       method: method.toUpperCase(),
       url: fullUrl,
+      calledAt: extra?.calledAt || new Date().toISOString(),
+      upstreamStatus: extra?.upstreamStatus ?? 200,
+      upstreamLatencyMs: extra?.upstreamLatencyMs,
+      cardSynthesisMs: extra?.cardSynthesisMs,
       curl,
       rawResponse: clonedRaw,
     };
@@ -412,23 +422,29 @@ export class DojahProvider implements IVerificationProvider {
       throw new Error('Live upstream credentials (DOJAH_APP_ID / DOJAH_SECRET_KEY) are not configured.');
     }
 
+    const endpoint = `${baseUrl}/api/v1/kyc/nin/premium`;
+    const queryParams: Record<string, any> = { nin: data.nin };
+    if ((data as any).nin_tin === true || (data as any).nin_tin === 'true') {
+      queryParams.nin_tin = true;
+    }
+    const calledAt = new Date().toISOString();
+    const t0 = Date.now();
+
     try {
-      const endpoint = `${baseUrl}/api/v1/kyc/nin/premium`;
-      const queryParams: Record<string, any> = { nin: data.nin };
-      if ((data as any).nin_tin === true || (data as any).nin_tin === 'true') {
-        queryParams.nin_tin = true;
-      }
       const response = await axios.get(endpoint, {
         params: queryParams,
         headers: this.getHeaders(secretKey!, appId),
         timeout: 18000,
       });
+      const upstreamLatencyMs = Date.now() - t0;
 
       const rawDirectResponse = JSON.parse(JSON.stringify(response.data || {}));
       const entity = response.data?.entity || {};
 
       // Synthesize Custom NIMC Card Premium image directly from the returned Dojah entity (no extra Dojah call)
+      let cardSynthesisMs = 0;
       if (entity.first_name || entity.firstname) {
+        const c0 = Date.now();
         try {
           const cardRes = await generateNimcPremiumCard({
             nin: entity.nin || data.nin,
@@ -444,6 +460,7 @@ export class DojahProvider implements IVerificationProvider {
         } catch (e: any) {
           this.logger.warn(`Could not generate NIMC Premium Card image for premium details: ${e?.message}`);
         }
+        cardSynthesisMs = Date.now() - c0;
       }
 
       return {
@@ -452,10 +469,28 @@ export class DojahProvider implements IVerificationProvider {
         meta: {
           provider: 'direct',
           reference: `vx_${uuidv4().slice(0, 12)}`,
-          upstreamDebug: this.buildUpstreamDebug('GET', endpoint, queryParams, appId, secretKey, rawDirectResponse),
+          upstreamDebug: this.buildUpstreamDebug('GET', endpoint, queryParams, appId, secretKey, rawDirectResponse, {
+            calledAt,
+            upstreamStatus: response.status,
+            upstreamLatencyMs,
+            cardSynthesisMs,
+          }),
         } as any,
       };
     } catch (err: any) {
+      err.upstreamDebug = this.buildUpstreamDebug(
+        'GET',
+        endpoint,
+        queryParams,
+        appId,
+        secretKey,
+        err?.response?.data || { error: err?.message, code: err?.code },
+        {
+          calledAt,
+          upstreamStatus: err?.response?.status || err?.code || 'ERROR',
+          upstreamLatencyMs: Date.now() - t0,
+        },
+      );
       this.logger.error(`Dojah NIN Premium Details lookup error: ${err?.message}`, err?.response?.data);
       throw err;
     }

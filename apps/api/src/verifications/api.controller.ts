@@ -403,6 +403,18 @@ export class ApiController {
         }
       }
 
+      const userRoleErr = String(req.user?.role || '').toLowerCase();
+      const includeErrDebug =
+        req.headers?.['x-admin-debug'] === 'true' &&
+        (userRoleErr === 'superadmin' || userRoleErr === 'super_admin' || userRoleErr === 'admin');
+      if (includeErrDebug && err?.upstreamDebug) {
+        throw new BadRequestException({
+          statusCode: 400,
+          message: err.response?.data?.error || err.response?.data?.message || err.message || `Failed to verify ${service}`,
+          _upstream: err.upstreamDebug,
+        });
+      }
+
       throw new BadRequestException(err.message || `Failed to verify ${service}`);
     }
 

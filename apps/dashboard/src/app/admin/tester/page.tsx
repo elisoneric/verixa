@@ -176,9 +176,10 @@ export default function AdminTesterPage() {
       setResponse({
         error: true,
         message: err.message || "Failed to execute upstream request",
+        ...(err._upstream ? { _upstream: err._upstream } : {}),
         details: err,
       })
-      setActiveTab("json")
+      setActiveTab(err._upstream ? "upstream" : "json")
     } finally {
       setIsLoading(false)
     }
@@ -533,6 +534,40 @@ export default function AdminTesterPage() {
             <div className="space-y-4">
               {response?._upstream ? (
                 <>
+                  {/* Call Timing & Status Metadata Strip */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                      <span className="text-slate-400 block text-[10px] uppercase">Called At</span>
+                      <span className="text-slate-900 font-bold">
+                        {response._upstream.calledAt
+                          ? new Date(response._upstream.calledAt).toLocaleString()
+                          : "—"}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                      <span className="text-slate-400 block text-[10px] uppercase">Dojah Status</span>
+                      <span className="text-slate-900 font-bold">
+                        {String(response._upstream.upstreamStatus ?? "—")}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                      <span className="text-slate-400 block text-[10px] uppercase">Dojah Time</span>
+                      <span className="text-slate-900 font-bold">
+                        {response._upstream.upstreamLatencyMs != null
+                          ? `${response._upstream.upstreamLatencyMs}ms`
+                          : "—"}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                      <span className="text-slate-400 block text-[10px] uppercase">Card Synth Time</span>
+                      <span className="text-slate-900 font-bold">
+                        {response._upstream.cardSynthesisMs != null
+                          ? `${response._upstream.cardSynthesisMs}ms`
+                          : "0ms"}
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs font-mono text-slate-600">
                       <span className="font-bold uppercase text-slate-800">1. cURL Sent to Upstream</span>

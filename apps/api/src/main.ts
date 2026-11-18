@@ -7,7 +7,7 @@ import sharp from 'sharp';
 async function bootstrap() {
   // Bound libvips native image cache & thread concurrency to prevent RSS bloat in containers
   sharp.cache({ memory: 20, files: 0, items: 20 });
-  sharp.concurrency(1);
+  sharp.concurrency(2);
 
   const logger = new Logger('Bootstrap');
 

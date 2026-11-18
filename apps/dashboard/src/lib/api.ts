@@ -161,7 +161,11 @@ export class ApiClient {
         )
       }
       const message = errData.message || response.statusText || "Request failed"
-      throw new Error(Array.isArray(message) ? message.join(", ") : message)
+      const err: any = new Error(Array.isArray(message) ? message.join(", ") : message)
+      if (errData._upstream) {
+        err._upstream = errData._upstream
+      }
+      throw err
     }
 
     return response.json()
