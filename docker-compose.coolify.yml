@@ -21,10 +21,11 @@ services:
     restart: always
     mem_limit: 768m
     command: >
-      sh -c "if [ -n \"$$REDIS_PASSWORD\" ]; then
-        redis-server --save \"\" --appendonly no --maxmemory $${REDIS_MAXMEMORY:-512mb} --maxmemory-policy allkeys-lru --requirepass \"$$REDIS_PASSWORD\";
+      sh -c "rm -rf /data/dump.rdb /data/appendonlydir &&
+      if [ -n \"$$REDIS_PASSWORD\" ]; then
+        exec redis-server --save \"\" --appendonly no --maxmemory $${REDIS_MAXMEMORY:-512mb} --maxmemory-policy allkeys-lru --requirepass \"$$REDIS_PASSWORD\";
       else
-        redis-server --save \"\" --appendonly no --maxmemory $${REDIS_MAXMEMORY:-512mb} --maxmemory-policy allkeys-lru;
+        exec redis-server --save \"\" --appendonly no --maxmemory $${REDIS_MAXMEMORY:-512mb} --maxmemory-policy allkeys-lru;
       fi"
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
