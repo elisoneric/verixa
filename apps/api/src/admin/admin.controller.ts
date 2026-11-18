@@ -224,4 +224,22 @@ export class AdminController {
   ) {
     return this.adminService.testSmtpConnection(body.to, body.customConfig);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('system/monitor')
+  async getSystemMonitor() {
+    return this.adminService.getSystemMonitor();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('system/clear-cache')
+  async clearSystemCache() {
+    return this.adminService.clearSystemCache();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('system/clear-slip-blobs')
+  async clearStoredSlipBlobs() {
+    return this.adminService.clearStoredSlipBlobs();
+  }
 }

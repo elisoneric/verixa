@@ -16,146 +16,107 @@ interface TestEndpoint {
 
 const TEST_ENDPOINTS: TestEndpoint[] = [
   {
-    id: "nin-slip",
-    name: "NIN Slip Record (Official Printable NIMC Slip)",
-    path: "/api/v1/kyc/nin/nin_slip",
+    id: "nin-premium-details",
+    name: "Premium NIN Details",
+    path: "/api/v1/kyc/nin/premium-details",
     method: "GET",
-    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin/nin_slip. Returns complete citizen identity plus base64-encoded PDF (nin_id).",
-    defaultParams: {
-      nin: "70123456789",
-      consent: true,
-    },
-  },
-  {
-    id: "nin-basic",
-    name: "Basic NIN Lookup (Names, DOB, Phone & Photo)",
-    path: "/api/v1/kyc/nin",
-    method: "GET",
-    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin. Core citizen demographic records and portrait photo.",
-    defaultParams: {
-      nin: "70123456789",
-      consent: true,
-    },
-  },
-  {
-    id: "nin-advance",
-    name: "Advance NIN Lookup (Address, NOK & Origin)",
-    path: "/api/v1/kyc/nin/advance",
-    method: "GET",
-    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin/advance. Adds residential address, next of kin, and tracking ID.",
-    defaultParams: {
-      nin: "70123456789",
-      consent: true,
-    },
+    description: "Full demographics, signature, parent & NOK fields + card_image.",
+    defaultParams: { nin: "70123456789", consent: true },
   },
   {
     id: "nin-premium",
-    name: "NIMC Card Premium (Plastic Card Image)",
+    name: "NIMC Card Premium",
     path: "/api/v1/kyc/nin/premium",
     method: "GET",
-    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin/premium. Synthesizes the high-resolution NIMC plastic wallet card image (entity.image).",
-    defaultParams: {
-      nin: "70123456789",
-      consent: true,
-    },
+    description: "Plastic wallet card image (entity.image).",
+    defaultParams: { nin: "70123456789", consent: true },
   },
   {
-    id: "nin-premium-details",
-    name: "Premium NIN Details (Full Profile + Card Image)",
-    path: "/api/v1/kyc/nin/premium-details",
+    id: "nin-advance",
+    name: "Advance NIN",
+    path: "/api/v1/kyc/nin/advance",
     method: "GET",
-    description: "Queries Dojah GET /api/v1/kyc/nin/premium (₦300). Returns full demographics, education, profession, religion, origin, residence, signature, parent & NOK info, plus synthesized card_image.",
-    defaultParams: {
-      nin: "70123456789",
-      consent: true,
-    },
+    description: "Demographics, address, origin & NOK.",
+    defaultParams: { nin: "70123456789", consent: true },
+  },
+  {
+    id: "nin-basic",
+    name: "Basic NIN",
+    path: "/api/v1/kyc/nin",
+    method: "GET",
+    description: "Core NIN demographics & photo.",
+    defaultParams: { nin: "70123456789", consent: true },
+  },
+  {
+    id: "nin-slip",
+    name: "NIN Slip Record",
+    path: "/api/v1/kyc/nin/nin_slip",
+    method: "GET",
+    description: "Official printable slip record + nin_id PDF.",
+    defaultParams: { nin: "70123456789", consent: true },
   },
   {
     id: "nin-slip-generator",
-    name: "NIMC Official NIN Slip Generator (PDF)",
+    name: "NIN Slip PDF",
     path: "/api/v1/slips/nin",
     method: "POST",
-    description: "Generates high-resolution printable PDF and instantaneous vector preview from official NIMC template.",
-    defaultParams: {
-      nin: "70123456789",
-      format: "pdf",
-      consent: true,
-    },
+    description: "Standard printable A4 NIN slip PDF.",
+    defaultParams: { nin: "70123456789", format: "pdf", consent: true },
   },
   {
     id: "nin-card-generator",
-    name: "NIMC Digital NIN Card (ID-1 Format without Address)",
+    name: "Digital NIN Card",
     path: "/api/v1/slips/nin",
     method: "POST",
-    description: "Generates official NIMC Digital NIN Card (Credit Card size) featuring Photo, Names, DOB, Gender, QR Code, and formatted NIN without address.",
-    defaultParams: {
-      nin: "70123456789",
-      cardType: "card",
-      format: "pdf",
-      consent: true,
-    },
+    description: "ID-1 digital NIN card PDF & SVG.",
+    defaultParams: { nin: "70123456789", cardType: "card", format: "pdf", consent: true },
   },
   {
     id: "bvn-match",
-    name: "BVN Lookup & Name Match",
+    name: "BVN Basic",
     path: "/api/v1/kyc/bvn",
     method: "GET",
-    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/bvn against the NIBSS central banking registry.",
-    defaultParams: {
-      bvn: "22222222222",
-      consent: true,
-    },
+    description: "NIBSS BVN lookup.",
+    defaultParams: { bvn: "22222222222", consent: true },
   },
   {
     id: "bvn-advance",
-    name: "BVN Advance Profile",
+    name: "BVN Advance",
     path: "/api/v1/kyc/bvn/advance",
     method: "GET",
-    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/bvn/advance. Full banking demographic and portrait records.",
-    defaultParams: {
-      bvn: "22222222222",
-      consent: true,
-    },
+    description: "Full BVN demographic profile.",
+    defaultParams: { bvn: "22222222222", consent: true },
   },
   {
     id: "phone-basic",
-    name: "Phone Number Basic Lookup",
+    name: "Phone Basic",
     path: "/api/v1/kyc/phone_number/basic",
     method: "GET",
-    description: "Queries telecommunications subscriber registry by registered phone number.",
-    defaultParams: {
-      phone_number: "09011111111",
-      consent: true,
-    },
+    description: "Phone subscriber lookup.",
+    defaultParams: { phone_number: "09011111111", consent: true },
   },
   {
     id: "phone-advance",
-    name: "Phone Number Advance Profile",
+    name: "Phone Advance",
     path: "/api/v1/kyc/phone_number",
     method: "GET",
-    description: "Queries comprehensive phone subscriber identity, demographics, and registration details.",
-    defaultParams: {
-      phone_number: "09011111111",
-      consent: true,
-    },
+    description: "Full phone subscriber profile.",
+    defaultParams: { phone_number: "09011111111", consent: true },
   },
   {
     id: "cac-search",
-    name: "CAC Corporate Search",
+    name: "CAC Search",
     path: "/api/v1/kyc/cac",
     method: "POST",
-    description: "Corporate Affairs Commission verified business identity and status lookup.",
-    defaultParams: {
-      rc_number: "1234567",
-      company_type: "COMPANY",
-      consent: true,
-    },
+    description: "Corporate Affairs Commission search.",
+    defaultParams: { rc_number: "1234567", company_type: "COMPANY", consent: true },
   },
 ]
 
 export default function AdminTesterPage() {
-  const [selectedId, setSelectedId] = React.useState<string>("nin-slip")
-  const [mode, setMode] = React.useState<"live" | "sandbox">("sandbox")
+  const [selectedId, setSelectedId] = React.useState<string>("nin-premium-details")
+  const [mode, setMode] = React.useState<"live" | "sandbox">("live")
+  const [bypassCache, setBypassCache] = React.useState<boolean>(true)
   const [params, setParams] = React.useState<string>("")
   const [isLoading, setIsLoading] = React.useState(false)
   const [response, setResponse] = React.useState<any | null>(null)
@@ -193,7 +154,8 @@ export default function AdminTesterPage() {
       }
 
       // Execute endpoint via direct REST call with selected environment (live or sandbox)
-      const res = await ApiClient.executeDirectApi(currentEndpoint.path, currentEndpoint.method, parsed, mode)
+      const extraHeaders: Record<string, string> = bypassCache ? { "x-bypass-cache": "true" } : {}
+      const res = await ApiClient.executeDirectApi(currentEndpoint.path, currentEndpoint.method, parsed, mode, extraHeaders)
       const duration = Math.max(15, Math.round(performance.now() - startTime))
       setLatencyMs(duration)
       setHttpStatus(200)
@@ -308,80 +270,53 @@ export default function AdminTesterPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-              Upstream API Tester & Live Slip Viewer
-            </h1>
-            <Badge variant={mode === "sandbox" ? "info" : "failed"} size="sm">
-              {mode === "sandbox" ? "SANDBOX FREE (0 COST)" : "LIVE DIRECT (METERED)"}
-            </Badge>
-          </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Test upstream identity verification endpoints and inspect authentic raw responses, tracking IDs, and decoded NIMC PDF slips & cards.
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">
+            API Tester
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Inspect live or sandbox responses, cards, portraits, signatures, and raw JSON.
           </p>
         </div>
 
-        {/* Mode Selector */}
-        <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-200 shadow-2xs">
-          <button
-            onClick={() => setMode("sandbox")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-              mode === "sandbox" ? "bg-emerald-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            🟢 Sandbox Mock (Free)
-          </button>
-          <button
-            onClick={() => setMode("live")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-              mode === "live" ? "bg-rose-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            🔴 Live Upstream (Charges Credits)
-          </button>
+        {/* Mode & Fresh Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 cursor-pointer shadow-2xs">
+            <input
+              type="checkbox"
+              checked={bypassCache}
+              onChange={(e) => setBypassCache(e.target.checked)}
+              className="rounded border-slate-300 text-slate-900 focus:ring-0"
+            />
+            <span>Fresh (Bypass Cache)</span>
+          </label>
+
+          <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-2xs">
+            <button
+              onClick={() => setMode("sandbox")}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                mode === "sandbox" ? "bg-emerald-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Sandbox
+            </button>
+            <button
+              onClick={() => setMode("live")}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                mode === "live" ? "bg-rose-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Live
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Mode Banner */}
-      {mode === "sandbox" ? (
-        <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs">
-          <div className="flex items-center gap-2">
-            <span className="font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">
-              🟢 Free Sandbox Active
-            </span>
-            <span>
-              Calls are simulated with official NIMC Direct sandbox credentials. Real high-resolution PDF slips & ID-1 cards are generated with zero upstream cost.
-            </span>
-          </div>
-          <div className="text-[11px] font-mono text-emerald-800 shrink-0">
-            NIMC Direct Sandbox: NIN <strong>70123456789</strong> • BVN <strong>22222222222</strong> • Phone <strong>09011111111</strong>
-          </div>
-        </div>
-      ) : (
-        <div className="p-3.5 rounded-xl border border-rose-300 bg-rose-50 text-rose-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs animate-pulse">
-          <div className="flex items-center gap-2">
-            <span className="font-bold uppercase tracking-wider text-rose-950 bg-rose-200 px-2 py-0.5 rounded text-[11px]">
-              ⚠️ Caution: Live Upstream Registry
-            </span>
-            <span>
-              Every query calls live NIMC Direct & federal registries, deducting real wallet credits/money. Only query authentic citizen records.
-            </span>
-          </div>
-          <div className="text-[11px] font-mono text-rose-800 shrink-0 font-bold">
-            Real Credits Billed Per Call
-          </div>
-        </div>
-      )}
-
       {/* Endpoint Selector Pills */}
-      <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-3 shadow-2xs">
-        <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
-          Select Upstream Endpoint to Test
-        </span>
+      <div className="p-3.5 rounded-2xl border border-slate-200 bg-white space-y-2.5 shadow-2xs">
         <div className="flex flex-wrap gap-2">
           {TEST_ENDPOINTS.map((ep) => {
             const isSelected = ep.id === selectedId
@@ -389,16 +324,14 @@ export default function AdminTesterPage() {
               <button
                 key={ep.id}
                 onClick={() => setSelectedId(ep.id)}
-                className={`px-3 py-2 rounded-xl text-xs font-mono transition-all text-left border cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all text-left border cursor-pointer ${
                   isSelected
-                    ? "bg-rose-50 text-rose-700 border-rose-300 font-bold shadow-xs"
-                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
+                    ? "bg-slate-900 text-white border-slate-900 font-semibold shadow-xs"
+                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                 }`}
               >
-                <div className="font-semibold">{ep.name}</div>
-                <div className="text-[10px] opacity-75 mt-0.5">
-                  {ep.method} {ep.path}
-                </div>
+                <div>{ep.name}</div>
+                <div className="text-[10px] opacity-70">{ep.method} {ep.path}</div>
               </button>
             )
           })}
@@ -508,10 +441,10 @@ export default function AdminTesterPage() {
             }`}
           >
             {isLoading
-              ? "Querying Gateway..."
+              ? "Querying..."
               : mode === "live"
-              ? `Send Upstream Test (${currentEndpoint.method}) - Live (Charges Credits)`
-              : `Send Upstream Test (${currentEndpoint.method}) - Sandbox (Free 0 Cost)`}
+              ? `Run Live Test${bypassCache ? " (Fresh)" : ""}`
+              : "Run Sandbox Test"}
           </Button>
         </div>
 
@@ -838,22 +771,27 @@ export default function AdminTesterPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500">
                 <span>
-                  {mode === "sandbox"
-                    ? "Sandbox Mock JSON Response Body (Free Test Registry)"
-                    : "Live Registry JSON Response Body (Official Production)"}
+                  {mode === "sandbox" ? "Sandbox Response" : "Live Response"}
                 </span>
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(JSON.stringify(response, null, 2))
-                    alert("JSON copied to clipboard!")
+                    alert("Full JSON copied to clipboard!")
                   }}
                   className="text-slate-700 hover:text-slate-900 font-semibold cursor-pointer"
                 >
-                  Copy JSON
+                  Copy Full JSON
                 </button>
               </div>
-              <pre className="p-4 rounded-xl bg-slate-900 font-mono text-xs text-emerald-400 overflow-x-auto leading-relaxed border border-slate-800 max-h-[420px] shadow-xs">
-                {JSON.stringify(response, null, 2)}
+              <pre className="p-4 rounded-xl bg-slate-900 font-mono text-xs text-emerald-400 overflow-x-auto leading-relaxed border border-slate-800 max-h-[460px] shadow-xs">
+                {JSON.stringify(
+                  response,
+                  (_key, val) =>
+                    typeof val === "string" && val.length > 220
+                      ? `${val.slice(0, 64)}... [truncated ${(val.length / 1024).toFixed(1)} KB — click Copy Full JSON]`
+                      : val,
+                  2
+                )}
               </pre>
             </div>
           )}

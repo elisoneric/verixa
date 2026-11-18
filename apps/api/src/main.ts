@@ -73,6 +73,8 @@ async function bootstrap() {
       'x-api-key',
       'Idempotency-Key',
       'idempotency-key',
+      'X-Bypass-Cache',
+      'x-bypass-cache',
       'x-verixa-environment',
       'x-environment',
       'X-Environment',

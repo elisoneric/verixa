@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit, NotFoundException, BadRequestException } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, MoreThanOrEqual } from 'typeorm';
+import { Repository, Between, MoreThanOrEqual, In } from 'typeorm';
 import { SystemConfig } from './entities/system-config.entity';
 import { Organization, OrganizationTier } from '../organizations/entities/organization.entity';
 import { Environment } from '../organizations/entities/environment-config.entity';
@@ -9,7 +10,8 @@ import { VerificationLog, VerificationStatus } from '../verifications/entities/v
 import { Wallet } from '../billing/entities/wallet.entity';
 import { User, UserRole } from '../users/entities/user.entity';
 import { NotificationsService, SmtpConfig } from '../notifications/notifications.service';
-import { encryptSecret, decryptSecret } from '../common/utils/crypto.util';
+import { encryptSecret, decryptSecret, encryptPayload, decryptPayload } from '../common/utils/crypto.util';
+import { IdentityCacheService } from '../verifications/identity-cache.service';
 
 @Injectable()
 export class AdminService implements OnModuleInit {
@@ -29,6 +31,7 @@ export class AdminService implements OnModuleInit {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private notificationsService: NotificationsService,
+    private moduleRef: ModuleRef,
   ) {}
 
   async onModuleInit() {
@@ -1088,5 +1091,110 @@ export class AdminService implements OnModuleInit {
         latency: '180ms',
       },
     ];
+  }
+
+  private getIdentityCacheService(): IdentityCacheService | null {
+    try {
+      return this.moduleRef.get(IdentityCacheService, { strict: false });
+    } catch {
+      return null;
+    }
+  }
+
+  async getSystemMonitor() {
+    const mem = process.memoryUsage();
+    const toMb = (b: number) => Math.round((b / 1024 / 1024) * 10) / 10;
+
+    const cacheService = this.getIdentityCacheService();
+    const cacheStats = cacheService
+      ? await cacheService.getStats()
+      : {
+          redisConnected: false,
+          usedMemoryHuman: 'N/A',
+          maxMemoryHuman: 'N/A',
+          totalKeys: 0,
+          memoryFallbackEntries: 0,
+        };
+
+    const slipServices = ['nin_slip', 'nin_card', 'nin_premium', 'nin_premium_ui', 'nin_premium_details'];
+    const totalSlipLogs = await this.verifyLogRepository.count({
+      where: { serviceType: In(slipServices) },
+    });
+    const slipLogsWithPayloads = await this.verifyLogRepository
+      .createQueryBuilder('log')
+      .where('log.serviceType IN (:...services)', { services: slipServices })
+      .andWhere('log.responsePayload IS NOT NULL')
+      .getCount();
+
+    return {
+      nodeMemory: {
+        rssMb: toMb(mem.rss),
+        heapUsedMb: toMb(mem.heapUsed),
+        heapTotalMb: toMb(mem.heapTotal),
+        externalMb: toMb(mem.external),
+        uptimeSeconds: Math.round(process.uptime()),
+      },
+      cache: cacheStats,
+      slipLogs: {
+        totalSlipLogs,
+        slipLogsWithPayloads,
+      },
+    };
+  }
+
+  async clearSystemCache() {
+    const cacheService = this.getIdentityCacheService();
+    if (!cacheService) {
+      return { clearedRedisKeys: 0, clearedMemoryEntries: 0 };
+    }
+    return cacheService.clearAllCache();
+  }
+
+  async clearStoredSlipBlobs() {
+    const slipServices = ['nin_slip', 'nin_card', 'nin_premium', 'nin_premium_ui', 'nin_premium_details'];
+    const logs = await this.verifyLogRepository
+      .createQueryBuilder('log')
+      .where('log.serviceType IN (:...services)', { services: slipServices })
+      .andWhere('log.responsePayload IS NOT NULL')
+      .getMany();
+
+    const heavyKeys = ['nin_id', 'pdf', 'pdfBase64', 'card_pdf', 'cardPdfBase64', 'card_image', 'docxBase64', 'svgContent', 'slipSvg', 'cardSvg'];
+    let clearedCount = 0;
+
+    for (const log of logs) {
+      let parsed: any = null;
+      if (typeof log.responsePayload === 'string') {
+        parsed = decryptPayload(log.responsePayload);
+      } else if (log.responsePayload && typeof log.responsePayload === 'object') {
+        parsed = log.responsePayload;
+      }
+
+      if (parsed && typeof parsed === 'object') {
+        const clean = { ...parsed };
+        for (const k of heavyKeys) {
+          delete clean[k];
+        }
+        if (typeof clean.image === 'string' && clean.image.length > 50_000) {
+          delete clean.image;
+        }
+        if (clean.entity && typeof clean.entity === 'object') {
+          clean.entity = { ...clean.entity };
+          for (const k of heavyKeys) {
+            delete clean.entity[k];
+          }
+          if (typeof clean.entity.image === 'string' && clean.entity.image.length > 50_000) {
+            delete clean.entity.image;
+          }
+        }
+        log.responsePayload = encryptPayload(clean) as any;
+      } else {
+        log.responsePayload = null as any;
+      }
+
+      await this.verifyLogRepository.save(log);
+      clearedCount++;
+    }
+
+    return { clearedLogs: clearedCount };
   }
 }

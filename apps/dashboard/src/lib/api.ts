@@ -283,7 +283,8 @@ export class ApiClient {
     path: string,
     method: "POST" | "GET" | string,
     payload?: any,
-    environment: "live" | "sandbox" | string = "live"
+    environment: "live" | "sandbox" | string = "live",
+    extraHeaders?: Record<string, string>
   ) {
     const isGet = method.toUpperCase() === "GET"
     let url = path
@@ -306,6 +307,7 @@ export class ApiClient {
       headers: {
         "x-environment": environment,
         "x-mode": environment,
+        ...(extraHeaders || {}),
       },
       ...(isGet ? {} : { body: payload ? JSON.stringify(payload) : undefined }),
     })
@@ -616,6 +618,41 @@ export class ApiClient {
 
   static async getAdminProviders() {
     return this.request<any[]>("/v1/admin/providers")
+  }
+
+  static async getSystemMonitor() {
+    return this.request<{
+      nodeMemory: {
+        rssMb: number
+        heapUsedMb: number
+        heapTotalMb: number
+        externalMb: number
+        uptimeSeconds: number
+      }
+      cache: {
+        redisConnected: boolean
+        usedMemoryHuman: string
+        maxMemoryHuman: string
+        totalKeys: number
+        memoryFallbackEntries: number
+      }
+      slipLogs: {
+        totalSlipLogs: number
+        slipLogsWithPayloads: number
+      }
+    }>("/v1/admin/system/monitor")
+  }
+
+  static async clearSystemCache() {
+    return this.request<{ clearedRedisKeys: number; clearedMemoryEntries: number }>("/v1/admin/system/clear-cache", {
+      method: "POST",
+    })
+  }
+
+  static async clearStoredSlipBlobs() {
+    return this.request<{ clearedLogs: number }>("/v1/admin/system/clear-slip-blobs", {
+      method: "POST",
+    })
   }
 
   static async getAdminConfigs() {

@@ -414,4 +414,56 @@ export class IdentityCacheService {
       } catch {}
     }
   }
+
+  async getStats(): Promise<{
+    redisConnected: boolean;
+    usedMemoryHuman: string;
+    maxMemoryHuman: string;
+    totalKeys: number;
+    memoryFallbackEntries: number;
+  }> {
+    let redisConnected = false;
+    let usedMemoryHuman = 'N/A';
+    let maxMemoryHuman = 'N/A';
+    let totalKeys = 0;
+
+    if (this.redisAvailable && this.redisClient) {
+      try {
+        const info = await this.redisClient.info('memory');
+        const usedMatch = info.match(/used_memory_human:([^\r\n]+)/);
+        const maxMatch = info.match(/maxmemory_human:([^\r\n]+)/);
+        if (usedMatch) usedMemoryHuman = usedMatch[1].trim();
+        if (maxMatch) maxMemoryHuman = maxMatch[1].trim();
+        totalKeys = await this.redisClient.dbsize();
+        redisConnected = true;
+      } catch {
+        this.redisAvailable = false;
+      }
+    }
+
+    return {
+      redisConnected,
+      usedMemoryHuman,
+      maxMemoryHuman,
+      totalKeys,
+      memoryFallbackEntries: this.memoryFallback.size,
+    };
+  }
+
+  async clearAllCache(): Promise<{ clearedRedisKeys: number; clearedMemoryEntries: number }> {
+    const clearedMemoryEntries = this.memoryFallback.size;
+    this.memoryFallback.clear();
+    let clearedRedisKeys = 0;
+
+    if (this.redisAvailable && this.redisClient) {
+      try {
+        clearedRedisKeys = await this.redisClient.dbsize();
+        await this.redisClient.flushdb();
+      } catch {
+        this.redisAvailable = false;
+      }
+    }
+
+    return { clearedRedisKeys, clearedMemoryEntries };
+  }
 }

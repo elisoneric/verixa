@@ -154,8 +154,7 @@ export class DojahProvider implements IVerificationProvider {
 
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!this.isConfigured()) {
-      this.logger.log('Dojah credentials not live, falling back to mock provider for NIN');
-      return this.mockProvider.verifyNin(data);
+      throw new Error('Live upstream credentials (DOJAH_APP_ID / DOJAH_SECRET_KEY) are not configured.');
     }
 
     try {
@@ -294,8 +293,7 @@ export class DojahProvider implements IVerificationProvider {
 
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!this.isConfigured()) {
-      this.logger.log('Dojah credentials not live, falling back to mock provider for NIN Advance');
-      return this.mockProvider.verifyNinAdvance(data);
+      throw new Error('Live upstream credentials (DOJAH_APP_ID / DOJAH_SECRET_KEY) are not configured.');
     }
 
     try {
@@ -361,8 +359,7 @@ export class DojahProvider implements IVerificationProvider {
 
     const { appId, secretKey, baseUrl } = this.getCredentials();
     if (!this.isConfigured()) {
-      this.logger.log('Dojah credentials not live, falling back to mock provider for NIN Premium Details');
-      return this.mockProvider.verifyNinPremiumDetails(data);
+      throw new Error('Live upstream credentials (DOJAH_APP_ID / DOJAH_SECRET_KEY) are not configured.');
     }
 
     try {

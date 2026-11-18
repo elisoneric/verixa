@@ -112,8 +112,14 @@ export class ApiController {
     else if (service === 'airtime') rateKey = 'airtime';
     else if (service === 'data') rateKey = 'data';
 
+    const bypassCache =
+      req.headers?.['x-bypass-cache'] === 'true' ||
+      req.headers?.['cache-control'] === 'no-cache' ||
+      payload?.fresh === true ||
+      payload?.fresh === 'true';
+
     // 0. Check Negative Cache (Not-Found Tombstone): Prevents repeated upstream charges on missing IDs
-    if (identifier) {
+    if (identifier && !bypassCache) {
       const notFoundCached = await this.identityCacheService.getNotFoundRecord(service, identifier);
       if (notFoundCached) {
         const reference = `vx_neg_${uuidv4().slice(0, 12)}`;
@@ -157,7 +163,7 @@ export class ApiController {
     }
 
     // 1. Check Smart Identity Cache
-    if (identifier) {
+    if (identifier && !bypassCache) {
       const cached = await this.identityCacheService.getCachedRecord(
         orgId,
         env,
