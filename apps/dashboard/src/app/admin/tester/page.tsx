@@ -468,7 +468,7 @@ export default function AdminTesterPage() {
                     ? "FROM CACHE"
                     : mode === "sandbox"
                     ? "SANDBOX"
-                    : "LOCAL / MOCK"}
+                    : "LIVE"}
                 </Badge>
               )}
               {latencyMs && <span className="font-mono text-xs text-slate-500">{latencyMs}ms</span>}

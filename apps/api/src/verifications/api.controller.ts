@@ -507,7 +507,10 @@ export class ApiController {
       }
     }
 
-    const includeAdminDebug = req.headers?.['x-admin-debug'] === 'true' && req.user?.role === 'SUPER_ADMIN';
+    const userRole = String(req.user?.role || '').toLowerCase();
+    const includeAdminDebug =
+      req.headers?.['x-admin-debug'] === 'true' &&
+      (userRole === 'superadmin' || userRole === 'super_admin' || userRole === 'admin');
     const upstreamDebug = includeAdminDebug ? result?.meta?.upstreamDebug : undefined;
 
     if (req.query?.verbose === 'true' || req.headers?.['x-verixa-verbose'] === 'true') {

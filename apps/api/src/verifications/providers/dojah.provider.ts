@@ -414,8 +414,12 @@ export class DojahProvider implements IVerificationProvider {
 
     try {
       const endpoint = `${baseUrl}/api/v1/kyc/nin/premium`;
+      const queryParams: Record<string, any> = { nin: data.nin };
+      if ((data as any).nin_tin === true || (data as any).nin_tin === 'true') {
+        queryParams.nin_tin = true;
+      }
       const response = await axios.get(endpoint, {
-        params: { nin: data.nin },
+        params: queryParams,
         headers: this.getHeaders(secretKey!, appId),
         timeout: 18000,
       });
@@ -448,7 +452,7 @@ export class DojahProvider implements IVerificationProvider {
         meta: {
           provider: 'direct',
           reference: `vx_${uuidv4().slice(0, 12)}`,
-          upstreamDebug: this.buildUpstreamDebug('GET', endpoint, { nin: data.nin }, appId, secretKey, rawDirectResponse),
+          upstreamDebug: this.buildUpstreamDebug('GET', endpoint, queryParams, appId, secretKey, rawDirectResponse),
         } as any,
       };
     } catch (err: any) {
