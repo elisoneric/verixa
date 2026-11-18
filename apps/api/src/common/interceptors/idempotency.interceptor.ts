@@ -41,8 +41,16 @@ export class IdempotencyInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap((data) => {
-        // Cache successful response for 24 hours
-        this.redisClient.set(cacheKey, JSON.stringify(data), 'EX', 60 * 60 * 24).catch(() => {});
+        try {
+          const serialized = JSON.stringify(data);
+          // Skip caching oversized responses (>256 KB, e.g., slip PDFs/DOCX blobs) to prevent Redis bloat
+          if (serialized && serialized.length <= 256 * 1024) {
+            // Cache successful response for 24 hours
+            this.redisClient.set(cacheKey, serialized, 'EX', 60 * 60 * 24).catch(() => {});
+          }
+        } catch {
+          // Ignore serialization/cache errors
+        }
       }),
     );
   }

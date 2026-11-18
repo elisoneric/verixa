@@ -103,6 +103,7 @@ export class ApiController {
     if (service === 'nin_advance') rateKey = 'nin_advance';
     else if (service === 'nin_slip') rateKey = 'nin_slip';
     else if (service === 'nin_premium') rateKey = 'nin_premium';
+    else if (service === 'nin_premium_details') rateKey = 'nin_premium_details';
     else if (service === 'bvn' || service === 'bvn_advance' || service === 'bvn_face_match') rateKey = 'bvn';
     else if (service === 'cac') rateKey = 'cac';
     else if (service === 'phone') rateKey = 'phone';
@@ -219,7 +220,41 @@ export class ApiController {
           }
         }
 
-        if ((service === 'nin_card' || (cleanEntity && cleanEntity.tier === 'card') || (cleanEntity && cleanEntity.tier === 'slip')) && cleanEntity && typeof cleanEntity === 'object') {
+        if (service === 'nin_premium_details' && cleanEntity && typeof cleanEntity === 'object' && !cleanEntity.card_image) {
+          try {
+            const cardRes = await generateNimcPremiumCard({
+              nin: cleanEntity.nin || identifier,
+              trackingId: cleanEntity.tracking_id || cleanEntity.trackingId || '',
+              firstName: cleanEntity.first_name || cleanEntity.firstname || '',
+              surname: cleanEntity.last_name || cleanEntity.surname || '',
+              middleName: cleanEntity.middle_name || cleanEntity.middlename || '',
+              gender: cleanEntity.gender || 'M',
+              birthdate: cleanEntity.date_of_birth || cleanEntity.dob || cleanEntity.birthdate || '',
+              photo: cleanEntity.photo,
+            }, { imageOnly: true });
+            cleanEntity.card_image = cardRes.cardImageBase64;
+          } catch {
+            // ignore card synthesis failure on cache hit
+          }
+        }
+
+        if (service === 'nin_premium_details' && cleanEntity && typeof cleanEntity === 'object' && !cleanEntity.card_image) {
+      try {
+        const cardRes = await generateNimcPremiumCard({
+          nin: cleanEntity.nin || identifier,
+          trackingId: cleanEntity.tracking_id || cleanEntity.trackingId || '',
+          firstName: cleanEntity.first_name || cleanEntity.firstname || '',
+          surname: cleanEntity.last_name || cleanEntity.surname || '',
+          middleName: cleanEntity.middle_name || cleanEntity.middlename || '',
+          gender: cleanEntity.gender || 'M',
+          birthdate: cleanEntity.date_of_birth || cleanEntity.dob || cleanEntity.birthdate || '',
+          photo: cleanEntity.photo,
+        }, { imageOnly: true });
+        cleanEntity.card_image = cardRes.cardImageBase64;
+      } catch {}
+    }
+
+    if ((service === 'nin_card' || (cleanEntity && cleanEntity.tier === 'card') || (cleanEntity && cleanEntity.tier === 'slip')) && cleanEntity && typeof cleanEntity === 'object') {
           // Synthesize crisp digital NIN card with embedded fonts (0 tofu □□□□ characters)
           try {
             const cardData = {
@@ -410,6 +445,22 @@ export class ApiController {
           photo: cleanEntity.photo,
         }, { imageOnly: true });
         cleanEntity.image = cardRes.cardImageBase64;
+      } catch {}
+    }
+
+    if (service === 'nin_premium_details' && cleanEntity && typeof cleanEntity === 'object' && !cleanEntity.card_image) {
+      try {
+        const cardRes = await generateNimcPremiumCard({
+          nin: cleanEntity.nin || identifier,
+          trackingId: cleanEntity.tracking_id || cleanEntity.trackingId || '',
+          firstName: cleanEntity.first_name || cleanEntity.firstname || '',
+          surname: cleanEntity.last_name || cleanEntity.surname || '',
+          middleName: cleanEntity.middle_name || cleanEntity.middlename || '',
+          gender: cleanEntity.gender || 'M',
+          birthdate: cleanEntity.date_of_birth || cleanEntity.dob || cleanEntity.birthdate || '',
+          photo: cleanEntity.photo,
+        }, { imageOnly: true });
+        cleanEntity.card_image = cardRes.cardImageBase64;
       } catch {}
     }
 
@@ -681,6 +732,42 @@ export class ApiController {
       payload,
       120,
       () => (isLive ? this.dojahProvider.verifyNin({ nin, ...payload, tier: 'premium' }) : this.mockProvider.verifyNin({ nin, ...payload, tier: 'premium' }))
+    );
+  }
+
+  // GET & POST /api/v1/kyc/nin/premium-details (Full Premium NIN Demographics, Signature, Parents & NOK)
+  @UseGuards(ApiKeyGuard)
+  @Get(['v1/kyc/nin/premium-details', 'v1/kyc/nin/details'])
+  @HttpCode(HttpStatus.OK)
+  async getKycNinPremiumDetails(@Req() req: any, @Query() query: any) {
+    const nin = String(query.nin || query.id || '').trim();
+    if (!nin) throw new BadRequestException('nin query parameter is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_premium_details',
+      nin,
+      query,
+      300,
+      () => (isLive ? this.dojahProvider.verifyNinPremiumDetails({ nin, ...query }) : this.mockProvider.verifyNinPremiumDetails({ nin, ...query }))
+    );
+  }
+
+  @UseGuards(ApiKeyGuard)
+  @Post(['v1/kyc/nin/premium-details', 'v1/kyc/nin/details'])
+  @HttpCode(HttpStatus.OK)
+  async postKycNinPremiumDetails(@Req() req: any, @Body() body: any, @Query() query: any) {
+    const payload = { ...query, ...body };
+    const nin = String(payload.nin || payload.id || '').trim();
+    if (!nin) throw new BadRequestException('nin is required');
+    const isLive = req.environment === Environment.LIVE;
+    return this.executeVerification(
+      req,
+      'nin_premium_details',
+      nin,
+      payload,
+      300,
+      () => (isLive ? this.dojahProvider.verifyNinPremiumDetails({ nin, ...payload }) : this.mockProvider.verifyNinPremiumDetails({ nin, ...payload }))
     );
   }
 

@@ -108,21 +108,28 @@ export default function NinDocsPage() {
             </p>
           </div>
           <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
-            <span className="text-sky-700 font-bold block">3. Premium NIN Lookup</span>
+            <span className="text-sky-700 font-bold block">3. NIMC Card Premium (Plastic Card)</span>
             <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/nin/premium or GET ?nin=...</code>
             <p className="text-slate-600 font-sans text-xs">
-              Direct connection to National Identity Database Premium (<code>GET /api/v1/kyc/nin/premium</code>). Everything in Advanced, plus demographics, profession, previous name/address, height, title, and digital signature records.
+              Generates the high-resolution NIMC plastic wallet card image (<code className="text-slate-800 font-mono">entity.image</code>) with verified demographics and portrait. (₦120 / API call)
             </p>
           </div>
           <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
-            <span className="text-sky-700 font-bold block">4. NIN Slip Record</span>
+            <span className="text-sky-700 font-bold block">4. Premium NIN Details (Full Profile)</span>
+            <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/nin/premium-details or GET ?nin=...</code>
+            <p className="text-slate-600 font-sans text-xs">
+              Full National Identity Database Premium record (₦300 / live call). Returns all demographics, education, spoken languages, profession, religion, origin, residence, height, title, signature, parent details (<code className="text-slate-800 font-mono">p_*</code>), and next-of-kin (<code className="text-slate-800 font-mono">nok_*</code>).
+            </p>
+          </div>
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+            <span className="text-sky-700 font-bold block">5. NIN Slip Record</span>
             <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/nin/nin_slip or GET ?nin=...</code>
             <p className="text-slate-600 font-sans text-xs">
               Direct connection to National Identity Database NIN Slip (<code>GET /api/v1/kyc/nin/nin_slip</code>). Resolves official printable NIMC slip data, tracking ID, and <code className="text-slate-800 font-mono">nin_id</code> (base64 PDF).
             </p>
           </div>
-          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1 sm:col-span-2">
-            <span className="text-emerald-700 font-bold block">5. NIN Selfie Face Verification</span>
+          <div className="p-3.5 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+            <span className="text-emerald-700 font-bold block">6. NIN Selfie Face Verification</span>
             <code className="text-slate-900 block text-[11px]">POST /api/v1/kyc/nin/verify</code>
             <p className="text-slate-600 font-sans text-xs">Matches live user selfie against the government NIMC identity image.</p>
           </div>
@@ -243,6 +250,71 @@ export default function NinDocsPage() {
     "nok_town": "IKEJA",
     "nok_lga": "Ikeja",
     "nok_address_line_1": "1, EXAMPLE STREET"
+  }
+}`}
+        />
+      </div>
+
+      {/* Code Examples: Premium NIN Details */}
+      <div className="space-y-4 pt-4 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">2b. Premium NIN Details (GET or POST /api/v1/kyc/nin/premium-details)</h2>
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          Full National Identity Database Premium lookup (₦300 / live call). Returns complete citizen demographics, education, spoken languages, profession, religion, origin, residence, height, title, signature, parent details, next-of-kin, and the synthesized NIMC Card Premium image (<code className="text-slate-800 font-mono">card_image</code>).
+        </p>
+        <CodeBlock
+          language="bash"
+          title="cURL Request (Premium NIN Details)"
+          code={`curl --request GET \\
+  "https://api.verixaid.com/api/v1/kyc/nin/premium-details?nin=70123456789&consent=true" \\
+  -H "Authorization: Bearer vrx_live_9f83a8f1e2b4c6d8_a1b2c3d4..."`}
+        />
+
+        <CodeBlock
+          language="json"
+          title="HTTP 200 OK Response (Premium NIN Details)"
+          code={`{
+  "entity": {
+    "nin": "70123456789",
+    "first_name": "JOHN",
+    "last_name": "ANON",
+    "middle_name": "DOE",
+    "date_of_birth": "1990-01-01",
+    "phone_number": "08012345678",
+    "photo": "/9j/4AAQSkZJRgABAgAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL....",
+    "gender": "Male",
+    "employment_status": "unemployed",
+    "birth_country": "nigeria",
+    "birth_lga": "Ikeja",
+    "birth_state": "Lagos",
+    "educational_level": "tertiary",
+    "nspoken_lang": "YORUBA",
+    "ospoken_lang": "ENGLISH",
+    "profession": "STUDENT",
+    "religion": "christianity",
+    "residence_address_line_1": "1, EXAMPLE STREET",
+    "residence_status": "birth",
+    "residence_town": "IKEJA",
+    "residence_lga": "Ikeja",
+    "residence_state": "Lagos",
+    "origin_lga": "Ikeja",
+    "origin_place": "IKEJA",
+    "origin_state": "Lagos",
+    "height": "171",
+    "title": "mr",
+    "signature": "/9j/4AAQSkZJRgABAQEAlgCWAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL....",
+    "p_first_name": "",
+    "p_middle_name": "",
+    "p_last_name": "",
+    "p_town": "",
+    "p_lga": "",
+    "p_address_line_1": "",
+    "nok_first_name": "JANE",
+    "nok_middle_name": "DOE",
+    "nok_last_name": "ANON",
+    "nok_town": "IKEJA",
+    "nok_lga": "Ikeja",
+    "nok_address_line_1": "1, EXAMPLE STREET",
+    "card_image": "iVBORw0KGgoAAAANSUhEUgAA..."
   }
 }`}
         />

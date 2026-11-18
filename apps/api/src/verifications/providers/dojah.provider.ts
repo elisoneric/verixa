@@ -352,6 +352,61 @@ export class DojahProvider implements IVerificationProvider {
     }
   }
 
+  async verifyNinPremiumDetails(data: NinAdvanceVerificationData): Promise<VerificationResponse<any>> {
+    const cleanNin = String(data.nin || '').trim();
+    if (cleanNin === '70123456789' || cleanNin === '00000000000' || cleanNin === '11234567890') {
+      this.logger.log(`DojahProvider: Sandbox test NIN ${cleanNin} detected in premium details query; routing to mock provider.`);
+      return this.mockProvider.verifyNinPremiumDetails(data);
+    }
+
+    const { appId, secretKey, baseUrl } = this.getCredentials();
+    if (!this.isConfigured()) {
+      this.logger.log('Dojah credentials not live, falling back to mock provider for NIN Premium Details');
+      return this.mockProvider.verifyNinPremiumDetails(data);
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/v1/kyc/nin/premium`, {
+        params: { nin: data.nin },
+        headers: this.getHeaders(secretKey!, appId),
+        timeout: 18000,
+      });
+
+      const entity = response.data?.entity || {};
+
+      // Synthesize Custom NIMC Card Premium image directly from the returned Dojah entity (no extra Dojah call)
+      if (entity.first_name || entity.firstname) {
+        try {
+          const cardRes = await generateNimcPremiumCard({
+            nin: entity.nin || data.nin,
+            trackingId: entity.tracking_id || entity.trackingId || '',
+            firstName: entity.first_name || entity.firstname,
+            surname: entity.last_name || entity.surname,
+            middleName: entity.middle_name || entity.middlename,
+            gender: entity.gender,
+            birthdate: entity.date_of_birth || entity.dob || entity.birthdate,
+            photo: entity.photo,
+          }, { imageOnly: true });
+          entity.card_image = cardRes.cardImageBase64;
+        } catch (e: any) {
+          this.logger.warn(`Could not generate NIMC Premium Card image for premium details: ${e?.message}`);
+        }
+      }
+
+      return {
+        status: 'success',
+        data: entity,
+        meta: {
+          provider: 'direct',
+          reference: `vx_${uuidv4().slice(0, 12)}`,
+        },
+      };
+    } catch (err: any) {
+      this.logger.error(`Dojah NIN Premium Details lookup error: ${err?.message}`, err?.response?.data);
+      throw err;
+    }
+  }
+
   // --- 3. Bank Account & NUBAN ---
 
   async verifyBankAccount(data: BankAccountVerificationData): Promise<VerificationResponse<any>> {

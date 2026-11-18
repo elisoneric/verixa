@@ -155,6 +155,63 @@ export class IdentityCacheService {
     }
   }
 
+  private readonly MAX_MEMORY_FALLBACK_ENTRIES = 200;
+  private readonly MAX_MEMORY_ENTRY_BYTES = 256 * 1024; // 256 KB cap per in-memory entry
+
+  private stripHeavyBlobs(obj: any): any {
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return obj;
+    const heavyKeys = [
+      'nin_id',
+      'pdf',
+      'pdfBase64',
+      'card_pdf',
+      'cardPdfBase64',
+      'card_image',
+      'docxBase64',
+      'svgContent',
+      'slipSvg',
+    ];
+    const copy: Record<string, any> = { ...obj };
+    for (const k of heavyKeys) {
+      if (k in copy) {
+        delete copy[k];
+      }
+    }
+    if (typeof copy.image === 'string' && copy.image.length > 200_000) {
+      delete copy.image;
+    }
+    if (typeof copy.photo === 'string' && copy.photo.length > 500_000) {
+      delete copy.photo;
+    }
+    if (copy.entity && typeof copy.entity === 'object') {
+      copy.entity = this.stripHeavyBlobs(copy.entity);
+    }
+    return copy;
+  }
+
+  private setMemoryFallback(key: string, value: string, expiresAt: number): void {
+    if (value.length > this.MAX_MEMORY_ENTRY_BYTES) {
+      return;
+    }
+    const now = Date.now();
+    // Prune expired entries first
+    for (const [k, entry] of this.memoryFallback.entries()) {
+      if (now >= entry.expiresAt) {
+        this.memoryFallback.delete(k);
+      }
+    }
+    // Refresh insertion order for LRU
+    if (this.memoryFallback.has(key)) {
+      this.memoryFallback.delete(key);
+    }
+    while (this.memoryFallback.size >= this.MAX_MEMORY_FALLBACK_ENTRIES) {
+      const oldestKey = this.memoryFallback.keys().next().value;
+      if (oldestKey === undefined) break;
+      this.memoryFallback.delete(oldestKey);
+    }
+    this.memoryFallback.set(key, { value, expiresAt });
+  }
+
   async getCacheTtlDays(): Promise<number> {
     try {
       const cfg = await this.configRepository.findOne({ where: { key: 'CACHE_TTL_DAYS' } });
@@ -162,9 +219,9 @@ export class IdentityCacheService {
         const parsed = parseInt(cfg.value, 10);
         if (!isNaN(parsed) && parsed > 0) return parsed;
       }
-      return 30; // 30 days default
+      return 7; // 7 days default to keep Redis footprint bounded
     } catch {
-      return 30;
+      return 7;
     }
   }
 
@@ -220,7 +277,7 @@ export class IdentityCacheService {
     const key = this.generateKey(orgId, env, service, identifier);
 
     const payload: CachedIdentityResponse = {
-      data,
+      data: this.stripHeavyBlobs(data),
       cachedAt: new Date().toISOString(),
       sourceProvider,
       service,
@@ -229,19 +286,20 @@ export class IdentityCacheService {
     const raw = JSON.stringify(payload);
 
     // 1. Set in Redis
+    let storedInRedis = false;
     if (this.redisAvailable && this.redisClient) {
       try {
         await this.redisClient.set(key, raw, 'EX', ttlSeconds);
+        storedInRedis = true;
       } catch {
         this.redisAvailable = false;
       }
     }
 
-    // 2. Always set in memory fallback as resilient local cache
-    this.memoryFallback.set(key, {
-      value: raw,
-      expiresAt: Date.now() + ttlSeconds * 1000,
-    });
+    // 2. Only fall back to bounded in-memory LRU cache when Redis is unavailable
+    if (!storedInRedis) {
+      this.setMemoryFallback(key, raw, Date.now() + ttlSeconds * 1000);
+    }
   }
 
   /**
@@ -297,18 +355,19 @@ export class IdentityCacheService {
     };
     const raw = JSON.stringify(payload);
 
+    let storedInRedis = false;
     if (this.redisAvailable && this.redisClient) {
       try {
         await this.redisClient.set(key, raw, 'EX', ttlSeconds);
+        storedInRedis = true;
       } catch {
         this.redisAvailable = false;
       }
     }
 
-    this.memoryFallback.set(key, {
-      value: raw,
-      expiresAt: Date.now() + ttlSeconds * 1000,
-    });
+    if (!storedInRedis) {
+      this.setMemoryFallback(key, raw, Date.now() + ttlSeconds * 1000);
+    }
 
     this.logger.log(`Negative cache tombstone set: [${service}:${identifier}] cached for ${ttlDays} days. Upstream Dojah cost is now locked at ₦0.`);
   }

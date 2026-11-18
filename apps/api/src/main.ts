@@ -2,8 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 import { ValidationPipe, Logger } from '@nestjs/common';
+import sharp from 'sharp';
 
 async function bootstrap() {
+  // Bound libvips native image cache & thread concurrency to prevent RSS bloat in containers
+  sharp.cache({ memory: 20, files: 0, items: 20 });
+  sharp.concurrency(1);
+
   const logger = new Logger('Bootstrap');
 
   // SEC-3: Startup validation for production environment variables

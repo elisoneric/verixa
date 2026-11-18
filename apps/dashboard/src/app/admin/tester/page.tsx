@@ -50,10 +50,21 @@ const TEST_ENDPOINTS: TestEndpoint[] = [
   },
   {
     id: "nin-premium",
-    name: "Premium NIN Lookup (Demographics & Signature)",
+    name: "NIMC Card Premium (Plastic Card Image)",
     path: "/api/v1/kyc/nin/premium",
     method: "GET",
-    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin/premium. Comprehensive record with profession, religion, and signature.",
+    description: "Queries Live/Sandbox Registry GET /api/v1/kyc/nin/premium. Synthesizes the high-resolution NIMC plastic wallet card image (entity.image).",
+    defaultParams: {
+      nin: "70123456789",
+      consent: true,
+    },
+  },
+  {
+    id: "nin-premium-details",
+    name: "Premium NIN Details (Full Profile + Card Image)",
+    path: "/api/v1/kyc/nin/premium-details",
+    method: "GET",
+    description: "Queries Dojah GET /api/v1/kyc/nin/premium (₦300). Returns full demographics, education, profession, religion, origin, residence, signature, parent & NOK info, plus synthesized card_image.",
     defaultParams: {
       nin: "70123456789",
       consent: true,
@@ -188,8 +199,10 @@ export default function AdminTesterPage() {
       setHttpStatus(200)
       setResponse(res)
 
-      // If response has card or slip, default to appropriate view
-      if (selectedId === "nin-card-generator" || (parsed as any)?.cardType === "card" || res?.data?.cardSvg || res?.entity?.cardSvg) {
+      // If response has card, premium details, or slip, default to appropriate view
+      if (selectedId === "nin-premium-details") {
+        setActiveTab("attributes")
+      } else if (selectedId === "nin-card-generator" || (parsed as any)?.cardType === "card" || res?.data?.cardSvg || res?.entity?.cardSvg || res?.entity?.card_image || (selectedId === "nin-premium" && res?.entity?.image)) {
         setActiveTab("card")
       } else if (res?.entity?.nin_id || res?.data?.nin_id || res?.data?.pdfBase64) {
         setActiveTab("slip")
@@ -215,6 +228,9 @@ export default function AdminTesterPage() {
   const entity = response?.entity || response?.data || null
   const ninIdBase64 = entity?.nin_id || entity?.pdfBase64 || null
   const photoBase64 = entity?.photo ? (entity.photo.startsWith("data:") ? entity.photo : `data:image/jpeg;base64,${entity.photo}`) : null
+  const signatureBase64 = entity?.signature ? (entity.signature.startsWith("data:") ? entity.signature : `data:image/jpeg;base64,${entity.signature}`) : null
+  const rawCardImage = entity?.card_image || (selectedId === "nin-premium" ? entity?.image : null)
+  const cardImageDataUrl = rawCardImage ? (rawCardImage.startsWith("data:") ? rawCardImage : `data:image/png;base64,${rawCardImage}`) : null
 
   // Generate Blob URL for base64 PDF to view authentic document
   const pdfBlobUrl = React.useMemo(() => {
@@ -583,7 +599,22 @@ export default function AdminTesterPage() {
 
                 {/* Card Canvas / SVG Container */}
                 <div className="flex justify-center p-4 bg-slate-900/5 rounded-2xl border border-slate-200">
-                  {entity?.cardSvg ? (
+                  {cardImageDataUrl ? (
+                    <div className="space-y-3 w-full flex flex-col items-center">
+                      <img
+                        src={cardImageDataUrl}
+                        alt="NIMC Card Premium Preview"
+                        className="max-w-[560px] w-full rounded-2xl shadow-md border border-slate-200 bg-white"
+                      />
+                      <a
+                        href={cardImageDataUrl}
+                        download={`NIMC_Card_${entity?.nin || "premium"}.png`}
+                        className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors"
+                      >
+                        Download Card PNG
+                      </a>
+                    </div>
+                  ) : entity?.cardSvg ? (
                     <div
                       className="max-w-[560px] w-full rounded-2xl overflow-hidden shadow-md"
                       dangerouslySetInnerHTML={{ __html: entity.cardSvg }}
@@ -596,7 +627,7 @@ export default function AdminTesterPage() {
                     />
                   ) : (
                     <div className="py-16 text-center text-slate-400 text-xs">
-                      No Digital Card payload received. Run a query with &quot;cardType&quot;: &quot;card&quot;.
+                      No Digital Card payload received. Run a query with &quot;cardType&quot;: &quot;card&quot; or Premium NIN Details.
                     </div>
                   )}
                 </div>
@@ -700,60 +731,106 @@ export default function AdminTesterPage() {
           ) : activeTab === "attributes" ? (
             /* Tab: Extracted Attributes */
             <div className="space-y-4">
-              <div className="flex items-center gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
-                {photoBase64 ? (
-                  <img
-                    src={photoBase64}
-                    alt="Citizen Photo"
-                    className="w-16 h-20 rounded-lg object-cover border border-slate-300 shadow-2xs"
-                  />
-                ) : (
-                  <div className="w-16 h-20 rounded-lg bg-slate-200 flex items-center justify-center text-[10px] text-slate-500 font-mono">
-                    NO PHOTO
+              {/* Top Identity Banner: Passport + Signature + Core Identity */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                <div className="flex items-center gap-4">
+                  {photoBase64 ? (
+                    <img
+                      src={photoBase64}
+                      alt="Citizen Passport Photo"
+                      className="w-20 h-24 rounded-lg object-cover border border-slate-300 shadow-2xs bg-white shrink-0"
+                    />
+                  ) : (
+                    <div className="w-20 h-24 rounded-lg bg-slate-200 flex items-center justify-center text-[10px] text-slate-500 font-mono shrink-0">
+                      NO PHOTO
+                    </div>
+                  )}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      {entity?.title && (
+                        <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 font-mono text-[10px] uppercase font-bold">
+                          {entity.title}
+                        </span>
+                      )}
+                      <h3 className="text-base font-bold text-slate-900">
+                        {entity?.first_name || entity?.firstName} {entity?.middle_name || entity?.middleName}{" "}
+                        {entity?.last_name || entity?.surname}
+                      </h3>
+                    </div>
+                    <div className="text-xs font-mono text-slate-600 mt-1">
+                      NIN: <span className="font-bold text-slate-900">{entity?.nin || "N/A"}</span>
+                      {(entity?.tracking_id || entity?.trackingId) && (
+                        <>
+                          {" "}• Tracking: <span className="font-bold text-slate-900">{entity?.tracking_id || entity?.trackingId}</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">
+                      Gender: {entity?.gender || "N/A"} • DOB: {entity?.date_of_birth || entity?.birthdate || "N/A"} • Phone:{" "}
+                      {entity?.phone_number || entity?.phoneNumber || "N/A"}
+                    </div>
                   </div>
-                )}
-                <div>
-                  <h3 className="text-base font-bold text-slate-900">
-                    {entity?.first_name || entity?.firstName} {entity?.middle_name || entity?.middleName}{" "}
-                    {entity?.last_name || entity?.surname}
-                  </h3>
-                  <div className="text-xs font-mono text-slate-600 mt-0.5">
-                    NIN: <span className="font-bold text-slate-900">{entity?.nin}</span> • Tracking:{" "}
-                    <span className="font-bold text-slate-900">{entity?.tracking_id || entity?.trackingId || "N/A"}</span>
-                  </div>
-                  <div className="text-xs text-slate-500 mt-1">
-                    Gender: {entity?.gender || "N/A"} • DOB: {entity?.date_of_birth || entity?.birthdate || "N/A"} • Phone:{" "}
-                    {entity?.phone_number || entity?.phoneNumber || "N/A"}
-                  </div>
+                </div>
+
+                {/* Signature Preview */}
+                <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
+                  <span className="text-[10px] font-mono text-slate-400 uppercase">Citizen Signature</span>
+                  {signatureBase64 ? (
+                    <img
+                      src={signatureBase64}
+                      alt="Citizen Signature"
+                      className="h-14 max-w-[160px] object-contain rounded-lg border border-slate-300 bg-white p-1 shadow-2xs"
+                    />
+                  ) : (
+                    <div className="h-14 w-32 rounded-lg border border-dashed border-slate-300 bg-white flex items-center justify-center text-[10px] text-slate-400 font-mono">
+                      NO SIGNATURE
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Attributes Grid */}
-              <div className="grid sm:grid-cols-2 gap-3 text-xs font-mono">
-                <div className="p-3 rounded-lg border border-slate-200 bg-white">
-                  <span className="text-slate-400 block text-[10px]">RESIDENCE ADDRESS</span>
-                  <span className="text-slate-900 font-medium">
-                    {entity?.residence_address_line_1 || entity?.address || "N/A"}
-                  </span>
+              {/* Synthesized NIMC Card Image (if returned) */}
+              {cardImageDataUrl && (
+                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 uppercase font-mono">
+                      Generated NIMC Card Image (card_image)
+                    </span>
+                    <a
+                      href={cardImageDataUrl}
+                      download={`NIMC_Card_${entity?.nin || "premium"}.png`}
+                      className="text-xs font-mono font-semibold text-sky-700 hover:underline"
+                    >
+                      Download PNG
+                    </a>
+                  </div>
+                  <div className="flex justify-center">
+                    <img
+                      src={cardImageDataUrl}
+                      alt="Generated NIMC Card Image"
+                      className="max-w-[440px] w-full rounded-xl shadow-sm border border-slate-200 bg-white"
+                    />
+                  </div>
                 </div>
-                <div className="p-3 rounded-lg border border-slate-200 bg-white">
-                  <span className="text-slate-400 block text-[10px]">RESIDENCE LGA & STATE</span>
-                  <span className="text-slate-900 font-medium">
-                    {entity?.residence_lga || entity?.lga || "N/A"}, {entity?.residence_state || entity?.state || "N/A"}
-                  </span>
-                </div>
-                <div className="p-3 rounded-lg border border-slate-200 bg-white">
-                  <span className="text-slate-400 block text-[10px]">EMPLOYMENT & MARITAL STATUS</span>
-                  <span className="text-slate-900 font-medium">
-                    {entity?.employment_status || "N/A"} • {entity?.marital_status || "N/A"}
-                  </span>
-                </div>
-                <div className="p-3 rounded-lg border border-slate-200 bg-white">
-                  <span className="text-slate-400 block text-[10px]">BIRTH STATE & HEIGHT</span>
-                  <span className="text-slate-900 font-medium">
-                    {entity?.birth_state || "N/A"} • {entity?.height ? `${entity.height} cm` : "N/A"}
-                  </span>
-                </div>
+              )}
+
+              {/* All Returned Fields Grid */}
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs font-mono">
+                {entity &&
+                  Object.entries(entity)
+                    .filter(([k]) => !["photo", "signature", "card_image", "image", "nin_id", "pdfBase64", "cardPdfBase64", "docxBase64", "slipSvg", "cardSvg"].includes(k))
+                    .map(([key, val]) => (
+                      <div key={key} className="p-2.5 rounded-lg border border-slate-200 bg-white">
+                        <span className="text-slate-400 block text-[10px] uppercase truncate">{key}</span>
+                        <span className="text-slate-900 font-medium break-words">
+                          {val === null || val === undefined || val === ""
+                            ? "—"
+                            : typeof val === "object"
+                            ? JSON.stringify(val)
+                            : String(val)}
+                        </span>
+                      </div>
+                    ))}
               </div>
             </div>
           ) : (
