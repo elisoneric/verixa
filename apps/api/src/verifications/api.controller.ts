@@ -507,6 +507,9 @@ export class ApiController {
       }
     }
 
+    const includeAdminDebug = req.headers?.['x-admin-debug'] === 'true' && req.user?.role === 'SUPER_ADMIN';
+    const upstreamDebug = includeAdminDebug ? result?.meta?.upstreamDebug : undefined;
+
     if (req.query?.verbose === 'true' || req.headers?.['x-verixa-verbose'] === 'true') {
       return {
         status: 'success',
@@ -520,11 +523,13 @@ export class ApiController {
           latency_ms: latencyMs,
           environment: env,
         },
+        ...(upstreamDebug ? { _upstream: upstreamDebug } : {}),
       };
     }
 
     return {
       entity: cleanEntity,
+      ...(upstreamDebug ? { _upstream: upstreamDebug } : {}),
     };
   }
 

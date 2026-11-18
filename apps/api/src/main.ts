@@ -75,6 +75,8 @@ async function bootstrap() {
       'idempotency-key',
       'X-Bypass-Cache',
       'x-bypass-cache',
+      'X-Admin-Debug',
+      'x-admin-debug',
       'x-verixa-environment',
       'x-environment',
       'X-Environment',

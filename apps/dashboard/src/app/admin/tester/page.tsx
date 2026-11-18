@@ -122,7 +122,7 @@ export default function AdminTesterPage() {
   const [response, setResponse] = React.useState<any | null>(null)
   const [latencyMs, setLatencyMs] = React.useState<number | null>(null)
   const [httpStatus, setHttpStatus] = React.useState<number | null>(null)
-  const [activeTab, setActiveTab] = React.useState<"json" | "slip" | "card" | "attributes">("slip")
+  const [activeTab, setActiveTab] = React.useState<"upstream" | "json" | "slip" | "card" | "attributes">("upstream")
   const [slipViewMode, setSlipViewMode] = React.useState<"visual" | "pdf">("visual")
 
   const currentEndpoint = React.useMemo(() => {
@@ -154,20 +154,18 @@ export default function AdminTesterPage() {
       }
 
       // Execute endpoint via direct REST call with selected environment (live or sandbox)
-      const extraHeaders: Record<string, string> = bypassCache ? { "x-bypass-cache": "true" } : {}
+      const extraHeaders: Record<string, string> = {
+        "x-admin-debug": "true",
+        ...(bypassCache ? { "x-bypass-cache": "true" } : {}),
+      }
       const res = await ApiClient.executeDirectApi(currentEndpoint.path, currentEndpoint.method, parsed, mode, extraHeaders)
       const duration = Math.max(15, Math.round(performance.now() - startTime))
       setLatencyMs(duration)
       setHttpStatus(200)
       setResponse(res)
 
-      // If response has card, premium details, or slip, default to appropriate view
-      if (selectedId === "nin-premium-details") {
-        setActiveTab("attributes")
-      } else if (selectedId === "nin-card-generator" || (parsed as any)?.cardType === "card" || res?.data?.cardSvg || res?.entity?.cardSvg || res?.entity?.card_image || (selectedId === "nin-premium" && res?.entity?.image)) {
-        setActiveTab("card")
-      } else if (res?.entity?.nin_id || res?.data?.nin_id || res?.data?.pdfBase64) {
-        setActiveTab("slip")
+      if (res?._upstream) {
+        setActiveTab("upstream")
       } else {
         setActiveTab("json")
       }
@@ -463,22 +461,22 @@ export default function AdminTesterPage() {
             </div>
 
             {/* View Tabs */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-mono">
+            <div className="flex flex-wrap items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-mono">
               <button
-                onClick={() => setActiveTab("card")}
+                onClick={() => setActiveTab("upstream")}
                 className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
-                  activeTab === "card" ? "bg-white font-bold text-slate-900 shadow-2xs" : "text-slate-600 hover:text-slate-900"
+                  activeTab === "upstream" ? "bg-white font-bold text-slate-900 shadow-2xs" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                Digital Card
+                cURL & Direct
               </button>
               <button
-                onClick={() => setActiveTab("slip")}
+                onClick={() => setActiveTab("json")}
                 className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
-                  activeTab === "slip" ? "bg-white font-bold text-slate-900 shadow-2xs" : "text-slate-600 hover:text-slate-900"
+                  activeTab === "json" ? "bg-white font-bold text-slate-900 shadow-2xs" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                Paper Slip
+                Verixa JSON
               </button>
               <button
                 onClick={() => setActiveTab("attributes")}
@@ -489,12 +487,20 @@ export default function AdminTesterPage() {
                 Attributes
               </button>
               <button
-                onClick={() => setActiveTab("json")}
+                onClick={() => setActiveTab("card")}
                 className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
-                  activeTab === "json" ? "bg-white font-bold text-slate-900 shadow-2xs" : "text-slate-600 hover:text-slate-900"
+                  activeTab === "card" ? "bg-white font-bold text-slate-900 shadow-2xs" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                Raw JSON
+                Card
+              </button>
+              <button
+                onClick={() => setActiveTab("slip")}
+                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                  activeTab === "slip" ? "bg-white font-bold text-slate-900 shadow-2xs" : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                Slip
               </button>
             </div>
           </div>
@@ -507,7 +513,63 @@ export default function AdminTesterPage() {
             </div>
           ) : !response ? (
             <div className="py-24 text-center text-xs text-slate-400 font-mono">
-              Click &quot;Send Upstream Test&quot; to inspect real returned data and slip records.
+              Run a test to inspect the cURL sent, raw upstream response, and Verixa output.
+            </div>
+          ) : activeTab === "upstream" ? (
+            <div className="space-y-4">
+              {response?._upstream ? (
+                <>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs font-mono text-slate-600">
+                      <span className="font-bold uppercase text-slate-800">1. cURL Sent to Upstream</span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(response._upstream.curl)
+                          alert("cURL copied!")
+                        }}
+                        className="text-slate-700 hover:text-slate-900 font-semibold cursor-pointer"
+                      >
+                        Copy cURL
+                      </button>
+                    </div>
+                    <pre className="p-3.5 rounded-xl bg-slate-900 font-mono text-xs text-sky-300 overflow-x-auto leading-relaxed border border-slate-800 shadow-xs">
+                      {response._upstream.curl}
+                    </pre>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs font-mono text-slate-600">
+                      <span className="font-bold uppercase text-slate-800">2. Direct Upstream Response (Raw)</span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(JSON.stringify(response._upstream.rawResponse, null, 2))
+                          alert("Full direct response copied!")
+                        }}
+                        className="text-slate-700 hover:text-slate-900 font-semibold cursor-pointer"
+                      >
+                        Copy Direct JSON
+                      </button>
+                    </div>
+                    <pre className="p-4 rounded-xl bg-slate-900 font-mono text-xs text-emerald-400 overflow-x-auto leading-relaxed border border-slate-800 max-h-[420px] shadow-xs">
+                      {JSON.stringify(
+                        response._upstream.rawResponse,
+                        (_key, val) =>
+                          typeof val === "string" && val.length > 220
+                            ? `${val.slice(0, 64)}... [truncated ${(val.length / 1024).toFixed(1)} KB — click Copy Direct JSON]`
+                            : val,
+                        2
+                      )}
+                    </pre>
+                  </div>
+                </>
+              ) : (
+                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono text-slate-600 space-y-2">
+                  <div className="font-bold text-slate-800">No Live Upstream Call Captured</div>
+                  <p>
+                    Switch to <strong>Live</strong> mode and enable <strong>Fresh (Bypass Cache)</strong> to inspect the exact cURL and raw upstream response before Verixa processing.
+                  </p>
+                </div>
+              )}
             </div>
           ) : activeTab === "card" ? (
             /* Tab: Digital NIN Card Preview (ID-1 Format without address) */

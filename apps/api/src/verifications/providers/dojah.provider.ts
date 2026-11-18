@@ -68,6 +68,50 @@ export class DojahProvider implements IVerificationProvider {
     return Boolean(secretKey && secretKey.length > 5 && !secretKey.startsWith('sk_test_mock'));
   }
 
+  private maskCredential(val: string | null | undefined): string {
+    if (!val) return '';
+    if (val.length <= 10) return '****';
+    return `${val.slice(0, 6)}...${val.slice(-4)}`;
+  }
+
+  private buildUpstreamDebug(
+    method: string,
+    url: string,
+    params: Record<string, any> | undefined,
+    appId: string | null,
+    secretKey: string | null,
+    rawResponse: any,
+  ) {
+    const qs = params
+      ? new URLSearchParams(
+          Object.entries(params)
+            .filter(([, v]) => v !== undefined && v !== null && v !== '')
+            .map(([k, v]) => [k, String(v)]),
+        ).toString()
+      : '';
+    const fullUrl = qs ? `${url}?${qs}` : url;
+    const maskedSecret = this.maskCredential(secretKey);
+    const maskedAppId = this.maskCredential(appId);
+    const curl = [
+      `curl --request ${method.toUpperCase()} \\`,
+      `  "${fullUrl}" \\`,
+      `  -H "Authorization: ${maskedSecret}" \\`,
+      ...(maskedAppId ? [`  -H "AppId: ${maskedAppId}"`] : []),
+    ].join('\n');
+
+    let clonedRaw: any = rawResponse;
+    try {
+      clonedRaw = JSON.parse(JSON.stringify(rawResponse));
+    } catch {}
+
+    return {
+      method: method.toUpperCase(),
+      url: fullUrl,
+      curl,
+      rawResponse: clonedRaw,
+    };
+  }
+
   private getHeaders(secretKey: string, appId: string | null) {
     return {
       Authorization: secretKey, // Note: Dojah requires raw key, not Bearer
@@ -128,6 +172,7 @@ export class DojahProvider implements IVerificationProvider {
         }
       }
 
+      const rawDirectResponse = JSON.parse(JSON.stringify(response.data || {}));
       const entity = response.data?.entity || response.data?.data || {};
       return {
         status: 'success',
@@ -135,7 +180,8 @@ export class DojahProvider implements IVerificationProvider {
         meta: {
           provider: 'direct',
           reference: `vx_${uuidv4().slice(0, 12)}`,
-        },
+          upstreamDebug: this.buildUpstreamDebug('GET', endpoint, params, appId, secretKey, rawDirectResponse),
+        } as any,
       };
     } catch (err: any) {
       this.logger.error(`Dojah BVN lookup error: ${err?.message}`, err?.response?.data);
@@ -174,6 +220,7 @@ export class DojahProvider implements IVerificationProvider {
         timeout: 15000,
       });
 
+      const rawDirectResponse = JSON.parse(JSON.stringify(response.data || {}));
       const entity = response.data?.entity || {};
 
       // If Dojah live NDPC call returns all fields but nin_id is not yet populated, synthesize it from slip template
@@ -276,7 +323,8 @@ export class DojahProvider implements IVerificationProvider {
         meta: {
           provider: 'direct',
           reference: `vx_${uuidv4().slice(0, 12)}`,
-        },
+          upstreamDebug: this.buildUpstreamDebug('GET', endpoint, { nin: data.nin }, appId, secretKey, rawDirectResponse),
+        } as any,
       };
     } catch (err: any) {
       this.logger.error(`Dojah NIN lookup error: ${err?.message}`, err?.response?.data);
@@ -303,6 +351,7 @@ export class DojahProvider implements IVerificationProvider {
         timeout: 18000,
       });
 
+      const rawDirectResponse = JSON.parse(JSON.stringify(response.data || {}));
       const entity = response.data?.entity || {};
       const trackingId = entity.tracking_id || entity.trackingId || '';
 
@@ -342,7 +391,8 @@ export class DojahProvider implements IVerificationProvider {
         meta: {
           provider: 'direct',
           reference: `vx_${uuidv4().slice(0, 12)}`,
-        },
+          upstreamDebug: this.buildUpstreamDebug('GET', `${baseUrl}/api/v1/kyc/nin/advance`, { nin: data.nin }, appId, secretKey, rawDirectResponse),
+        } as any,
       };
     } catch (err: any) {
       this.logger.error(`Dojah NIN Advance lookup error: ${err?.message}`, err?.response?.data);
@@ -363,12 +413,14 @@ export class DojahProvider implements IVerificationProvider {
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/api/v1/kyc/nin/premium`, {
+      const endpoint = `${baseUrl}/api/v1/kyc/nin/premium`;
+      const response = await axios.get(endpoint, {
         params: { nin: data.nin },
         headers: this.getHeaders(secretKey!, appId),
         timeout: 18000,
       });
 
+      const rawDirectResponse = JSON.parse(JSON.stringify(response.data || {}));
       const entity = response.data?.entity || {};
 
       // Synthesize Custom NIMC Card Premium image directly from the returned Dojah entity (no extra Dojah call)
@@ -396,7 +448,8 @@ export class DojahProvider implements IVerificationProvider {
         meta: {
           provider: 'direct',
           reference: `vx_${uuidv4().slice(0, 12)}`,
-        },
+          upstreamDebug: this.buildUpstreamDebug('GET', endpoint, { nin: data.nin }, appId, secretKey, rawDirectResponse),
+        } as any,
       };
     } catch (err: any) {
       this.logger.error(`Dojah NIN Premium Details lookup error: ${err?.message}`, err?.response?.data);
