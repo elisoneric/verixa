@@ -91,6 +91,11 @@ export default function ErrorsDocsPage() {
             <TableCell className="text-slate-700">NGX credit balance is too low to perform lookup.</TableCell>
           </TableRow>
           <TableRow>
+            <TableCell className="font-mono text-amber-700 font-bold">404 Not Found</TableCell>
+            <TableCell className="font-mono text-amber-700">record_not_found</TableCell>
+            <TableCell className="text-slate-700">No matching record found in the upstream registry for the supplied NIN, BVN, or identifier. Repeat queries for the same missing ID are served from Negative Cache at ₦0.</TableCell>
+          </TableRow>
+          <TableRow>
             <TableCell className="font-mono text-rose-700 font-bold">429 Too Many Requests</TableCell>
             <TableCell className="font-mono text-rose-700">rate_limit_exceeded</TableCell>
             <TableCell className="text-slate-700">Exceeded rate limit for the organization.</TableCell>
